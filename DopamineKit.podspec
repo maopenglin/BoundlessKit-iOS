@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "DopamineKit"
-  s.version          = "master"
+  s.version          = "0.1.0"
   s.summary          = "A framework to use DopamineLabs machine learning API"
 
 # This description is used to generate tags and improve search results.
