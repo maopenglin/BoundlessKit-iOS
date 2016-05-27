@@ -93,129 +93,116 @@ typedef int swift_int4  __attribute__((__ext_vector_type__(4)));
 #endif
 #if defined(__has_feature) && __has_feature(modules)
 @import UIKit;
-@import Foundation;
-@import CoreGraphics;
 @import ObjectiveC;
+@import CoreGraphics;
 #endif
 
 #pragma clang diagnostic ignored "-Wproperty-attribute-mismatch"
 #pragma clang diagnostic ignored "-Wduplicate-method-arg"
-@class UIColor;
-@class UILabel;
-@class UIImageView;
 @class UIImage;
+@class UIImageView;
+@class UILabel;
+@class UIButton;
 @class NSCoder;
 
+SWIFT_CLASS("_TtC11DopamineKit25DesignerReinforcementView")
+@interface DesignerReinforcementView : UIView
+@property (nonatomic, strong) UIImage * _Nullable image;
+@property (nonatomic, strong) UIImageView * _Nonnull imageView;
+@property (nonatomic, strong) UILabel * _Nonnull primaryLabel;
+@property (nonatomic, copy) NSString * _Nonnull primaryText;
+@property (nonatomic, strong) UILabel * _Nonnull secondaryLabel;
+@property (nonatomic, copy) NSString * _Nonnull secondaryText;
+@property (nonatomic, strong) UIButton * _Nonnull closeButton;
+@property (nonatomic, copy) NSString * _Nonnull buttonText;
+- (void)dismiss;
 
-/// Banner is a dropdown notification view that presents above the main view controller, but below the status bar.
-SWIFT_CLASS("_TtC11DopamineKit6Banner")
-@interface Banner : UIView
-
-/// How long the slide down animation should last.
-@property (nonatomic) NSTimeInterval animationDuration;
-
-/// The preferred style of the status bar during display of the banner. Defaults to .LightContent.
-///
-/// If the banner's <code>adjustsStatusBarStyle
-/// </code> is false, this property does nothing.
-@property (nonatomic) UIStatusBarStyle preferredStatusBarStyle;
-
-/// Whether or not this banner should adjust the status bar style during its presentation. Defaults to false.
-@property (nonatomic) BOOL adjustsStatusBarStyle;
-
-/// The color of the text as well as the image tint color if shouldTintImage is true.
-@property (nonatomic, strong) UIColor * _Nonnull textColor;
-
-/// Whether or not the banner should show a shadow when presented.
-@property (nonatomic) BOOL hasShadows;
-
-/// The color of the background view. Defaults to nil.
-@property (nonatomic, strong) UIColor * _Nullable backgroundColor;
-
-/// The opacity of the background view. Defaults to 0.95.
-@property (nonatomic) CGFloat alpha;
-
-/// A block to call when the uer taps on the banner.
+/// A block to call when the user taps on the reinforcement.
 @property (nonatomic, copy) void (^ _Nullable didTapBlock)(void);
 
-/// A block to call after the banner has finished dismissing and is off screen.
+/// A block to call after the reinforcement has finished dismissing and is off screen.
 @property (nonatomic, copy) void (^ _Nullable didDismissBlock)(void);
 
-/// Whether or not the banner should dismiss itself when the user taps. Defaults to true.
+/// Whether or not the reinforcement should dismiss itself when the user taps. Defaults to false.
 @property (nonatomic) BOOL dismissesOnTap;
 
-/// Whether or not the banner should dismiss itself when the user swipes up. Defaults to true.
+/// Whether or not the reinforcement should dismiss itself when the user swipes up. Defaults to true.
 @property (nonatomic) BOOL dismissesOnSwipe;
-
-/// Whether or not the banner should tint the associated image to the provided textColor. Defaults to true.
-@property (nonatomic) BOOL shouldTintImage;
-
-/// The label that displays the banner's title.
-@property (nonatomic, readonly, strong) UILabel * _Nonnull titleLabel;
-
-/// The label that displays the banner's subtitle.
-@property (nonatomic, readonly, strong) UILabel * _Nonnull detailLabel;
-
-/// The image view that displays the image.
-@property (nonatomic, readonly, strong) UIImageView * _Nonnull imageView;
-
-/// A Banner with the provided title, subtitle, and optional image, ready to be presented with show().
-///
-/// \param title The title of the banner. Optional. Defaults to nil.
-///
-/// \param subtitle The subtitle of the banner. Optional. Defaults to nil.
-///
-/// \param image The image on the left of the banner. Optional. Defaults to nil.
-///
-/// \param backgroundColor The color of the banner's background view. Defaults to <code>UIColor.blackColor()
-/// </code>.
-///
-/// \param didTapBlock An action to be called when the user taps on the banner. Optional. Defaults to <code>nil
-/// </code>.
-- (nonnull instancetype)initWithTitle:(NSString * _Nullable)title subtitle:(NSString * _Nullable)subtitle image:(UIImage * _Nullable)image backgroundColor:(UIColor * _Nonnull)backgroundColor didTapBlock:(void (^ _Nullable)(void))didTapBlock OBJC_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder OBJC_DESIGNATED_INITIALIZER;
-- (void)didMoveToSuperview;
-- (void)layoutSubviews;
 @end
 
-@class DopeReinforcementViewController;
 
 SWIFT_CLASS("_TtC11DopamineKit11DopamineKit")
 @interface DopamineKit : NSObject
+
+/// This function sends an asynchronous tracking call for the specified actionID
+///
+/// \param actionID the name of the action
+///
+/// \param metaData Default <code>nil
+/// </code> - metadata as a set of key-value pairs that can be sent with a tracking call. The value should be JSON formattable.
+///
+/// \param secondaryIdentity Default <code>nil
+/// </code> - an additional idetification string
+///
+/// \param callback Optional - A callback function with the track HTTP response code passed in as a String
 + (void)track:(NSString * _Nonnull)actionID metaData:(NSDictionary<NSString *, id> * _Nullable)metaData secondaryIdentity:(NSString * _Nullable)secondaryIdentity callback:(void (^ _Nonnull)(NSString * _Nullable))callback;
+
+/// This function sends an asynchronous reinforcement call for the specified actionID
+///
+/// \param actionID the name of the action
+///
+/// \param metaData Default <code>nil
+/// </code> - metadata as a set of key-value pairs that can be sent with a tracking call. The value should be JSON formattable.
+///
+/// \param secondaryIdentity Default <code>nil
+/// </code> - an additional idetification string
+///
+/// \param callback A callback function with the reinforcement response passed in as a String
 + (void)reinforce:(NSString * _Nonnull)actionID metaData:(NSDictionary<NSString *, id> * _Nullable)metaData secondaryIdentity:(NSString * _Nullable)secondaryIdentity timeoutSeconds:(float)timeoutSeconds callback:(void (^ _Nonnull)(NSString * _Nullable))callback;
-+ (DopeReinforcementViewController * _Nonnull)createReinforcement:(NSString * _Nonnull)reinforcementTemplate reinforcementTitle:(NSString * _Nonnull)reinforcementTitle reinforcementMessage:(NSString * _Nonnull)reinforcementMessage dismissMessage:(NSString * _Nonnull)dismissMessage;
 @end
 
-@protocol DopeReinforcementViewControllerDelegate;
-@class NSBundle;
+@class NSAttributedString;
 
-SWIFT_CLASS("_TtC11DopamineKit31DopeReinforcementViewController")
-@interface DopeReinforcementViewController : UIViewController
-@property (nonatomic, weak) id <DopeReinforcementViewControllerDelegate> _Nullable delegate;
-@property (nonatomic, copy) NSString * _Nonnull imageName;
-@property (nonatomic, copy) NSString * _Nonnull titleText;
-@property (nonatomic, copy) NSString * _Nonnull bodyText;
-@property (nonatomic, copy) NSString * _Nonnull buttonText;
-- (void)viewDidLoad;
-- (void)viewDidAppear:(BOOL)animated;
-- (void)viewDidDisappear:(BOOL)animated;
-- (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil OBJC_DESIGNATED_INITIALIZER;
+SWIFT_CLASS("_TtC11DopamineKit8MemeView")
+@interface MemeView : UIView
+@property (nonatomic, strong) UIImage * _Nullable image;
+@property (nonatomic, readonly, strong) UIImageView * _Nonnull imageView;
+@property (nonatomic) CGSize size;
+@property (nonatomic, readonly, strong) UILabel * _Nonnull topLabel;
+@property (nonatomic, strong) NSAttributedString * _Nonnull topString;
+@property (nonatomic, readonly, strong) UILabel * _Nonnull bottomLabel;
+@property (nonatomic, strong) NSAttributedString * _Nonnull bottomString;
+- (NSDictionary<NSString *, NSObject *> * _Nonnull)defaultStringAttributes;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
-SWIFT_PROTOCOL("_TtP11DopamineKit39DopeReinforcementViewControllerDelegate_")
-@protocol DopeReinforcementViewControllerDelegate
-- (void)didDismissReinforcement:(DopeReinforcementViewController * _Nonnull)sender;
-@end
+SWIFT_CLASS("_TtC11DopamineKit27ReinforcementModalPresenter")
+@interface ReinforcementModalPresenter : UIViewController
 
+/// Initializes a ReinforcementModalPresenter
+///
+/// \param view Default <code>nil
+/// </code> - the view for this UIViewController
+- (nonnull instancetype)initWithView:(UIView * _Nullable)view OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder OBJC_DESIGNATED_INITIALIZER;
+- (void)viewDidAppear:(BOOL)animated;
 
-@interface NSLayoutConstraint (SWIFT_EXTENSION(DopamineKit))
-@end
+/// Calls this dismissViewControllerAnimated on the presented view controller itself; UIKit asks the presenting view controller to handle the dismissal itself.
+- (void)dismissSelf;
+- (void)viewDidDisappear:(BOOL)animated;
 
-
-@interface UIView (SWIFT_EXTENSION(DopamineKit))
+/// You can use this function to present the view controller. It is a shortcut for the presentViewController function
+///
+/// \param owningViewController the view controller that will present this view
+///
+/// \param animated Default <code>false
+/// </code> - Pass <code>true
+/// </code> to animate the presentation; otherwise, pass false.
+///
+/// \param completion Pass a function that will be executed once the view is presented and done animating
+- (void)show:(UIViewController * _Null_unspecified)owningViewController animated:(BOOL)animated completion:(void (^ _Nullable)(void))completion;
 @end
 
 #pragma clang diagnostic pop
