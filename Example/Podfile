@@ -1,11 +1,6 @@
 use_frameworks!
-
-target 'DopamineKit_Example' do
+target 'DopamineKit_Tests' do
   pod 'DopamineKit', :path => '../'
-
-  target 'DopamineKit_Tests' do
-    inherit! :search_paths
-
-    
-  end
+  
+  
 end
