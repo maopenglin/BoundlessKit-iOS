@@ -1,6 +1,6 @@
 use_frameworks!
 target 'DopamineKit_Tests' do
-  pod 'DopamineKit', :path => '../'
+  pod 'DopamineKit'
   
   
 end
