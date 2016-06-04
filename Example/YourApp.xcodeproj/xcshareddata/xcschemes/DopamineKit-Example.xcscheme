@@ -17,7 +17,7 @@
                BlueprintIdentifier = "607FACCF1AFB9204008FA782"
                BuildableName = "DopamineKit_Example.app"
                BlueprintName = "DopamineKit_Example"
-               ReferencedContainer = "container:DopamineKit.xcodeproj">
+               ReferencedContainer = "container:YourApp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -29,9 +29,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "607FACE41AFB9204008FA782"
-               BuildableName = "DopamineKit_Tests.xctest"
-               BlueprintName = "DopamineKit_Tests"
-               ReferencedContainer = "container:DopamineKit.xcodeproj">
+               BuildableName = "YourApp_Tests.xctest"
+               BlueprintName = "YourApp_Tests"
+               ReferencedContainer = "container:YourApp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,9 +47,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "607FACE41AFB9204008FA782"
-               BuildableName = "DopamineKit_Tests.xctest"
-               BlueprintName = "DopamineKit_Tests"
-               ReferencedContainer = "container:DopamineKit.xcodeproj">
+               BuildableName = "YourApp_Tests.xctest"
+               BlueprintName = "YourApp_Tests"
+               ReferencedContainer = "container:YourApp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -59,7 +59,7 @@
             BlueprintIdentifier = "607FACCF1AFB9204008FA782"
             BuildableName = "DopamineKit_Example.app"
             BlueprintName = "DopamineKit_Example"
-            ReferencedContainer = "container:DopamineKit.xcodeproj">
+            ReferencedContainer = "container:YourApp.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -82,7 +82,7 @@
             BlueprintIdentifier = "607FACCF1AFB9204008FA782"
             BuildableName = "DopamineKit_Example.app"
             BlueprintName = "DopamineKit_Example"
-            ReferencedContainer = "container:DopamineKit.xcodeproj">
+            ReferencedContainer = "container:YourApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -101,7 +101,7 @@
             BlueprintIdentifier = "607FACCF1AFB9204008FA782"
             BuildableName = "DopamineKit_Example.app"
             BlueprintName = "DopamineKit_Example"
-            ReferencedContainer = "container:DopamineKit.xcodeproj">
+            ReferencedContainer = "container:YourApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
