@@ -9,5 +9,5 @@ before_install:
 - gem install cocoapods # Since Travis is not always on latest version
 - pod install --project-directory=DopamineKit
 script:
-- set -o pipefail && xcodebuild test -workspace YourApp/DopamineKit.xcworkspace -scheme YourApp-Example -sdk iphonesimulator -arch i386 ONLY_ACTIVE_ARCH=NO | xcpretty
+- set -o pipefail && xcodebuild test -workspace YourApp/Workspace.xcworkspace -scheme YourApp-Example -sdk iphonesimulator -arch i386 ONLY_ACTIVE_ARCH=NO | xcpretty
 - pod lib lint
