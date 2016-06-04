@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		63878D9EAEEA28DD91DE19477B569E30 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC22C73C1608DFA5D5D78BDCB218219 /* Foundation.framework */; };
 		77DDEF96C19D3648450FDF1030575B7F /* Pods-DopamineKit_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 585A4F9238929DAA24D4B27CD24D9C26 /* Pods-DopamineKit_Tests-dummy.m */; };
-		845305FF1D01D9BE006E83BD /* DopamineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A174ED7C713B6EB17ACA4623609D3D0 /* DopamineKit.framework */; };
 		B46070C79DA80EFBB26F01C3644213AE /* Pods-DopamineKit_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = E3B124E196ECD7444B00D5B63E465449 /* Pods-DopamineKit_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -36,7 +35,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				63878D9EAEEA28DD91DE19477B569E30 /* Foundation.framework in Frameworks */,
-				845305FF1D01D9BE006E83BD /* DopamineKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,10 +245,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/DopamineKit/DopamineKit/Frameworks",
-				);
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "Target Support Files/Pods-DopamineKit_Tests/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -284,10 +278,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/DopamineKit/DopamineKit/Frameworks",
-				);
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "Target Support Files/Pods-DopamineKit_Tests/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
