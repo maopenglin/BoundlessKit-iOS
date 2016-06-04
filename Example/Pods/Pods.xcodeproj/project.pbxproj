@@ -12,11 +12,22 @@
 		B46070C79DA80EFBB26F01C3644213AE /* Pods-DopamineKit_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = E3B124E196ECD7444B00D5B63E465449 /* Pods-DopamineKit_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		84CEC6981D02BE3D00FA5137 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84CEC6941D02BE3D00FA5137 /* YourApp.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 607FACE51AFB9204008FA782;
+			remoteInfo = YourApp_Tests;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		1519C94111E00749B2C035A43EA20369 /* Pods-DopamineKit_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-DopamineKit_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
 		3A174ED7C713B6EB17ACA4623609D3D0 /* DopamineKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DopamineKit.framework; path = DopamineKit/Frameworks/DopamineKit.framework; sourceTree = "<group>"; };
 		585A4F9238929DAA24D4B27CD24D9C26 /* Pods-DopamineKit_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-DopamineKit_Tests-dummy.m"; sourceTree = "<group>"; };
 		626F4BB333904A4CEEF64754AC8A1845 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		84CEC6941D02BE3D00FA5137 /* YourApp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = YourApp.xcodeproj; path = ../YourApp.xcodeproj; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		946101F0DE1C14B02D890734A8C46A52 /* Pods-DopamineKit_Tests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Tests-frameworks.sh"; sourceTree = "<group>"; };
 		991C77CBD6CE63BD7F9699C6675AA300 /* Pods-DopamineKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DopamineKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -94,6 +105,14 @@
 			);
 			sourceTree = "<group>";
 		};
+		84CEC6951D02BE3D00FA5137 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				84CEC6991D02BE3D00FA5137 /* YourApp_Tests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -113,6 +132,7 @@
 		D023E28D28D880E207304D5ABCE94BDD /* Targets Support Files */ = {
 			isa = PBXGroup;
 			children = (
+				84CEC6941D02BE3D00FA5137 /* YourApp.xcodeproj */,
 				29EA27C89E9216175EB915D50CCB1AEC /* Pods-DopamineKit_Tests */,
 			);
 			name = "Targets Support Files";
@@ -176,12 +196,28 @@
 			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
 			productRefGroup = 143E4ACB5831B210AA092F002F0986B7 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 84CEC6951D02BE3D00FA5137 /* Products */;
+					ProjectRef = 84CEC6941D02BE3D00FA5137 /* YourApp.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				DC1E24D560F9BCD4E9DDAE83C2EE6AC8 /* Pods-DopamineKit_Tests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		84CEC6991D02BE3D00FA5137 /* YourApp_Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = YourApp_Tests.xctest;
+			remoteRef = 84CEC6981D02BE3D00FA5137 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
 		CF3A5A083BF5BDF6BECEBD42C6AC9E0F /* Sources */ = {
