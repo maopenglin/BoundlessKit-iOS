@@ -6,10 +6,12 @@ language: objective-c
 cache: cocoapods
 podfile: Example/Podfile
 before_install:
-- echo | gem --version
+- sudo apt-get update
+- sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 - gem install activesupport        # yeah, it works if you install it beforehand
 - apt-get install -y zlib1g-dev ruby-execjs
 - gem install github-pages
+
 
 - gem install cocoapods # Since Travis is not always on latest version
 - pod install --project-directory=DopamineKit
