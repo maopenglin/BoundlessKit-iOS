@@ -6,7 +6,7 @@
 	<dict>
 		<key>Assets.car</key>
 		<data>
-		9kp2azTPQgNX/+/jM2JijyxlaxI=
+		DA4eluMxCnOBvWVxV+naI2yAbqQ=
 		</data>
 		<key>Headers/CandyBar.swift</key>
 		<data>
@@ -30,7 +30,7 @@
 		</data>
 		<key>Modules/DopamineKit.swiftmodule/arm.swiftmodule</key>
 		<data>
-		SswO480whCB0Mwv1tu9USmhb2Sg=
+		IAZrOiRjaAol44bf/UMXP/00uAA=
 		</data>
 		<key>Modules/DopamineKit.swiftmodule/arm64.swiftdoc</key>
 		<data>
@@ -38,7 +38,7 @@
 		</data>
 		<key>Modules/DopamineKit.swiftmodule/arm64.swiftmodule</key>
 		<data>
-		LokzZ6N95XEuUxIkwI44ZyqpNmA=
+		wdlZeRLWv5fs6XoPG7lcIAV/z/E=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -51,11 +51,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			9kp2azTPQgNX/+/jM2JijyxlaxI=
+			DA4eluMxCnOBvWVxV+naI2yAbqQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			ZY7xx45FmUz/2efdjB7s7baD2qBfO/y+B1QZ5OeltBQ=
+			hIsXsq8fQdg18TIqQZMie+J2aCDKMHxbr5wHNCf6QjQ=
 			</data>
 		</dict>
 		<key>Headers/CandyBar.swift</key>
@@ -106,11 +106,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			SswO480whCB0Mwv1tu9USmhb2Sg=
+			IAZrOiRjaAol44bf/UMXP/00uAA=
 			</data>
 			<key>hash2</key>
 			<data>
-			CAYdy4oA6Yg+eSRRukqUdQoGAgIIWE5X0zVoDd2Kwos=
+			1lP/2yIA///OZyKpfUMxuJu8wqIJGam9h3cz01HG/j4=
 			</data>
 		</dict>
 		<key>Modules/DopamineKit.swiftmodule/arm64.swiftdoc</key>
@@ -128,11 +128,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			LokzZ6N95XEuUxIkwI44ZyqpNmA=
+			wdlZeRLWv5fs6XoPG7lcIAV/z/E=
 			</data>
 			<key>hash2</key>
 			<data>
-			7bXH0p+ZAyfPleZuPSld1R3CdMvHIOzJQUVClV5wO1U=
+			9TL90cpAwafSguFGoIsC3SHZEUgUgC9fxXIbFBcsimA=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
