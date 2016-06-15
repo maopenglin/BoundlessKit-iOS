@@ -202,6 +202,7 @@ SWIFT_CLASS("_TtC11DopamineKit8CandyBar")
 
 SWIFT_CLASS("_TtC11DopamineKit11DopamineKit")
 @interface DopamineKit : NSObject
++ (DopamineKit * _Nonnull)instance;
 
 /// This function sends an asynchronous tracking call for the specified actionID
 ///
@@ -214,7 +215,7 @@ SWIFT_CLASS("_TtC11DopamineKit11DopamineKit")
 /// </code> - an additional idetification string
 ///
 /// \param callback Optional - A callback function with the track HTTP response code passed in as a String
-+ (void)track:(NSString * _Nonnull)actionID metaData:(NSDictionary<NSString *, id> * _Nullable)metaData secondaryIdentity:(NSString * _Nullable)secondaryIdentity callback:(void (^ _Nonnull)(NSString * _Nullable))callback;
++ (void)track:(NSString * _Nonnull)actionID metaData:(NSDictionary<NSString *, id> * _Nullable)metaData secondaryIdentity:(NSString * _Nullable)secondaryIdentity callback:(void (^ _Nonnull)(NSString * _Nonnull))callback;
 
 /// This function sends an asynchronous reinforcement call for the specified actionID
 ///
@@ -227,7 +228,7 @@ SWIFT_CLASS("_TtC11DopamineKit11DopamineKit")
 /// </code> - an additional idetification string
 ///
 /// \param callback A callback function with the reinforcement response passed in as a String
-+ (void)reinforce:(NSString * _Nonnull)actionID metaData:(NSDictionary<NSString *, id> * _Nullable)metaData secondaryIdentity:(NSString * _Nullable)secondaryIdentity timeoutSeconds:(float)timeoutSeconds callback:(void (^ _Nonnull)(NSString * _Nullable))callback;
++ (void)reinforce:(NSString * _Nonnull)actionID metaData:(NSDictionary<NSString *, id> * _Nullable)metaData secondaryIdentity:(NSString * _Nullable)secondaryIdentity timeoutSeconds:(float)timeoutSeconds callback:(void (^ _Nonnull)(NSString * _Nonnull))callback;
 
 /// This function takes a hex string and returns a UIColor
 ///
@@ -239,6 +240,7 @@ SWIFT_CLASS("_TtC11DopamineKit11DopamineKit")
 /// \returns  The corresponding UIColor for valid hex strings, <code>UIColor.grayColor()
 /// </code> otherwise
 + (UIColor * _Nonnull)hexStringToUIColor:(NSString * _Nonnull)hex;
+@property (nonatomic, copy) NSString * _Nonnull propertyListPath;
 @end
 
 @class NSAttributedString;

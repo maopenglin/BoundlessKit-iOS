@@ -7,7 +7,10 @@ class Tests: XCTestCase {
     /// Note: The NSBundle.mainBundle() must have DopamineProperites.plist in its path
     override func setUp() {
         super.setUp()
-        // read the note
+        
+        // Set the plist so DopamineKit can read the AppID, API keys, ...
+        let path = NSBundle(forClass: self.dynamicType).pathForResource("DopamineProperties", ofType: "plist")
+        DopamineKit.instance.propertyListPath = path as String!
     }
     
     override func tearDown() {
