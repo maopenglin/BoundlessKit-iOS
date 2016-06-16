@@ -7,12 +7,9 @@ cache: cocoapods
 podfile: Example/Podfile
 sudo: required
 before_install:
-#- sudo apt-get -qq update -y
 - gem install activesupport        # yeah, it works if you install it beforehand
-#- apt-get install -y zlib1g-dev ruby-execjs
-#- gem install github-pages
 - gem install cocoapods # Since Travis is not always on latest version
-- pod install --project-directory=DopamineKit
+- pod install --project-directory=Example
 
 script:
 - set -o pipefail && xcodebuild test -workspace Example/Workspace.xcworkspace -scheme YourApp-Example -sdk iphonesimulator -arch i386 ONLY_ACTIVE_ARCH=NO | xcpretty

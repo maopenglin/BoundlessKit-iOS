@@ -1,5 +1,5 @@
 use_frameworks!
-target 'DopamineKit_Tests' do
+target 'YourApp_Tests' do
   pod 'DopamineKit'
   
   
