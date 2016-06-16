@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "DopamineKit"
-  s.version          = "2.9.9"
+  s.version          = "3.0.0"
   s.summary          = "A framework to use DopamineLabs machine learning API"
 
   s.description      = <<-DESC
