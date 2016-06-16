@@ -15,6 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		50B3187E0EDFFF9FEB42C72E /* Pods-DopamineKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DopamineKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DopamineKit_Tests/Pods-DopamineKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		51F9296F4E91D4254D22BA74 /* DopamineKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = DopamineKit.podspec; path = ../DopamineKit.podspec; sourceTree = "<group>"; };
 		607FACE51AFB9204008FA782 /* YourApp_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YourApp_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -25,6 +26,7 @@
 		B34DED3CC4B0331D68D9D18D /* Pods-YourApp_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YourApp_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-YourApp_Tests/Pods-YourApp_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		B99D19EC50EE319F225A673B /* Pods-YourApp_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YourApp_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-YourApp_Tests/Pods-YourApp_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		CC92D3478270B86C91223723 /* Pods_DopamineKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB6E4D311936CE5B900A7864 /* Pods-DopamineKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DopamineKit_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-DopamineKit_Tests/Pods-DopamineKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		DCB0D489AB341C0FFCE4C533 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		DF416C7024B7236C821BDA12 /* Pods_YourApp_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_YourApp_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -46,6 +48,8 @@
 		3F15007069ED27CF8CDE07C4 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
+				50B3187E0EDFFF9FEB42C72E /* Pods-DopamineKit_Tests.debug.xcconfig */,
+				DB6E4D311936CE5B900A7864 /* Pods-DopamineKit_Tests.release.xcconfig */,
 				B34DED3CC4B0331D68D9D18D /* Pods-YourApp_Tests.debug.xcconfig */,
 				B99D19EC50EE319F225A673B /* Pods-YourApp_Tests.release.xcconfig */,
 			);
