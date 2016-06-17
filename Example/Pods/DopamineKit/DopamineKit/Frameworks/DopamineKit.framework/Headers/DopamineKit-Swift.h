@@ -182,18 +182,18 @@ SWIFT_CLASS("_TtC11DopamineKit6Banner")
 SWIFT_CLASS("_TtC11DopamineKit8CandyBar")
 @interface CandyBar : Banner
 
-/// A CandyBar with the provided title, subtitle, and optional image, ready to be presented with show().
+/// A CandyBar with the provided title, subtitle, and an optional image, ready to be presented with show().
 ///
-/// \param title The title of the banner. Optional. Defaults to nil.
+/// \param title The title of the banner. Defaults to nil.
 ///
-/// \param subtitle The subtitle of the banner. Optional. Defaults to nil.
+/// \param subtitle The subtitle of the banner. Defaults to nil.
 ///
-/// \param image The image on the left of the banner. Optional. Defaults to nil.
+/// \param image The image on the left of the banner. Defaults to nil.
 ///
 /// \param backgroundColor The color of the banner's background view. Defaults to <code>UIColor.blackColor()
 /// </code>.
 ///
-/// \param didTapBlock An action to be called when the user taps on the banner. Optional. Defaults to <code>nil
+/// \param didTapBlock An action to be called when the user taps on the banner. Defaults to <code>nil
 /// </code>.
 - (nonnull instancetype)initWithTitle:(NSString * _Nullable)title subtitle:(NSString * _Nullable)subtitle image:(UIImage * _Nullable)image backgroundColor:(UIColor * _Nonnull)backgroundColor didTapBlock:(void (^ _Nullable)(void))didTapBlock OBJC_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder OBJC_DESIGNATED_INITIALIZER;
@@ -214,7 +214,7 @@ SWIFT_CLASS("_TtC11DopamineKit11DopamineKit")
 /// \param secondaryIdentity Default <code>nil
 /// </code> - an additional idetification string
 ///
-/// \param callback Optional - A callback function with the track HTTP response code passed in as a String
+/// \param callback A callback function with the track HTTP response code passed in as a String. Defaults to an empty function
 + (void)track:(NSString * _Nonnull)actionID metaData:(NSDictionary<NSString *, id> * _Nullable)metaData secondaryIdentity:(NSString * _Nullable)secondaryIdentity callback:(void (^ _Nonnull)(NSString * _Nonnull))callback;
 
 /// This function sends an asynchronous reinforcement call for the specified actionID
@@ -241,23 +241,6 @@ SWIFT_CLASS("_TtC11DopamineKit11DopamineKit")
 /// </code> otherwise
 + (UIColor * _Nonnull)hexStringToUIColor:(NSString * _Nonnull)hex;
 @property (nonatomic, copy) NSString * _Nonnull propertyListPath;
-@end
-
-@class NSAttributedString;
-
-SWIFT_CLASS("_TtC11DopamineKit8MemeView")
-@interface MemeView : UIView
-@property (nonatomic, strong) UIImage * _Nullable image;
-@property (nonatomic, readonly, strong) UIImageView * _Nonnull imageView;
-
-/// Resizes the image and adjusts the top and bottom text
-@property (nonatomic) CGSize size;
-@property (nonatomic, readonly, strong) UILabel * _Nonnull topLabel;
-@property (nonatomic, strong) NSAttributedString * _Nonnull topString;
-@property (nonatomic, readonly, strong) UILabel * _Nonnull bottomLabel;
-@property (nonatomic, strong) NSAttributedString * _Nonnull bottomString;
-- (NSDictionary<NSString *, NSObject *> * _Nonnull)defaultStringAttributes;
-- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder OBJC_DESIGNATED_INITIALIZER;
 @end
 
 

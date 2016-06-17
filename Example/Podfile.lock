@@ -1,11 +1,11 @@
 PODS:
-  - DopamineKit (2.9.9)
+  - DopamineKit (3.0.2)
 
 DEPENDENCIES:
   - DopamineKit
 
 SPEC CHECKSUMS:
-  DopamineKit: ae14e326f55330d6af9fc57835dbfa7c03de3979
+  DopamineKit: 4b1239a14ce9a958f570c5e7aa97a47074b3e420
 
 PODFILE CHECKSUM: 44d0918972f50e67fa146ba88d6efd1478a44484
 
