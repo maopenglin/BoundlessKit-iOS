@@ -7,8 +7,9 @@
 //
 
 /// Candy is an enumeration of icons that can appear on a CandyBar. Visit UseDopamine.com to see them all visually displayed
-public enum Candy{
-    case None, Certificate, Crown, Crown2, MedalStar, RibbonStar, Stars, Stopwatch, ThumbsUp, TrophyHand, TrophyStar, WreathStar
+@objc
+public enum Candy : Int{
+    case None = 0, Certificate, Crown, Crown2, MedalStar, RibbonStar, Stars, Stopwatch, ThumbsUp, TrophyHand, TrophyStar, WreathStar
     
     private var DopeAssetName:String?{
         switch self{
@@ -28,6 +29,7 @@ public enum Candy{
     }
 }
 
+@objc
 public class CandyBar: Banner {
     
     /// A CandyBar with the provided `title`, `subtitle`, and an optional `image`, ready to be presented with `show()`.
@@ -53,7 +55,7 @@ public class CandyBar: Banner {
     public required init(title: String? = nil, subtitle: String? = nil, icon: Candy = .Stars, backgroundColor: UIColor = UIColor.blackColor(), didTapBlock: (() -> ())? = nil) {
         
         var retrievedImage:UIImage? = nil
-        let frameworkBundle = NSBundle(identifier: "com.DopamineLabs.DopamineKit")
+        let frameworkBundle = NSBundle(identifier: "com.UseDopamine.DopamineKit")
         retrievedImage = UIImage(named: icon.DopeAssetName!, inBundle: frameworkBundle, compatibleWithTraitCollection: nil)
         
         

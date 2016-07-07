@@ -100,6 +100,8 @@ typedef int swift_int4  __attribute__((__ext_vector_type__(4)));
 
 #pragma clang diagnostic ignored "-Wproperty-attribute-mismatch"
 #pragma clang diagnostic ignored "-Wduplicate-method-arg"
+enum BannerPosition : NSInteger;
+enum BannerSpringiness : NSInteger;
 @class UIColor;
 @class UILabel;
 @class UIImageView;
@@ -122,6 +124,12 @@ SWIFT_CLASS("_TtC11DopamineKit6Banner")
 
 /// Whether or not this banner should adjust the status bar style during its presentation. Defaults to false.
 @property (nonatomic) BOOL adjustsStatusBarStyle;
+
+/// Whether the banner should appear at the top or the bottom of the screen. Defaults to .Top.
+@property (nonatomic) enum BannerPosition position;
+
+/// How 'springy' the banner should display. Defaults to .Slight
+@property (nonatomic) enum BannerSpringiness springiness;
 
 /// The color of the text as well as the image tint color if shouldTintImage is true.
 @property (nonatomic, strong) UIColor * _Nonnull textColor;
@@ -179,6 +187,42 @@ SWIFT_CLASS("_TtC11DopamineKit6Banner")
 @end
 
 
+/// Wheter the banner should appear at the top or the bottom of the screen.
+///
+/// <ul><li>Top: The banner will appear at the top.</li><li>Bottom: The banner will appear at the bottom.</li></ul>
+typedef SWIFT_ENUM(NSInteger, BannerPosition) {
+  BannerPositionTop = 0,
+  BannerPositionBottom = 1,
+};
+
+
+/// A level of 'springiness' for Banners.
+///
+/// <ul><li>None: The banner will slide in and not bounce.</li><li>Slight: The banner will bounce a little.</li><li>Heavy: The banner will bounce a lot.</li></ul>
+typedef SWIFT_ENUM(NSInteger, BannerSpringiness) {
+  BannerSpringinessNone = 0,
+  BannerSpringinessSlight = 1,
+  BannerSpringinessHeavy = 2,
+};
+
+
+/// Candy is an enumeration of icons that can appear on a CandyBar. Visit UseDopamine.com to see them all visually displayed
+typedef SWIFT_ENUM(NSInteger, Candy) {
+  CandyNone = 0,
+  CandyCertificate = 1,
+  CandyCrown = 2,
+  CandyCrown2 = 3,
+  CandyMedalStar = 4,
+  CandyRibbonStar = 5,
+  CandyStars = 6,
+  CandyStopwatch = 7,
+  CandyThumbsUp = 8,
+  CandyTrophyHand = 9,
+  CandyTrophyStar = 10,
+  CandyWreathStar = 11,
+};
+
+
 SWIFT_CLASS("_TtC11DopamineKit8CandyBar")
 @interface CandyBar : Banner
 
@@ -196,6 +240,21 @@ SWIFT_CLASS("_TtC11DopamineKit8CandyBar")
 /// \param didTapBlock An action to be called when the user taps on the banner. Defaults to <code>nil
 /// </code>.
 - (nonnull instancetype)initWithTitle:(NSString * _Nullable)title subtitle:(NSString * _Nullable)subtitle image:(UIImage * _Nullable)image backgroundColor:(UIColor * _Nonnull)backgroundColor didTapBlock:(void (^ _Nullable)(void))didTapBlock OBJC_DESIGNATED_INITIALIZER;
+
+/// A CandyBar with the provided title, subtitle, and an optional icon, ready to be presented with show().
+///
+/// \param title The title of the banner. Defaults to nil.
+///
+/// \param subtitle The subtitle of the banner. Defaults to nil.
+///
+/// \param icon The icon on the left of the banner. Defaults to .Stars
+///
+/// \param backgroundColor The color of the banner's background view. Defaults to <code>UIColor.blackColor()
+/// </code>.
+///
+/// \param didTapBlock An action to be called when the user taps on the banner. Defaults to <code>nil
+/// </code>.
+- (nonnull instancetype)initWithTitle:(NSString * _Nullable)title subtitle:(NSString * _Nullable)subtitle icon:(enum Candy)icon backgroundColor:(UIColor * _Nonnull)backgroundColor didTapBlock:(void (^ _Nullable)(void))didTapBlock OBJC_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder OBJC_DESIGNATED_INITIALIZER;
 @end
 
@@ -209,7 +268,7 @@ SWIFT_CLASS("_TtC11DopamineKit11DopamineKit")
 /// \param actionID the name of the action
 ///
 /// \param metaData Default <code>nil
-/// </code> - metadata as a set of key-value pairs that can be sent with a tracking call. The value should be JSON formattable.
+/// </code> - metadata as a set of key-value pairs that can be sent with a tracking call. The value should JSON formattable like an NSNumber or NSString.
 ///
 /// \param secondaryIdentity Default <code>nil
 /// </code> - an additional idetification string
@@ -222,24 +281,15 @@ SWIFT_CLASS("_TtC11DopamineKit11DopamineKit")
 /// \param actionID the name of the action
 ///
 /// \param metaData Default <code>nil
-/// </code> - metadata as a set of key-value pairs that can be sent with a tracking call. The value should be JSON formattable.
+/// </code> - metadata as a set of key-value pairs that can be sent with a tracking call. The value should JSON formattable like an NSNumber or NSString.
 ///
 /// \param secondaryIdentity Default <code>nil
 /// </code> - an additional idetification string
 ///
+/// \param timeoutSeconds Default 2.0 - the timeout in seconds for the connection
+///
 /// \param callback A callback function with the reinforcement response passed in as a String
 + (void)reinforce:(NSString * _Nonnull)actionID metaData:(NSDictionary<NSString *, id> * _Nullable)metaData secondaryIdentity:(NSString * _Nullable)secondaryIdentity timeoutSeconds:(float)timeoutSeconds callback:(void (^ _Nonnull)(NSString * _Nonnull))callback;
-
-/// This function takes a hex string and returns a UIColor
-///
-/// \param hex A hex string with either format <code>"#ffffff"
-/// </code> or <code>"ffffff"
-/// </code> or <code>"#FFFFFF"
-/// </code>
-///
-/// \returns  The corresponding UIColor for valid hex strings, <code>UIColor.grayColor()
-/// </code> otherwise
-+ (UIColor * _Nonnull)hexStringToUIColor:(NSString * _Nonnull)hex;
 @property (nonatomic, copy) NSString * _Nonnull propertyListPath;
 @end
 
