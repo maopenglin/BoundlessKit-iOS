@@ -7,11 +7,11 @@ cache: cocoapods
 podfile: Example/Podfile
 sudo: required
 before_install:
-- rvm get head
-- rvm reload
-- rvm get stable
-# - rvm install 2.2
-- rvm use 2.2
+# - rvm get head
+# - rvm reload
+# - rvm get stable
+- rvm install ruby-2.2.4
+- rvm use 2.2.4
 - gem install activesupport        # yeah, it works if you install it beforehand
 - gem install cocoapods # Since Travis is not always on latest version
 - pod install --project-directory=Example
