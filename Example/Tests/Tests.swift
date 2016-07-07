@@ -1,38 +1,31 @@
 import UIKit
 import XCTest
-import DopamineKit
+import Pods_DopamineKit_Tests
 
 class Tests: XCTestCase {
     
-    /// Note: The NSBundle.mainBundle() must have DopamineProperites.plist in its path
     override func setUp() {
         super.setUp()
-        
-        // Set the plist so DopamineKit can read the AppID, API keys, ...
-        let path = NSBundle(forClass: self.dynamicType).pathForResource("DopamineProperties", ofType: "plist")
-        DopamineKit.instance.propertyListPath = path as String!
+        // Put setup code here. This method is called before the invocation of each test method in the class.
     }
     
     override func tearDown() {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
     
-    /// Test DopamineKit.reinforce(actionID,callback)
-    func testReinforceRequest() {
-        let asyncExpectation = expectationWithDescription("Reinforcement decision")
-        DopamineKit.reinforce("action1", callback: {response in
-            NSLog("DopamineKitTest reinforce resulted in:\(response)")
-            asyncExpectation.fulfill()
-        })
+    func testExample() {
+        // This is an example of a functional test case.
+        XCTAssert(true, "Pass")
         
-        waitForExpectationsWithTimeout(10, handler: {error in
-            XCTAssertNil(error, "DopamineKitTest error: reinforce request timed out")
-        })
+        
     }
     
-    /// Test DopamineKit.track(actionID)
-    func testTrackingRequest() {
-        DopamineKit.track("test")
+    func testPerformanceExample() {
+        // This is an example of a performance test case.
+        self.measureBlock() {
+            // Put the code you want to measure the time of here.
+        }
     }
     
 }
