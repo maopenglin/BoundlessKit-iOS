@@ -1,6 +1,6 @@
 use_frameworks!
 target 'YourApp_Tests' do
-  pod 'DopamineKit'
+  pod 'DopamineKit', '~> 3.0.2'
   
   
 end
