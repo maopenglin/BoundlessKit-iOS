@@ -8,6 +8,8 @@
 
 [![Platform](https://img.shields.io/cocoapods/p/DopamineKit.svg?style=flat)](http://cocoapods.org/pods/DopamineKit)
 
+[![Maintenance](https://img.shields.io/maintenance/yes/2016.svg?maxAge=2592000)](mailto:team@usedopamine.com)
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
