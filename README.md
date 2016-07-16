@@ -1,14 +1,9 @@
 # DopamineKit
 
-[![CI Status](http://img.shields.io/travis/DopamineLabs/DopamineKit-iOS-CocoaPodRepo.svg?style=flat)](https://travis-ci.org/DopamineLabs/DopamineKit-iOS-CocoaPodRepo)
-
+[![CI Status](http://img.shields.io/travis/Akash Desai/DopamineKit.svg?style=flat)](https://travis-ci.org/Akash Desai/DopamineKit)
 [![Version](https://img.shields.io/cocoapods/v/DopamineKit.svg?style=flat)](http://cocoapods.org/pods/DopamineKit)
-
 [![License](https://img.shields.io/cocoapods/l/DopamineKit.svg?style=flat)](http://cocoapods.org/pods/DopamineKit)
-
 [![Platform](https://img.shields.io/cocoapods/p/DopamineKit.svg?style=flat)](http://cocoapods.org/pods/DopamineKit)
-
-[![Maintenance](https://img.shields.io/maintenance/yes/2016.svg?maxAge=2592000)](mailto:team@usedopamine.com)
 
 ## Example
 
