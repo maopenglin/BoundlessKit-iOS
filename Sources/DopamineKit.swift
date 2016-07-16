@@ -11,7 +11,7 @@ import UIKit
     
 let deviceUUID = UIDevice.currentDevice().identifierForVendor!.UUIDString
 let clientOSVersion = UIDevice.currentDevice().systemVersion
-let clientSDKVersion = "4.0.0.beta"
+let clientSDKVersion = "3.1.0"
 let clientOS = "iOS"
 
 // constants
@@ -58,6 +58,24 @@ public class DopamineKit : NSObject{
         self.requestContainedMetadata = !(metaData==nil)
         self.requestContainedSecondaryID = !(secondaryIdentity==nil)
         
+    }
+    
+    /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
+    ///
+    /// - parameters:
+    ///     - message: The debug message.
+    ///     - filename?: Used to get filename of bug. Do not use this parameter. Defaults to #file.
+    ///     - function?: Used to get function name of bug. Do not use this parameter. Defaults to #function.
+    ///     - line?: Used to get the line of bug. Do not use this parameter. Defaults to #line.
+    ///
+    internal static func DebugLog(message: String,  fileName: String = #file, function: String =  #function, line: Int = #line) {
+        #if DEBUG
+            var functionSignature:String = function
+            if let parameterNames = functionSignature.rangeOfString("\\((.*?)\\)", options: .RegularExpressionSearch){
+                functionSignature.replaceRange(parameterNames, with: "()")
+            }
+            NSLog("[\((fileName as NSString).lastPathComponent):\(line):\(functionSignature)] - \(message)")
+        #endif
     }
     
     
@@ -273,16 +291,6 @@ public class DopamineKit : NSObject{
             defaults.setValue(defaultIdentity, forKey: DopamineDefaultsKey)
             return defaultIdentity
         }
-    }
-    
-    internal static func DebugLog(message: String,  fileName: String = #file, function: String =  #function, line: Int = #line) {
-        //#if DEBUG
-            var functionSignature:String = function
-            if let parameterNames = functionSignature.rangeOfString("\\((.*?)\\)", options: .RegularExpressionSearch){
-                functionSignature.replaceRange(parameterNames, with: "()")
-            }
-            NSLog("[\((fileName as NSString).lastPathComponent):\(line):\(functionSignature)] - \(message)")
-        //#endif
     }
 
 }

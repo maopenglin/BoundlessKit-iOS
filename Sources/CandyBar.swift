@@ -61,7 +61,7 @@ import Foundation
     public required init(title: String? = nil, subtitle: String? = nil, icon: Candy = .Stars, backgroundColor: UIColor = UIColor.blackColor(), didTapBlock: (() -> ())? = nil) {
         
         var retrievedImage:UIImage? = nil
-        if let url = NSBundle(forClass: DopamineKit.self).URLForResource("DopamineKit", withExtension: "bundle"){
+        if let url = NSBundle(forClass: DopamineKit.self).URLForResource("CandyIcons", withExtension: "bundle"){
             let dkitBundle = NSBundle(URL: url)
             retrievedImage = UIImage(named: icon.DopeAssetName!, inBundle:dkitBundle, compatibleWithTraitCollection: nil)
         }

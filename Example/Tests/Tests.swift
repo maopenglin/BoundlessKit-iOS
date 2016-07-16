@@ -88,19 +88,11 @@ class Tests: XCTestCase {
     }
     
     
-    /// Test CandyBar init() and show(duration)
+    /// Test CandyBar init()
     ///
     func testCandyBar(){
         let color = CandyBar.hexStringToUIColor("#F0F0F0")
         let candybar = CandyBar(title: "Title", subtitle: "subtitle", icon: Candy.Certificate, backgroundColor: color)
-        candybar.didDismissBlock = {
-            NSLog("hello")
-        }
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-//        candybar.show(view, duration: 1.0)
-        //        NSThread.sleepForTimeInterval(5.2)
-        //        XCTAssert(candybar.didShow())
-        
+        print("CandyBar title: ", candybar.titleLabel.text)
     }
 }
