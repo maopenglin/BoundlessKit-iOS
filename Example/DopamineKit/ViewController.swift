@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  DopamineKit
 //
-//  Created by Akash Desai on 07/06/2016.
+//  Created by Akash Desai on 07/13/2016.
 //  Copyright (c) 2016 Akash Desai. All rights reserved.
 //
 
@@ -10,85 +10,26 @@ import UIKit
 import DopamineKit
 
 class ViewController: UIViewController {
-
+    
+    var responseLabel:UILabel = UILabel()
+    var action1Button:UIButton = UIButton()
+    var trackedActionButton:UIButton = UIButton()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
-    
-    /**
-    Create a simple view with
-        - 2 buttons 
-            > button1:Test()
-            > button2:Reinforce()
-        - 1 label that displays the result
-    */
-    
-    var button1:UIButton = UIButton()
-    var button2:UIButton = UIButton()
-    var responseLabel:UILabel = UILabel()
-    
-    func loadBasicUI(){
-        let viewSize = self.view.frame.size
-        let viewCenter = self.view.center
-        
-        // Dopamine icon
-        let frameworkBundle = NSBundle(identifier: "com.DopamineLabs.DopamineKit")
-        let dopamineIcon = UIImage(named: "Dopamine", inBundle: frameworkBundle, compatibleWithTraitCollection: nil)
-        let imageView = UIImageView(image: dopamineIcon)
-        imageView.center = CGPointMake(viewSize.width/2, 100)
-        self.view.addSubview(imageView)
-        
-        // Response label
-        responseLabel = UILabel.init(frame: CGRectMake(0, 150, viewSize.width, 50))
-        responseLabel.text = "Click a button below!"
-        responseLabel.textAlignment = NSTextAlignment.Center
-        self.view.addSubview(responseLabel)
-        
-        // Reinforced action button
-        button1 = UIButton.init(frame: CGRectMake(0, 0, viewSize.width/3, viewSize.width/6+10))
-        button1.center = CGPointMake(viewSize.width/4, viewCenter.y)
-        button1.layer.cornerRadius = 5
-        button1.setTitle("Test Reinforce Call", forState: UIControlState.Normal)
-        button1.titleLabel?.lineBreakMode = NSLineBreakMode.ByWordWrapping
-        button1.titleLabel?.textAlignment = NSTextAlignment.Center
-        button1.backgroundColor = UIColor.init(red: 51/255.0, green: 153/255.0, blue: 51/255.0, alpha: 1.0)
-        button1.addTarget(self, action: #selector(ViewController.someActionToReinforce), forControlEvents: UIControlEvents.TouchUpInside)
-        self.view.addSubview(button1)
-        
-        // Tracked action button
-        button2 = UIButton.init(frame: CGRectMake(0, 0, viewSize.width/3, viewSize.width/6+10))
-        button2.center = CGPointMake(viewSize.width/4*3, viewCenter.y)
-        button2.layer.cornerRadius = 5
-        button2.setTitle("Test Track Call", forState: UIControlState.Normal)
-        button2.titleLabel?.lineBreakMode = NSLineBreakMode.ByWordWrapping
-        button2.titleLabel?.textAlignment = NSTextAlignment.Center
-        button2.backgroundColor = UIColor.init(red: 204/255.0, green: 51/255.0, blue: 51/255.0, alpha: 1.0)
-        button2.addTarget(self, action: #selector(ViewController.someActionToTrack), forControlEvents: UIControlEvents.TouchUpInside)
-        self.view.addSubview(button2)
-        
-        
-    }
-    
-    
-    // Callback for button1
-    func someActionToReinforce(){
+    func action1Performed(){
         
         // Reinforce the action to make it sticky!!
-        
-        DopamineKit.reinforce("action1", callback: {response in
+        DopamineKit.reinforce("action1", completion: {response in
             // So we don't run on the main thread
             dispatch_async(dispatch_get_main_queue(), {
                 
                 // Update UI to display reinforcement decision on screen for learning purposes
                 self.responseLabel.text = response
-                self.flashView(self.responseLabel)
+                self.flash(self.responseLabel)
                 
                 
                 // Try out CandyBar as a form of reinforcement!
@@ -115,6 +56,7 @@ class ViewController: UIViewController {
                     reinforcerType = Candy.ThumbsUp
                     title = "Awesome run!"
                     subtitle = "Either you run the day,\nOr the day runs you."
+                    backgroundColor = CandyBar.hexStringToUIColor("#ff0000")
                     visibilityDuration = 2.5
                     break
                 default:
@@ -122,31 +64,62 @@ class ViewController: UIViewController {
                 }
                 
                 // Woo hoo! Treat yoself
-                let candyBar = CandyBar.init(title: title, subtitle: subtitle, icon: reinforcerType, backgroundColor: backgroundColor)
-                candyBar.position = .Bottom
-                // if `nil` or no duration is provided, the CandyBar will go away when the user clicks on it
-                candyBar.show(self.view, duration: visibilityDuration)
-                
+                let candybar = CandyBar(title: title, subtitle: subtitle, icon: reinforcerType, backgroundColor: backgroundColor)
+                // if `nil` or no duration is provided, the CandyBar will go away when the user taps it or `candybar.dismiss()` is used
+                candybar.show(duration: visibilityDuration)
                 
             })
         })
     }
     
     
-    // Callback for button2
-    func someActionToTrack(){
+    func action2Performed(){
         // Tracking call is sent asynchronously
-        DopamineKit.track("someAction", metaData: ["key":"value"], callback: {status in
-            dispatch_async(dispatch_get_main_queue(), {
-                self.responseLabel.text = status
-                self.flashView(self.responseLabel)
-            })
-        })
+        DopamineKit.track("action2")
     }
     
     
-    // Flash the text so if the same value comes, it's visible
-    func flashView(elm:UIView){
+    func loadBasicUI(){
+        let viewSize = self.view.frame.size
+        let viewCenter = self.view.center
+        
+        // Dopamine icon up top
+        let dopamineIcon = UIImage(named:"DopamineLogo")
+        
+        let imageView = UIImageView(image: dopamineIcon)
+        imageView.center = CGPointMake(viewSize.width/2, 100)
+        self.view.addSubview(imageView)
+        
+        // Response label below dopamine icon
+        responseLabel = UILabel.init(frame: CGRectMake(0, 150, viewSize.width, 50))
+        responseLabel.text = "Click a button below!"
+        responseLabel.textAlignment = NSTextAlignment.Center
+        self.view.addSubview(responseLabel)
+        
+        // Button to represent some user action to Reinforce
+        action1Button = UIButton.init(frame: CGRectMake(0, 0, viewSize.width/3, viewSize.width/6+10))
+        action1Button.center = CGPointMake(viewSize.width/4, viewCenter.y)
+        action1Button.layer.cornerRadius = 5
+        action1Button.setTitle("Reinforce a user action", forState: UIControlState.Normal)
+        action1Button.titleLabel?.lineBreakMode = NSLineBreakMode.ByWordWrapping
+        action1Button.titleLabel?.textAlignment = NSTextAlignment.Center
+        action1Button.backgroundColor = UIColor.init(red: 51/255.0, green: 153/255.0, blue: 51/255.0, alpha: 1.0)
+        action1Button.addTarget(self, action: #selector(ViewController.action1Performed), forControlEvents: UIControlEvents.TouchUpInside)
+        self.view.addSubview(action1Button)
+        
+        // Button to represent some user action to Track
+        trackedActionButton = UIButton.init(frame: CGRectMake(0, 0, viewSize.width/3, viewSize.width/6+10))
+        trackedActionButton.center = CGPointMake(viewSize.width/4*3, viewCenter.y)
+        trackedActionButton.layer.cornerRadius = 5
+        trackedActionButton.setTitle("Track a user action", forState: UIControlState.Normal)
+        trackedActionButton.titleLabel?.lineBreakMode = NSLineBreakMode.ByWordWrapping
+        trackedActionButton.titleLabel?.textAlignment = NSTextAlignment.Center
+        trackedActionButton.backgroundColor = UIColor.init(red: 204/255.0, green: 51/255.0, blue: 51/255.0, alpha: 1.0)
+        trackedActionButton.addTarget(self, action: #selector(ViewController.action2Performed), forControlEvents: UIControlEvents.TouchUpInside)
+        self.view.addSubview(trackedActionButton)
+    }
+    
+    func flash(elm:UIView){
         elm.alpha = 0.0
         UIView.animateWithDuration(0.75, delay: 0.0, options: [.CurveEaseInOut, .AllowUserInteraction], animations: {() -> Void in
             elm.alpha = 1.0
@@ -156,6 +129,6 @@ class ViewController: UIViewController {
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.Portrait
     }
-
+    
 }
 
