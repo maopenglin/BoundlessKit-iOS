@@ -14,9 +14,14 @@
 		6BE52CD2D42B962423CE72A4CCD6918C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC22C73C1608DFA5D5D78BDCB218219 /* Foundation.framework */; };
 		77DDEF96C19D3648450FDF1030575B7F /* Pods-DopamineKit_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C52B24D3596967BD4F17CA99753F541 /* Pods-DopamineKit_Tests-dummy.m */; };
 		821EB3FD0BA88DB5A0CF86341DFAB976 /* DopamineKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697615AA3D83991FF9C76E5C9F5C925E /* DopamineKit.swift */; };
+		841F3B231D3A0F0900E2A948 /* DecisionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3B221D3A0F0900E2A948 /* DecisionEngine.swift */; };
+		841F3B271D3A149E00E2A948 /* DopeAPIPortal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3B261D3A149E00E2A948 /* DopeAPIPortal.swift */; };
+		841F3B291D3A14D600E2A948 /* DopeEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3B281D3A14D600E2A948 /* DopeEvent.swift */; };
+		841F3B2B1D3A14F000E2A948 /* Cartridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3B2A1D3A14F000E2A948 /* Cartridge.swift */; };
+		841F3B2D1D3A26BF00E2A948 /* SQLStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3B2C1D3A26BF00E2A948 /* SQLStorage.swift */; };
+		841F3B321D3A58DF00E2A948 /* CandyBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3B311D3A58DF00E2A948 /* CandyBar.swift */; };
+		841F3B371D3A594400E2A948 /* CandyIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3B361D3A594400E2A948 /* CandyIcon.swift */; };
 		89452633DF6A2A07C2284BA614CE8CAE /* Pods-DopamineKit_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 613E0AB4F58AD2A5F39FF738DC2E8E37 /* Pods-DopamineKit_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		A9ED8FBE84A1658EF12BE2FD847E67DE /* CandyBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A374DCD9CE5E8ACBF29AEE79A8C5296 /* CandyBar.swift */; };
-		B450367B06D9B0882D907492FA2173B8 /* Banner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C57F6C97E9109C2E05CD24AD2ED3A6 /* Banner.swift */; };
 		B46070C79DA80EFBB26F01C3644213AE /* Pods-DopamineKit_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C0432E7482FF606EF28ED29A9AD71C6 /* Pods-DopamineKit_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6CE80B1C9B77AD026DF470F28A098BB /* CandyIcons.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D00DFAE840DCD8E947193E4F329FD67B /* CandyIcons.bundle */; };
 		BE3F6C8A1ADB4C1037F926D525F62621 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC22C73C1608DFA5D5D78BDCB218219 /* Foundation.framework */; };
@@ -58,13 +63,18 @@
 		37BE7792B0F5B9374EBB368BCD36D181 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4C52B24D3596967BD4F17CA99753F541 /* Pods-DopamineKit_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-DopamineKit_Tests-dummy.m"; sourceTree = "<group>"; };
 		5864E3A3702926E6EB350A2458586561 /* ResourceBundle-CandyIcons-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-CandyIcons-Info.plist"; sourceTree = "<group>"; };
-		5A374DCD9CE5E8ACBF29AEE79A8C5296 /* CandyBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CandyBar.swift; sourceTree = "<group>"; };
 		5E8648748D36553CB551C475C67C309C /* DopamineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DopamineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		613E0AB4F58AD2A5F39FF738DC2E8E37 /* Pods-DopamineKit_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-DopamineKit_Example-umbrella.h"; sourceTree = "<group>"; };
 		697615AA3D83991FF9C76E5C9F5C925E /* DopamineKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineKit.swift; sourceTree = "<group>"; };
 		7555C005FD3F95381466C1E2DE4D4F46 /* Pods-DopamineKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Example-resources.sh"; sourceTree = "<group>"; };
-		76C57F6C97E9109C2E05CD24AD2ED3A6 /* Banner.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
 		7D3845E0EBDFF0ECB4D7D8D6A46533BE /* DopamineKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DopamineKit-umbrella.h"; sourceTree = "<group>"; };
+		841F3B221D3A0F0900E2A948 /* DecisionEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DecisionEngine.swift; sourceTree = "<group>"; };
+		841F3B261D3A149E00E2A948 /* DopeAPIPortal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DopeAPIPortal.swift; sourceTree = "<group>"; };
+		841F3B281D3A14D600E2A948 /* DopeEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DopeEvent.swift; sourceTree = "<group>"; };
+		841F3B2A1D3A14F000E2A948 /* Cartridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cartridge.swift; sourceTree = "<group>"; };
+		841F3B2C1D3A26BF00E2A948 /* SQLStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLStorage.swift; sourceTree = "<group>"; };
+		841F3B311D3A58DF00E2A948 /* CandyBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CandyBar.swift; path = Candy/CandyBar.swift; sourceTree = "<group>"; };
+		841F3B361D3A594400E2A948 /* CandyIcon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CandyIcon.swift; path = Candy/CandyIcon.swift; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		94E602D2C33E2E9FC4082B1F07DC8F3E /* Pods-DopamineKit_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-DopamineKit_Example.modulemap"; sourceTree = "<group>"; };
 		A510393F8D747D15F137D0E60595C82F /* DopamineKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DopamineKit.h; sourceTree = "<group>"; };
@@ -189,13 +199,26 @@
 			);
 			sourceTree = "<group>";
 		};
+		841F3B301D3A58C000E2A948 /* Candy */ = {
+			isa = PBXGroup;
+			children = (
+				841F3B311D3A58DF00E2A948 /* CandyBar.swift */,
+				841F3B361D3A594400E2A948 /* CandyIcon.swift */,
+			);
+			name = Candy;
+			sourceTree = "<group>";
+		};
 		933CEB22810411D5BC90D675D9D0E5F1 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				76C57F6C97E9109C2E05CD24AD2ED3A6 /* Banner.swift */,
-				5A374DCD9CE5E8ACBF29AEE79A8C5296 /* CandyBar.swift */,
-				A510393F8D747D15F137D0E60595C82F /* DopamineKit.h */,
 				697615AA3D83991FF9C76E5C9F5C925E /* DopamineKit.swift */,
+				A510393F8D747D15F137D0E60595C82F /* DopamineKit.h */,
+				841F3B261D3A149E00E2A948 /* DopeAPIPortal.swift */,
+				841F3B221D3A0F0900E2A948 /* DecisionEngine.swift */,
+				841F3B281D3A14D600E2A948 /* DopeEvent.swift */,
+				841F3B2A1D3A14F000E2A948 /* Cartridge.swift */,
+				841F3B2C1D3A26BF00E2A948 /* SQLStorage.swift */,
+				841F3B301D3A58C000E2A948 /* Candy */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -431,10 +454,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B450367B06D9B0882D907492FA2173B8 /* Banner.swift in Sources */,
-				A9ED8FBE84A1658EF12BE2FD847E67DE /* CandyBar.swift in Sources */,
-				CC6F33778D1F99BDE3812D5CEAA27A61 /* DopamineKit-dummy.m in Sources */,
 				821EB3FD0BA88DB5A0CF86341DFAB976 /* DopamineKit.swift in Sources */,
+				CC6F33778D1F99BDE3812D5CEAA27A61 /* DopamineKit-dummy.m in Sources */,
+				841F3B271D3A149E00E2A948 /* DopeAPIPortal.swift in Sources */,
+				841F3B2D1D3A26BF00E2A948 /* SQLStorage.swift in Sources */,
+				841F3B231D3A0F0900E2A948 /* DecisionEngine.swift in Sources */,
+				841F3B2B1D3A14F000E2A948 /* Cartridge.swift in Sources */,
+				841F3B291D3A14D600E2A948 /* DopeEvent.swift in Sources */,
+				841F3B321D3A58DF00E2A948 /* CandyBar.swift in Sources */,
+				841F3B371D3A594400E2A948 /* CandyIcon.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -573,14 +601,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CBECB322C78DEE0646B76C6502A74070 /* DopamineKit.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/DopamineKit";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "Target Support Files/DopamineKit/ResourceBundle-CandyIcons-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = CandyIcons;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "../../Sources/DopamineKit-CandyIcons-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -623,14 +655,17 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CBECB322C78DEE0646B76C6502A74070 /* DopamineKit.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/DopamineKit";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "Target Support Files/DopamineKit/ResourceBundle-CandyIcons-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = CandyIcons;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "../../Sources/DopamineKit-CandyIcons-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = bundle;
 			};

@@ -9,8 +9,8 @@ class Tests: XCTestCase {
         super.setUp()
         
         // Set the plist so DopamineKit can read the appID, versionID, production and development secrets, and the inProduction flag
-        let path = NSBundle(forClass: self.dynamicType).pathForResource("DopamineDemoProperties", ofType: "plist")
-        DopamineKit.instance.propertyListPath = path as String!
+//        let path = NSBundle(forClass: self.dynamicType).pathForResource("DopamineDemoProperties", ofType: "plist")
+//        DopamineKit.instance.propertyListPath = path as String!
     }
     
     override func tearDown() {
@@ -35,7 +35,7 @@ class Tests: XCTestCase {
     ///
     func testReinforceRequestFull() {
         let asyncExpectation = expectationWithDescription("Reinforcement decision")
-        DopamineKit.reinforce("action1", metaData: ["key":"value", "number":-1.4], secondaryIdentity: "user@example.com", timeout: 2.0, completion: {response in
+        DopamineKit.reinforce("action1", metaData: ["key":"value", "number":-1.4], completion: {response in
             NSLog("DopamineKitTest reinforce resulted in:\(response)")
             asyncExpectation.fulfill()
         })
@@ -48,29 +48,25 @@ class Tests: XCTestCase {
     /// Test DopamineKit.track() with just actionID and completion handler
     ///
     func testTrackingRequestSimple() {
-        let asyncExpectation = expectationWithDescription("Tracking request")
-        DopamineKit.track("tracktest1", completion: {response in
-            NSLog("DopamineKitTest tracking resulted in:\(response)")
-            asyncExpectation.fulfill()
-        })
+//        let asyncExpectation = expectationWithDescription("Tracking request")
         
-        waitForExpectationsWithTimeout(10, handler: {error in
-            XCTAssertNil(error, "DopamineKitTest error: track request timed out")
-        })
+        DopamineKit.track("tracktest1")
+        
+//        waitForExpectationsWithTimeout(10, handler: {error in
+//            XCTAssertNil(error, "DopamineKitTest error: track request timed out")
+//        })
     }
     
     /// Test DopamineKit.track() with actionID, metaData, secondaryIdentity, and completion handler
     ///
     func testTrackingRequestFull() {
-        let asyncExpectation = expectationWithDescription("Tracking request")
-        DopamineKit.track("tracktest2", metaData: ["key":"value", "number":2.2], secondaryIdentity: "user@example.com", completion: {response in
-            NSLog("DopamineKitTest tracking resulted in:\(response)")
-            asyncExpectation.fulfill()
-        })
+//        let asyncExpectation = expectationWithDescription("Tracking request")
         
-        waitForExpectationsWithTimeout(10, handler: {error in
-            XCTAssertNil(error, "DopamineKitTest error: track request timed out")
-        })
+        DopamineKit.track("tracktest2", metaData: ["key":"value", "number":2.2])
+        
+//        waitForExpectationsWithTimeout(10, handler: {error in
+//            XCTAssertNil(error, "DopamineKitTest error: track request timed out")
+//        })
     }
     
     /// Test 10 calls in a row
@@ -92,7 +88,66 @@ class Tests: XCTestCase {
     ///
     func testCandyBar(){
         let color = CandyBar.hexStringToUIColor("#F0F0F0")
-        let candybar = CandyBar(title: "Title", subtitle: "subtitle", icon: Candy.Certificate, backgroundColor: color)
+        let candybar = CandyBar(title: "Title", subtitle: "subtitle", icon: CandyIcon.Certificate, backgroundColor: color)
         print("CandyBar title: ", candybar.titleLabel.text)
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    func testRefresh(){
+        print("starting test")
+        let resultCartridge = DopeAPIPortal.refresh("action1")
+//        while var event = resultCartridge.pop(){
+//            print(event.reinforcement)
+//        }
+        
+        print("test ended")
+        
+        
+        
+        let asyncExpectation = expectationWithDescription("Waiting to hear back")
+        sleep(3)
+        asyncExpectation.fulfill()
+
+        waitForExpectationsWithTimeout(3, handler: {error in
+            XCTAssertNil(error, "DopamineKitTest error: reinforce request timed out")
+        })
+
+        
+    }
+    
+    func testNewTrack(){
+        DopamineKit.track("taction")
+        
+        let asyncExpectation = expectationWithDescription("Waiting to hear back")
+        sleep(3)
+        asyncExpectation.fulfill()
+        
+        waitForExpectationsWithTimeout(3, handler: {error in
+            XCTAssertNil(error, "DopamineKitTest error: reinforce request timed out")
+        })
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

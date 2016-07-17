@@ -33,7 +33,7 @@ class ViewController: UIViewController {
                 
                 
                 // Try out CandyBar as a form of reinforcement!
-                var reinforcerType:Candy
+                var reinforcerType:CandyIcon
                 var title:String?
                 var subtitle:String?
                 var backgroundColor:UIColor = UIColor.blueColor()
@@ -42,18 +42,18 @@ class ViewController: UIViewController {
                 // Set up a couple of different responses to keep your users surprised
                 switch(response){
                 case "medalStar":
-                    reinforcerType = Candy.MedalStar
+                    reinforcerType = CandyIcon.MedalStar
                     title = "You should drop an album soon"
                     subtitle = "Cuz you're on 🔥"
                     break
                 case "stars":
-                    reinforcerType = Candy.Stars
+                    reinforcerType = CandyIcon.Stars
                     title = "Great workout 💯"
                     subtitle = "It's not called sweating, it's called glisenting"
                     backgroundColor = UIColor.orangeColor()
                     break
                 case "thumbsUp":
-                    reinforcerType = Candy.ThumbsUp
+                    reinforcerType = CandyIcon.ThumbsUp
                     title = "Awesome run!"
                     subtitle = "Either you run the day,\nOr the day runs you."
                     backgroundColor = CandyBar.hexStringToUIColor("#ff0000")
@@ -66,7 +66,7 @@ class ViewController: UIViewController {
                 // Woo hoo! Treat yoself
                 let candybar = CandyBar(title: title, subtitle: subtitle, icon: reinforcerType, backgroundColor: backgroundColor)
                 // if `nil` or no duration is provided, the CandyBar will go away when the user taps it or `candybar.dismiss()` is used
-                candybar.show(duration: visibilityDuration)
+                candybar.show(visibilityDuration)
                 
             })
         })

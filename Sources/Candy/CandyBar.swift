@@ -1,35 +1,31 @@
 //
-//  Banner.swift
-//  Used as the base class for CandyBar.swift
+//  CandyBar.swift
 //
-//
-//  Created by Harlan Haskins on 7/27/15.
-//  Copyright (c) 2015 Bryx. All rights reserved.
 //
 
-
+import Foundation
 import UIKit
 
-internal enum BannerState {
+internal enum CandyBarState {
     case Showing, Hidden, Gone
 }
 
-/// Wheter the banner should appear at the top or the bottom of the screen.
+/// Wheter the candybar should appear at the top or the bottom of the screen.
 ///
-/// - Top: The banner will appear at the top.
-/// - Bottom: The banner will appear at the bottom.
+/// - Top: The candybar will appear at the top.
+/// - Bottom: The candybar will appear at the bottom.
 @objc
-public enum BannerPosition : Int{
+public enum CandyBarPosition : Int{
     case Top, Bottom
 }
 
-/// A level of 'springiness' for Banners.
+/// A level of 'springiness' for CandyBars.
 ///
-/// - None: The banner will slide in and not bounce.
-/// - Slight: The banner will bounce a little.
-/// - Heavy: The banner will bounce a lot.
+/// - None: The candybar will slide in and not bounce.
+/// - Slight: The candybar will bounce a little.
+/// - Heavy: The candybar will bounce a lot.
 @objc
-public enum BannerSpringiness : Int{
+public enum CandyBarSpringiness : Int{
     case None, Slight, Heavy
     private var springValues: (damping: CGFloat, velocity: CGFloat) {
         switch self {
@@ -40,9 +36,140 @@ public enum BannerSpringiness : Int{
     }
 }
 
-/// Banner is a dropdown notification view that presents above the main view controller, but below the status bar.
+/// CandyBar is a dropdown notification view.
 @objc
-public class Banner: UIView {
+public class CandyBar: UIView {
+    
+    /// A CandyBar with the provided `title`, `subtitle`, and an optional `image`, ready to be presented with `show()`.
+    ///
+    /// - parameters:
+    ///     - title?: The title of the candybar. Defaults to `nil`.
+    ///     - subtitle?: The subtitle of the candybar. Defaults to `nil`.
+    ///     - image?: The image on the left of the candybar. Defaults to `nil`.
+    ///     - backgroundColor?: The color of the candybar's background view. Defaults to `UIColor.blackColor()`.
+    ///     - didTapBlock?: An action to be called when the user taps on the candybar. Defaults to `nil`.
+    ///
+    public required init(title: String? = nil, subtitle: String? = nil, image: UIImage? = nil, backgroundColor: UIColor = UIColor.blackColor(), didTapBlock: (() -> ())? = nil) {
+        self.didTapBlock = didTapBlock
+        self.image = image
+        super.init(frame: CGRectZero)
+        resetShadows()
+        addGestureRecognizers()
+        initializeSubviews()
+        resetTintColor()
+        titleLabel.text = title
+        detailLabel.text = subtitle
+        backgroundView.backgroundColor = backgroundColor
+        backgroundView.alpha = 0.95
+    }
+    
+    
+    /// A CandyBar with the provided `title`, `subtitle`, and an optional icon, ready to be presented with `show()`.
+    ///
+    /// - parameters:
+    ///     - title?: The title of the candybar. Defaults to `nil`.
+    ///     - subtitle?: The subtitle of the candybar. Defaults to `nil`.
+    ///     - icon?: An icon, from the `Candy` class, to be displayed on the left of a candybar. Defaults to `.Stars`
+    ///     - backgroundColor?: The color of the candybar's background view. Defaults to `UIColor.blackColor()`.
+    ///     - didTapBlock?: An action to be called when the user taps on the candybar. Defaults to `nil`.
+    ///
+    public required init(title: String? = nil, subtitle: String? = nil, icon: CandyIcon = .Stars, backgroundColor: UIColor = UIColor.blackColor(), didTapBlock: (() -> ())? = nil) {
+        self.didTapBlock = didTapBlock
+        self.image = icon.image
+        super.init(frame: CGRectZero)
+        resetShadows()
+        addGestureRecognizers()
+        initializeSubviews()
+        resetTintColor()
+        titleLabel.text = title
+        detailLabel.text = subtitle
+        backgroundView.backgroundColor = backgroundColor
+        backgroundView.alpha = 0.95
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    /// Shows the candybar. If a view is specified, the candybar will be displayed at the top of that view, otherwise at top of the top window. If a `duration` is specified, the candybar dismisses itself automatically after that duration elapses.
+    ///
+    /// - parameter:
+    ///     - duration?: A time interval, after which the candybar will dismiss itself. Defaults to `nil`, which in turn means the user will have to tap-to-dismiss or the function `candybar.dismiss()` can be used.
+    ///
+    public func show(duration: NSTimeInterval? = nil) {
+        CandyBar.topWindow()!.addSubview(self)
+        forceUpdates()
+        let (damping, velocity) = self.springiness.springValues
+        if adjustsStatusBarStyle {
+            UIApplication.sharedApplication().setStatusBarStyle(preferredStatusBarStyle, animated: true)
+        }
+        UIView.animateWithDuration(animationDuration, delay: 0.0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: .AllowUserInteraction, animations: {
+            self.candybarState = .Showing
+            }, completion: { finished in
+                guard let duration = duration else { return }
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(duration * NSTimeInterval(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+                    self.dismiss()
+                }
+        })
+    }
+    
+    /// This function takes a hex string and returns a UIColor
+    ///
+    /// - parameters:
+    ///     - hex: A hex string with either format `"#ffffff"` or `"ffffff"` or `"#FFFFFF"`.
+    ///
+    /// - returns:
+    ///     The corresponding UIColor for valid hex strings, `UIColor.grayColor()` otherwise.
+    ///
+    public static func hexStringToUIColor (hex:String) -> UIColor {
+        var cString:String = hex.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet() as NSCharacterSet).uppercaseString
+        
+        if (cString.hasPrefix("#")) {
+            cString = cString.substringFromIndex(cString.startIndex.advancedBy(1))
+        }
+        
+        if ((cString.characters.count) != 6) {
+            return UIColor.grayColor()
+        }
+        
+        var rgbValue:UInt32 = 0
+        NSScanner(string: cString).scanHexInt(&rgbValue)
+        
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    /** 
+     
+     
+     
+     Internal functions below
+     Created by Harlan Haskins and Akash Desai
+     
+     
+     
+     
+    */
+    
+    
+    
+    
+    
+    
+    
+    
+    
     class func topWindow() -> UIWindow? {
         for window in UIApplication.sharedApplication().windows.reverse() {
             if window.windowLevel == UIWindowLevelNormal && !window.hidden && window.frame != CGRectZero { return window }
@@ -57,19 +184,19 @@ public class Banner: UIView {
     /// How long the slide down animation should last.
     public var animationDuration: NSTimeInterval = 0.4
     
-    /// The preferred style of the status bar during display of the banner. Defaults to `.LightContent`.
+    /// The preferred style of the status bar during display of the candybar. Defaults to `.LightContent`.
     ///
-    /// If the banner's `adjustsStatusBarStyle` is false, this property does nothing.
+    /// If the candybar's `adjustsStatusBarStyle` is false, this property does nothing.
     public var preferredStatusBarStyle = UIStatusBarStyle.LightContent
     
-    /// Whether or not this banner should adjust the status bar style during its presentation. Defaults to `false`.
+    /// Whether or not this candybar should adjust the status bar style during its presentation. Defaults to `false`.
     public var adjustsStatusBarStyle = false
     
-    /// Whether the banner should appear at the top or the bottom of the screen. Defaults to `.Top`.
-    public var position = BannerPosition.Top
+    /// Whether the candybar should appear at the top or the bottom of the screen. Defaults to `.Top`.
+    public var position = CandyBarPosition.Bottom
     
-    /// How 'springy' the banner should display. Defaults to `.Slight`
-    public var springiness = BannerSpringiness.Slight
+    /// How 'springy' the candybar should display. Defaults to `.Slight`
+    public var springiness = CandyBarSpringiness.Slight
     
     /// The color of the text as well as the image tint color if `shouldTintImage` is `true`.
     public var textColor = UIColor.whiteColor() {
@@ -78,7 +205,7 @@ public class Banner: UIView {
         }
     }
     
-    /// Whether or not the banner should show a shadow when presented.
+    /// Whether or not the candybar should show a shadow when presented.
     public var hasShadows = true {
         didSet {
             resetShadows()
@@ -97,26 +224,26 @@ public class Banner: UIView {
         set { backgroundView.alpha = newValue }
     }
     
-    /// A block to call when the uer taps on the banner.
+    /// A block to call when the uer taps on the candybar.
     public var didTapBlock: (() -> ())?
     
-    /// A block to call after the banner has finished dismissing and is off screen.
+    /// A block to call after the candybar has finished dismissing and is off screen.
     public var didDismissBlock: (() -> ())?
     
-    /// Whether or not the banner should dismiss itself when the user taps. Defaults to `true`.
+    /// Whether or not the candybar should dismiss itself when the user taps. Defaults to `true`.
     public var dismissesOnTap = true
     
-    /// Whether or not the banner should dismiss itself when the user swipes up. Defaults to `true`.
+    /// Whether or not the candybar should dismiss itself when the user swipes up. Defaults to `true`.
     public var dismissesOnSwipe = true
     
-    /// Whether or not the banner should tint the associated image to the provided `textColor`. Defaults to `true`.
+    /// Whether or not the candybar should tint the associated image to the provided `textColor`. Defaults to `true`.
     public var shouldTintImage = true {
         didSet {
             resetTintColor()
         }
     }
     
-    /// The label that displays the banner's title.
+    /// The label that displays the candybar's title.
     public let titleLabel: UILabel = {
         let label = UILabel()
         var titleFont = UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline)
@@ -128,7 +255,7 @@ public class Banner: UIView {
         return label
     }()
     
-    /// The label that displays the banner's subtitle.
+    /// The label that displays the candybar's subtitle.
     public let detailLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFontForTextStyle(UIFontTextStyleSubheadline)
@@ -137,7 +264,7 @@ public class Banner: UIView {
         return label
     }()
     
-    /// The image on the left of the banner.
+    /// The image on the left of the candybar.
     let image: UIImage?
     
     /// The image view that displays the `image`.
@@ -148,38 +275,17 @@ public class Banner: UIView {
         return imageView
     }()
     
-    internal var bannerState = BannerState.Hidden {
+    internal var candybarState = CandyBarState.Hidden {
         didSet {
-            if bannerState != oldValue {
+            if candybarState != oldValue {
                 forceUpdates()
             }
         }
     }
     
-    /// A Banner with the provided `title`, `subtitle`, and optional `image`, ready to be presented with `show()`.
-    ///
-    /// - parameter title: The title of the banner. Optional. Defaults to nil.
-    /// - parameter subtitle: The subtitle of the banner. Optional. Defaults to nil.
-    /// - parameter image: The image on the left of the banner. Optional. Defaults to nil.
-    /// - parameter backgroundColor: The color of the banner's background view. Defaults to `UIColor.blackColor()`.
-    /// - parameter didTapBlock: An action to be called when the user taps on the banner. Optional. Defaults to `nil`.
-    public required init(title: String? = nil, subtitle: String? = nil, image: UIImage? = nil, backgroundColor: UIColor = UIColor.blackColor(), didTapBlock: (() -> ())? = nil) {
-        self.didTapBlock = didTapBlock
-        self.image = image
-        super.init(frame: CGRectZero)
-        resetShadows()
-        addGestureRecognizers()
-        initializeSubviews()
-        resetTintColor()
-        titleLabel.text = title
-        detailLabel.text = subtitle
-        backgroundView.backgroundColor = backgroundColor
-        backgroundView.alpha = 0.95
-    }
-    
     private func forceUpdates() {
         guard let superview = superview, showingConstraint = showingConstraint, hiddenConstraint = hiddenConstraint else { return }
-        switch bannerState {
+        switch candybarState {
         case .Hidden:
             superview.removeConstraint(showingConstraint)
             superview.addConstraint(hiddenConstraint)
@@ -286,9 +392,9 @@ public class Banner: UIView {
         labelView.addConstraints(NSLayoutConstraint.defaultConstraintsWithVisualFormat("V:|-(10)-[titleLabel][detailLabel]-(10)-|", views: views))
     }
     
-    required public init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    //    required public init?(coder aDecoder: NSCoder) {
+    //        fatalError("init(coder:) has not been implemented")
+    //    }
     
     private var showingConstraint: NSLayoutConstraint?
     private var hiddenConstraint: NSLayoutConstraint?
@@ -296,7 +402,7 @@ public class Banner: UIView {
     
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        guard let superview = superview where bannerState != .Gone else { return }
+        guard let superview = superview where candybarState != .Gone else { return }
         commonConstraints = self.constraintsWithAttributes([.Leading, .Trailing], .Equal, to: superview)
         superview.addConstraints(commonConstraints)
         
@@ -320,7 +426,7 @@ public class Banner: UIView {
     
     private func adjustHeightOffset() {
         guard let superview = superview else { return }
-        if superview === Banner.topWindow() && self.position == .Top {
+        if superview === CandyBar.topWindow() && self.position == .Top {
             let statusBarSize = UIApplication.sharedApplication().statusBarFrame.size
             let heightOffset = min(statusBarSize.height, statusBarSize.width) // Arbitrary, but looks nice.
             contentTopOffsetConstraint.constant = heightOffset
@@ -331,53 +437,13 @@ public class Banner: UIView {
         }
     }
     
-    /// Shows the banner. If a view is specified, the banner will be displayed at the top of that view, otherwise at top of the top window. If a `duration` is specified, the banner dismisses itself automatically after that duration elapses.
-    /// - parameter view: A view the banner will be shown in. Optional. Defaults to 'nil', which in turn means it will be shown in the top window. duration A time interval, after which the banner will dismiss itself. Optional. Defaults to `nil`.
-    public func show(view: UIView? = Banner.topWindow(), duration: NSTimeInterval? = nil) {
-        guard let view = view else {
-            print("[Banner]: Could not find view. Aborting.")
-            return
-        }
-        view.addSubview(self)
-        forceUpdates()
-        let (damping, velocity) = self.springiness.springValues
-//        let oldStatusBarStyle = UIApplication.sharedApplication().statusBarStyle
-        if adjustsStatusBarStyle {
-            UIApplication.sharedApplication().setStatusBarStyle(preferredStatusBarStyle, animated: true)
-        }
-        UIView.animateWithDuration(animationDuration, delay: 0.0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: .AllowUserInteraction, animations: {
-            self.bannerState = .Showing
-            }, completion: { finished in
-                guard let duration = duration else { return }
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(duration * NSTimeInterval(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-//                    self.dismiss(self.adjustsStatusBarStyle ? oldStatusBarStyle : nil)
-                    self.dismiss()
-                }
-        })
-    }
-    
-//    /// Dismisses the banner.
-//    public func dismiss(oldStatusBarStyle: UIStatusBarStyle? = nil) {
-//        let (damping, velocity) = self.springiness.springValues
-//        UIView.animateWithDuration(animationDuration, delay: 0.0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: .AllowUserInteraction, animations: {
-//                self.bannerState = .Hidden
-//                if let oldStatusBarStyle = oldStatusBarStyle {
-//                    UIApplication.sharedApplication().setStatusBarStyle(oldStatusBarStyle, animated: true)
-//                }
-//            }, completion: { finished in
-//                self.bannerState = .Gone
-//                self.removeFromSuperview()
-//                self.didDismissBlock?()
-//        })
-//    }
-    
-    /// Dismisses the banner without a oldStatusBarStyle parameter.
+    /// Dismisses the candybar without a oldStatusBarStyle parameter.
     public func dismiss() {
         let (damping, velocity) = self.springiness.springValues
         UIView.animateWithDuration(animationDuration, delay: 0.0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: .AllowUserInteraction, animations: {
-            self.bannerState = .Hidden
+            self.candybarState = .Hidden
             }, completion: { finished in
-                self.bannerState = .Gone
+                self.candybarState = .Gone
                 self.removeFromSuperview()
                 self.didDismissBlock?()
         })
