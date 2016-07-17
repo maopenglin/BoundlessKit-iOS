@@ -29,6 +29,7 @@ public class DopeAPIPortal : NSObject{
     static func track(events: [DopeEvent]){
         for event in events{
             instance.trackCartridge.push(event)
+            SQLStorage.writeTrack(event)
         }
         
         // Post once near capacity

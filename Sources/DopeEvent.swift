@@ -12,6 +12,8 @@ import Foundation
 
 public struct DopeEvent{
     
+    public var id:Int64
+    
     public var actionID:String?
     public var metaData:[String: AnyObject]?
     public var reinforcement:String?            // never created on init, no need
@@ -19,8 +21,9 @@ public struct DopeEvent{
     public var UTC:Double?
     public var localTime:Double?
     
-    public init(action: String? = nil, metaData: [String: AnyObject]? = nil, UTC:Double?=nil, localTime:Double?=nil)
+    public init(id:Int64 = -1, action: String? = nil, metaData: [String: AnyObject]? = nil, UTC:Double?=nil, localTime:Double?=nil)
     {
+        self.id = id
         self.actionID = action
         self.metaData = metaData
         self.UTC = UTC

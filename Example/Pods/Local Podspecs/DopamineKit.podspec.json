@@ -22,5 +22,10 @@
   "public_header_files": "Sources/**/*.h",
   "resource_bundles": {
     "CandyIcons": "Resources/**/CandyIcons.xcassets"
+  },
+  "dependencies": {
+    "SQLite.swift": [
+
+    ]
   }
 }

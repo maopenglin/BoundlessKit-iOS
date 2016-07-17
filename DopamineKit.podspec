@@ -89,6 +89,6 @@ s.resource_bundle = { 'CandyIcons' => 'Resources/**/CandyIcons.xcassets' }
 #  where they will only apply to your library. If you depend on other Podspecs
 #  you can include multiple dependencies to ensure it works.
 
-#s.dependency 'SQLite.swift'
+s.dependency 'SQLite.swift'
 
 end
