@@ -9,7 +9,7 @@
 import Foundation
 
 let clientOSVersion = UIDevice.currentDevice().systemVersion
-let clientSDKVersion = "3.1.0"
+let clientSDKVersion = "4.0.0.beta"
 let clientOS = "iOS"
 
 public class DopeAPIPortal : NSObject{
@@ -78,8 +78,8 @@ public class DopeAPIPortal : NSObject{
             var payload = instance.configurationData
             
             // add reinforcement events to payload
-            while var event = instance.reportCartridge.pop(){
-                let reinforcementEvent :[String:AnyObject] = ["actionID":event.actionName!, "reinforcement":event.reinforcement!]
+            while let event = instance.reportCartridge.pop(){
+                let reinforcementEvent :[String:AnyObject] = ["actionID":event.actionID!, "reinforcement":event.reinforcement!]
                 payload.update(["events":reinforcementEvent])
             }
             
@@ -222,6 +222,7 @@ public class DopeAPIPortal : NSObject{
             return dict
         }
         
+        /* commented out for DEBUG code abouve
         // create a credentials dict from .plist
         let credentialsFilename = "DopamineProperties"
         guard let path = NSBundle.mainBundle().pathForResource(credentialsFilename, ofType: "plist") else{
@@ -265,6 +266,8 @@ public class DopeAPIPortal : NSObject{
         }
         
         return dict
+ 
+         */
     }()
     
     

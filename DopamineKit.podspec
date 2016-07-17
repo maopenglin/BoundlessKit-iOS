@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
 #
 
 s.name             = "DopamineKit"
-s.version          = "3.1.0"
+s.version          = "4.0.0.beta"
 s.summary          = "A framework to use DopamineLabs machine learning API"
 
 s.description      = <<-DESC
@@ -89,6 +89,6 @@ s.ios.resource_bundle = { 'CandyIcons' => 'Resources/**/CandyIcons.xcassets' }
 #  where they will only apply to your library. If you depend on other Podspecs
 #  you can include multiple dependencies to ensure it works.
 
-s.dependency 'SQLite.swift'
+#s.dependency 'SQLite.swift'
 
 end

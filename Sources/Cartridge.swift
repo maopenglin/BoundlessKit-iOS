@@ -26,13 +26,13 @@ public class Cartridge{
             DopamineKit.DebugLog("Cartridge empty (0\(max))")
             return nil
         }
-        end--
+        end-1
         return events.popLast()
     }
     
     public func push(event:DopeEvent){
         events.append(event)
-        end++
+        end+1
     }
     
     public func toJsonable() -> [AnyObject] {

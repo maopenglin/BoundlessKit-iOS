@@ -12,7 +12,7 @@ import Foundation
 
 public struct DopeEvent{
     
-    public var actionName:String?
+    public var actionID:String?
     public var metaData:[String: AnyObject]?
     public var reinforcement:String?            // never created on init, no need
     
@@ -21,7 +21,7 @@ public struct DopeEvent{
     
     public init(action: String? = nil, metaData: [String: AnyObject]? = nil, UTC:Double?=nil, localTime:Double?=nil)
     {
-        self.actionName = action
+        self.actionID = action
         self.metaData = metaData
         self.UTC = UTC
         self.localTime = localTime
@@ -39,8 +39,8 @@ public struct DopeEvent{
     public func toJsonable() -> [String:AnyObject]{
         var dict:[String:AnyObject] = [:]
         
-        if let actionID = actionName{
-            dict["actionID"] = actionName
+        if let actionID = actionID{
+            dict["actionID"] = actionID
         }
         if let metaData = metaData{
             dict["metaData"] = metaData

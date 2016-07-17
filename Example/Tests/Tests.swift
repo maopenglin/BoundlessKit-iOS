@@ -104,7 +104,7 @@ class Tests: XCTestCase {
     
     func testRefresh(){
         print("starting test")
-        let resultCartridge = DopeAPIPortal.refresh("action1")
+        _ = DopeAPIPortal.refresh("action1")
 //        while var event = resultCartridge.pop(){
 //            print(event.reinforcement)
 //        }
