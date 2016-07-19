@@ -19,10 +19,17 @@ public class DopamineKit : NSObject {
         super.init()
         
         do {
-            try SQLTrackedActionDataHelper.createTable()
-            DopamineKit.DebugLog("Table for `Tracked_Actions` created!")
+            try SQLReportedActionDataHelper.createTable()
+            DopamineKit.DebugLog("Table \(SQLReportedActionDataHelper.TABLE_NAME) created!")
         } catch {
-            DopamineKit.DebugLog("Something went wrong with Tracked Action table creation")
+            DopamineKit.DebugLog("Something went wrong with \(SQLReportedActionDataHelper.TABLE_NAME) table creation")
+        }
+        
+        do {
+            try SQLTrackedActionDataHelper.createTable()
+            DopamineKit.DebugLog("Table \(SQLTrackedActionDataHelper.TABLE_NAME) created!")
+        } catch {
+            DopamineKit.DebugLog("Something went wrong with \(SQLTrackedActionDataHelper.TABLE_NAME) table creation")
         }
     }
     
@@ -51,7 +58,7 @@ public class DopamineKit : NSObject {
             )
             // send chunk of actions
             do{
-                if (Int(rowId) > DopamineAPI.PreferredTrackSize) {
+                if (Int(rowId) >= DopamineAPI.PreferredTrackLength) {
                     var trackedActions = Array<DopeAction>()
                     for action in try SQLTrackedActionDataHelper.findAll()!{
                         trackedActions.append(
@@ -64,9 +71,13 @@ public class DopamineKit : NSObject {
                     }
                     
                     DopamineAPI.track(trackedActions)
+                    do { try SQLTrackedActionDataHelper.dropTable() }
+                    catch { DopamineKit.DebugLog("Error dropping table \(SQLTrackedActionDataHelper.TABLE_NAME)") }
+                    do { try SQLTrackedActionDataHelper.createTable() }
+                    catch { DopamineKit.DebugLog("Error recreating table \(SQLTrackedActionDataHelper.TABLE_NAME)") }
                 }
                 else {
-                    DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(rowId)/\(DopamineAPI.PreferredTrackSize))")
+                    DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(rowId)/\(DopamineAPI.PreferredTrackLength))")
                 }
             }
         }
@@ -92,47 +103,53 @@ public class DopamineKit : NSObject {
         
         // First generate a decision and call the handler
         var action = DopeAction(actionID: actionID)
+        let feedback = "neutralFeedback"
 //        let feedback = DecisionEngine.reinforceEvent(&event)
 //        completion(feedback)
         
-//        // debug sql insert
-//        do{
-//        let trackingID = try TrackedActionDataHelper.insert(
-//            TrackedAction(index:0, actionID: action.actionID, utc: action.utc, timezoneOffset: action.timezoneOffset)
-//        )
-//        DopamineKit.DebugLog("Added tracked action with id:\(trackingID)")
-//        } catch {
-//            DopamineKit.DebugLog("Couldn't add tracked action")
-//        }
         
-//        do {
-//            try SQLTrackedActionDataHelper.delete(SQLTrackedAction(index: 5, actionID: "test",
-//                utc: 12345,
-//                timezoneOffset: 3))
-//        } catch {
-//            DopamineKit.DebugLog("COuldn't delete")
-//        }
-        
-        
-        
-        // query whole table
         do {
-            
-            if let trackedActions = try SQLTrackedActionDataHelper.findAll(){
-                for action in trackedActions{
-                    DopamineKit.DebugLog("Index:(\(action.index!)) ActionID:(\(action.actionID!)) at utc:(\(action.utc!)) with offset:(\(action.timezoneOffset!))")
+            // save action
+            action.reinforcementID = feedback
+            let rowId =
+                try SQLReportedActionDataHelper.insert(
+                    SQLReportedAction(
+                        index:0,
+                        actionID: action.actionID,
+                        reinforcementID: action.reinforcementID,
+                        utc: action.utc,
+                        timezoneOffset: action.timezoneOffset)
+            )
+            // send chunk of actions
+            do{
+                if (Int(rowId) > DopamineAPI.PreferredReportLength) {
+                    var reportedActions = Array<DopeAction>()
+                    for action in try SQLReportedActionDataHelper.findAll()!{
+                        reportedActions.append(
+                            DopeAction(
+                                actionID: action.actionID!,
+                                reinforcementID: action.reinforcementID!,
+                                utc: action.utc!,
+                                timezoneOffset: action.timezoneOffset!
+                            )
+                        )
+                    }
+                    
+                    DopamineAPI.report(reportedActions)
+                }
+                else {
+                    DopamineKit.DebugLog("\(actionID) saved. Report container:(\(rowId)/\(DopamineAPI.PreferredReportLength))")
                 }
             }
-        } catch {
-            DopamineKit.DebugLog("Couldn't print all from sql table")
         }
-        
-        do {
-            try SQLTrackedActionDataHelper.dropTable()
-        } catch {
-            DopamineKit.DebugLog("COuldn't drop Tracked Action table")
+        catch {
+            DopamineKit.DebugLog("Error: could not get results from \(SQLReportedActionDataHelper.TABLE_NAME)")
+            return
         }
-        
+        catch {
+            DopamineKit.DebugLog("Error: could not insert (\(actionID)) into \(SQLReportedActionDataHelper.TABLE_NAME)")
+        }
+
     }
     
     /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'

@@ -1,5 +1,5 @@
 //
-//  SQLTrackedActionDataHelper.swift
+//  SQLReportedActionDataHelper.swift
 //  Pods
 //
 //  Created by Akash Desai on 7/18/16.
@@ -10,27 +10,29 @@ import Foundation
 import SQLite
 
 
-typealias SQLTrackedAction = (
+typealias SQLReportedAction = (
     index: Int64?,
     actionID: String?,
-//    metaData: NSData?,
+    reinforcementID: String?,
+    //    metaData: NSData?,
     utc: Int64?,
     timezoneOffset: Int64?
 )
 
 
-class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
+class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     
-    static let TABLE_NAME = "Tracked_Actions"
+    static let TABLE_NAME = "Reinforced_Actions"
     
     static let table = Table(TABLE_NAME)
     static let index = Expression<Int64>("index")
     static let actionID = Expression<String>("actionid")
-//    static let metaData = Expression<SQLite.Blob>("metadata")
+    static let reinforcementID = Expression<String>("reinforcementid")
+    //    static let metaData = Expression<SQLite.Blob>("metadata")
     static let utc = Expression<Int64>("utc")
     static let timezoneOffset = Expression<Int64>("timezoneoffset")
     
-    typealias T = SQLTrackedAction
+    typealias T = SQLReportedAction
     
     static func createTable() throws {
         guard let DB = SQLiteDataStore.instance.DDB else {
@@ -40,7 +42,8 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
             let _ = try DB.run( table.create(ifNotExists: true) {t in
                 t.column(index, primaryKey: true)
                 t.column(actionID)
-//                t.column(metaData)
+                t.column(reinforcementID)
+                //                t.column(metaData)
                 t.column(utc)
                 t.column(timezoneOffset)
                 })
@@ -67,11 +70,11 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func insert(item: T) throws -> Int64 {
-        guard let DB = SQLiteDataStore.instance.DDB else {
-            throw SQLDataAccessError.Datastore_Connection_Error
-        }
-        if (item.actionID != nil && item.utc != nil && item.timezoneOffset != nil) {
-            let insert = table.insert(actionID <- item.actionID!, utc <- item.utc!, timezoneOffset <- item.timezoneOffset!)
+        guard let DB = SQLiteDataStore.instance.DDB
+        else { throw SQLDataAccessError.Datastore_Connection_Error }
+        
+        if (item.actionID != nil && item.reinforcementID != nil && item.utc != nil && item.timezoneOffset != nil) {
+            let insert = table.insert(actionID <- item.actionID!, reinforcementID <- item.reinforcementID!, utc <- item.utc!, timezoneOffset <- item.timezoneOffset!)
             do {
                 let rowId = try DB.run(insert)
                 guard rowId > 0 else {
@@ -83,7 +86,7 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
                 throw SQLDataAccessError.Insert_Error
             }
         } else {
-            DopamineKit.DebugLog("Invalid tracked action values: actionID:(\(item.actionID)) utc:(\(item.utc)) timezoneOffset(\(item.timezoneOffset))")
+            DopamineKit.DebugLog("Invalid reinforced action values: actionID:(\(item.actionID)) reinforcementID:(\(item.reinforcementID)) utc:(\(item.utc)) timezoneOffset:(\(item.timezoneOffset))")
         }
         throw SQLDataAccessError.Nil_In_Data
         
@@ -115,10 +118,10 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
         do {
             let items = try DB.prepare(query)
             for item in  items {
-////                guard var itemMetaData:[String:AnyObject] = NSKeyedUnarchiver(forReadingWithData: NSData.fromDatatypeValue(item[metaData])) as NSDictionary! else {
-//                    return nil
-//                }
-                return SQLTrackedAction(index: item[index] , actionID: item[actionID], utc: item[utc], timezoneOffset: item[timezoneOffset])
+                ////                guard var itemMetaData:[String:AnyObject] = NSKeyedUnarchiver(forReadingWithData: NSData.fromDatatypeValue(item[metaData])) as NSDictionary! else {
+                //                    return nil
+                //                }
+                return SQLReportedAction(index: item[index] , actionID: item[actionID], reinforcementID: item[reinforcementID], utc: item[utc], timezoneOffset: item[timezoneOffset])
             }
         } catch _ {
             throw SQLDataAccessError.Search_Error
@@ -135,8 +138,8 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
         do {
             let items = try DB.prepare(table)
             for item in items {
-//                guard var itemMetaData:[String:AnyObject] = NSKeyedUnarchiver
-                results.append(SQLTrackedAction(index: item[index] , actionID: item[actionID], utc: item[utc], timezoneOffset: item[timezoneOffset]))
+                //                guard var itemMetaData:[String:AnyObject] = NSKeyedUnarchiver
+                results.append(SQLReportedAction(index: item[index] , actionID: item[actionID], reinforcementID: item[reinforcementID], utc: item[utc], timezoneOffset: item[timezoneOffset]))
             }
         } catch {
             throw SQLDataAccessError.Search_Error

@@ -14,65 +14,77 @@ let clientOS = "iOS"
 
 public class DopamineAPI : NSObject{
     
-    static let PreferredTrackSize = 1
+    static let PreferredTrackLength = 5
+    static let PreferredReportLength = 5
+    
+    private let dopamineAPIURL = "https://api.usedopamine.com/v3/app/"
     
     static let instance: DopamineAPI = DopamineAPI()
     private override init() {
         super.init()
     }
     
-    private let dopamineAPIURL = "https://api.usedopamine.com/v3/app/"
+    /// Enter one or more as parameters, or in an array...
+    public static func track(actions: DopeAction...){ return track(actions) }
     
-    static func track(events: DopeAction...){    // Enter one or more as parameters, or in an array
-        return track(events)
-    }
-    
-//    typealias TrackedAction = (
-//        actionID: String,
-//        //    metaData: NSData?,
-//        utc: Int,
-//        timezoneOffset: Int
-//    )
-    
-    static func track(actions: [DopeAction]){
+    public static func track(actions: [DopeAction]){
         // create dict with credentials
         var payload = instance.configurationData
         
         // add tracked events to payload
         var trackedActionsArray = Array<AnyObject>()
         for action in actions{
-            var actionDictionary:[String:AnyObject] = [:]
-            actionDictionary["actionID"] = action.actionID
-//            actionDictionary["metaData"] = action.metaData
-            actionDictionary["UTC"] = NSNumber(longLong: action.utc!)
-            actionDictionary["timezoneOffset"] = NSNumber(longLong: action.timezoneOffset!)
-            trackedActionsArray.append(actionDictionary)
+            trackedActionsArray.append(action.toJSONType())
         }
         payload["actions"] = trackedActionsArray
-        DopamineKit.DebugLog("Payload:\(payload)")
         
         instance.send(.Track, payload: payload, completion: {response in
             // check for bad statusCode
-            NSLog("report response:\(response)")
+            NSLog("track response:\(response)")
         })
         
     }
 
+    public static func report(actions: DopeAction...){ return report(actions) }
     
-    
-    
-    private enum CallType{
-        case Track, Report, Refresh
-        var str:String{ switch self{
-            case .Track: return "track"
-            case .Report: return "report"
-            case .Refresh: return "track"
-            }
+    public static func report(actions: [DopeAction]) {
+        var payload = instance.configurationData
+        
+        var reinforcedActionsArray = Array<AnyObject>()
+        for action in actions{
+            reinforcedActionsArray.append(action.toJSONType())
         }
+        payload["actions"] = reinforcedActionsArray
+        
+        instance.send(.Report, payload: payload, completion: {response in
+            // check for bad statusCode
+            NSLog("report response:\(response)")
+        })
     }
     
     
+    public static func refresh() {
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
     lazy var session = NSURLSession.sharedSession()
+    private enum CallType{
+        case Track, Report, Refresh
+        var str:String{ switch self{
+        case .Track: return "track"
+        case .Report: return "report"
+        case .Refresh: return "track"
+            }
+        }
+    }
     
     /// This function sends a request to the DopamineAPI
     ///
@@ -83,6 +95,7 @@ public class DopamineAPI : NSObject{
     ///     - secondaryIdentity?: An additional idetification string. Defaults to `nil`.
     ///     - completion: A closure with the reinforcement response passed in as a `String`.
     private func send(type: CallType, payload: [String:AnyObject], timeout:NSTimeInterval = 3, completion: [String: AnyObject] -> Void) {
+        DopamineKit.DebugLog("Payload:\(payload)")
         
         let baseURL = NSURL(string: dopamineAPIURL)!
         
@@ -146,7 +159,7 @@ public class DopamineAPI : NSObject{
     // compile the static elements of the request call
     lazy var configurationData: [String: AnyObject] = {
         
-        var dict: [String: AnyObject] = [ "clientOS": "iOS-Swift",
+        var dict: [String: AnyObject] = [ "clientOS": "iOS",
                                           "clientOSVersion": clientOSVersion,
                                           "clientSDKVersion": clientSDKVersion,
                                           ]
