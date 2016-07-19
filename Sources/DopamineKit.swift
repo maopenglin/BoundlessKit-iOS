@@ -11,8 +11,10 @@ import UIKit
 
 
 @objc
-public class DopamineKit : NSObject{
-    /// Initializes the DopamineKit singleton.
+public class DopamineKit : NSObject {
+    
+    // Singleton object
+    public static let instance: DopamineKit = DopamineKit()
     private override init() {
         super.init()
         
@@ -24,45 +26,57 @@ public class DopamineKit : NSObject{
         }
     }
     
-    // Singleton configuration
-    public static let instance: DopamineKit = DopamineKit()
+    
+    
         
     /// This function sends an asynchronous tracking call for the specified actionID
     ///
     /// - parameters:
     ///     - actionID: Descriptive name of the action.
-    ///     - metaData?: Event info as a set of key-value pairs that can be sent with a tracking call. The value should JSON formattable like an NSNumber or NSString. Defaults to `nil`.
+    ///     - metaData?: Action details i.e. calories or streak_count. Must be JSON formattable (Number, String, Bool, Array, Object). Defaults to `nil`.
     ///
-    public static func track(actionID: String, metaData: [String: AnyObject]? = nil){
+    public static func track(actionID: String,
+                             metaData: [String: AnyObject]? = nil) {
+        
         let action = DopeAction(actionID: actionID, metaData:metaData)
-        
-        var queuedTracks:Int64 = 0
-        
         do{
-            queuedTracks = try SQLTrackedActionDataHelper.insert(
-                SQLTrackedAction(index:0, actionID: action.actionID, utc: action.utc, timezoneOffset: action.timezoneOffset)
+            // save action
+            let rowId =
+                try SQLTrackedActionDataHelper.insert(
+                    SQLTrackedAction(
+                        index:0,
+                        actionID: action.actionID,
+                        utc: action.utc,
+                        timezoneOffset: action.timezoneOffset)
             )
-            DopamineKit.DebugLog("Added tracked action with id:\(queuedTracks)")
-        } catch {
-            DopamineKit.DebugLog("Couldn't add tracked action")
-        }
-        
-        if(queuedTracks > 5){
+            // send chunk of actions
             do{
-                var trackArray = Array<DopeAction>()
-                let sqlTrackedActions = try SQLTrackedActionDataHelper.findAll()!
-                
-                for sqlTrack in sqlTrackedActions{
-                    trackArray.append(DopeAction(actionID: sqlTrack.actionID!, utc: sqlTrack.utc!, timezoneOffset: sqlTrack.timezoneOffset!))
+                if (Int(rowId) > DopamineAPI.PreferredTrackSize) {
+                    var trackedActions = Array<DopeAction>()
+                    for action in try SQLTrackedActionDataHelper.findAll()!{
+                        trackedActions.append(
+                            DopeAction(
+                                actionID: action.actionID!,
+                                utc: action.utc!,
+                                timezoneOffset: action.timezoneOffset!
+                            )
+                        )
+                    }
+                    
+                    DopamineAPI.track(trackedActions)
                 }
-                
-                DopamineAPI.track(trackArray)
-            } catch {
-                DopamineKit.DebugLog("Couldnt findall() in Tracked_Actions table")
-                return
+                else {
+                    DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(rowId)/\(DopamineAPI.PreferredTrackSize))")
+                }
             }
         }
-        
+        catch {
+            DopamineKit.DebugLog("Error: could not get results from \(SQLTrackedActionDataHelper.TABLE_NAME)")
+            return
+        }
+        catch {
+            DopamineKit.DebugLog("Error: could not insert (\(actionID)) into \(SQLTrackedActionDataHelper.TABLE_NAME)")
+        }
     }
     
     /// This function sends an asynchronous reinforcement call for the specified actionID
@@ -129,13 +143,14 @@ public class DopamineKit : NSObject{
     ///     - function?: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line?: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    internal static func DebugLog(message: String,  fileName: String = #file, function: String =  #function, line: Int = #line) {
+    internal static func DebugLog(message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
 //        #if DEBUG
             var functionSignature:String = function
             if let parameterNames = functionSignature.rangeOfString("\\((.*?)\\)", options: .RegularExpressionSearch){
                 functionSignature.replaceRange(parameterNames, with: "()")
             }
-            NSLog("[\((fileName as NSString).lastPathComponent):\(line):\(functionSignature)] - \(message)")
+            var fileName = NSString(string: filePath).lastPathComponent.componentsSeparatedByString(".")[0]
+            NSLog("[\(fileName):\(line):\(functionSignature)] - \(message)")
 //        #endif
     }
         

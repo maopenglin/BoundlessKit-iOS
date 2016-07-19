@@ -75,7 +75,7 @@ class Tests: XCTestCase {
     func testPerformanceExample() {
         self.measureBlock {
             
-            let numRequests = 10
+            let numRequests = 1000
             for _ in 1...numRequests{
                 self.testTrackingRequestSimple()
             }
@@ -92,17 +92,6 @@ class Tests: XCTestCase {
         print("CandyBar title: ", candybar.titleLabel.text)
 
     }
-    
-    
-    func add1ToQueue(){
-        
-    
-    }
-    
-    
-    
-    
-    
     
     
     

@@ -13,7 +13,6 @@
 		187F5B015685A684D803CC74A0007B39 /* SQLite.swift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E632933A41B65B75D355F754C005BA4A /* SQLite.swift-dummy.m */; };
 		19AF8BA512DC73AB4B4600EFA4FD8BAB /* CandyBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D78972B57B1249A4B019D1EEEA22535 /* CandyBar.swift */; };
 		1BEE51B92D2F278DBDD8E30F94A3A8D2 /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17220893E9E63E46F70BCA7784198523 /* Schema.swift */; };
-		1C4E6F2CC1F57293BB0C5427E727DBD5 /* Cartridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 768FB110063B0D57E7E35A52E4B9212C /* Cartridge.swift */; };
 		227C676309F43025B8BF87BE9290EEDC /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB44F0C85553660857F351B59660E399 /* SQLite.framework */; };
 		231774216328DDF036152F59DC60E5B2 /* FTS4.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E1491786CB78977109E7F1AF68DCA8 /* FTS4.swift */; };
 		24D3953AE4E43CD88860C24D606B266E /* CoreFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84631C774A3B4D8EB83109D8805D91E /* CoreFunctions.swift */; };
@@ -41,7 +40,6 @@
 		98D6CF4B1D9E53006666FB70C2DE66B2 /* AggregateFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D6DB362DA0D2A1935D75E0A8F808B7 /* AggregateFunctions.swift */; };
 		9A1DEE0CA7DBF39617EFF7370634C61C /* Collation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B509B4439E05E972E58A507E755440B /* Collation.swift */; };
 		9B5C0457A23E61E7C4C5FEAD5235F19D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50E7815F88576C9437438BE64F8C3EE6 /* Foundation.framework */; };
-		9DF8513F1F063917D96C24E69C10EFBE /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5EE11D09D4BC123EA679FB8BB43E049 /* Queue.swift */; };
 		9DF99937BB063D794C1C267DDA40AC69 /* SQLTrackedActionDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 290F2FECB8E954DCDD72B062C180C860 /* SQLTrackedActionDataHelper.swift */; };
 		A54BFC1E1C6EF3C3EE4EC6AD3C4DBFDE /* CandyIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68525871537699DE8C167BF68FE67B2A /* CandyIcon.swift */; };
 		B46070C79DA80EFBB26F01C3644213AE /* Pods-DopamineKit_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C0432E7482FF606EF28ED29A9AD71C6 /* Pods-DopamineKit_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -125,7 +123,6 @@
 		691EC58A4A04A4AEF3C759FA995E2747 /* Expression.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Expression.swift; path = SQLite/Typed/Expression.swift; sourceTree = "<group>"; };
 		71D6DB362DA0D2A1935D75E0A8F808B7 /* AggregateFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AggregateFunctions.swift; path = SQLite/Typed/AggregateFunctions.swift; sourceTree = "<group>"; };
 		7555C005FD3F95381466C1E2DE4D4F46 /* Pods-DopamineKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Example-resources.sh"; sourceTree = "<group>"; };
-		768FB110063B0D57E7E35A52E4B9212C /* Cartridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Cartridge.swift; sourceTree = "<group>"; };
 		7903C387F9738F8BEA1FB1FB17A88892 /* CustomFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CustomFunctions.swift; path = SQLite/Typed/CustomFunctions.swift; sourceTree = "<group>"; };
 		87C3518FB656CDBEB4FCC23B856AD3F0 /* DopeAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeAction.swift; sourceTree = "<group>"; };
 		8AA3974F2DDA824CE5187F9B8434C339 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -147,7 +144,6 @@
 		BCB50A43A300BE12D82B869B121CF3A8 /* Pods-DopamineKit_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-DopamineKit_Example-dummy.m"; sourceTree = "<group>"; };
 		C069E20DDEF64B34B672C03C3CD47AF7 /* SQLite.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SQLite.h; path = SQLite/SQLite.h; sourceTree = "<group>"; };
 		C21963AA06060B425BBBC20DDE17E7E2 /* DopamineKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineKit.swift; sourceTree = "<group>"; };
-		C5EE11D09D4BC123EA679FB8BB43E049 /* Queue.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Queue.swift; path = DataStore/Queue.swift; sourceTree = "<group>"; };
 		CF03B633F34480A002F9568A44AC5DD6 /* Foundation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Foundation.swift; path = SQLite/Foundation.swift; sourceTree = "<group>"; };
 		D439E63659A662FC303F0F404E31FC76 /* Pods_DopamineKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB44F0C85553660857F351B59660E399 /* SQLite.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SQLite.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -411,10 +407,8 @@
 		FB88BEAB44E317DD41BD673C2B95C6E2 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				768FB110063B0D57E7E35A52E4B9212C /* Cartridge.swift */,
 				8B999F80D9B9DB311CD3988C5C93F4F5 /* DopamineKit.h */,
 				C21963AA06060B425BBBC20DDE17E7E2 /* DopamineKit.swift */,
-				C5EE11D09D4BC123EA679FB8BB43E049 /* Queue.swift */,
 				87C3518FB656CDBEB4FCC23B856AD3F0 /* DopeAction.swift */,
 				68227B766B39F6A9B237AA755DBEC400 /* Candy */,
 				4802EB8110AB282A699761C11B1BBDE5 /* DataStore */,
@@ -678,12 +672,10 @@
 			files = (
 				19AF8BA512DC73AB4B4600EFA4FD8BAB /* CandyBar.swift in Sources */,
 				A54BFC1E1C6EF3C3EE4EC6AD3C4DBFDE /* CandyIcon.swift in Sources */,
-				1C4E6F2CC1F57293BB0C5427E727DBD5 /* Cartridge.swift in Sources */,
 				E10AD780FBCBC231299FC5F3797FC4D3 /* DopamineAPI.swift in Sources */,
 				85204E236F1DA4CDF8FA69ED1BA4FA79 /* DopamineKit-dummy.m in Sources */,
 				94EC2F3B3C8C6A016795F0E052A39248 /* DopamineKit.swift in Sources */,
 				D9BF86D8B8E7863CB76525615BF0459F /* DopeAction.swift in Sources */,
-				9DF8513F1F063917D96C24E69C10EFBE /* Queue.swift in Sources */,
 				309C6B1F4DB1AC5E447E83E94DAA5EEF /* SQLDataHelperProtocol.swift in Sources */,
 				8E0B0F49C4D140EA0F84E14EAAF5FE00 /* SQLiteDataStore.swift in Sources */,
 				9DF99937BB063D794C1C267DDA40AC69 /* SQLTrackedActionDataHelper.swift in Sources */,
