@@ -58,7 +58,7 @@ public class DopamineKit : NSObject {
             )
             // send chunk of actions
             do{
-                if (Int(rowId) >= DopamineAPI.PreferredTrackLength) {
+                if ( instance.timerExpired(instance.trackTimer) || Int(rowId) >= DopamineAPI.PreferredTrackLength) {
                     var trackedActions = Array<DopeAction>()
                     for action in try SQLTrackedActionDataHelper.findAll()!{
                         trackedActions.append(
@@ -122,7 +122,7 @@ public class DopamineKit : NSObject {
             )
             // send chunk of actions
             do{
-                if (Int(rowId) > DopamineAPI.PreferredReportLength) {
+                if (instance.timerExpired(instance.reportTimer) || Int(rowId) > DopamineAPI.PreferredReportLength) {
                     var reportedActions = Array<DopeAction>()
                     for action in try SQLReportedActionDataHelper.findAll()!{
                         reportedActions.append(
@@ -152,6 +152,43 @@ public class DopamineKit : NSObject {
 
     }
     
+    
+    typealias SyncTimer = (Int, Int)    // last time and timer length
+    private func timerExpired(timer:SyncTimer) -> Bool{
+        return DopamineKit.UTCTime() > (timer.0+timer.1)
+    }
+    private lazy var trackTimer:SyncTimer = {
+        let keys = ("DopamineTimerTrackLast", "DopamineTimerTrackLength")
+        let defaults = NSUserDefaults.standardUserDefaults()
+        if let lastTime = defaults.valueForKey(keys.0) as? Int, timeLength = defaults.valueForKey(keys.1) as? Int {
+            return (lastTime, timeLength)
+        } else {
+            let utcTime = DopamineKit.UTCTime()
+            let hours = 48 * 3600000
+            defaults.setValue(utcTime, forKey: keys.0)
+            defaults.setValue(hours, forKey: keys.1)
+            return (utcTime, hours)
+        }
+    }()
+    
+    private lazy var reportTimer:SyncTimer = {
+        let keys = ("DopamineTimerReportLast", "DopamineTimerReportLength")
+        let defaults = NSUserDefaults.standardUserDefaults()
+        if let lastTime = defaults.valueForKey(keys.0) as? Int, timeLength = defaults.valueForKey(keys.1) as? Int {
+            return (lastTime, timeLength)
+        } else {
+            let utcTime = DopamineKit.UTCTime()
+            let hours = 12 * 3600000
+            defaults.setValue(utcTime, forKey: keys.0)
+            defaults.setValue(hours, forKey: keys.1)
+            return (utcTime, hours)
+        }
+    }()
+    
+    private static func UTCTime() -> Int {
+        return Int( 1000*NSDate().timeIntervalSince1970 )
+    }
+        
     /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
     ///
     /// - parameters:

@@ -16,6 +16,7 @@ public class DopamineAPI : NSObject{
     
     static let PreferredTrackLength = 5
     static let PreferredReportLength = 5
+    static var PreferredCartridgeLength = 100
     
     private let dopamineAPIURL = "https://api.usedopamine.com/v3/app/"
     
