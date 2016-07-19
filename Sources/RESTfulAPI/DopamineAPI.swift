@@ -12,57 +12,58 @@ let clientOSVersion = UIDevice.currentDevice().systemVersion
 let clientSDKVersion = "4.0.0.beta"
 let clientOS = "iOS"
 
-public class DopeAPIPortal : NSObject{
-    static let instance: DopeAPIPortal = DopeAPIPortal()
+public class DopamineAPI : NSObject{
+    static let instance: DopamineAPI = DopamineAPI()
     private override init() {
         super.init()
     }
     
     private let dopamineAPIURL = "https://api.usedopamine.com/v3/app/"
     
-    static func track(events: DopeEvent...){    // Enter one or more as parameters, or in an array
+    static func track(events: DopeAction...){    // Enter one or more as parameters, or in an array
         return track(events)
     }
     
-    var trackCartridge = Cartridge()
-    
-    static func track(events: [DopeEvent]){
-        for event in events{
-            instance.trackCartridge.push(event)
-        }
+    static func track(actions: [DopeAction]){
+        // create dict with credentials
+        var payload = instance.configurationData
         
-        // Post once near capacity
-        let max = Double(instance.reportCartridge.max)
-        let end = Double(instance.reportCartridge.end)
-        let nearCapacity = 0.0
-        if(end/max >= nearCapacity){
-            // create dict with credentials
-            var payload = instance.configurationData
-            
-            // add tracked events to payload
-            payload.update(["events":instance.trackCartridge.toJsonable()])
-            payload.update(events.first!.toJsonable())  // debug. v3 adaptation
-            
-            // sendRequest()
-            instance.send(.Track, payload: payload, completion: {response in
-                // check for bad statusCode
-                NSLog("report response:\(response)")
-            })
-            
-            
-            // sqldelete all events that were sent
-            
-            // empty the cartridge
+        // add tracked events to payload
+        var trackedActionsArray = Array<AnyObject>()
+        for action in actions{
+            var actionDictionary:[String:AnyObject] = [:]
+            actionDictionary["actionID"] = action.actionID
+//            actionDictionary["metaData"] = action.metaData
+            actionDictionary["UTC"] = NSNumber(longLong: action.utc!)
+            actionDictionary["timezoneOffset"] = NSNumber(longLong: action.timezoneOffset!)
+            trackedActionsArray.append(actionDictionary)
         }
+//        do {
+//        payload["actions"] = try NSJSONSerialization.dataWithJSONObject(trackedActionsArray, options: .PrettyPrinted)
+//        } catch {
+//            DopamineKit.DebugLog("Couldn't add actions:\(trackedActionsArray.debugDescription)")
+//        }
+        payload["actions"] = trackedActionsArray
+        DopamineKit.DebugLog("Payload:\(payload)")
+        // sendRequest()
+        instance.send(.Track, payload: payload, completion: {response in
+            // check for bad statusCode
+            NSLog("report response:\(response)")
+        })
+        
+        
+        // sqldelete all events that were sent
+        
+        // empty the cartridge
+        
         
     }
-    
-    
+
     
     
     var reportCartridge = Cartridge()
     
-    static func report(events: [DopeEvent]){
+    static func report(events: [DopeAction]){
         // add all events and also their feedbacks. feedbacks were added during dkit.reinforce()
         for event in events{
             instance.reportCartridge.push(event)
@@ -103,26 +104,26 @@ public class DopeAPIPortal : NSObject{
     }
     
     // Enter one or more as parameters, or in an array
-    static func report(events: DopeEvent...){ return report(events) }
-    
-    public static func refresh(actionID: String) -> Cartridge{
-        
-        // sendRequest()
-        var payload = instance.configurationData
-        payload["actionID"] = actionID
-        instance.send(.Refresh, payload: payload, completion: {
-            response in
-            DopamineKit.DebugLog("refresh for \(actionID) resulted in:\(response)")
-            
-            // check for bad statusCode
-            
-            // Turn data into DopeEvent
-            
-            // Load into cartridge
-        })
-        
-        return Cartridge()
-    }
+//    static func report(events: DopeAction...){ return report(events) }
+//    
+//    public static func refresh(actionID: String) -> Cartridge{
+//        
+//        // sendRequest()
+//        var payload = instance.configurationData
+//        payload["actionID"] = actionID
+//        instance.send(.Refresh, payload: payload, completion: {
+//            response in
+//            DopamineKit.DebugLog("refresh for \(actionID) resulted in:\(response)")
+//            
+//            // check for bad statusCode
+//            
+//            // Turn data into DopeAction
+//            
+//            // Load into cartridge
+//        })
+//        
+//        return Cartridge()
+//    }
     
     private enum CallType{
         case Track, Report, Refresh
@@ -160,6 +161,7 @@ public class DopeAPIPortal : NSObject{
                 request.HTTPMethod = "POST"
                 request.timeoutInterval = timeout
                 let jsonPayload = try NSJSONSerialization.dataWithJSONObject(payload, options: NSJSONWritingOptions())
+                DopamineKit.DebugLog("sending payload:\(jsonPayload.debugDescription)")
                 request.HTTPBody = jsonPayload
                 
                 // request handler

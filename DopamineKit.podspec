@@ -80,7 +80,7 @@ s.public_header_files = "Sources/**/*.h"
 #
 #  A list of resources included with the Pod.
 
-s.ios.resource_bundle = { 'CandyIcons' => 'Resources/**/CandyIcons.xcassets' }
+s.resource_bundle = { 'CandyIcons' => 'Resources/**/CandyIcons.xcassets' }
 
 
 # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -89,6 +89,6 @@ s.ios.resource_bundle = { 'CandyIcons' => 'Resources/**/CandyIcons.xcassets' }
 #  where they will only apply to your library. If you depend on other Podspecs
 #  you can include multiple dependencies to ensure it works.
 
-#s.dependency 'SQLite.swift'
+s.dependency 'SQLite.swift'
 
 end
