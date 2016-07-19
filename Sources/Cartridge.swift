@@ -12,35 +12,35 @@ import Foundation
 
 public class Cartridge{
     
-    public var events = [DopeEvent]()
+    public var events = [DopeAction]()
     
-    var end:Int = 0
+    var end:Int = -1
     let max:Int         // soft max. you can push more than max
     
     public init(size:Int = 100){
         max = size
     }
     
-    public func pop() -> DopeEvent?{
-        guard end > 0 else{
+    public func pop() -> DopeAction?{
+        guard end > -1 else{
             DopamineKit.DebugLog("Cartridge empty (0\(max))")
             return nil
         }
-        end-1
+        end-=1
         return events.popLast()
     }
     
-    public func push(event:DopeEvent){
+    public func push(event:DopeAction){
         events.append(event)
-        end+1
+        end+=1
     }
     
     public func toJsonable() -> [AnyObject] {
         var eventArray:[AnyObject] = []
         
-        for event in events{
-            eventArray.append(event.toJsonable())
-        }
+//        for event in events{
+//            eventArray.append(event.toJsonable())
+//        }
         
         return eventArray
     }

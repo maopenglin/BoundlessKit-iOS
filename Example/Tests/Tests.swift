@@ -90,10 +90,14 @@ class Tests: XCTestCase {
         let color = CandyBar.hexStringToUIColor("#F0F0F0")
         let candybar = CandyBar(title: "Title", subtitle: "subtitle", icon: CandyIcon.Certificate, backgroundColor: color)
         print("CandyBar title: ", candybar.titleLabel.text)
+
     }
     
     
+    func add1ToQueue(){
+        
     
+    }
     
     
     
@@ -104,7 +108,7 @@ class Tests: XCTestCase {
     
     func testRefresh(){
         print("starting test")
-        _ = DopeAPIPortal.refresh("action1")
+//        _ = DopamineAPI.refresh("action1")
 //        while var event = resultCartridge.pop(){
 //            print(event.reinforcement)
 //        }

@@ -18,17 +18,18 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
+        DopamineKit.instance
     }
     
     func action1Performed(){
         
         // Reinforce the action to make it sticky!!
-        DopamineKit.reinforce("action1", completion: {response in
+        DopamineKit.reinforce("action1", completion: {reinforcement in
             // So we don't run on the main thread
             dispatch_async(dispatch_get_main_queue(), {
                 
                 // Update UI to display reinforcement decision on screen for learning purposes
-                self.responseLabel.text = response
+                self.responseLabel.text = reinforcement
                 self.flash(self.responseLabel)
                 
                 
@@ -40,7 +41,7 @@ class ViewController: UIViewController {
                 var visibilityDuration:NSTimeInterval = 1.75
                 
                 // Set up a couple of different responses to keep your users surprised
-                switch(response){
+                switch(reinforcement){
                 case "medalStar":
                     reinforcerType = CandyIcon.MedalStar
                     title = "You should drop an album soon"
