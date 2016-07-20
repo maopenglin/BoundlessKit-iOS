@@ -38,7 +38,7 @@ public class DopamineKit : NSObject {
             SQLTrackedAction(
                 index:0,
                 actionID: action.actionID,
-                metaData: action.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(action.metaData!).datatypeValue,
+                metaData: action.metaData,
                 utc: action.utc,
                 timezoneOffset: action.timezoneOffset)
             )
@@ -55,7 +55,7 @@ public class DopamineKit : NSObject {
                 trackedActions.append(
                     DopeAction(
                         actionID: action.actionID,
-                        metaData: action.metaData==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData( NSData.fromDatatypeValue( action.metaData!) ) as? [String : AnyObject],
+                        metaData: action.metaData,
                         utc: action.utc,
                         timezoneOffset: action.timezoneOffset)
                 )
@@ -96,7 +96,7 @@ public class DopamineKit : NSObject {
                     index:0,
                     actionID: action.actionID,
                     reinforcementDecision: action.reinforcementDecision!,
-                    metaData: action.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(action.metaData!).datatypeValue,
+                    metaData: action.metaData,
                     utc: action.utc,
                     timezoneOffset: action.timezoneOffset)
             )
@@ -114,7 +114,7 @@ public class DopamineKit : NSObject {
                     DopeAction(
                         actionID: action.actionID,
                         reinforcementDecision: action.reinforcementDecision,
-                        metaData: action.metaData==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData( NSData.fromDatatypeValue( action.metaData!) ) as? [String : AnyObject],
+                        metaData: action.metaData,
                         utc: action.utc,
                         timezoneOffset: action.timezoneOffset
                     )

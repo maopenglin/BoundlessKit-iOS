@@ -13,7 +13,7 @@ import SQLite
 typealias SQLTrackedAction = (
     index: Int64,
     actionID: String,
-    metaData: Blob?,
+    metaData: [String:AnyObject]?,
     utc: Int64,
     timezoneOffset: Int64
 )
@@ -61,7 +61,11 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     static func insert(item: T) -> Int64? {
         let DB = SQLiteDataStore.instance.DDB!
         
-        let insert = table.insert(actionID <- item.actionID, metaData <- item.metaData?.datatypeValue, utc <- item.utc, timezoneOffset <- item.timezoneOffset)
+        let insert = table.insert(
+            actionID <- item.actionID,
+            metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue),
+            utc <- item.utc,
+            timezoneOffset <- item.timezoneOffset )
         do {
             let rowId = try DB.run(insert)
             DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID)")
@@ -96,7 +100,12 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
         do {
             let items = try DB.prepare(query)
             for item:Row in  items {
-                return SQLTrackedAction(index: item[index] , actionID: item[actionID], metaData: item[metaData], utc: item[utc], timezoneOffset: item[timezoneOffset])
+                return SQLTrackedAction(
+                    index: item[index] ,
+                    actionID: item[actionID],
+                    metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
+                    utc: item[utc],
+                    timezoneOffset: item[timezoneOffset])
             }
         } catch {
             DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with id:\(id)")
@@ -112,7 +121,13 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
         do {
             let items = try DB.prepare(table)
             for item in items {
-                results.append(SQLTrackedAction(index: item[index] , actionID: item[actionID], metaData: item[metaData], utc: item[utc], timezoneOffset: item[timezoneOffset]))
+                results.append( SQLTrackedAction(
+                    index: item[index],
+                    actionID: item[actionID],
+                    metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
+                    utc: item[utc],
+                    timezoneOffset: item[timezoneOffset] )
+                )
             }
         } catch {
             DopamineKit.DebugLog("Search error for Table:\(TABLE_NAME)")

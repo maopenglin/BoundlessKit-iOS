@@ -14,7 +14,7 @@ typealias SQLReportedAction = (
     index: Int64,
     actionID: String,
     reinforcementDecision: String,
-    metaData: Blob?,
+    metaData: [String:AnyObject]?,
     utc: Int64,
     timezoneOffset: Int64
 )
@@ -65,13 +65,18 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     static func insert(item: T) -> Int64? {
         let DB = SQLiteDataStore.instance.DDB!
         
-        let insert = table.insert(actionID <- item.actionID, reinforcementDecision <- item.reinforcementDecision, metaData <- item.metaData?.datatypeValue, utc <- item.utc, timezoneOffset <- item.timezoneOffset)
+        let insert = table.insert(
+            actionID <- item.actionID,
+            reinforcementDecision <- item.reinforcementDecision,
+            metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue),
+            utc <- item.utc,
+            timezoneOffset <- item.timezoneOffset )
         do {
             let rowId = try DB.run(insert)
             DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID)")
             return rowId
         } catch {
-            DopamineKit.DebugLog("Insert error for reported action with values actionID:(\(item.actionID)) utc:(\(item.utc)) timezoneOffset(\(item.timezoneOffset))")
+            DopamineKit.DebugLog("Insert error for reported action with values actionID:(\(item.actionID)) metaData:(\(item.metaData)) utc:(\(item.utc)) timezoneOffset(\(item.timezoneOffset))")
             return nil
         }
     }
@@ -100,7 +105,13 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         do {
             let items = try DB.prepare(query)
             for item in  items {
-                return SQLReportedAction(index: item[index] , actionID: item[actionID], reinforcementDecision: item[reinforcementDecision], metaData: item[metaData], utc: item[utc], timezoneOffset: item[timezoneOffset])
+                return SQLReportedAction(
+                    index: item[index],
+                    actionID: item[actionID],
+                    reinforcementDecision: item[reinforcementDecision],
+                    metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
+                    utc: item[utc],
+                    timezoneOffset: item[timezoneOffset] )
             }
         } catch {
             DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with id:\(id)")
@@ -116,7 +127,14 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         do {
             let items = try DB.prepare(table)
             for item in items {
-                results.append(SQLReportedAction(index: item[index] , actionID: item[actionID], reinforcementDecision: item[reinforcementDecision], metaData: item[metaData], utc: item[utc], timezoneOffset: item[timezoneOffset]))
+                results.append(SQLReportedAction(
+                    index: item[index] ,
+                    actionID: item[actionID],
+                    reinforcementDecision: item[reinforcementDecision],
+                    metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
+                    utc: item[utc],
+                    timezoneOffset: item[timezoneOffset] )
+                )
             }
         } catch {
             DopamineKit.DebugLog("Search error for Table:\(TABLE_NAME)")
