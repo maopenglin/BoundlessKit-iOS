@@ -18,13 +18,14 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
-        DopamineKit.instance
+//        let _ = DopamineKit.instance
     }
     
     func action1Performed(){
-        
+
         // Reinforce the action to make it sticky!!
-        DopamineKit.reinforce("action1", completion: {reinforcement in
+//        DopamineKit.reinforce("action1", completion: {reinforcement in
+        DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {reinforcement in
             // So we don't run on the main thread
             dispatch_async(dispatch_get_main_queue(), {
                 
@@ -76,6 +77,7 @@ class ViewController: UIViewController {
     
     func action2Performed(){
         // Tracking call is sent asynchronously
+//        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
         DopamineKit.track("action2")
     }
     

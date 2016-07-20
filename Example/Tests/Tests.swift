@@ -25,7 +25,7 @@ class Tests: XCTestCase {
 //            NSLog("DopamineKitTest reinforce resulted in:\(response)")
 //            asyncExpectation.fulfill()
 //        })
-//        
+//
 //        waitForExpectationsWithTimeout(10, handler: {error in
 //            XCTAssertNil(error, "DopamineKitTest error: reinforce request timed out")
 //        })

@@ -8,32 +8,18 @@
 
 import Foundation
 import UIKit
-
+import SQLite
 
 @objc
 public class DopamineKit : NSObject {
     
     // Singleton object
     public static let instance: DopamineKit = DopamineKit()
+    
     private override init() {
         super.init()
-        
-        do {
-            try SQLReportedActionDataHelper.createTable()
-            DopamineKit.DebugLog("Table \(SQLReportedActionDataHelper.TABLE_NAME) created!")
-        } catch {
-            DopamineKit.DebugLog("Something went wrong with \(SQLReportedActionDataHelper.TABLE_NAME) table creation")
-        }
-        
-        do {
-            try SQLTrackedActionDataHelper.createTable()
-            DopamineKit.DebugLog("Table \(SQLTrackedActionDataHelper.TABLE_NAME) created!")
-        } catch {
-            DopamineKit.DebugLog("Something went wrong with \(SQLTrackedActionDataHelper.TABLE_NAME) table creation")
-        }
+        SQLiteDataStore.instance.createTables()
     }
-    
-    
     
         
     /// This function sends an asynchronous tracking call for the specified actionID
@@ -44,52 +30,48 @@ public class DopamineKit : NSObject {
     ///
     public static func track(actionID: String,
                              metaData: [String: AnyObject]? = nil) {
-        
+        let _ = instance
         let action = DopeAction(actionID: actionID, metaData:metaData)
-        do{
-            // save action
-            let rowId =
-                try SQLTrackedActionDataHelper.insert(
-                    SQLTrackedAction(
-                        index:0,
+        
+        // save action
+        guard let rowId = SQLTrackedActionDataHelper.insert(
+            SQLTrackedAction(
+                index:0,
+                actionID: action.actionID,
+                metaData: action.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(action.metaData!).datatypeValue,
+                utc: action.utc,
+                timezoneOffset: action.timezoneOffset)
+            )
+            else{
+                // if it couldnt be saved, send it
+                DopamineAPI.track(action)
+                return
+        }
+        
+        // send chunk of actions
+        if ( Int(rowId) >= DopamineAPI.PreferredTrackLength ) {
+            var trackedActions = Array<DopeAction>()
+            for action in SQLTrackedActionDataHelper.findAll() {
+                trackedActions.append(
+                    DopeAction(
                         actionID: action.actionID,
+                        metaData: action.metaData==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData( NSData.fromDatatypeValue( action.metaData!) ) as? [String : AnyObject],
                         utc: action.utc,
                         timezoneOffset: action.timezoneOffset)
-            )
-            // send chunk of actions
-            do{
-                if ( instance.timerExpired(instance.trackTimer) || Int(rowId) >= DopamineAPI.PreferredTrackLength) {
-                    var trackedActions = Array<DopeAction>()
-                    for action in try SQLTrackedActionDataHelper.findAll()!{
-                        trackedActions.append(
-                            DopeAction(
-                                actionID: action.actionID!,
-                                utc: action.utc!,
-                                timezoneOffset: action.timezoneOffset!
-                            )
-                        )
-                    }
-                    
-                    DopamineAPI.track(trackedActions)
-                    do { try SQLTrackedActionDataHelper.dropTable() }
-                    catch { DopamineKit.DebugLog("Error dropping table \(SQLTrackedActionDataHelper.TABLE_NAME)") }
-                    do { try SQLTrackedActionDataHelper.createTable() }
-                    catch { DopamineKit.DebugLog("Error recreating table \(SQLTrackedActionDataHelper.TABLE_NAME)") }
-                }
-                else {
-                    DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(rowId)/\(DopamineAPI.PreferredTrackLength))")
-                }
+                )
             }
+            
+            DopamineAPI.track(trackedActions)
+            
+            SQLTrackedActionDataHelper.dropTable()
+            SQLTrackedActionDataHelper.createTable()
         }
-        catch {
-            DopamineKit.DebugLog("Error: could not get results from \(SQLTrackedActionDataHelper.TABLE_NAME)")
-            return
+        else {
+            DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(rowId)/\(DopamineAPI.PreferredTrackLength))")
         }
-        catch {
-            DopamineKit.DebugLog("Error: could not insert (\(actionID)) into \(SQLTrackedActionDataHelper.TABLE_NAME)")
-        }
+        
     }
-    
+
     /// This function sends an asynchronous reinforcement call for the specified actionID
     ///
     /// - parameters:
@@ -100,95 +82,58 @@ public class DopamineKit : NSObject {
     ///     - completion: A closure with the reinforcement response passed in as a `String`.
     ///
     public static func reinforce(actionID: String, metaData: [String: AnyObject]? = nil, completion: (String) -> ()) {
-        
+        let _ = instance
         // First generate a decision and call the handler
-        var action = DopeAction(actionID: actionID)
+        var action = DopeAction(actionID: actionID, metaData: metaData)
         let feedback = "neutralFeedback"
 //        let feedback = DecisionEngine.reinforceEvent(&event)
-//        completion(feedback)
+        completion(feedback)
         
-        
-        do {
-            // save action
-            action.reinforcementID = feedback
-            let rowId =
-                try SQLReportedActionDataHelper.insert(
-                    SQLReportedAction(
-                        index:0,
-                        actionID: action.actionID,
-                        reinforcementID: action.reinforcementID,
-                        utc: action.utc,
-                        timezoneOffset: action.timezoneOffset)
+        // save action
+        action.reinforcementDecision = feedback
+        guard let rowId = SQLReportedActionDataHelper.insert(
+                SQLReportedAction(
+                    index:0,
+                    actionID: action.actionID,
+                    reinforcementDecision: action.reinforcementDecision!,
+                    metaData: action.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(action.metaData!).datatypeValue,
+                    utc: action.utc,
+                    timezoneOffset: action.timezoneOffset)
             )
-            // send chunk of actions
-            do{
-                if (instance.timerExpired(instance.reportTimer) || Int(rowId) > DopamineAPI.PreferredReportLength) {
-                    var reportedActions = Array<DopeAction>()
-                    for action in try SQLReportedActionDataHelper.findAll()!{
-                        reportedActions.append(
-                            DopeAction(
-                                actionID: action.actionID!,
-                                reinforcementID: action.reinforcementID!,
-                                utc: action.utc!,
-                                timezoneOffset: action.timezoneOffset!
-                            )
-                        )
-                    }
-                    
-                    DopamineAPI.report(reportedActions)
-                }
-                else {
-                    DopamineKit.DebugLog("\(actionID) saved. Report container:(\(rowId)/\(DopamineAPI.PreferredReportLength))")
-                }
+            else {
+                DopamineAPI.report(action)
+                return
+        }
+        // send chunk of actions
+        if ( Int(rowId) >= DopamineAPI.PreferredReportLength ) {
+            
+            var reportedActions = Array<DopeAction>()
+            for action in SQLReportedActionDataHelper.findAll() {
+                var unarchivedMetaData:[String:AnyObject]?
+                reportedActions.append(
+                    DopeAction(
+                        actionID: action.actionID,
+                        reinforcementDecision: action.reinforcementDecision,
+                        metaData: action.metaData==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData( NSData.fromDatatypeValue( action.metaData!) ) as? [String : AnyObject],
+                        utc: action.utc,
+                        timezoneOffset: action.timezoneOffset
+                    )
+                )
             }
-        }
-        catch {
-            DopamineKit.DebugLog("Error: could not get results from \(SQLReportedActionDataHelper.TABLE_NAME)")
-            return
-        }
-        catch {
-            DopamineKit.DebugLog("Error: could not insert (\(actionID)) into \(SQLReportedActionDataHelper.TABLE_NAME)")
-        }
-
-    }
-    
-    
-    typealias SyncTimer = (Int, Int)    // last time and timer length
-    private func timerExpired(timer:SyncTimer) -> Bool{
-        return DopamineKit.UTCTime() > (timer.0+timer.1)
-    }
-    private lazy var trackTimer:SyncTimer = {
-        let keys = ("DopamineTimerTrackLast", "DopamineTimerTrackLength")
-        let defaults = NSUserDefaults.standardUserDefaults()
-        if let lastTime = defaults.valueForKey(keys.0) as? Int, timeLength = defaults.valueForKey(keys.1) as? Int {
-            return (lastTime, timeLength)
+            
+            DopamineAPI.report(reportedActions)
+            
+            SQLReportedActionDataHelper.dropTable()
+            SQLReportedActionDataHelper.createTable()
+            
         } else {
-            let utcTime = DopamineKit.UTCTime()
-            let hours = 48 * 3600000
-            defaults.setValue(utcTime, forKey: keys.0)
-            defaults.setValue(hours, forKey: keys.1)
-            return (utcTime, hours)
+            DopamineKit.DebugLog("\(actionID) saved. Report container:(\(rowId)/\(DopamineAPI.PreferredReportLength))")
         }
-    }()
-    
-    private lazy var reportTimer:SyncTimer = {
-        let keys = ("DopamineTimerReportLast", "DopamineTimerReportLength")
-        let defaults = NSUserDefaults.standardUserDefaults()
-        if let lastTime = defaults.valueForKey(keys.0) as? Int, timeLength = defaults.valueForKey(keys.1) as? Int {
-            return (lastTime, timeLength)
-        } else {
-            let utcTime = DopamineKit.UTCTime()
-            let hours = 12 * 3600000
-            defaults.setValue(utcTime, forKey: keys.0)
-            defaults.setValue(hours, forKey: keys.1)
-            return (utcTime, hours)
-        }
-    }()
-    
-    private static func UTCTime() -> Int {
-        return Int( 1000*NSDate().timeIntervalSince1970 )
-    }
         
+        
+        
+    }
+    
     /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
     ///
     /// - parameters:

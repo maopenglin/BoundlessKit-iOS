@@ -10,8 +10,9 @@ import Foundation
 
 protocol SQLDataHelperProtocol {
     typealias T
-    static func createTable() throws -> Void
-    static func insert(item: T) throws -> Int64
-    static func delete(item: T) throws -> Void
-    static func findAll() throws -> [T]?
+    static func createTable() -> Void
+    static func dropTable() -> Void
+    static func insert(item: T) -> Int64?
+    static func delete(item: T) -> Void
+    static func findAll() -> [T]
 }
