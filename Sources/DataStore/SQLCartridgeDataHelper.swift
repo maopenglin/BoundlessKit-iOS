@@ -47,7 +47,7 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
     }
     
     
-    static func dropTable() {}
+    static func dropTable() { }
     
     static func dropTable(actionID: String) {
         let DB = SQLiteDataStore.instance.DDB!
@@ -60,6 +60,19 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         } catch {
             DopamineKit.DebugLog("Error dropping table:(\(TABLE_NAME))")
         }
+    }
+    
+    static func dropTables() {
+        let DB = SQLiteDataStore.instance.DDB!
+        for table in tables {
+            do {
+                let _ = try DB.run( table.1.drop(ifExists: true) )
+                DopamineKit.DebugLog("Dropped table:(\(TABLE_NAME_PREFIX)\(table.0))")
+            } catch {
+                DopamineKit.DebugLog("Error dropping table:(\(TABLE_NAME_PREFIX)\(table.0))")
+            }
+        }
+        tables = [:]
     }
     
     static func insert(item: T) -> Int64? {
@@ -91,7 +104,7 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
             guard tmp == 1 else {
                 throw SQLDataAccessError.Delete_Error
             }
-            DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) successful")
+            DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) actionID:\(item.actionID) reinforcementDecision:\(item.reinforcementDecision) successful")
         } catch {
             DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) failed")
         }

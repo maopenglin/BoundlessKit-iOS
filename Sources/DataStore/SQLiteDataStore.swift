@@ -57,6 +57,7 @@ public class SQLiteDataStore : NSObject{
         
         SQLTrackedActionDataHelper.dropTable()
         SQLReportedActionDataHelper.dropTable()
+        SQLCartridgeDataHelper.dropTables()
     }
     
 }
