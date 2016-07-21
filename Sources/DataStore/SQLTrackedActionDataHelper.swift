@@ -53,6 +53,7 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
         let DB = SQLiteDataStore.instance.DDB!
         do {
             let _ = try DB.run( table.drop(ifExists: true) )
+            DopamineKit.DebugLog("Dropped table:(\(TABLE_NAME))")
         } catch {
             DopamineKit.DebugLog("Error dropping table:(\(TABLE_NAME))")
         }

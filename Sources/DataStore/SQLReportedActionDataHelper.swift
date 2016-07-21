@@ -43,7 +43,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                 t.column(actionID)
                 t.column(reinforcementDecision)
                 t.column(metaData)
-                t.column(utc)
+                t.column(utc, references: SQLTrackedActionDataHelper.table, index)
                 t.column(timezoneOffset)
                 })
             DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
@@ -57,6 +57,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         let DB = SQLiteDataStore.instance.DDB!
         do {
             let _ = try DB.run( table.drop(ifExists: true) )
+            DopamineKit.DebugLog("Dropped table:(\(TABLE_NAME))")
         } catch {
             DopamineKit.DebugLog("Error dropping table:(\(TABLE_NAME))")
         }

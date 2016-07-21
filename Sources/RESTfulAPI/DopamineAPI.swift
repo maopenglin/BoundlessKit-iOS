@@ -16,7 +16,9 @@ public class DopamineAPI : NSObject{
     
     static let PreferredTrackLength = 5
     static let PreferredReportLength = 5
-    static var PreferredCartridgeLength = 100
+    static var PreferredMinimumCartridgeCapacity = 0.25
+    
+    static var cartridges : [String:[String]] = [:]
     
     private let dopamineAPIURL = "https://api.usedopamine.com/v3/app/"
     
@@ -64,8 +66,33 @@ public class DopamineAPI : NSObject{
     }
     
     
-    public static func refresh() {
+    public static func refresh(actionID: String){
         
+        var payload = instance.configurationData
+        payload["actionID"] = actionID
+        
+        DopamineKit.DebugLog("Refreshing \(actionID)...")
+        instance.send(.Refresh, payload: payload, completion: { response in
+            // load
+            var cartridge = ["neutralFeedback", "stars", "neutralFeedback", "thumbsUp"]
+            
+            SQLCartridgeDataHelper.dropTable(actionID)
+            SQLCartridgeDataHelper.createTable(actionID)
+            for decision in cartridge {
+                guard let rowId = SQLCartridgeDataHelper.insert(
+                    SQLCartridge(
+                        index:0,
+                        actionID: actionID,
+                        reinforcementDecision: decision)
+                    )
+                    else{
+                        DopamineKit.DebugLog("Couldn't add \(decision) to cartridge sql")
+                        break
+                }
+            }
+            
+            DopamineKit.DebugLog("\(actionID) refreshed!")
+        })
     }
     
     
@@ -82,7 +109,7 @@ public class DopamineAPI : NSObject{
         var str:String{ switch self{
         case .Track: return "track"
         case .Report: return "report"
-        case .Refresh: return "track"
+        case .Refresh: return "refresh"
             }
         }
     }
@@ -222,6 +249,30 @@ public class DopamineAPI : NSObject{
          */
     }()
     
+    static let CartridgeCapacityKey = "DopamineCartridgeCapacities"
+    lazy var cartridgeCapacities:[NSString:NSNumber] = {
+        let defaults = NSUserDefaults.standardUserDefaults()
+        if let capacities = defaults.valueForKey(DopamineAPI.CartridgeCapacityKey) as? [NSString:NSNumber] {
+            return capacities
+        } else {
+            let capacities:[NSString:NSNumber] = [:]
+            defaults.setObject(capacities, forKey: DopamineAPI.CartridgeCapacityKey)
+            return capacities
+        }
+    }()
+    private func updateCartridgeCapacity(actionID: NSString, size: NSNumber){
+        let defaults = NSUserDefaults.standardUserDefaults()
+        cartridgeCapacities[actionID] = size
+        defaults.setObject(cartridgeCapacities, forKey: DopamineAPI.CartridgeCapacityKey)
+    }
+    
+    private func cartridgeNeedsReload(actionID: String, left:Int64) -> Bool{
+        if let capacity = cartridgeCapacities[NSString(string: actionID)]{
+            return (Double(left) / Double(capacity)) < DopamineAPI.PreferredMinimumCartridgeCapacity
+        } else {
+            return true
+        }
+    }
     
     // get the primary identity as a lazy computed variable
     lazy var primaryIdentity:String = {

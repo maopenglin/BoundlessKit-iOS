@@ -13,7 +13,7 @@ import SQLite
 @objc
 public class DopamineKit : NSObject {
     
-    // Singleton object
+    // Singleton pattern
     public static let instance: DopamineKit = DopamineKit()
     
     private override init() {
@@ -26,10 +26,11 @@ public class DopamineKit : NSObject {
     ///
     /// - parameters:
     ///     - actionID: Descriptive name of the action.
-    ///     - metaData?: Action details i.e. calories or streak_count. Must be JSON formattable (Number, String, Bool, Array, Object). Defaults to `nil`.
+    ///     - metaData?: Action details i.e. calories or streak_count. 
+    ///                  Must be JSON formattable (Number, String, Bool, Array, Object).
+    ///                  Defaults to `nil`.
     ///
-    public static func track(actionID: String,
-                             metaData: [String: AnyObject]? = nil) {
+    public static func track(actionID: String, metaData: [String: AnyObject]? = nil) {
         let _ = instance
         let action = DopeAction(actionID: actionID, metaData:metaData)
         
@@ -70,27 +71,40 @@ public class DopamineKit : NSObject {
             DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(rowId)/\(DopamineAPI.PreferredTrackLength))")
         }
         
+        SQLCartridgeDataHelper.createTable("action1")
+        DopamineAPI.refresh("action1")
+        
     }
 
     /// This function sends an asynchronous reinforcement call for the specified actionID
     ///
     /// - parameters:
     ///     - actionID: Descriptive name of the action.
-    ///     - metaData?: Event info as a set of key-value pairs that can be sent with a tracking call. The value should JSON formattable like an NSNumber or NSString. Defaults to `nil`.
-    ///     - secondaryIdentity?: An additional idetification string. Defaults to `nil`.
-    ///     - timeoutSeconds?: Default 2.0 - the timeout in seconds for the connection
+    ///     - metaData?: Action details i.e. calories or streak_count.
+    ///                  Must be JSON formattable (Number, String, Bool, Array, Object).
+    ///                  Defaults to `nil`.
     ///     - completion: A closure with the reinforcement response passed in as a `String`.
     ///
     public static func reinforce(actionID: String, metaData: [String: AnyObject]? = nil, completion: (String) -> ()) {
         let _ = instance
-        // First generate a decision and call the handler
         var action = DopeAction(actionID: actionID, metaData: metaData)
-        let feedback = "neutralFeedback"
+        
+        // send back a reinforcementDecision
+        var reinforcementDecision = "test"
 //        let feedback = DecisionEngine.reinforceEvent(&event)
-        completion(feedback)
+        
+        if let rdSql = SQLCartridgeDataHelper.findLast(actionID) {
+            reinforcementDecision = rdSql.reinforcementDecision
+            SQLCartridgeDataHelper.delete(rdSql)
+        } else {
+            DopamineAPI.refresh(actionID)
+        }
+        
+        
+        completion(reinforcementDecision)
         
         // save action
-        action.reinforcementDecision = feedback
+        action.reinforcementDecision = reinforcementDecision
         guard let rowId = SQLReportedActionDataHelper.insert(
                 SQLReportedAction(
                     index:0,
@@ -125,7 +139,6 @@ public class DopamineKit : NSObject {
             
             SQLReportedActionDataHelper.dropTable()
             SQLReportedActionDataHelper.createTable()
-            
         } else {
             DopamineKit.DebugLog("\(actionID) saved. Report container:(\(rowId)/\(DopamineAPI.PreferredReportLength))")
         }
