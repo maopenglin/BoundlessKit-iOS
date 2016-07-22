@@ -37,6 +37,8 @@ public class SQLiteDataStore : NSObject{
             DopamineKit.DebugLog("Connection to \(path) failed")
             DDB = nil
         }
+        
+        super.init()
     }
     
     func createTables(){

@@ -34,6 +34,8 @@
 		844AEFF71D3E33E40018B31F /* JSONDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844AEFF61D3E33E40018B31F /* JSONDataType.swift */; };
 		844AEFF91D3E3C730018B31F /* SQLReportedActionDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844AEFF81D3E3C730018B31F /* SQLReportedActionDataHelper.swift */; };
 		844AEFFB1D3F03630018B31F /* SQLCartridgeDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844AEFFA1D3F03630018B31F /* SQLCartridgeDataHelper.swift */; };
+		8481E6051D421CCC001F818E /* DopeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8481E6041D421CCC001F818E /* DopeAction.swift */; };
+		8481E6071D421F57001F818E /* TimeSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8481E6061D421F57001F818E /* TimeSyncer.swift */; };
 		84F48B1D3C69DE3D818FB8E0C1E6B478 /* DopamineKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = ED876943A1CC0F97C3AB879A3887FAAC /* DopamineKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		85204E236F1DA4CDF8FA69ED1BA4FA79 /* DopamineKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 162F804AE3E398D48D45792A69C0ED4B /* DopamineKit-dummy.m */; };
 		87ABCCC9A063741F389498D76DC60D3E /* CandyIcons.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 1F130D9149F249F64C4260D3884DC9F3 /* CandyIcons.bundle */; };
@@ -50,7 +52,6 @@
 		C5C753FD1A2A359C2D22385079C123A7 /* Blob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919B4A12D2BBB42EB054E1EAC1590385 /* Blob.swift */; };
 		CA5FD1C2C2D186C48B02AAAB9C847452 /* R*Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84DB78283823A3B7F6E11103F659531 /* R*Tree.swift */; };
 		D771B9E4AD9A854E81FB5D5A9C3230D4 /* fts3_tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = E0DC67512C037897FF9B19B0F4BC616F /* fts3_tokenizer.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		D9BF86D8B8E7863CB76525615BF0459F /* DopeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C3518FB656CDBEB4FCC23B856AD3F0 /* DopeAction.swift */; };
 		DF49C805BFA5ECD11218E2C283B7DCCF /* Statement.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0225E57F58EF2E72B91E96C6A27E0A4 /* Statement.swift */; };
 		E10AD780FBCBC231299FC5F3797FC4D3 /* DopamineAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7E4F5878F2886BA8F04C783CC23CCD /* DopamineAPI.swift */; };
 		EB0391AE80EA63B2BAF34B350FD1A702 /* Setter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312683405829449442CB839B43181C21 /* Setter.swift */; };
@@ -130,7 +131,8 @@
 		844AEFF61D3E33E40018B31F /* JSONDataType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONDataType.swift; sourceTree = "<group>"; };
 		844AEFF81D3E3C730018B31F /* SQLReportedActionDataHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLReportedActionDataHelper.swift; sourceTree = "<group>"; };
 		844AEFFA1D3F03630018B31F /* SQLCartridgeDataHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLCartridgeDataHelper.swift; sourceTree = "<group>"; };
-		87C3518FB656CDBEB4FCC23B856AD3F0 /* DopeAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeAction.swift; sourceTree = "<group>"; };
+		8481E6041D421CCC001F818E /* DopeAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DopeAction.swift; sourceTree = "<group>"; };
+		8481E6061D421F57001F818E /* TimeSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSyncer.swift; sourceTree = "<group>"; };
 		8AA3974F2DDA824CE5187F9B8434C339 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8B999F80D9B9DB311CD3988C5C93F4F5 /* DopamineKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DopamineKit.h; sourceTree = "<group>"; };
 		919B4A12D2BBB42EB054E1EAC1590385 /* Blob.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Blob.swift; path = SQLite/Core/Blob.swift; sourceTree = "<group>"; };
@@ -335,6 +337,15 @@
 			);
 			sourceTree = "<group>";
 		};
+		8481E6031D421CCC001F818E /* Synchronization */ = {
+			isa = PBXGroup;
+			children = (
+				8481E6041D421CCC001F818E /* DopeAction.swift */,
+				8481E6061D421F57001F818E /* TimeSyncer.swift */,
+			);
+			path = Synchronization;
+			sourceTree = "<group>";
+		};
 		8C900629ABE3B1BDE7CDD446AA99624D /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -418,7 +429,7 @@
 			children = (
 				8B999F80D9B9DB311CD3988C5C93F4F5 /* DopamineKit.h */,
 				C21963AA06060B425BBBC20DDE17E7E2 /* DopamineKit.swift */,
-				87C3518FB656CDBEB4FCC23B856AD3F0 /* DopeAction.swift */,
+				8481E6031D421CCC001F818E /* Synchronization */,
 				68227B766B39F6A9B237AA755DBEC400 /* Candy */,
 				4802EB8110AB282A699761C11B1BBDE5 /* DataStore */,
 				2BDAF4D80A1EF6A3A116179F1B54E9E6 /* RESTfulAPI */,
@@ -683,11 +694,12 @@
 				A54BFC1E1C6EF3C3EE4EC6AD3C4DBFDE /* CandyIcon.swift in Sources */,
 				844AEFFB1D3F03630018B31F /* SQLCartridgeDataHelper.swift in Sources */,
 				E10AD780FBCBC231299FC5F3797FC4D3 /* DopamineAPI.swift in Sources */,
+				8481E6071D421F57001F818E /* TimeSyncer.swift in Sources */,
 				85204E236F1DA4CDF8FA69ED1BA4FA79 /* DopamineKit-dummy.m in Sources */,
 				94EC2F3B3C8C6A016795F0E052A39248 /* DopamineKit.swift in Sources */,
 				844AEFF71D3E33E40018B31F /* JSONDataType.swift in Sources */,
-				D9BF86D8B8E7863CB76525615BF0459F /* DopeAction.swift in Sources */,
 				309C6B1F4DB1AC5E447E83E94DAA5EEF /* SQLDataHelperProtocol.swift in Sources */,
+				8481E6051D421CCC001F818E /* DopeAction.swift in Sources */,
 				8E0B0F49C4D140EA0F84E14EAAF5FE00 /* SQLiteDataStore.swift in Sources */,
 				9DF99937BB063D794C1C267DDA40AC69 /* SQLTrackedActionDataHelper.swift in Sources */,
 				844AEFF91D3E3C730018B31F /* SQLReportedActionDataHelper.swift in Sources */,

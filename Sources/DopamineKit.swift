@@ -17,7 +17,7 @@ public class DopamineKit : NSObject {
     public static let instance: DopamineKit = DopamineKit()
     
     private override init() {
-        super.init()
+        DopamineAPI.track(DopeAction(actionID: "alive"))
         SQLiteDataStore.instance.createTables()
     }
     
@@ -50,7 +50,7 @@ public class DopamineKit : NSObject {
         }
         
         // send chunk of actions
-        if ( Int(rowId) >= DopamineAPI.PreferredTrackLength ) {
+        if ( Int(rowId) >= DopamineAPI.PreferredTrackLength || TimeSyncer.hasExpired("Track")) {
             var trackedActions = Array<DopeAction>()
             for action in SQLTrackedActionDataHelper.findAll() {
                 trackedActions.append(
@@ -66,6 +66,8 @@ public class DopamineKit : NSObject {
             
             SQLTrackedActionDataHelper.dropTable()
             SQLTrackedActionDataHelper.createTable()
+            
+            TimeSyncer.create("Track")
         }
         else {
             DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(rowId)/\(DopamineAPI.PreferredTrackLength))")
@@ -119,7 +121,7 @@ public class DopamineKit : NSObject {
                 return
         }
         // send chunk of actions
-        if ( Int(rowId) >= DopamineAPI.PreferredReportLength ) {
+        if ( Int(rowId) >= DopamineAPI.PreferredReportLength || TimeSyncer.hasExpired("Report")) {
             
             var reportedActions = Array<DopeAction>()
             for action in SQLReportedActionDataHelper.findAll() {
@@ -139,6 +141,8 @@ public class DopamineKit : NSObject {
             
             SQLReportedActionDataHelper.dropTable()
             SQLReportedActionDataHelper.createTable()
+            
+            TimeSyncer.create("Report")
         } else {
             DopamineKit.DebugLog("\(actionID) saved. Report container:(\(rowId)/\(DopamineAPI.PreferredReportLength))")
         }
@@ -146,6 +150,7 @@ public class DopamineKit : NSObject {
         
         
     }
+    
     
     /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
     ///

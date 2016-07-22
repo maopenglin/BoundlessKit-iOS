@@ -35,7 +35,11 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     typealias T = SQLReportedAction
     
     static func createTable() {
-        let DB = SQLiteDataStore.instance.DDB!
+        guard let DB = SQLiteDataStore.instance.DDB else
+        {
+            DopamineKit.DebugLog("SQLite database never initialized.")
+            return
+        }
         
         do {
             let _ = try DB.run( table.create(ifNotExists: true) {t in
@@ -54,7 +58,12 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func dropTable() {
-        let DB = SQLiteDataStore.instance.DDB!
+        guard let DB = SQLiteDataStore.instance.DDB else
+        {
+            DopamineKit.DebugLog("SQLite database never initialized.")
+            return
+        }
+        
         do {
             let _ = try DB.run( table.drop(ifExists: true) )
             DopamineKit.DebugLog("Dropped table:(\(TABLE_NAME))")
@@ -64,7 +73,11 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func insert(item: T) -> Int64? {
-        let DB = SQLiteDataStore.instance.DDB!
+        guard let DB = SQLiteDataStore.instance.DDB else
+        {
+            DopamineKit.DebugLog("SQLite database never initialized.")
+            return nil
+        }
         
         let insert = table.insert(
             actionID <- item.actionID,
@@ -82,8 +95,12 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
-    static func delete (item: T) -> Void {
-        let DB = SQLiteDataStore.instance.DDB!
+    static func delete (item: T) {
+        guard let DB = SQLiteDataStore.instance.DDB else
+        {
+            DopamineKit.DebugLog("SQLite database never initialized.")
+            return
+        }
         
         let id = item.index
         let query = table.filter(index == id)
@@ -100,7 +117,11 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func find(id: Int64) -> T? {
-        let DB = SQLiteDataStore.instance.DDB!
+        guard let DB = SQLiteDataStore.instance.DDB else
+        {
+            DopamineKit.DebugLog("SQLite database never initialized.")
+            return nil
+        }
         
         let query = table.filter(index == id)
         do {
@@ -122,7 +143,11 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func findAll() -> [T] {
-        let DB = SQLiteDataStore.instance.DDB!
+        guard let DB = SQLiteDataStore.instance.DDB else
+        {
+            DopamineKit.DebugLog("SQLite database never initialized.")
+            return []
+        }
         
         var results = [T]()
         do {
