@@ -15,10 +15,17 @@ public class DopamineKit : NSObject {
     
     // Singleton pattern
     public static let instance: DopamineKit = DopamineKit()
+    let trackSyncer: TrackSyncer
+    let reportSyncer: ReportSyncer
     
     private override init() {
-        DopamineAPI.track(DopeAction(actionID: "alive"))
         SQLiteDataStore.instance.createTables()
+        trackSyncer = TrackSyncer()
+        reportSyncer = ReportSyncer()
+    }
+    
+    deinit {
+        
     }
     
         
@@ -31,50 +38,15 @@ public class DopamineKit : NSObject {
     ///                  Defaults to `nil`.
     ///
     public static func track(actionID: String, metaData: [String: AnyObject]? = nil) {
-        let _ = instance
         let action = DopeAction(actionID: actionID, metaData:metaData)
         
-        // save action
-        guard let rowId = SQLTrackedActionDataHelper.insert(
-            SQLTrackedAction(
-                index:0,
-                actionID: action.actionID,
-                metaData: action.metaData,
-                utc: action.utc,
-                timezoneOffset: action.timezoneOffset)
-            )
-            else{
-                // if it couldnt be saved, send it
-                DopamineAPI.track(action)
-                return
-        }
-        
         // send chunk of actions
-        if ( Int(rowId) >= DopamineAPI.PreferredTrackLength || TimeSyncer.hasExpired("Track")) {
-            var trackedActions = Array<DopeAction>()
-            for action in SQLTrackedActionDataHelper.findAll() {
-                trackedActions.append(
-                    DopeAction(
-                        actionID: action.actionID,
-                        metaData: action.metaData,
-                        utc: action.utc,
-                        timezoneOffset: action.timezoneOffset)
-                )
-            }
-            
-            DopamineAPI.track(trackedActions)
-            
-            SQLTrackedActionDataHelper.dropTable()
-            SQLTrackedActionDataHelper.createTable()
-            
-            TimeSyncer.create("Track")
+        instance.trackSyncer.store(action)
+        if (  instance.trackSyncer.shouldSend() ) {
+            instance.trackSyncer.send()
+        } else {
+            DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(SQLTrackedActionDataHelper.count())/\(instance.trackSyncer.getLogSize()))")
         }
-        else {
-            DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(rowId)/\(DopamineAPI.PreferredTrackLength))")
-        }
-        
-        SQLCartridgeDataHelper.createTable("action1")
-        DopamineAPI.refresh("action1")
         
     }
 
@@ -88,7 +60,6 @@ public class DopamineKit : NSObject {
     ///     - completion: A closure with the reinforcement response passed in as a `String`.
     ///
     public static func reinforce(actionID: String, metaData: [String: AnyObject]? = nil, completion: (String) -> ()) {
-        let _ = instance
         var action = DopeAction(actionID: actionID, metaData: metaData)
         
         // send back a reinforcementDecision
@@ -98,56 +69,23 @@ public class DopamineKit : NSObject {
         if let rdSql = SQLCartridgeDataHelper.findLast(actionID) {
             reinforcementDecision = rdSql.reinforcementDecision
             SQLCartridgeDataHelper.delete(rdSql)
-        } else {
-            DopamineAPI.refresh(actionID)
         }
-        
         
         completion(reinforcementDecision)
-        
-        // save action
         action.reinforcementDecision = reinforcementDecision
-        guard let rowId = SQLReportedActionDataHelper.insert(
-                SQLReportedAction(
-                    index:0,
-                    actionID: action.actionID,
-                    reinforcementDecision: action.reinforcementDecision!,
-                    metaData: action.metaData,
-                    utc: action.utc,
-                    timezoneOffset: action.timezoneOffset)
-            )
-            else {
-                DopamineAPI.report(action)
-                return
-        }
+        
         // send chunk of actions
-        if ( Int(rowId) >= DopamineAPI.PreferredReportLength || TimeSyncer.hasExpired("Report")) {
-            
-            var reportedActions = Array<DopeAction>()
-            for action in SQLReportedActionDataHelper.findAll() {
-                var unarchivedMetaData:[String:AnyObject]?
-                reportedActions.append(
-                    DopeAction(
-                        actionID: action.actionID,
-                        reinforcementDecision: action.reinforcementDecision,
-                        metaData: action.metaData,
-                        utc: action.utc,
-                        timezoneOffset: action.timezoneOffset
-                    )
-                )
-            }
-            
-            DopamineAPI.report(reportedActions)
-            
-            SQLReportedActionDataHelper.dropTable()
-            SQLReportedActionDataHelper.createTable()
-            
-            TimeSyncer.create("Report")
+        instance.reportSyncer.store(action)
+        if (  instance.reportSyncer.shouldSend() ) {
+            instance.reportSyncer.send()
         } else {
-            DopamineKit.DebugLog("\(actionID) saved. Report container:(\(rowId)/\(DopamineAPI.PreferredReportLength))")
+            DopamineKit.DebugLog("\(actionID) saved. Reinforcement report container:(\(SQLReportedActionDataHelper.count())/\(instance.reportSyncer.getLogSize()))")
         }
         
-        
+        let cartridge = CartridgeSyncer(actionID: actionID)
+        if( cartridge.shouldReload() ) {
+            cartridge.reload()
+        }
         
     }
     

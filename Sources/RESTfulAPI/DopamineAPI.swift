@@ -14,12 +14,6 @@ let clientOS = "iOS"
 
 public class DopamineAPI : NSObject{
     
-    static let PreferredTrackLength = 5
-    static let PreferredReportLength = 5
-    static var PreferredMinimumCartridgeCapacity = 0.25
-    
-    static var cartridges : [String:[String]] = [:]
-    
     private let dopamineAPIURL = "https://api.usedopamine.com/v3/app/"
     
     static let instance: DopamineAPI = DopamineAPI()
@@ -27,10 +21,7 @@ public class DopamineAPI : NSObject{
         super.init()
     }
     
-    /// Enter one or more as parameters, or in an array...
-    public static func track(actions: DopeAction...){ return track(actions) }
-    
-    public static func track(actions: [DopeAction]){
+    public static func track(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
         // create dict with credentials
         var payload = instance.configurationData
         
@@ -42,15 +33,13 @@ public class DopamineAPI : NSObject{
         payload["actions"] = trackedActionsArray
         
         instance.send(.Track, payload: payload, completion: {response in
-            // check for bad statusCode
             NSLog("track response:\(response)")
+            completion(response)
         })
         
     }
 
-    public static func report(actions: DopeAction...){ return report(actions) }
-    
-    public static func report(actions: [DopeAction]) {
+    public static func report(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
         var payload = instance.configurationData
         
         var reinforcedActionsArray = Array<AnyObject>()
@@ -60,38 +49,21 @@ public class DopamineAPI : NSObject{
         payload["actions"] = reinforcedActionsArray
         
         instance.send(.Report, payload: payload, completion: {response in
-            // check for bad statusCode
             NSLog("report response:\(response)")
+            completion(response)
         })
     }
     
     
-    public static func refresh(actionID: String){
-        
+    public static func refresh(actionID: String, completion: ([String:AnyObject]) -> ()){
         var payload = instance.configurationData
+        
         payload["actionID"] = actionID
         
         DopamineKit.DebugLog("Refreshing \(actionID)...")
-        instance.send(.Refresh, payload: payload, completion: { response in
-            // load
-            var cartridge = ["neutralFeedback", "stars", "neutralFeedback", "thumbsUp"]
-            
-            SQLCartridgeDataHelper.dropTable(actionID)
-            SQLCartridgeDataHelper.createTable(actionID)
-            for decision in cartridge {
-                guard let rowId = SQLCartridgeDataHelper.insert(
-                    SQLCartridge(
-                        index:0,
-                        actionID: actionID,
-                        reinforcementDecision: decision)
-                    )
-                    else{
-                        DopamineKit.DebugLog("Couldn't add \(decision) to cartridge sql")
-                        break
-                }
-            }
-            
-            DopamineKit.DebugLog("\(actionID) refreshed!")
+        instance.send(.Refresh, payload: payload, completion:  { response in
+            NSLog("refresh response:\(response)")
+            completion(response)
         })
     }
     
@@ -249,30 +221,30 @@ public class DopamineAPI : NSObject{
          */
     }()
     
-    static let CartridgeCapacityKey = "DopamineCartridgeCapacities"
-    lazy var cartridgeCapacities:[NSString:NSNumber] = {
-        let defaults = NSUserDefaults.standardUserDefaults()
-        if let capacities = defaults.valueForKey(DopamineAPI.CartridgeCapacityKey) as? [NSString:NSNumber] {
-            return capacities
-        } else {
-            let capacities:[NSString:NSNumber] = [:]
-            defaults.setObject(capacities, forKey: DopamineAPI.CartridgeCapacityKey)
-            return capacities
-        }
-    }()
-    private func updateCartridgeCapacity(actionID: NSString, size: NSNumber){
-        let defaults = NSUserDefaults.standardUserDefaults()
-        cartridgeCapacities[actionID] = size
-        defaults.setObject(cartridgeCapacities, forKey: DopamineAPI.CartridgeCapacityKey)
-    }
+//    static let CartridgeCapacityKey = "DopamineCartridgeCapacities"
+//    lazy var cartridgeCapacities:[NSString:NSNumber] = {
+//        let defaults = NSUserDefaults.standardUserDefaults()
+//        if let capacities = defaults.valueForKey(DopamineAPI.CartridgeCapacityKey) as? [NSString:NSNumber] {
+//            return capacities
+//        } else {
+//            let capacities:[NSString:NSNumber] = [:]
+//            defaults.setObject(capacities, forKey: DopamineAPI.CartridgeCapacityKey)
+//            return capacities
+//        }
+//    }()
+//    private func updateCartridgeCapacity(actionID: NSString, size: NSNumber){
+//        let defaults = NSUserDefaults.standardUserDefaults()
+//        cartridgeCapacities[actionID] = size
+//        defaults.setObject(cartridgeCapacities, forKey: DopamineAPI.CartridgeCapacityKey)
+//    }
     
-    private func cartridgeNeedsReload(actionID: String, left:Int64) -> Bool{
-        if let capacity = cartridgeCapacities[NSString(string: actionID)]{
-            return (Double(left) / Double(capacity)) < DopamineAPI.PreferredMinimumCartridgeCapacity
-        } else {
-            return true
-        }
-    }
+//    private func cartridgeNeedsReload(actionID: String, left:Int64) -> Bool{
+//        if let capacity = cartridgeCapacities[NSString(string: actionID)]{
+//            return (Double(left) / Double(capacity)) < DopamineAPI.PreferredMinimumCartridgeCapacity
+//        } else {
+//            return true
+//        }
+//    }
     
     // get the primary identity as a lazy computed variable
     lazy var primaryIdentity:String = {

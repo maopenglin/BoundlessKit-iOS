@@ -169,5 +169,16 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         return results
     }
     
+    static func count() -> Int {
+        
+        guard let DB = SQLiteDataStore.instance.DDB else
+        {
+            DopamineKit.DebugLog("SQLite database never initialized.")
+            return 0
+        }
+        
+        return DB.scalar(table.count)
+    }
+    
 }
 

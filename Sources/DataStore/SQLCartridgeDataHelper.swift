@@ -44,8 +44,8 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
                 t.column(index, primaryKey: true)
                 t.column(reinforcementDecision)
                 })
+            tables[TABLE_NAME] = table
             DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
-            tables[actionID] = table
         } catch {
             DopamineKit.DebugLog("Error creating table:(\(TABLE_NAME))")
         }
@@ -96,9 +96,11 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return nil
         }
+        // create table if not exists
+        SQLCartridgeDataHelper.createTable(item.actionID)
         
         let TABLE_NAME = TABLE_NAME_PREFIX + item.actionID
-        let table = tables[item.actionID]!
+        let table:Table = tables[TABLE_NAME]==nil ? Table(TABLE_NAME) : tables[TABLE_NAME]!
         
         let insert = table.insert(
             reinforcementDecision <- item.reinforcementDecision )
@@ -217,6 +219,22 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         }
         
         return results
+    }
+    
+    static func count(actionID: String) -> Int {
+        
+        guard let DB = SQLiteDataStore.instance.DDB else
+        {
+            DopamineKit.DebugLog("SQLite database never initialized.")
+            return 0
+        }
+        
+        let TABLE_NAME = TABLE_NAME_PREFIX + actionID
+        if let table = tables[TABLE_NAME] {
+            return DB.scalar(table.count)
+        } else {
+            return 0
+        }
     }
     
 }

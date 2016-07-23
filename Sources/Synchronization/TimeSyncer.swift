@@ -10,33 +10,37 @@ import Foundation
 
 class TimeSyncer {
     
-    static func UTCTime() -> Int {
-        return Int( 1000*NSDate().timeIntervalSince1970 )
-    }
-    
     private static let KEY_PREFIX = "DopamineTimer"
     private static let KEY_SUFFIX_START_TIME = "StartTime"
     private static let KEY_SUFFIX_DURATION = "Duration"
     
     private init() { }
     
-    static func create(key: String){
-        let hours = 48 * 3600000
-        return TimeSyncer.create(key, duration: hours)
+    static func create(key: String, ifNotExists: Bool) {
+        let defaultHours = 48 * 3600000
+        return TimeSyncer.create(key, duration: defaultHours, ifNotExists: ifNotExists)
     }
     
-    static func create(key: String, duration: Int){
+    static func create(key: String, duration: Int, ifNotExists: Bool) {
+        let defaults = NSUserDefaults.standardUserDefaults()
+        if(ifNotExists && defaults.valueForKey(KEY_PREFIX + key + KEY_SUFFIX_START_TIME) != nil && defaults.valueForKey(KEY_PREFIX + key + KEY_SUFFIX_DURATION) != nil){
+            return
+        }
+        let currentTime = TimeSyncer.UTCTime()
+        defaults.setValue(currentTime, forKey: KEY_PREFIX + key + KEY_SUFFIX_START_TIME)
+        defaults.setValue(duration, forKey: KEY_PREFIX + key + KEY_SUFFIX_DURATION)
+    }
+    
+    static func reset(key: String) {
         let defaults = NSUserDefaults.standardUserDefaults()
         let currentTime = TimeSyncer.UTCTime()
-        defaults.setValue(currentTime, forKey: KEY_PREFIX+KEY_SUFFIX_START_TIME+KEY_SUFFIX_START_TIME)
-        defaults.setValue(duration, forKey: KEY_PREFIX+KEY_SUFFIX_START_TIME+KEY_SUFFIX_DURATION)
-        
+        defaults.setValue(currentTime, forKey: KEY_PREFIX + key + KEY_SUFFIX_START_TIME)
     }
     
-    static func hasExpired(key: String) -> Bool {
+    static func isExpired(key: String) -> Bool {
         let defaults = NSUserDefaults.standardUserDefaults()
-        if let startTime = defaults.valueForKey(KEY_PREFIX+key+KEY_SUFFIX_START_TIME) as? Int,
-            duration = defaults.valueForKey(KEY_PREFIX+key+KEY_SUFFIX_DURATION) as? Int {
+        if let startTime = defaults.valueForKey(KEY_PREFIX + key + KEY_SUFFIX_START_TIME) as? Int,
+            duration = defaults.valueForKey(KEY_PREFIX + key + KEY_SUFFIX_DURATION) as? Int {
             return TimeSyncer.UTCTime() > (startTime + duration)
         } else {
             return true
@@ -45,13 +49,21 @@ class TimeSyncer {
     
     static func progress(key: String) -> Double {
         let defaults = NSUserDefaults.standardUserDefaults()
-        if let startTime = defaults.valueForKey(KEY_PREFIX+key+KEY_SUFFIX_START_TIME) as? Int,
-            duration = defaults.valueForKey(KEY_PREFIX+key+KEY_SUFFIX_DURATION) as? Int {
-            let timeElapsed = Double(UTCTime() - startTime)
-            return timeElapsed / Double(duration)
+        if let startTime = defaults.valueForKey(KEY_PREFIX + key + KEY_SUFFIX_START_TIME) as? Int,
+            duration = defaults.valueForKey(KEY_PREFIX + key + KEY_SUFFIX_DURATION) as? Int {
+            let timeElapsed = UTCTime() - startTime
+            if (timeElapsed > duration){
+                return 1.0
+            } else {
+                return Double(timeElapsed) / Double(duration)
+            }
         } else {
             return 1.0
         }
+    }
+    
+    static func UTCTime() -> Int {
+        return Int( 1000*NSDate().timeIntervalSince1970 )
     }
         
 }
