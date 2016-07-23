@@ -45,7 +45,6 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
                 t.column(reinforcementDecision)
                 })
             tables[TABLE_NAME] = table
-            DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
         } catch {
             DopamineKit.DebugLog("Error creating table:(\(TABLE_NAME))")
         }
@@ -166,7 +165,33 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         return nil
     }
     
-    static func findLast(actionID: String) -> T? {
+//    static func findLast(actionID: String) -> T? {
+//        guard let DB = SQLiteDataStore.instance.DDB else
+//        {
+//            DopamineKit.DebugLog("SQLite database never initialized.")
+//            return nil
+//        }
+//        
+//        let TABLE_NAME = TABLE_NAME_PREFIX + actionID
+//        let table:Table = tables[TABLE_NAME]==nil ? Table(TABLE_NAME) : tables[TABLE_NAME]!
+//        
+//        let query = table.order(index.desc).limit(1)
+//        do {
+//            let items = try DB.prepare(query)
+//            for item in  items {
+//                return SQLCartridge(
+//                    index: item[index],
+//                    actionID: actionID,
+//                    reinforcementDecision: item[reinforcementDecision] )
+//            }
+//        } catch {
+//            DopamineKit.DebugLog("Table:\(TABLE_NAME) is empty")
+//        }
+//        
+//        return nil
+//    }
+    
+    static func findFirst(actionID: String) -> T? {
         guard let DB = SQLiteDataStore.instance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
@@ -176,7 +201,7 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         let TABLE_NAME = TABLE_NAME_PREFIX + actionID
         let table:Table = tables[TABLE_NAME]==nil ? Table(TABLE_NAME) : tables[TABLE_NAME]!
         
-        let query = table.order(index.desc).limit(1)
+        let query = table.order(index.asc).limit(1)
         do {
             let items = try DB.prepare(query)
             for item in  items {

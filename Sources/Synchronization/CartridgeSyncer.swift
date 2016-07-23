@@ -10,6 +10,8 @@ import Foundation
 
 class CartridgeSyncer {
     
+    private var lock:Int = 0
+    
     private let defaults = NSUserDefaults.standardUserDefaults()
     private let DefaultsKey = "DopamineCartridgeSyncer"
     private let TimeSyncerKey = "Cartridge"
@@ -26,37 +28,38 @@ class CartridgeSyncer {
         TimeSyncer.create(TimeSyncerKey + actionID, ifNotExists: true)
     }
     
-    func getCartridgeSize() -> Int {
+    func getCartridgeInitialSize() -> Int {
         return defaults.integerForKey(DefaultsKey + actionID + SizeKey)
     }
     
-    func setCartridgeSize(newSize: Int) {
+    func setCartridgeInitialSize(newSize: Int) {
         defaults.setValue(newSize, forKey: DefaultsKey + actionID + SizeKey)
     }
     
-    func shouldReload() -> Bool {
-        if (
-            Double(SQLCartridgeDataHelper.count(actionID)) <= getCartridgeCapacity() ||
-                TimeSyncer.isExpired(TimeSyncerKey + actionID) )
-        {
-            return true
-        } else {
-            return false
-        }
+    func getCartridgeProgress() -> Double {
+        return 1.0 - Double(SQLCartridgeDataHelper.count(actionID)) / Double(getCartridgeInitialSize() )
     }
     
-    func getCartridgeCapacity() -> Double {
-        return Double( SQLCartridgeDataHelper.count(actionID)) / Double(getCartridgeSize() )
+    func shouldReload() -> Bool {
+        objc_sync_enter(lock)
+        defer{ objc_sync_exit(lock) }
+        
+        return getCartridgeProgress() > 0.50
+            || TimeSyncer.isExpired(TimeSyncerKey + actionID)
     }
     
     func reload() {
+        objc_sync_enter(lock)
+        
         DopamineAPI.refresh(actionID, completion: { response in
             // var cartridge = response["cartridge"] as? [String]
             // fake load
-            var cartridge = ["neutralFeedback", "stars", "neutralFeedback", "thumbsUp"]
+            var cartridge = [ "stars", "thumbsUp", "stars", "neutralFeedback", "neutralFeedback" ]
             
             SQLCartridgeDataHelper.dropTable(self.actionID)
             SQLCartridgeDataHelper.createTable(self.actionID)
+            TimeSyncer.reset(self.TimeSyncerKey + self.actionID)
+            self.setCartridgeInitialSize(cartridge.count)
             for decision in cartridge {
                 guard let rowId = SQLCartridgeDataHelper.insert(
                     SQLCartridge(
@@ -71,7 +74,30 @@ class CartridgeSyncer {
             }
             
             DopamineKit.DebugLog("\(self.actionID) refreshed!")
+            objc_sync_exit(self.lock)
         })
+    }
+    
+    func pop() -> String {
+        objc_sync_enter(lock)
+        defer{ objc_sync_exit(lock) }
+        
+        var decision = "neutralFeedback"
+        if let rdSql = SQLCartridgeDataHelper.findFirst(actionID) {
+            decision = rdSql.reinforcementDecision
+            SQLCartridgeDataHelper.delete(rdSql)
+        }
+        
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            if( self.shouldReload() ) {
+                self.reload()
+            }
+        })
+        
+        
+        return decision
+        
     }
     
 }

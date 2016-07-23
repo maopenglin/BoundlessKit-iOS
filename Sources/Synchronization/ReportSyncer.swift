@@ -10,6 +10,8 @@ import Foundation
 
 class ReportSyncer {
     
+    private let lock:Int = 0
+    
     private let defaults = NSUserDefaults.standardUserDefaults()
     private let DefaultsKey = "DopamineReportSyncer"
     private let TimeSyncerKey = "ReportLog"
@@ -33,21 +35,22 @@ class ReportSyncer {
     }
     
     func shouldSend() -> Bool {
-        if (
-            SQLReportedActionDataHelper.count() >= getLogSize() ||
-                TimeSyncer.isExpired(TimeSyncerKey) )
-        {
-            return true
-        } else {
-            return false
-        }
+        objc_sync_enter(lock)
+        defer{ objc_sync_exit(lock) }
+        
+        return  SQLReportedActionDataHelper.count() >= getLogSize() ||
+                TimeSyncer.isExpired(TimeSyncerKey)
     }
     
     func getLogCapacity() -> Double {
+        objc_sync_enter(lock)
+        defer{ objc_sync_exit(lock) }
+        
         return Double(SQLReportedActionDataHelper.count()) / Double(getLogSize())
     }
     
     func send() {
+        objc_sync_enter(lock)
         var reportedActions = Array<DopeAction>()
         for action in SQLReportedActionDataHelper.findAll() {
             reportedActions.append(
@@ -68,14 +71,15 @@ class ReportSyncer {
             SQLReportedActionDataHelper.dropTable()
             SQLReportedActionDataHelper.createTable()
             TimeSyncer.reset(self.TimeSyncerKey)
+            
+            objc_sync_exit(self.lock)
         })
-        
-        
-        
     }
     
     func store(action: DopeAction) {
-        // save action
+        objc_sync_enter(lock)
+        defer{ objc_sync_exit(lock) }
+        
         guard let rowId = SQLReportedActionDataHelper.insert(
             SQLReportedAction(
                 index:0,

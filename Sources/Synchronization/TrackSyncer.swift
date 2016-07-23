@@ -10,6 +10,8 @@ import Foundation
 
 class TrackSyncer {
     
+    private let lock:Int = 0
+    
     private let defaults = NSUserDefaults.standardUserDefaults()
     private let DefaultsKey = "DopamineTrackSyncer"
     private let TimeSyncerKey = "TrackLog"
@@ -33,21 +35,23 @@ class TrackSyncer {
     }
     
     func shouldSend() -> Bool {
-        if (
-            SQLTrackedActionDataHelper.count() >= getLogSize() ||
-            TimeSyncer.isExpired(TimeSyncerKey) )
-        {
-            return true
-        } else {
-            return false
-        }
+        objc_sync_enter(lock)
+        defer{ objc_sync_exit(lock) }
+        
+        return SQLTrackedActionDataHelper.count() >= getLogSize() ||
+               TimeSyncer.isExpired(TimeSyncerKey)
     }
     
     func getLogCapacity() -> Double {
+        objc_sync_enter(lock)
+        defer{ objc_sync_exit(lock) }
+        
         return Double(SQLTrackedActionDataHelper.count()) / Double(getLogSize())
     }
     
     func send() {
+        objc_sync_enter(self.lock)
+        
         var trackedActions = Array<DopeAction>()
         for action in SQLTrackedActionDataHelper.findAll() {
             trackedActions.append(
@@ -65,16 +69,20 @@ class TrackSyncer {
             SQLTrackedActionDataHelper.dropTable()
             SQLTrackedActionDataHelper.createTable()
             TimeSyncer.reset(self.TimeSyncerKey)
+            
+            objc_sync_exit(self.lock)
         })
-        
     }
     
     func store(action: DopeAction) {
-        // save action
+        objc_sync_enter(self.lock)
+        defer{ objc_sync_exit(self.lock) }
+        
         guard let rowId = SQLTrackedActionDataHelper.insert(
             SQLTrackedAction(
                 index:0,
-                actionID: action.actionID,
+                actionID:
+                action.actionID,
                 metaData: action.metaData,
                 utc: action.utc,
                 timezoneOffset: action.timezoneOffset)

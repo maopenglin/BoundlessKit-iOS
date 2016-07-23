@@ -61,15 +61,9 @@ public class DopamineKit : NSObject {
     ///
     public static func reinforce(actionID: String, metaData: [String: AnyObject]? = nil, completion: (String) -> ()) {
         var action = DopeAction(actionID: actionID, metaData: metaData)
+        let cartridge = CartridgeSyncer(actionID: actionID)
         
-        // send back a reinforcementDecision
-        var reinforcementDecision = "test"
-//        let feedback = DecisionEngine.reinforceEvent(&event)
-        
-        if let rdSql = SQLCartridgeDataHelper.findLast(actionID) {
-            reinforcementDecision = rdSql.reinforcementDecision
-            SQLCartridgeDataHelper.delete(rdSql)
-        }
+        var reinforcementDecision = cartridge.pop()
         
         completion(reinforcementDecision)
         action.reinforcementDecision = reinforcementDecision
@@ -82,10 +76,8 @@ public class DopamineKit : NSObject {
             DopamineKit.DebugLog("\(actionID) saved. Reinforcement report container:(\(SQLReportedActionDataHelper.count())/\(instance.reportSyncer.getLogSize()))")
         }
         
-        let cartridge = CartridgeSyncer(actionID: actionID)
-        if( cartridge.shouldReload() ) {
-            cartridge.reload()
-        }
+        
+        
         
     }
     
