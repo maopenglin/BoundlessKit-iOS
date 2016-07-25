@@ -10,48 +10,38 @@ import Foundation
 
 class TrackSyncer {
     
-    private let lock:Int = 0
+    static private let instance: TrackSyncer = TrackSyncer()
     
-    private let defaults = NSUserDefaults.standardUserDefaults()
-    private let DefaultsKey = "DopamineTrackSyncer"
-    private let TimeSyncerKey = "TrackLog"
-    private let LogSizeKey = "LogSize"
+    private static let defaults = NSUserDefaults.standardUserDefaults()
+    private static let DefaultsKey = "DopamineTrackSyncer"
+    private static let TimeSyncerKey = "TrackLog"
+    private static let LogSizeKey = "LogSize"
     
-    init() {
+    private init() {
         let defaults = NSUserDefaults.standardUserDefaults()
         let standardSize = 10
-        if( defaults.valueForKey(DefaultsKey + LogSizeKey) == nil ){
-            defaults.setValue(standardSize, forKey: DefaultsKey + LogSizeKey)
+        if( defaults.valueForKey(TrackSyncer.DefaultsKey + TrackSyncer.LogSizeKey) == nil ){
+            defaults.setValue(standardSize, forKey: TrackSyncer.DefaultsKey + TrackSyncer.LogSizeKey)
         }
-        TimeSyncer.create(TimeSyncerKey, ifNotExists: true)
+        TimeSyncer.create(TrackSyncer.TimeSyncerKey, ifNotExists: true)
     }
     
-    func getLogSize() -> Int {
+    static func getLogSize() -> Int {
         return defaults.integerForKey(DefaultsKey + LogSizeKey)
     }
     
-    func setLogSize(newSize: Int) {
-        defaults.setValue(newSize, forKey: DefaultsKey + LogSizeKey)
-    }
+//    static func setLogSize(newSize: Int) {
+//        defaults.setValue(newSize, forKey: DefaultsKey + LogSizeKey)
+//    }
     
-    func shouldSend() -> Bool {
-        objc_sync_enter(lock)
-        defer{ objc_sync_exit(lock) }
-        
-        return SQLTrackedActionDataHelper.count() >= getLogSize() ||
-               TimeSyncer.isExpired(TimeSyncerKey)
-    }
+//    static func getLogCapacity() -> Double {
+//        objc_sync_enter(instance)
+//        defer{ objc_sync_exit(instance) }
+//        
+//        return Double(SQLTrackedActionDataHelper.count()) / Double(getLogSize())
+//    }
     
-    func getLogCapacity() -> Double {
-        objc_sync_enter(lock)
-        defer{ objc_sync_exit(lock) }
-        
-        return Double(SQLTrackedActionDataHelper.count()) / Double(getLogSize())
-    }
-    
-    func send() {
-        objc_sync_enter(self.lock)
-        
+    private func sync() {
         var trackedActions = Array<DopeAction>()
         for action in SQLTrackedActionDataHelper.findAll() {
             trackedActions.append(
@@ -63,20 +53,20 @@ class TrackSyncer {
             )
         }
         
+        
+        
         DopamineAPI.track(trackedActions, completion: {
             response in
-            DopamineKit.DebugLog("Track syner sent tracked actions with response:\(response)")
+            DopamineKit.DebugLog("Track syncer sent tracked actions and got response:\(response)")
             SQLTrackedActionDataHelper.dropTable()
             SQLTrackedActionDataHelper.createTable()
-            TimeSyncer.reset(self.TimeSyncerKey)
-            
-            objc_sync_exit(self.lock)
+            TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
         })
     }
     
-    func store(action: DopeAction) {
-        objc_sync_enter(self.lock)
-        defer{ objc_sync_exit(self.lock) }
+    static func store(action: DopeAction) {
+        objc_sync_enter(instance)
+        defer{ objc_sync_exit(instance) }
         
         guard let rowId = SQLTrackedActionDataHelper.insert(
             SQLTrackedAction(
@@ -95,7 +85,13 @@ class TrackSyncer {
                 return
         }
         
-        DopamineKit.DebugLog("Stored \(rowId) actions.")
+        DopamineKit.DebugLog("Stored \(rowId) tracked actions.")
+        if SQLTrackedActionDataHelper.count() >= TrackSyncer.getLogSize() ||
+            TimeSyncer.isExpired(TrackSyncer.TimeSyncerKey)
+        {
+            instance.sync()
+        }
+        
     }
     
     

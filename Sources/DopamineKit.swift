@@ -15,12 +15,10 @@ public class DopamineKit : NSObject {
     
     // Singleton pattern
     public static let instance: DopamineKit = DopamineKit()
-    let trackSyncer: TrackSyncer
     let reportSyncer: ReportSyncer
     
     private override init() {
         SQLiteDataStore.instance.createTables()
-        trackSyncer = TrackSyncer()
         reportSyncer = ReportSyncer()
     }
     
@@ -41,12 +39,13 @@ public class DopamineKit : NSObject {
         let action = DopeAction(actionID: actionID, metaData:metaData)
         
         // send chunk of actions
-        instance.trackSyncer.store(action)
-        if (  instance.trackSyncer.shouldSend() ) {
-            instance.trackSyncer.send()
-        } else {
-            DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(SQLTrackedActionDataHelper.count())/\(instance.trackSyncer.getLogSize()))")
-        }
+        TrackSyncer.store(action)
+        TrackSyncer.sync()
+//        if (  TrackSyncer.shouldSend() ) {
+//            TrackSyncer.send()
+//        } else {
+//            DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(SQLTrackedActionDataHelper.count())/\(TrackSyncer.getLogCapacity()))")
+//        }
         
     }
 

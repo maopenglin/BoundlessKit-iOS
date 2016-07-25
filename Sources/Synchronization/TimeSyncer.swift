@@ -23,7 +23,9 @@ class TimeSyncer {
     
     static func create(key: String, duration: Int, ifNotExists: Bool) {
         let defaults = NSUserDefaults.standardUserDefaults()
-        if(ifNotExists && defaults.valueForKey(KEY_PREFIX + key + KEY_SUFFIX_START_TIME) != nil && defaults.valueForKey(KEY_PREFIX + key + KEY_SUFFIX_DURATION) != nil){
+        if(ifNotExists &&
+            defaults.valueForKey(KEY_PREFIX + key + KEY_SUFFIX_START_TIME) != nil &&
+            defaults.valueForKey(KEY_PREFIX + key + KEY_SUFFIX_DURATION) != nil) {
             return
         }
         let currentTime = TimeSyncer.UTCTime()

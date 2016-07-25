@@ -50,7 +50,7 @@ class CartridgeSyncer {
     
     func reload() {
         objc_sync_enter(lock)
-        
+//        dispatch_async
         DopamineAPI.refresh(actionID, completion: { response in
             // var cartridge = response["cartridge"] as? [String]
             // fake load
