@@ -8,10 +8,9 @@
 
 import Foundation
 
-class ReportSyncer : DopamineSyncer {
+class ReportSyncer {
     
     static private let sharedInstance: ReportSyncer = ReportSyncer()
-    internal var state: SyncState
     
     private static let defaults = NSUserDefaults.standardUserDefaults()
     private static let DefaultsKey = "DopamineReportSyncer"
@@ -25,35 +24,20 @@ class ReportSyncer : DopamineSyncer {
             defaults.setValue(standardSize, forKey: ReportSyncer.DefaultsKey + ReportSyncer.LogSizeKey)
         }
         TimeSyncer.create(ReportSyncer.TimeSyncerKey, ifNotExists: true)
-        
-        self.state = SyncState.READY
     }
     
     static func getLogSize() -> Int {
         return defaults.integerForKey(DefaultsKey + LogSizeKey)
     }
     
-//    func setLogSize(newSize: Int) {
-//        defaults.setValue(newSize, forKey: DefaultsKey + LogSizeKey)
-//    }
-    
-//    func getLogCapacity() -> Double {
-//        objc_sync_enter(lock)
-//        defer{ objc_sync_exit(lock) }
-//        
-//        return Double(SQLReportedActionDataHelper.count()) / Double(getLogSize())
-//    }
-    
     static func sync() {
-        while(sharedInstance.state != .READY) {
-            
-        }
-        sharedInstance.state = .SYNCING
+        objc_sync_enter(sharedInstance)
+        defer { objc_sync_exit(sharedInstance) }
         
         let actions = SQLReportedActionDataHelper.findAll()
         if actions.count == 0 {
             DopamineKit.DebugLog("No reported actions to sync.")
-            sharedInstance.state = .READY
+//            objc_sync_exit(sharedInstance)
             return
         }
     
@@ -78,18 +62,13 @@ class ReportSyncer : DopamineSyncer {
             SQLReportedActionDataHelper.createTable()
             TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
             
-//            objc_sync_exit(instance)
-            sharedInstance.state = .READY
+//            objc_sync_exit(sharedInstance)
         })
     }
     
     static func store(action: DopeAction) {
-//        objc_sync_enter(sharedInstance)
-//        defer{ objc_sync_exit(sharedInstance) }
-        while(sharedInstance.state != .READY) {
-            
-        }
-        sharedInstance.state = .STORING
+        objc_sync_enter(sharedInstance)
+        defer{ objc_sync_exit(sharedInstance) }
         
         guard let rowId = SQLReportedActionDataHelper.insert(
             SQLReportedAction(
@@ -103,14 +82,13 @@ class ReportSyncer : DopamineSyncer {
             else{
                 // if it couldnt be saved, send it
                 DopamineKit.DebugLog("SQLiteDataStore error, sending single action report")
-                DopamineAPI.report([action], completion: { response in
-                    sharedInstance.state = .READY
+                DopamineAPI.report([action], completion: {
+                    response in
                 })
                 return
         }
         
         DopamineKit.DebugLog("Stored \(rowId) actions.")
-        sharedInstance.state = .READY
         
         // check if sync needs to be done
         if SQLReportedActionDataHelper.count() >= ReportSyncer.getLogSize() ||

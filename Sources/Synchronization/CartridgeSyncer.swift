@@ -8,10 +8,9 @@
 
 import Foundation
 
-class CartridgeSyncer : DopamineSyncer{
+class CartridgeSyncer {
     
-//    private var lock:Int = 0
-    internal var state: SyncState
+    private var lock:Int = 0
     
     private let defaults = NSUserDefaults.standardUserDefaults()
     private let DefaultsKey = "DopamineCartridgeSyncer"
@@ -41,8 +40,6 @@ class CartridgeSyncer : DopamineSyncer{
             defaults.setValue(standardSize, forKey: key)
         }
         TimeSyncer.create(TimeSyncerKey + actionID, ifNotExists: true)
-        
-        state = .READY
     }
     
     func getCartridgeInitialSize() -> Int {
@@ -57,21 +54,8 @@ class CartridgeSyncer : DopamineSyncer{
         return 1.0 - Double(SQLCartridgeDataHelper.count(actionID)) / Double(getCartridgeInitialSize() )
     }
     
-//    func shouldReload() -> Bool {
-////        objc_sync_enter(lock)
-////        defer{ objc_sync_exit(lock) }
-//        
-////        return getCartridgeProgress() > 0.50
-//        return SQLCartridgeDataHelper.count(actionID) <= 1
-//            || TimeSyncer.isExpired(TimeSyncerKey + actionID)
-//    }
-    
     func reload(forced:Bool = false) {
-//        objc_sync_enter(lock)
-        while(state != .READY){
-            
-        }
-        state = .SYNCING
+        objc_sync_enter(lock)
 
         if SQLCartridgeDataHelper.count(actionID) <= 1 || TimeSyncer.isExpired(TimeSyncerKey + actionID)
             || forced
@@ -109,30 +93,29 @@ class CartridgeSyncer : DopamineSyncer{
                                 }
                                 
                                 DopamineKit.DebugLog("\(self.actionID) refreshed!")
-                                //            objc_sync_exit(self.lock)
-                                self.state = .READY
+//                                objc_sync_exit(self.lock)
                             })
                         }
                     }
                 }
             }
         }
+        objc_sync_exit(lock)
+        
     }
     
     func pop() -> String {
-//        objc_sync_enter(lock)
+        
 //        defer{ objc_sync_exit(lock) }
 
         var decision = "neutralFeedback"
         
-        if state == .READY && SQLCartridgeDataHelper.count(actionID) > 0 {
-//            state = .REMOVING
-//            
-            if let rdSql = SQLCartridgeDataHelper.findFirst(actionID) {
+        objc_sync_enter(lock)
+        if let rdSql = SQLCartridgeDataHelper.findFirst(actionID) {
                 decision = rdSql.reinforcementDecision
                 SQLCartridgeDataHelper.delete(rdSql)
-            }
         }
+        objc_sync_exit(lock)
         
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0)) {
             self.reload()
