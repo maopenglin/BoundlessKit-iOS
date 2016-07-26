@@ -37,7 +37,6 @@ class ReportSyncer {
         let actions = SQLReportedActionDataHelper.findAll()
         if actions.count == 0 {
             DopamineKit.DebugLog("No reported actions to sync.")
-//            objc_sync_exit(sharedInstance)
             return
         }
     
@@ -54,15 +53,13 @@ class ReportSyncer {
             )
         }
         
+        SQLReportedActionDataHelper.dropTable()
+        SQLReportedActionDataHelper.createTable()
+        TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
+        
         DopamineAPI.report(reportedActions, completion: {
             response in
             // TODO: if response['error'] != null { return }
-            
-            SQLReportedActionDataHelper.dropTable()
-            SQLReportedActionDataHelper.createTable()
-            TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
-            
-//            objc_sync_exit(sharedInstance)
         })
     }
     

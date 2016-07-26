@@ -30,17 +30,6 @@ class TrackSyncer {
         return defaults.integerForKey(DefaultsKey + LogSizeKey)
     }
     
-//    static func setLogSize(newSize: Int) {
-//        defaults.setValue(newSize, forKey: DefaultsKey + LogSizeKey)
-//    }
-    
-//    static func getLogCapacity() -> Double {
-//        objc_sync_enter(instance)
-//        defer{ objc_sync_exit(instance) }
-//        
-//        return Double(SQLTrackedActionDataHelper.count()) / Double(getLogSize())
-//    }
-    
     static func sync() {
         objc_sync_enter(instance)
         defer{ objc_sync_exit(instance) }
@@ -62,15 +51,13 @@ class TrackSyncer {
             )
         }
         
+        SQLTrackedActionDataHelper.dropTable()
+        SQLTrackedActionDataHelper.createTable()
+        TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
+        
         DopamineAPI.track(trackedActions, completion: {
             response in
             // TODO: if response['error'] == null { return }
-            
-            SQLTrackedActionDataHelper.dropTable()
-            SQLTrackedActionDataHelper.createTable()
-            TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
-            
-//            objc_sync_exit(instance)
         })
     }
     
