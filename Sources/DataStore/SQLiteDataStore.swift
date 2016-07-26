@@ -22,7 +22,7 @@ public class SQLiteDataStore : NSObject{
     
     let DDB: Connection?
     
-    public static let instance: SQLiteDataStore = SQLiteDataStore()
+    public static let sharedInstance: SQLiteDataStore = SQLiteDataStore()
     
     private override init() {
         var path = "DopamineDB.sqlite"

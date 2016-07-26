@@ -26,14 +26,13 @@ public class DopamineAPI : NSObject{
         var payload = instance.configurationData
         
         // add tracked events to payload
-        var trackedActionsArray = Array<AnyObject>()
+        var trackedActionsJSONArray = Array<AnyObject>()
         for action in actions{
-            trackedActionsArray.append(action.toJSONType())
+            trackedActionsJSONArray.append(action.toJSONType())
         }
-        payload["actions"] = trackedActionsArray
+        payload["actions"] = trackedActionsJSONArray
         
         instance.send(.Track, payload: payload, completion: {response in
-            NSLog("track response:\(response)")
             completion(response)
         })
         
@@ -49,7 +48,6 @@ public class DopamineAPI : NSObject{
         payload["actions"] = reinforcedActionsArray
         
         instance.send(.Report, payload: payload, completion: {response in
-            NSLog("report response:\(response)")
             completion(response)
         })
     }
@@ -62,7 +60,6 @@ public class DopamineAPI : NSObject{
         
         DopamineKit.DebugLog("Refreshing \(actionID)...")
         instance.send(.Refresh, payload: payload, completion:  { response in
-            NSLog("refresh response:\(response)")
             completion(response)
         })
     }
@@ -95,14 +92,13 @@ public class DopamineAPI : NSObject{
     ///     - secondaryIdentity?: An additional idetification string. Defaults to `nil`.
     ///     - completion: A closure with the reinforcement response passed in as a `String`.
     private func send(type: CallType, payload: [String:AnyObject], timeout:NSTimeInterval = 3, completion: [String: AnyObject] -> Void) {
-        DopamineKit.DebugLog("Payload:\(payload)")
         
         let baseURL = NSURL(string: dopamineAPIURL)!
-        
         guard let url = NSURL(string: type.str, relativeToURL: baseURL) else {
             DopamineKit.DebugLog("Could not construct url:() with path ()")
             return
         }
+        
         DopamineKit.DebugLog("Preparing \(type.str) api call to \(url.absoluteString)...")
             do {
                 let request = NSMutableURLRequest(URL: url)
@@ -115,8 +111,6 @@ public class DopamineAPI : NSObject{
                 
                 // request handler
                 let task = session.dataTaskWithRequest(request) { responseData, responseURL, error in
-                    DopamineKit.DebugLog("request sent")
-                    
                     guard let responseURL = responseURL as? NSHTTPURLResponse else{
                         DopamineKit.DebugLog("invalid response")
                         return
@@ -145,15 +139,12 @@ public class DopamineAPI : NSObject{
                 }
                 
                 // send request
-                DopamineKit.DebugLog("Sending \(type.str) request with payload: \(payload.description)")
+                DopamineKit.DebugLog("Sending \(type.str) api call with payload: \(payload.description)")
                 task.resume()
                 
             } catch {
-                DopamineKit.DebugLog("Error composing \(type.str) request with payload:(\(payload.description))")
+                DopamineKit.DebugLog("Error sending \(type.str) api call with payload:(\(payload.description))")
             }
-        
-        
-        DopamineKit.DebugLog("Finished \(type.str) api call...")
         }
     
     // compile the static elements of the request call

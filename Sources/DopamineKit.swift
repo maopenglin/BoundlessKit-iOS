@@ -14,12 +14,11 @@ import SQLite
 public class DopamineKit : NSObject {
     
     // Singleton pattern
-    public static let instance: DopamineKit = DopamineKit()
-    let reportSyncer: ReportSyncer
+    public static let sharedInstance: DopamineKit = DopamineKit()
+    private let dataStore:SQLiteDataStore = SQLiteDataStore.sharedInstance
     
     private override init() {
-        SQLiteDataStore.instance.createTables()
-        reportSyncer = ReportSyncer()
+        dataStore.createTables()
     }
     
     deinit {
@@ -36,17 +35,11 @@ public class DopamineKit : NSObject {
     ///                  Defaults to `nil`.
     ///
     public static func track(actionID: String, metaData: [String: AnyObject]? = nil) {
+        let _ = sharedInstance
         let action = DopeAction(actionID: actionID, metaData:metaData)
         
-        // send chunk of actions
+        // store the action to be synced
         TrackSyncer.store(action)
-        TrackSyncer.sync()
-//        if (  TrackSyncer.shouldSend() ) {
-//            TrackSyncer.send()
-//        } else {
-//            DopamineKit.DebugLog("\(actionID) saved. Tracking container:(\(SQLTrackedActionDataHelper.count())/\(TrackSyncer.getLogCapacity()))")
-//        }
-        
     }
 
     /// This function sends an asynchronous reinforcement call for the specified actionID
@@ -59,24 +52,17 @@ public class DopamineKit : NSObject {
     ///     - completion: A closure with the reinforcement response passed in as a `String`.
     ///
     public static func reinforce(actionID: String, metaData: [String: AnyObject]? = nil, completion: (String) -> ()) {
+        let _ = sharedInstance
         var action = DopeAction(actionID: actionID, metaData: metaData)
-        let cartridge = CartridgeSyncer(actionID: actionID)
+        let cartridge = CartridgeSyncer.forAction(actionID)
         
         var reinforcementDecision = cartridge.pop()
         
         completion(reinforcementDecision)
         action.reinforcementDecision = reinforcementDecision
         
-        // send chunk of actions
-        instance.reportSyncer.store(action)
-        if (  instance.reportSyncer.shouldSend() ) {
-            instance.reportSyncer.send()
-        } else {
-            DopamineKit.DebugLog("\(actionID) saved. Reinforcement report container:(\(SQLReportedActionDataHelper.count())/\(instance.reportSyncer.getLogSize()))")
-        }
-        
-        
-        
+        // store the action to be synced
+        ReportSyncer.store(action)
         
     }
     

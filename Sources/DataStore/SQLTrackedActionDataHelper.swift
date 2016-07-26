@@ -33,7 +33,7 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     typealias T = SQLTrackedAction
     
     static func createTable() {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
                 DopamineKit.DebugLog("SQLite database never initialized.")
                 return
@@ -54,7 +54,7 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     }
     
     public static func dropTable() {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return
@@ -68,7 +68,7 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func insert(item: T) -> Int64? {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return nil
@@ -90,7 +90,7 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func delete (item: T) -> Void {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return
@@ -111,7 +111,7 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func find(id: Int64) -> T? {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return nil
@@ -136,7 +136,7 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func findAll() -> [T] {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return []
@@ -163,7 +163,7 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     
     static func count() -> Int {
         
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return 0

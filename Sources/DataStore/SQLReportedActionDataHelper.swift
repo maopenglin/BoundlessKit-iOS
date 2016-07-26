@@ -35,7 +35,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     typealias T = SQLReportedAction
     
     static func createTable() {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return
@@ -47,7 +47,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                 t.column(actionID)
                 t.column(reinforcementDecision)
                 t.column(metaData)
-                t.column(utc, references: SQLTrackedActionDataHelper.table, index)
+                t.column(utc)
                 t.column(timezoneOffset)
                 })
             DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
@@ -58,7 +58,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func dropTable() {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return
@@ -73,7 +73,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func insert(item: T) -> Int64? {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return nil
@@ -87,7 +87,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
             timezoneOffset <- item.timezoneOffset )
         do {
             let rowId = try DB.run(insert)
-            DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID)")
+            DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID) reinforcementDecision:\(item.reinforcementDecision)")
             return rowId
         } catch {
             DopamineKit.DebugLog("Insert error for reported action with values actionID:(\(item.actionID)) metaData:(\(item.metaData)) utc:(\(item.utc)) timezoneOffset(\(item.timezoneOffset))")
@@ -96,7 +96,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func delete (item: T) {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return
@@ -117,7 +117,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func find(id: Int64) -> T? {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return nil
@@ -143,7 +143,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     }
     
     static func findAll() -> [T] {
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return []
@@ -171,7 +171,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     
     static func count() -> Int {
         
-        guard let DB = SQLiteDataStore.instance.DDB else
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return 0

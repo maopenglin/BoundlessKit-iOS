@@ -39,6 +39,7 @@
 		8481E60B1D42B81B001F818E /* ReportSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8481E60A1D42B81B001F818E /* ReportSyncer.swift */; };
 		8481E60D1D42DB10001F818E /* CartridgeSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8481E60C1D42DB10001F818E /* CartridgeSyncer.swift */; };
 		8481E60F1D42E25B001F818E /* TrackSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8481E60E1D42E25B001F818E /* TrackSyncer.swift */; };
+		84A9E6EA1D46E2BC004FC365 /* DopamineSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A9E6E91D46E2BC004FC365 /* DopamineSyncer.swift */; };
 		84F48B1D3C69DE3D818FB8E0C1E6B478 /* DopamineKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = ED876943A1CC0F97C3AB879A3887FAAC /* DopamineKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		85204E236F1DA4CDF8FA69ED1BA4FA79 /* DopamineKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 162F804AE3E398D48D45792A69C0ED4B /* DopamineKit-dummy.m */; };
 		87ABCCC9A063741F389498D76DC60D3E /* CandyIcons.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 1F130D9149F249F64C4260D3884DC9F3 /* CandyIcons.bundle */; };
@@ -139,6 +140,7 @@
 		8481E60A1D42B81B001F818E /* ReportSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportSyncer.swift; sourceTree = "<group>"; };
 		8481E60C1D42DB10001F818E /* CartridgeSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartridgeSyncer.swift; sourceTree = "<group>"; };
 		8481E60E1D42E25B001F818E /* TrackSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackSyncer.swift; sourceTree = "<group>"; };
+		84A9E6E91D46E2BC004FC365 /* DopamineSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DopamineSyncer.swift; sourceTree = "<group>"; };
 		8AA3974F2DDA824CE5187F9B8434C339 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8B999F80D9B9DB311CD3988C5C93F4F5 /* DopamineKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DopamineKit.h; sourceTree = "<group>"; };
 		919B4A12D2BBB42EB054E1EAC1590385 /* Blob.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Blob.swift; path = SQLite/Core/Blob.swift; sourceTree = "<group>"; };
@@ -350,6 +352,7 @@
 				8481E6061D421F57001F818E /* TimeSyncer.swift */,
 				8481E60A1D42B81B001F818E /* ReportSyncer.swift */,
 				8481E60C1D42DB10001F818E /* CartridgeSyncer.swift */,
+				84A9E6E91D46E2BC004FC365 /* DopamineSyncer.swift */,
 				8481E60E1D42E25B001F818E /* TrackSyncer.swift */,
 			);
 			path = Synchronization;
@@ -710,6 +713,7 @@
 				94EC2F3B3C8C6A016795F0E052A39248 /* DopamineKit.swift in Sources */,
 				844AEFF71D3E33E40018B31F /* JSONDataType.swift in Sources */,
 				309C6B1F4DB1AC5E447E83E94DAA5EEF /* SQLDataHelperProtocol.swift in Sources */,
+				84A9E6EA1D46E2BC004FC365 /* DopamineSyncer.swift in Sources */,
 				8481E60D1D42DB10001F818E /* CartridgeSyncer.swift in Sources */,
 				8481E6051D421CCC001F818E /* DopeAction.swift in Sources */,
 				8E0B0F49C4D140EA0F84E14EAAF5FE00 /* SQLiteDataStore.swift in Sources */,

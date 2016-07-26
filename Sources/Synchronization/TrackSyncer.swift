@@ -41,9 +41,18 @@ class TrackSyncer {
 //        return Double(SQLTrackedActionDataHelper.count()) / Double(getLogSize())
 //    }
     
-    private func sync() {
+    static func sync() {
+        objc_sync_enter(instance)
+        defer{ objc_sync_exit(instance) }
+        
+        let actions = SQLTrackedActionDataHelper.findAll()
+        if actions.count == 0 {
+            DopamineKit.DebugLog("No tracked actions to sync.")
+            return
+        }
+        
         var trackedActions = Array<DopeAction>()
-        for action in SQLTrackedActionDataHelper.findAll() {
+        for action in  actions {
             trackedActions.append(
                 DopeAction(
                     actionID: action.actionID,
@@ -53,14 +62,15 @@ class TrackSyncer {
             )
         }
         
-        
-        
         DopamineAPI.track(trackedActions, completion: {
             response in
-            DopamineKit.DebugLog("Track syncer sent tracked actions and got response:\(response)")
+            // TODO: if response['error'] == null { return }
+            
             SQLTrackedActionDataHelper.dropTable()
             SQLTrackedActionDataHelper.createTable()
             TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
+            
+//            objc_sync_exit(instance)
         })
     }
     
@@ -79,8 +89,9 @@ class TrackSyncer {
             )
             else{
                 // if it couldnt be saved, send it
+                DopamineKit.DebugLog("SQLiteDataStore error, sending single action track")
                 DopamineAPI.track([action], completion: { response in
-                    DopamineKit.DebugLog("Track syncer sent tracked actions with response:\(response)")
+                    
                 })
                 return
         }
@@ -89,7 +100,7 @@ class TrackSyncer {
         if SQLTrackedActionDataHelper.count() >= TrackSyncer.getLogSize() ||
             TimeSyncer.isExpired(TrackSyncer.TimeSyncerKey)
         {
-            instance.sync()
+            sync()
         }
         
     }
