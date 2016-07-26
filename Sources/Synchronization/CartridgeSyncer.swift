@@ -10,7 +10,7 @@ import Foundation
 
 class CartridgeSyncer {
     
-    private var lock:Int = 0
+    private var mutex_lock:Int = 1
     
     private let defaults = NSUserDefaults.standardUserDefaults()
     private let DefaultsKey = "DopamineCartridgeSyncer"
@@ -55,7 +55,11 @@ class CartridgeSyncer {
     }
     
     func reload(forced:Bool = false) {
-        objc_sync_enter(lock)
+        if (mutex_lock > 0) {
+            mutex_lock-=1
+        } else {
+            return
+        }
 
         if SQLCartridgeDataHelper.count(actionID) <= 1 || TimeSyncer.isExpired(TimeSyncerKey + actionID)
             || forced
@@ -93,34 +97,32 @@ class CartridgeSyncer {
                                 }
                                 
                                 DopamineKit.DebugLog("\(self.actionID) refreshed!")
-//                                objc_sync_exit(self.lock)
+                                self.mutex_lock+=1
                             })
                         }
                     }
                 }
             }
+        } else {
+            mutex_lock+=1
         }
-        objc_sync_exit(lock)
         
     }
     
     func pop() -> String {
-        
-//        defer{ objc_sync_exit(lock) }
-
         var decision = "neutralFeedback"
         
-        objc_sync_enter(lock)
-        if let rdSql = SQLCartridgeDataHelper.findFirst(actionID) {
+        if mutex_lock > 0 {
+            mutex_lock-=1
+            if let rdSql = SQLCartridgeDataHelper.findFirst(actionID) {
                 decision = rdSql.reinforcementDecision
                 SQLCartridgeDataHelper.delete(rdSql)
-        }
-        objc_sync_exit(lock)
-        
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0)) {
-            self.reload()
+            }
+            mutex_lock+=1
         }
         
+        self.reload()
+
         return decision
     }
     
