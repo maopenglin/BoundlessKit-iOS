@@ -53,12 +53,12 @@ public class DopamineKit : NSObject {
     ///
     public static func reinforce(actionID: String, metaData: [String: AnyObject]? = nil, completion: (String) -> ()) {
         let _ = sharedInstance
-        var reinforcementDecision = CartridgeSyncer.forAction(actionID).unload()
+        let reinforcementDecision = CartridgeSyncer.forAction(actionID).unload()
         
         completion(reinforcementDecision)
         
         // store the action to be synced
-        var action = DopeAction(actionID: actionID, reinforcementDecision: reinforcementDecision, metaData: metaData)
+        let action = DopeAction(actionID: actionID, reinforcementDecision: reinforcementDecision, metaData: metaData)
         ReportSyncer.store(action)
     }
     
@@ -77,7 +77,7 @@ public class DopamineKit : NSObject {
             if let parameterNames = functionSignature.rangeOfString("\\((.*?)\\)", options: .RegularExpressionSearch){
                 functionSignature.replaceRange(parameterNames, with: "()")
             }
-            var fileName = NSString(string: filePath).lastPathComponent.componentsSeparatedByString(".")[0]
+            let fileName = NSString(string: filePath).lastPathComponent.componentsSeparatedByString(".")[0]
             NSLog("[\(fileName):\(line):\(functionSignature)] - \(message)")
 //        #endif
     }

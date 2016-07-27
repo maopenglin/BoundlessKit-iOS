@@ -29,7 +29,6 @@ class TimeSyncer {
     }
     
     static func reset(key: String, duration: Int?=nil) {
-        let defaults = NSUserDefaults.standardUserDefaults()
         if let expiry = duration {
             create(KEY_PREFIX + key + KEY_SUFFIX_START_TIME, duration: expiry, ifNotExists: false)
         } else {

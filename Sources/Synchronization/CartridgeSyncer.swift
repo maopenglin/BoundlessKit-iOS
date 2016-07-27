@@ -21,7 +21,7 @@ class CartridgeSyncer {
     
     private static var cartridges: [String:CartridgeSyncer] = [:]
     
-    public static func forAction(actionID: String) -> CartridgeSyncer{
+    static func forAction(actionID: String) -> CartridgeSyncer{
         if let cartridge = cartridges[actionID] {
             return cartridge
         } else {

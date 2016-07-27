@@ -33,42 +33,42 @@ class ViewController: UIViewController {
                 self.responseLabel.text = reinforcement
                 self.flash(self.responseLabel)
                 
-                
-                // Try out CandyBar as a form of reinforcement!
-                var reinforcerType:CandyIcon
-                var title:String?
-                var subtitle:String?
-                var backgroundColor:UIColor = UIColor.blueColor()
-                var visibilityDuration:NSTimeInterval = 1.75
-                
-                // Set up a couple of different responses to keep your users surprised
-                switch(reinforcement){
-                case "medalStar":
-                    reinforcerType = CandyIcon.MedalStar
-                    title = "You should drop an album soon"
-                    subtitle = "Cuz you're on 🔥"
-                    break
-                case "stars":
-                    reinforcerType = CandyIcon.Stars
-                    title = "Great workout 💯"
-                    subtitle = "It's not called sweating, it's called glisenting"
-                    backgroundColor = UIColor.orangeColor()
-                    break
-                case "thumbsUp":
-                    reinforcerType = CandyIcon.ThumbsUp
-                    title = "Awesome run!"
-                    subtitle = "Either you run the day,\nOr the day runs you."
-                    backgroundColor = CandyBar.hexStringToUIColor("#ff0000")
-                    visibilityDuration = 2.5
-                    break
-                default:
-                    return
-                }
-                
-                // Woo hoo! Treat yoself
-                let candybar = CandyBar(title: title, subtitle: subtitle, icon: reinforcerType, backgroundColor: backgroundColor)
-                // if `nil` or no duration is provided, the CandyBar will go away when the user taps it or `candybar.dismiss()` is used
-                candybar.show(visibilityDuration)
+//                
+//                // Try out CandyBar as a form of reinforcement!
+//                var reinforcerType:CandyIcon
+//                var title:String?
+//                var subtitle:String?
+//                var backgroundColor:UIColor = UIColor.blueColor()
+//                var visibilityDuration:NSTimeInterval = 1.75
+//                
+//                // Set up a couple of different responses to keep your users surprised
+//                switch(reinforcement){
+//                case "medalStar":
+//                    reinforcerType = CandyIcon.MedalStar
+//                    title = "You should drop an album soon"
+//                    subtitle = "Cuz you're on 🔥"
+//                    break
+//                case "stars":
+//                    reinforcerType = CandyIcon.Stars
+//                    title = "Great workout 💯"
+//                    subtitle = "It's not called sweating, it's called glisenting"
+//                    backgroundColor = UIColor.orangeColor()
+//                    break
+//                case "thumbsUp":
+//                    reinforcerType = CandyIcon.ThumbsUp
+//                    title = "Awesome run!"
+//                    subtitle = "Either you run the day,\nOr the day runs you."
+//                    backgroundColor = CandyBar.hexStringToUIColor("#ff0000")
+//                    visibilityDuration = 2.5
+//                    break
+//                default:
+//                    return
+//                }
+//                
+//                // Woo hoo! Treat yoself
+//                let candybar = CandyBar(title: title, subtitle: subtitle, icon: reinforcerType, backgroundColor: backgroundColor)
+//                // if `nil` or no duration is provided, the CandyBar will go away when the user taps it or `candybar.dismiss()` is used
+//                candybar.show(visibilityDuration)
                 
             })
         })

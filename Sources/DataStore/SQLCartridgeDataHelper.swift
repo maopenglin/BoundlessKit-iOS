@@ -61,7 +61,7 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         let TABLE_NAME = TABLE_NAME_PREFIX + actionID
         do {
             let stmt = try DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='\(TABLE_NAME)'")
-            for row in stmt {
+            for _ in stmt {
                 return Table(TABLE_NAME)
             }
         } catch {

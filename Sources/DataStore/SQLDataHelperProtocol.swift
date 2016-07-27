@@ -9,7 +9,7 @@
 import Foundation
 
 protocol SQLDataHelperProtocol {
-    typealias T
+    associatedtype T
     static func createTable() -> Void
     static func dropTable() -> Void
     static func insert(item: T) -> Int64?

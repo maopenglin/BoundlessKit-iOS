@@ -84,14 +84,14 @@ class Tests: XCTestCase {
     }
     
     
-    /// Test CandyBar init()
-    ///
-    func testCandyBar(){
-        let color = CandyBar.hexStringToUIColor("#F0F0F0")
-        let candybar = CandyBar(title: "Title", subtitle: "subtitle", icon: CandyIcon.Certificate, backgroundColor: color)
-        print("CandyBar title: ", candybar.titleLabel.text)
-
-    }
+//    /// Test CandyBar init()
+//    ///
+//    func testCandyBar(){
+//        let color = CandyBar.hexStringToUIColor("#F0F0F0")
+//        let candybar = CandyBar(title: "Title", subtitle: "subtitle", icon: CandyIcon.Certificate, backgroundColor: color)
+//        print("CandyBar title: ", candybar.titleLabel.text)
+//
+//    }
     
     
     
