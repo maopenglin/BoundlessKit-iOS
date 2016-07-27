@@ -36,9 +36,9 @@ public class DopamineKit : NSObject {
     ///
     public static func track(actionID: String, metaData: [String: AnyObject]? = nil) {
         let _ = sharedInstance
-        let action = DopeAction(actionID: actionID, metaData:metaData)
         
         // store the action to be synced
+        let action = DopeAction(actionID: actionID, metaData:metaData)
         TrackSyncer.store(action)
     }
 
@@ -53,20 +53,13 @@ public class DopamineKit : NSObject {
     ///
     public static func reinforce(actionID: String, metaData: [String: AnyObject]? = nil, completion: (String) -> ()) {
         let _ = sharedInstance
-        var action = DopeAction(actionID: actionID, metaData: metaData)
-        let cartridge = CartridgeSyncer.forAction(actionID)
-        
-        var reinforcementDecision = cartridge.unload()
+        var reinforcementDecision = CartridgeSyncer.forAction(actionID).unload()
         
         completion(reinforcementDecision)
-        action.reinforcementDecision = reinforcementDecision
         
         // store the action to be synced
+        var action = DopeAction(actionID: actionID, reinforcementDecision: reinforcementDecision, metaData: metaData)
         ReportSyncer.store(action)
-        
-        
-//        DopamineKit.DebugLog("Count is:\(SQLCartridgeDataHelper.count(actionID+"4"))")
-        
     }
     
     
