@@ -16,12 +16,7 @@ class TimeSyncer {
     
     private init() { }
     
-    static func create(key: String, ifNotExists: Bool) {
-        let defaultHours = 48 * 3600000
-        return TimeSyncer.create(key, duration: defaultHours, ifNotExists: ifNotExists)
-    }
-    
-    static func create(key: String, duration: Int, ifNotExists: Bool) {
+    static func create(key: String, duration: Int=48 * 3600000, ifNotExists: Bool) {
         let defaults = NSUserDefaults.standardUserDefaults()
         if(ifNotExists &&
             defaults.valueForKey(KEY_PREFIX + key + KEY_SUFFIX_START_TIME) != nil &&
@@ -33,10 +28,13 @@ class TimeSyncer {
         defaults.setValue(duration, forKey: KEY_PREFIX + key + KEY_SUFFIX_DURATION)
     }
     
-    static func reset(key: String) {
+    static func reset(key: String, duration: Int?=nil) {
         let defaults = NSUserDefaults.standardUserDefaults()
-        let currentTime = TimeSyncer.UTCTime()
-        defaults.setValue(currentTime, forKey: KEY_PREFIX + key + KEY_SUFFIX_START_TIME)
+        if let expiry = duration {
+            create(KEY_PREFIX + key + KEY_SUFFIX_START_TIME, duration: expiry, ifNotExists: false)
+        } else {
+            create(KEY_PREFIX + key + KEY_SUFFIX_START_TIME, ifNotExists: false)
+        }
     }
     
     static func isExpired(key: String) -> Bool {

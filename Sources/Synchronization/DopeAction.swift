@@ -37,8 +37,10 @@ public struct DopeAction {
         dict["actionID"] = self.actionID
         dict["metaData"] = self.metaData
         dict["reinforcementDecision"] = self.reinforcementDecision
-        dict["utc"] = NSNumber( longLong:self.utc )
-        dict["timezoneOffset"] = NSNumber( longLong:self.timezoneOffset )
+        let utc_json = ["timeType":"utc", "value": NSNumber( longLong:self.utc )]
+//        let latency_json = ["timeType":"latency", "value": 9001]
+        dict["time"] = [utc_json] //, latency_json]
+//        dict["timezoneOffset"] = NSNumber( longLong:self.timezoneOffset )
         
         return dict
     }

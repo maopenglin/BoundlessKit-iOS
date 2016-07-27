@@ -14,7 +14,8 @@ let clientOS = "iOS"
 
 public class DopamineAPI : NSObject{
     
-    private let dopamineAPIURL = "https://api.usedopamine.com/v3/app/"
+    private let dopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/"
+//    private let dopamineAPIURL = "https://api.usedopamine.com/v3/app/"
     
     static let instance: DopamineAPI = DopamineAPI()
     private override init() {
@@ -32,6 +33,9 @@ public class DopamineAPI : NSObject{
         }
         payload["actions"] = trackedActionsJSONArray
         
+        payload["utc"] = 1000*NSDate().timeIntervalSince1970
+        payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
+        
         instance.send(.Track, payload: payload, completion: {response in
             completion(response)
         })
@@ -47,6 +51,9 @@ public class DopamineAPI : NSObject{
         }
         payload["actions"] = reinforcedActionsArray
         
+        payload["utc"] = 1000*NSDate().timeIntervalSince1970
+        payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
+        
         instance.send(.Report, payload: payload, completion: {response in
             completion(response)
         })
@@ -57,6 +64,9 @@ public class DopamineAPI : NSObject{
         var payload = instance.configurationData
         
         payload["actionID"] = actionID
+        
+        payload["utc"] = 1000*NSDate().timeIntervalSince1970
+        payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
         
         DopamineKit.DebugLog("Refreshing \(actionID)...")
         instance.send(.Refresh, payload: payload, completion:  { response in
@@ -111,39 +121,36 @@ public class DopamineAPI : NSObject{
                 
                 // request handler
                 let task = session.dataTaskWithRequest(request) { responseData, responseURL, error in
+                    var responseDict: [String : AnyObject] = [:]
+                    defer { completion(responseDict) }
+                    
                     guard let responseURL = responseURL as? NSHTTPURLResponse else{
-                        DopamineKit.DebugLog("invalid response")
+                        DopamineKit.DebugLog("❌ invalid response:\(error?.localizedDescription)")
                         return
                     }
                     
-                    // ensure json response object
-                    var responseDict: [String : AnyObject]
                     do {
                         // turn the response into a json object
                         responseDict = try NSJSONSerialization.JSONObjectWithData(responseData!, options: NSJSONReadingOptions()) as! [String: AnyObject]
                         DopamineKit.DebugLog("\(type.str) call got response:\(responseDict.debugDescription)")
                     } catch {
-                        DopamineKit.DebugLog("Error reading \(type.str) response data: \(responseData.debugDescription)")
+                        DopamineKit.DebugLog("❌ Error reading \(type.str) response data: \(responseData.debugDescription)")
                         return
                     }
                     
                     
-                    if responseURL.statusCode == 200 {
-                        completion(responseDict)
-                    } else{
-                        DopamineKit.DebugLog("HTTP status code:\(responseURL.statusCode)")
-                        completion(responseDict)
+                    if responseURL.statusCode != 200 {
+                        DopamineKit.DebugLog("❌ HTTP status code:\(responseURL.statusCode)")
                     }
-                    
                     
                 }
                 
                 // send request
-                DopamineKit.DebugLog("Sending \(type.str) api call with payload: \(payload.description)")
+                DopamineKit.DebugLog("✅ Sending \(type.str) api call with payload: \(payload.description)")
                 task.resume()
                 
             } catch {
-                DopamineKit.DebugLog("Error sending \(type.str) api call with payload:(\(payload.description))")
+                DopamineKit.DebugLog("❌Error sending \(type.str) api call with payload:(\(payload.description))")
             }
         }
     
@@ -160,7 +167,7 @@ public class DopamineAPI : NSObject{
         if(true){
             dict["appID"] = "570ffc491b4c6e9869482fbf"
             dict["versionID"] = "testing"
-            dict["secret"] = "d388c7074d8a283bff1f01eb932c1c9e6bec3b10"
+            dict["secret"] = "20af24a85fa00938a5247709fed395c31c89b142"
             return dict
         }
         
@@ -242,6 +249,7 @@ public class DopamineAPI : NSObject{
         let key = "DopaminePrimaryIdentity"
         let defaults = NSUserDefaults.standardUserDefaults()
         if let identity = defaults.valueForKey(key) as? String {
+            DopamineKit.DebugLog("primaryIdentity:(\(identity))")
             return identity
         } else {
             let defaultIdentity = UIDevice.currentDevice().identifierForVendor!.UUIDString

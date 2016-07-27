@@ -56,13 +56,16 @@ public class DopamineKit : NSObject {
         var action = DopeAction(actionID: actionID, metaData: metaData)
         let cartridge = CartridgeSyncer.forAction(actionID)
         
-        var reinforcementDecision = cartridge.pop()
+        var reinforcementDecision = cartridge.unload()
         
         completion(reinforcementDecision)
         action.reinforcementDecision = reinforcementDecision
         
         // store the action to be synced
         ReportSyncer.store(action)
+        
+        
+//        DopamineKit.DebugLog("Count is:\(SQLCartridgeDataHelper.count(actionID+"4"))")
         
     }
     
