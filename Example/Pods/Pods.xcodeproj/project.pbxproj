@@ -7,56 +7,54 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0B296B9A07740970C43B0275E57EBEC5 /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280CCF42A7869EF20FF7AB7B0898368E /* Operators.swift */; };
-		164E9B1379AED74BA1A07595F31AADB1 /* SQLite-Bridging.m in Sources */ = {isa = PBXBuildFile; fileRef = B2BBE1D49B1FEEBE4FA119D4EFEDB3ED /* SQLite-Bridging.m */; };
-		16EF938593FED4FCEDEEFEA2C222D124 /* CustomFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7903C387F9738F8BEA1FB1FB17A88892 /* CustomFunctions.swift */; };
-		187F5B015685A684D803CC74A0007B39 /* SQLite.swift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E632933A41B65B75D355F754C005BA4A /* SQLite.swift-dummy.m */; };
-		1BEE51B92D2F278DBDD8E30F94A3A8D2 /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17220893E9E63E46F70BCA7784198523 /* Schema.swift */; };
-		227C676309F43025B8BF87BE9290EEDC /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB44F0C85553660857F351B59660E399 /* SQLite.framework */; };
-		231774216328DDF036152F59DC60E5B2 /* FTS4.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E1491786CB78977109E7F1AF68DCA8 /* FTS4.swift */; };
-		24D3953AE4E43CD88860C24D606B266E /* CoreFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84631C774A3B4D8EB83109D8805D91E /* CoreFunctions.swift */; };
-		29D69CA4CFC08A7738E9E0FFF9A47225 /* SQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = C069E20DDEF64B34B672C03C3CD47AF7 /* SQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		309C6B1F4DB1AC5E447E83E94DAA5EEF /* SQLDataHelperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62F6C5BADF45ABCAF3D1C76580C321F /* SQLDataHelperProtocol.swift */; };
-		545F1F51D6522EA76D7397DA029B923F /* DopamineKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B999F80D9B9DB311CD3988C5C93F4F5 /* DopamineKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		59263E672520466CDB0C5683F2EE6A0B /* SQLite.swift-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = F15A794987BA3FF7982936C98D4DD207 /* SQLite.swift-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		057189E6497DD8FD70D9856688020B22 /* TimeSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2453A7EDDB8A948489A7B978D0E38E /* TimeSyncer.swift */; };
+		10D276AC2D4CCE5BDFB16021DAB8A7B2 /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB44F0C85553660857F351B59660E399 /* SQLite.framework */; };
+		13556157B419DA29B01150A1AB7E7111 /* SQLite-Bridging.m in Sources */ = {isa = PBXBuildFile; fileRef = B2BBE1D49B1FEEBE4FA119D4EFEDB3ED /* SQLite-Bridging.m */; };
+		145FC521FBC2068264F4470C2A67CF8D /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84C8F00AF77BD72F5A2A43232F30314 /* Value.swift */; };
+		155394462272A5C475F1EA39D294CA10 /* DopamineKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = D73DCCF431B5191B4AB26F1F7AE1A630 /* DopamineKit-dummy.m */; };
+		161B538D633B4FCD305C0998ECF9A3FB /* SQLCartridgeDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821F1B6904E9BD62523D3B1218F05048 /* SQLCartridgeDataHelper.swift */; };
+		170051502412CB17150442B9353C7BD1 /* SQLite-Bridging.h in Headers */ = {isa = PBXBuildFile; fileRef = 51411E977D8E3752F0D68AD1D616FEEA /* SQLite-Bridging.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		19BA54CBEC191394C955613EE73F1154 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50E7815F88576C9437438BE64F8C3EE6 /* Foundation.framework */; };
+		1A3B059334A3D4CE6DBA671E77A23014 /* SQLiteDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535D9790E1E822EC16CF74C1B808DE2A /* SQLiteDataStore.swift */; };
+		1CAC944A62867E1E192AA45EE91F971B /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55842CACC1AA5359DE0F6BD1C563C69 /* Query.swift */; };
+		1D7A9B8D94532EED09E1CA84C73901CC /* DopamineKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3B05D0581BAF88BE2027B6B8E33A80E /* DopamineKit.swift */; };
+		1E6757B991E3060065FC86B55ABB5E18 /* Statement.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0225E57F58EF2E72B91E96C6A27E0A4 /* Statement.swift */; };
+		261FDC62DFAAF9153E1833FE2D574DEA /* FTS4.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E1491786CB78977109E7F1AF68DCA8 /* FTS4.swift */; };
+		2BFD506668D501F20284F90493352A27 /* ReportSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F7007FCC39C8A390C6188798E1D32E /* ReportSyncer.swift */; };
+		2CDB638619BEF629B13E4D85A3ECC57D /* CustomFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7903C387F9738F8BEA1FB1FB17A88892 /* CustomFunctions.swift */; };
+		3008C39A53C577772957BA265821CB3C /* DopeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B01476367D487DC16DAA9AF496F79A0 /* DopeAction.swift */; };
+		35D53A95DD631F5DBCF9E7F80029F29B /* SQLReportedActionDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135DE200AEA4998E7A629DF4E87CCE53 /* SQLReportedActionDataHelper.swift */; };
+		3A052C75064BBDD86FA7D9A8ED572E2C /* SQLDataHelperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D67428DE9D1F2702C775652E9294AD18 /* SQLDataHelperProtocol.swift */; };
+		44A553030C8F43289644597E12998205 /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280CCF42A7869EF20FF7AB7B0898368E /* Operators.swift */; };
+		47809196CF640C97A4F37D0A6129DFEF /* SQLTrackedActionDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FA31A130B39032AEE9D290F681128E /* SQLTrackedActionDataHelper.swift */; };
+		4B144B65005F56CDA843692940CF30C3 /* TrackSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 989E345612D7D56967DDC507EACE8D21 /* TrackSyncer.swift */; };
 		63878D9EAEEA28DD91DE19477B569E30 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50E7815F88576C9437438BE64F8C3EE6 /* Foundation.framework */; };
-		6584D7FA17022E584805846F8439B390 /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55842CACC1AA5359DE0F6BD1C563C69 /* Query.swift */; };
-		75FD8766C5602A6FB90B1AD9865B7DA7 /* SQLite-Bridging.h in Headers */ = {isa = PBXBuildFile; fileRef = 51411E977D8E3752F0D68AD1D616FEEA /* SQLite-Bridging.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		771F7979E63C3C4D6800B12B40058F8D /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0652CFB007BBA46B92138A30E2F0513 /* Connection.swift */; };
-		778F21F34E5C06687AD327760B1A3B30 /* Expression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691EC58A4A04A4AEF3C759FA995E2747 /* Expression.swift */; };
+		6568D55EAFDFCC725AA214C4CBB67C49 /* SQLite.swift-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = F15A794987BA3FF7982936C98D4DD207 /* SQLite.swift-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		72378708954A6D345C9FBE6FE2546218 /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17220893E9E63E46F70BCA7784198523 /* Schema.swift */; };
 		77DDEF96C19D3648450FDF1030575B7F /* Pods-DopamineKit_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C52B24D3596967BD4F17CA99753F541 /* Pods-DopamineKit_Tests-dummy.m */; };
 		78C019A6F177B14DCAC52B609C3DE31F /* Pods-DopamineKit_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = BCB50A43A300BE12D82B869B121CF3A8 /* Pods-DopamineKit_Example-dummy.m */; };
-		83382260DDC4E5BEB82FD33C6F1BB917 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84C8F00AF77BD72F5A2A43232F30314 /* Value.swift */; };
-		844AEFB01D3DCC780018B31F /* DopamineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BABA84D9AE60273751C1BB43A1517C7D /* DopamineKit.framework */; };
-		844AEFB11D3DCC780018B31F /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DC63E2B075EE70F114032E7FA2A7431 /* SQLite.framework */; };
-		844AEFF71D3E33E40018B31F /* JSONDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844AEFF61D3E33E40018B31F /* JSONDataType.swift */; };
-		844AEFF91D3E3C730018B31F /* SQLReportedActionDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844AEFF81D3E3C730018B31F /* SQLReportedActionDataHelper.swift */; };
-		844AEFFB1D3F03630018B31F /* SQLCartridgeDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844AEFFA1D3F03630018B31F /* SQLCartridgeDataHelper.swift */; };
-		8481E6051D421CCC001F818E /* DopeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8481E6041D421CCC001F818E /* DopeAction.swift */; };
-		8481E6071D421F57001F818E /* TimeSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8481E6061D421F57001F818E /* TimeSyncer.swift */; };
-		8481E60B1D42B81B001F818E /* ReportSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8481E60A1D42B81B001F818E /* ReportSyncer.swift */; };
-		8481E60D1D42DB10001F818E /* CartridgeSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8481E60C1D42DB10001F818E /* CartridgeSyncer.swift */; };
-		8481E60F1D42E25B001F818E /* TrackSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8481E60E1D42E25B001F818E /* TrackSyncer.swift */; };
-		84F48B1D3C69DE3D818FB8E0C1E6B478 /* DopamineKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = ED876943A1CC0F97C3AB879A3887FAAC /* DopamineKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		85204E236F1DA4CDF8FA69ED1BA4FA79 /* DopamineKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 162F804AE3E398D48D45792A69C0ED4B /* DopamineKit-dummy.m */; };
-		8E0B0F49C4D140EA0F84E14EAAF5FE00 /* SQLiteDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A531BB33E807841E98179E2AAA46DA8 /* SQLiteDataStore.swift */; };
-		9062894BC4B0972580FA208764D2D2D5 /* Foundation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF03B633F34480A002F9568A44AC5DD6 /* Foundation.swift */; };
-		94EC2F3B3C8C6A016795F0E052A39248 /* DopamineKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = C21963AA06060B425BBBC20DDE17E7E2 /* DopamineKit.swift */; };
-		98D6CF4B1D9E53006666FB70C2DE66B2 /* AggregateFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D6DB362DA0D2A1935D75E0A8F808B7 /* AggregateFunctions.swift */; };
-		9A1DEE0CA7DBF39617EFF7370634C61C /* Collation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B509B4439E05E972E58A507E755440B /* Collation.swift */; };
-		9B5C0457A23E61E7C4C5FEAD5235F19D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50E7815F88576C9437438BE64F8C3EE6 /* Foundation.framework */; };
-		9DF99937BB063D794C1C267DDA40AC69 /* SQLTrackedActionDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 290F2FECB8E954DCDD72B062C180C860 /* SQLTrackedActionDataHelper.swift */; };
+		790FDABB10F995D3972F19CDC9B463C2 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B338CF0803DDE4D7D67626BF31133D5D /* Helpers.swift */; };
+		8B1E635A6DD19834C7D9BD47AD2587A6 /* Foundation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF03B633F34480A002F9568A44AC5DD6 /* Foundation.swift */; };
+		9AC563108132E56542441785563D527D /* DopamineAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 017EE535DC22F22259B94B13484C2C89 /* DopamineAPI.swift */; };
+		A025474AF42F47F19D8453479D4BF241 /* JSONDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01EA6FBA4E15161E47FE9C8F0D80B2C /* JSONDataType.swift */; };
+		A51F7E6C68BC63724C9F22808724A8FE /* R*Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84DB78283823A3B7F6E11103F659531 /* R*Tree.swift */; };
+		A89FD84056C6A18EBDF836D617D7033B /* AggregateFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D6DB362DA0D2A1935D75E0A8F808B7 /* AggregateFunctions.swift */; };
+		A8FED56A3BE9EEE66497438A4E0FD721 /* SQLite.swift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E632933A41B65B75D355F754C005BA4A /* SQLite.swift-dummy.m */; };
 		B46070C79DA80EFBB26F01C3644213AE /* Pods-DopamineKit_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C0432E7482FF606EF28ED29A9AD71C6 /* Pods-DopamineKit_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B9F4D526CA0614890F05D519B817F29E /* Pods-DopamineKit_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 613E0AB4F58AD2A5F39FF738DC2E8E37 /* Pods-DopamineKit_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		C5C753FD1A2A359C2D22385079C123A7 /* Blob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919B4A12D2BBB42EB054E1EAC1590385 /* Blob.swift */; };
-		CA5FD1C2C2D186C48B02AAAB9C847452 /* R*Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84DB78283823A3B7F6E11103F659531 /* R*Tree.swift */; };
-		D771B9E4AD9A854E81FB5D5A9C3230D4 /* fts3_tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = E0DC67512C037897FF9B19B0F4BC616F /* fts3_tokenizer.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		DF49C805BFA5ECD11218E2C283B7DCCF /* Statement.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0225E57F58EF2E72B91E96C6A27E0A4 /* Statement.swift */; };
-		E10AD780FBCBC231299FC5F3797FC4D3 /* DopamineAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7E4F5878F2886BA8F04C783CC23CCD /* DopamineAPI.swift */; };
-		EB0391AE80EA63B2BAF34B350FD1A702 /* Setter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312683405829449442CB839B43181C21 /* Setter.swift */; };
+		BA46ACD515044B0AE59B52AA3292AB3E /* CartridgeSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3281D4DF77B8A94431E29D2749B50154 /* CartridgeSyncer.swift */; };
+		BFB7C8DF736DE56ADF68618B2445DF37 /* Setter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312683405829449442CB839B43181C21 /* Setter.swift */; };
+		C09A8B86FB754047DC8E9DCB324AEDB4 /* Collation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B509B4439E05E972E58A507E755440B /* Collation.swift */; };
+		CBF7CCA3F6135C3367204CB248A0A6C8 /* DopamineKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 956D37F1B2D2FF857D56CDFB2E0701B2 /* DopamineKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CF654764ECB9671479C89C371653DF90 /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0652CFB007BBA46B92138A30E2F0513 /* Connection.swift */; };
+		E5D57DA0DFC2B7A6A31BC03623BC73FF /* SQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = C069E20DDEF64B34B672C03C3CD47AF7 /* SQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E763E68AF597ACBD1AC24E21C89959B7 /* Blob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919B4A12D2BBB42EB054E1EAC1590385 /* Blob.swift */; };
+		E8DF494D5CEBE252A88CB82CAE683CB1 /* CoreFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84631C774A3B4D8EB83109D8805D91E /* CoreFunctions.swift */; };
+		EC89502F3EFAEDD71FF25C2B106D4640 /* fts3_tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = E0DC67512C037897FF9B19B0F4BC616F /* fts3_tokenizer.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		ECFF076B3F18CD2215879A376F686F87 /* DopamineKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 7371AF2B77A7F28E528657E05E32436D /* DopamineKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EFAD11772DAFABD8C4DD589C2778C41F /* Expression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691EC58A4A04A4AEF3C759FA995E2747 /* Expression.swift */; };
 		F21E0383BC7E1B470A91758B78DDBA6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50E7815F88576C9437438BE64F8C3EE6 /* Foundation.framework */; };
-		F4DCB7BA80468F7DA6D430F75DDBDC24 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B338CF0803DDE4D7D67626BF31133D5D /* Helpers.swift */; };
-		F98F5AB2A5F1D680EF94BC7BCDBEB696 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50E7815F88576C9437438BE64F8C3EE6 /* Foundation.framework */; };
+		F4508DBDC79D29B44F9149EAE1858634 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50E7815F88576C9437438BE64F8C3EE6 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,91 +62,89 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 80B4242D698F4F97D68E04238E5CDAE1;
+			remoteGlobalIDString = E30C554E216ACEF8A261C51A606E5F10;
 			remoteInfo = SQLite.swift;
 		};
 		7B6E86FE1026A126F5FEEAF1138C009B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = C0B7CCFF854298EBA53F5D5C33DF177A;
+			remoteGlobalIDString = 686603462C0E4F35A1A3F772CCC89EE3;
 			remoteInfo = DopamineKit;
 		};
-		9D33ECF6C22F2D4458F278F55B915DB7 /* PBXContainerItemProxy */ = {
+		C275DA9816BA34E31A13CACDCEC65A85 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 80B4242D698F4F97D68E04238E5CDAE1;
+			remoteGlobalIDString = E30C554E216ACEF8A261C51A606E5F10;
 			remoteInfo = SQLite.swift;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		017EE535DC22F22259B94B13484C2C89 /* DopamineAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineAPI.swift; sourceTree = "<group>"; };
 		03EC12842F9AE4AF1625AD64778233F3 /* Pods-DopamineKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DopamineKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		04453859393965C0E94C0F49B23F3210 /* Pods-DopamineKit_Tests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Tests-frameworks.sh"; sourceTree = "<group>"; };
-		072AB4A9CB7F3E81EA2D4A50577E0445 /* DopamineKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DopamineKit-prefix.pch"; sourceTree = "<group>"; };
 		0A0EF42E8B92F8C58A8C7DFEE4D6DB07 /* SQLite.swift.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SQLite.swift.xcconfig; sourceTree = "<group>"; };
 		0C0432E7482FF606EF28ED29A9AD71C6 /* Pods-DopamineKit_Tests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-DopamineKit_Tests-umbrella.h"; sourceTree = "<group>"; };
 		0EFB39368BCCB20253E353C332374A52 /* Pods-DopamineKit_Tests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Tests-resources.sh"; sourceTree = "<group>"; };
+		135DE200AEA4998E7A629DF4E87CCE53 /* SQLReportedActionDataHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SQLReportedActionDataHelper.swift; sourceTree = "<group>"; };
 		1402C8679B8629AC2FB7DBCEF3EEE690 /* Pods-DopamineKit_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-DopamineKit_Example-acknowledgements.plist"; sourceTree = "<group>"; };
 		141981C3446020463DBC1F7D885E9710 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		162F804AE3E398D48D45792A69C0ED4B /* DopamineKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "DopamineKit-dummy.m"; sourceTree = "<group>"; };
 		17220893E9E63E46F70BCA7784198523 /* Schema.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Schema.swift; path = SQLite/Typed/Schema.swift; sourceTree = "<group>"; };
 		176FB7D61215325FEF9AF904A93A4A45 /* Pods-DopamineKit_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-DopamineKit_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		184B8B0F6C485512E8398AA8757969F9 /* SQLite.swift-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SQLite.swift-prefix.pch"; sourceTree = "<group>"; };
 		18A5DF57ECD0BBED4FEAA9C31EFA84EC /* Pods-DopamineKit_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-DopamineKit_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
+		1B01476367D487DC16DAA9AF496F79A0 /* DopeAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeAction.swift; sourceTree = "<group>"; };
 		1B509B4439E05E972E58A507E755440B /* Collation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Collation.swift; path = SQLite/Typed/Collation.swift; sourceTree = "<group>"; };
-		1DC63E2B075EE70F114032E7FA2A7431 /* SQLite.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SQLite.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		27F7007FCC39C8A390C6188798E1D32E /* ReportSyncer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReportSyncer.swift; sourceTree = "<group>"; };
 		280CCF42A7869EF20FF7AB7B0898368E /* Operators.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Operators.swift; path = SQLite/Typed/Operators.swift; sourceTree = "<group>"; };
 		288BF5FB588AF286DA9322FAB66617D0 /* Pods-DopamineKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DopamineKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
-		290F2FECB8E954DCDD72B062C180C860 /* SQLTrackedActionDataHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SQLTrackedActionDataHelper.swift; sourceTree = "<group>"; };
-		2A531BB33E807841E98179E2AAA46DA8 /* SQLiteDataStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SQLiteDataStore.swift; sourceTree = "<group>"; };
-		2E0D25AD929062020A3691BA0E010D81 /* DopamineKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = DopamineKit.modulemap; sourceTree = "<group>"; };
 		312683405829449442CB839B43181C21 /* Setter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Setter.swift; path = SQLite/Typed/Setter.swift; sourceTree = "<group>"; };
 		31A74B0854F5A456CDAD650659E1DA48 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3281D4DF77B8A94431E29D2749B50154 /* CartridgeSyncer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CartridgeSyncer.swift; sourceTree = "<group>"; };
 		37BE7792B0F5B9374EBB368BCD36D181 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3D7E4F5878F2886BA8F04C783CC23CCD /* DopamineAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineAPI.swift; sourceTree = "<group>"; };
+		37DB89690C917CFCEFBDF2D16A573E39 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3EA4A93EE417B0B5E86394AB73DD1E96 /* DopamineKit.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = DopamineKit.xcconfig; sourceTree = "<group>"; };
+		4C01023615691E251FC847035C781684 /* Pods_DopamineKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C52B24D3596967BD4F17CA99753F541 /* Pods-DopamineKit_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-DopamineKit_Tests-dummy.m"; sourceTree = "<group>"; };
-		4F18037DCEA76F6817E69D906A449AAF /* Pods_DopamineKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		50E7815F88576C9437438BE64F8C3EE6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		51411E977D8E3752F0D68AD1D616FEEA /* SQLite-Bridging.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "SQLite-Bridging.h"; path = "SQLite/Core/SQLite-Bridging.h"; sourceTree = "<group>"; };
+		535D9790E1E822EC16CF74C1B808DE2A /* SQLiteDataStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SQLiteDataStore.swift; sourceTree = "<group>"; };
 		613E0AB4F58AD2A5F39FF738DC2E8E37 /* Pods-DopamineKit_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-DopamineKit_Example-umbrella.h"; sourceTree = "<group>"; };
 		691EC58A4A04A4AEF3C759FA995E2747 /* Expression.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Expression.swift; path = SQLite/Typed/Expression.swift; sourceTree = "<group>"; };
 		71D6DB362DA0D2A1935D75E0A8F808B7 /* AggregateFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AggregateFunctions.swift; path = SQLite/Typed/AggregateFunctions.swift; sourceTree = "<group>"; };
+		7371AF2B77A7F28E528657E05E32436D /* DopamineKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DopamineKit.h; sourceTree = "<group>"; };
 		7555C005FD3F95381466C1E2DE4D4F46 /* Pods-DopamineKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Example-resources.sh"; sourceTree = "<group>"; };
+		76FA31A130B39032AEE9D290F681128E /* SQLTrackedActionDataHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SQLTrackedActionDataHelper.swift; sourceTree = "<group>"; };
 		7903C387F9738F8BEA1FB1FB17A88892 /* CustomFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CustomFunctions.swift; path = SQLite/Typed/CustomFunctions.swift; sourceTree = "<group>"; };
-		844AEFF61D3E33E40018B31F /* JSONDataType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONDataType.swift; sourceTree = "<group>"; };
-		844AEFF81D3E3C730018B31F /* SQLReportedActionDataHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLReportedActionDataHelper.swift; sourceTree = "<group>"; };
-		844AEFFA1D3F03630018B31F /* SQLCartridgeDataHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLCartridgeDataHelper.swift; sourceTree = "<group>"; };
-		8481E6041D421CCC001F818E /* DopeAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DopeAction.swift; sourceTree = "<group>"; };
-		8481E6061D421F57001F818E /* TimeSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSyncer.swift; sourceTree = "<group>"; };
-		8481E60A1D42B81B001F818E /* ReportSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportSyncer.swift; sourceTree = "<group>"; };
-		8481E60C1D42DB10001F818E /* CartridgeSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartridgeSyncer.swift; sourceTree = "<group>"; };
-		8481E60E1D42E25B001F818E /* TrackSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackSyncer.swift; sourceTree = "<group>"; };
-		8AA3974F2DDA824CE5187F9B8434C339 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8B999F80D9B9DB311CD3988C5C93F4F5 /* DopamineKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DopamineKit.h; sourceTree = "<group>"; };
+		821F1B6904E9BD62523D3B1218F05048 /* SQLCartridgeDataHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SQLCartridgeDataHelper.swift; sourceTree = "<group>"; };
 		919B4A12D2BBB42EB054E1EAC1590385 /* Blob.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Blob.swift; path = SQLite/Core/Blob.swift; sourceTree = "<group>"; };
+		92F1C8B02B9983EBFD7A8D11326E0AB9 /* DopamineKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = DopamineKit.modulemap; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		94E602D2C33E2E9FC4082B1F07DC8F3E /* Pods-DopamineKit_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-DopamineKit_Example.modulemap"; sourceTree = "<group>"; };
+		956D37F1B2D2FF857D56CDFB2E0701B2 /* DopamineKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DopamineKit-umbrella.h"; sourceTree = "<group>"; };
+		989E345612D7D56967DDC507EACE8D21 /* TrackSyncer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrackSyncer.swift; sourceTree = "<group>"; };
 		9A4FB98E4A71B9F4FE0AAC71ACD0069A /* SQLite.swift.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = SQLite.swift.modulemap; sourceTree = "<group>"; };
 		A0225E57F58EF2E72B91E96C6A27E0A4 /* Statement.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Statement.swift; path = SQLite/Core/Statement.swift; sourceTree = "<group>"; };
 		A0652CFB007BBA46B92138A30E2F0513 /* Connection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Connection.swift; path = SQLite/Core/Connection.swift; sourceTree = "<group>"; };
+		A3B05D0581BAF88BE2027B6B8E33A80E /* DopamineKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineKit.swift; sourceTree = "<group>"; };
 		A55842CACC1AA5359DE0F6BD1C563C69 /* Query.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Query.swift; path = SQLite/Typed/Query.swift; sourceTree = "<group>"; };
-		AA0E4D061169518AE1BB02B5F40BB4CA /* DopamineKit.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = DopamineKit.xcconfig; sourceTree = "<group>"; };
+		AD053B5C755989F71B58D427DF4FEC06 /* SQLite.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SQLite.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2BBE1D49B1FEEBE4FA119D4EFEDB3ED /* SQLite-Bridging.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "SQLite-Bridging.m"; path = "SQLite/Core/SQLite-Bridging.m"; sourceTree = "<group>"; };
 		B338CF0803DDE4D7D67626BF31133D5D /* Helpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Helpers.swift; path = SQLite/Helpers.swift; sourceTree = "<group>"; };
-		B6357F8B7A4A64F15386BE704AA7A541 /* ResourceBundle-CandyIcons-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-CandyIcons-Info.plist"; sourceTree = "<group>"; };
-		BABA84D9AE60273751C1BB43A1517C7D /* DopamineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DopamineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC712BD5A44905028B74C926FB07AAB9 /* Pods-DopamineKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-DopamineKit_Tests.modulemap"; sourceTree = "<group>"; };
 		BCB50A43A300BE12D82B869B121CF3A8 /* Pods-DopamineKit_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-DopamineKit_Example-dummy.m"; sourceTree = "<group>"; };
 		C069E20DDEF64B34B672C03C3CD47AF7 /* SQLite.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SQLite.h; path = SQLite/SQLite.h; sourceTree = "<group>"; };
-		C21963AA06060B425BBBC20DDE17E7E2 /* DopamineKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineKit.swift; sourceTree = "<group>"; };
+		CCC8462C2C058536AA1B8237C2E71B12 /* DopamineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DopamineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD75507FE26F892EFFDB11D53DF66427 /* Pods_DopamineKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF03B633F34480A002F9568A44AC5DD6 /* Foundation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Foundation.swift; path = SQLite/Foundation.swift; sourceTree = "<group>"; };
-		D439E63659A662FC303F0F404E31FC76 /* Pods_DopamineKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF2453A7EDDB8A948489A7B978D0E38E /* TimeSyncer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TimeSyncer.swift; sourceTree = "<group>"; };
+		D67428DE9D1F2702C775652E9294AD18 /* SQLDataHelperProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SQLDataHelperProtocol.swift; sourceTree = "<group>"; };
+		D73DCCF431B5191B4AB26F1F7AE1A630 /* DopamineKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "DopamineKit-dummy.m"; sourceTree = "<group>"; };
 		DB44F0C85553660857F351B59660E399 /* SQLite.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SQLite.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0318C8FA7B6AE30863D47A061606E3A /* Pods-DopamineKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DopamineKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		E0DC67512C037897FF9B19B0F4BC616F /* fts3_tokenizer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = fts3_tokenizer.h; path = SQLite/Core/fts3_tokenizer.h; sourceTree = "<group>"; };
-		E62F6C5BADF45ABCAF3D1C76580C321F /* SQLDataHelperProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SQLDataHelperProtocol.swift; sourceTree = "<group>"; };
 		E632933A41B65B75D355F754C005BA4A /* SQLite.swift-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SQLite.swift-dummy.m"; sourceTree = "<group>"; };
 		E844B40E16277A1E364E80531E8D71C1 /* Pods-DopamineKit_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-DopamineKit_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
 		E84631C774A3B4D8EB83109D8805D91E /* CoreFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CoreFunctions.swift; path = SQLite/Typed/CoreFunctions.swift; sourceTree = "<group>"; };
@@ -157,25 +153,26 @@
 		E8C82F218024BED642819A5BF926D73C /* Pods-DopamineKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DopamineKit_Example.release.xcconfig"; sourceTree = "<group>"; };
 		E9CB3DAE67CF3AF0771D90DBEE80413F /* Pods-DopamineKit_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Example-frameworks.sh"; sourceTree = "<group>"; };
 		E9E1491786CB78977109E7F1AF68DCA8 /* FTS4.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FTS4.swift; path = SQLite/Extensions/FTS4.swift; sourceTree = "<group>"; };
-		ED876943A1CC0F97C3AB879A3887FAAC /* DopamineKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DopamineKit-umbrella.h"; sourceTree = "<group>"; };
+		F01EA6FBA4E15161E47FE9C8F0D80B2C /* JSONDataType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = JSONDataType.swift; sourceTree = "<group>"; };
 		F15A794987BA3FF7982936C98D4DD207 /* SQLite.swift-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SQLite.swift-umbrella.h"; sourceTree = "<group>"; };
+		FA4F94149999DECD74BC7F875208CA96 /* DopamineKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DopamineKit-prefix.pch"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		10FCC84D7893226B0FC0BBE4D5D421D9 /* Frameworks */ = {
+		5467030396BBB45FD1CF986FD41EAEDD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F98F5AB2A5F1D680EF94BC7BCDBEB696 /* Foundation.framework in Frameworks */,
+				F4508DBDC79D29B44F9149EAE1858634 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		56F55F890FAD6FC13E98B38AD7A55B64 /* Frameworks */ = {
+		63E8A05459635D16609856AB5770216A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B5C0457A23E61E7C4C5FEAD5235F19D /* Foundation.framework in Frameworks */,
-				227C676309F43025B8BF87BE9290EEDC /* SQLite.framework in Frameworks */,
+				19BA54CBEC191394C955613EE73F1154 /* Foundation.framework in Frameworks */,
+				10D276AC2D4CCE5BDFB16021DAB8A7B2 /* SQLite.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -191,8 +188,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				844AEFB01D3DCC780018B31F /* DopamineKit.framework in Frameworks */,
-				844AEFB11D3DCC780018B31F /* SQLite.framework in Frameworks */,
 				63878D9EAEEA28DD91DE19477B569E30 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -200,14 +195,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		09A5F1F9C8A15EC3DA35D6D1ADCAB092 /* Development Pods */ = {
-			isa = PBXGroup;
-			children = (
-				28CF52BFE501104AEE4F7E5CE0B382AA /* DopamineKit */,
-			);
-			name = "Development Pods";
-			sourceTree = "<group>";
-		};
 		0E9CC0217CE03B66912982F024F7C64D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -217,46 +204,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		28CF52BFE501104AEE4F7E5CE0B382AA /* DopamineKit */ = {
+		2F8B5CC1499D9488268F1337D81FDA5B /* DopamineKit */ = {
 			isa = PBXGroup;
 			children = (
-				FB88BEAB44E317DD41BD673C2B95C6E2 /* Sources */,
-				58EA9F5B47328BE460FCEBD98A7675BD /* Support Files */,
+				639D2496162B349199478480EDF14956 /* Sources */,
+				A537A462BC43245D102047A9E064B9F4 /* Support Files */,
 			);
 			name = DopamineKit;
 			path = ../..;
-			sourceTree = "<group>";
-		};
-		2BDAF4D80A1EF6A3A116179F1B54E9E6 /* RESTfulAPI */ = {
-			isa = PBXGroup;
-			children = (
-				3D7E4F5878F2886BA8F04C783CC23CCD /* DopamineAPI.swift */,
-				844AEFF61D3E33E40018B31F /* JSONDataType.swift */,
-			);
-			path = RESTfulAPI;
-			sourceTree = "<group>";
-		};
-		3F98BF8E0AB8139345AF78F8E225602D /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				BABA84D9AE60273751C1BB43A1517C7D /* DopamineKit.framework */,
-				D439E63659A662FC303F0F404E31FC76 /* Pods_DopamineKit_Example.framework */,
-				4F18037DCEA76F6817E69D906A449AAF /* Pods_DopamineKit_Tests.framework */,
-				1DC63E2B075EE70F114032E7FA2A7431 /* SQLite.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		4802EB8110AB282A699761C11B1BBDE5 /* DataStore */ = {
-			isa = PBXGroup;
-			children = (
-				E62F6C5BADF45ABCAF3D1C76580C321F /* SQLDataHelperProtocol.swift */,
-				2A531BB33E807841E98179E2AAA46DA8 /* SQLiteDataStore.swift */,
-				290F2FECB8E954DCDD72B062C180C860 /* SQLTrackedActionDataHelper.swift */,
-				844AEFF81D3E3C730018B31F /* SQLReportedActionDataHelper.swift */,
-				844AEFFA1D3F03630018B31F /* SQLCartridgeDataHelper.swift */,
-			);
-			path = DataStore;
 			sourceTree = "<group>";
 		};
 		55EC1D21DBE2EBBA621774D9A2A5A684 /* Pods */ = {
@@ -267,19 +222,24 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		58EA9F5B47328BE460FCEBD98A7675BD /* Support Files */ = {
+		5A6A76ADEEEA6E667646CBD02153BE54 /* Development Pods */ = {
 			isa = PBXGroup;
 			children = (
-				2E0D25AD929062020A3691BA0E010D81 /* DopamineKit.modulemap */,
-				AA0E4D061169518AE1BB02B5F40BB4CA /* DopamineKit.xcconfig */,
-				162F804AE3E398D48D45792A69C0ED4B /* DopamineKit-dummy.m */,
-				072AB4A9CB7F3E81EA2D4A50577E0445 /* DopamineKit-prefix.pch */,
-				ED876943A1CC0F97C3AB879A3887FAAC /* DopamineKit-umbrella.h */,
-				8AA3974F2DDA824CE5187F9B8434C339 /* Info.plist */,
-				B6357F8B7A4A64F15386BE704AA7A541 /* ResourceBundle-CandyIcons-Info.plist */,
+				2F8B5CC1499D9488268F1337D81FDA5B /* DopamineKit */,
 			);
-			name = "Support Files";
-			path = "Example/Pods/Target Support Files/DopamineKit";
+			name = "Development Pods";
+			sourceTree = "<group>";
+		};
+		639D2496162B349199478480EDF14956 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				7371AF2B77A7F28E528657E05E32436D /* DopamineKit.h */,
+				A3B05D0581BAF88BE2027B6B8E33A80E /* DopamineKit.swift */,
+				A0516D6F21AD9CBD2E30CC3CC74525A1 /* DataStore */,
+				9B28DEB672ED845551E12578DC583CCD /* RESTfulAPI */,
+				EBDFCB2A48F1C157F60FE0F0F37802E2 /* Synchronization */,
+			);
+			path = Sources;
 			sourceTree = "<group>";
 		};
 		6A4CECB51B6C85045C3E9B9DD42537FD /* iOS */ = {
@@ -294,24 +254,12 @@
 			isa = PBXGroup;
 			children = (
 				93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */,
-				09A5F1F9C8A15EC3DA35D6D1ADCAB092 /* Development Pods */,
+				5A6A76ADEEEA6E667646CBD02153BE54 /* Development Pods */,
 				0E9CC0217CE03B66912982F024F7C64D /* Frameworks */,
 				55EC1D21DBE2EBBA621774D9A2A5A684 /* Pods */,
-				3F98BF8E0AB8139345AF78F8E225602D /* Products */,
+				B6950C33A7CE9DC913C71C98C9DC07F2 /* Products */,
 				F8C245E8221D70827C0BD64A8AA995C6 /* Targets Support Files */,
 			);
-			sourceTree = "<group>";
-		};
-		8481E6031D421CCC001F818E /* Synchronization */ = {
-			isa = PBXGroup;
-			children = (
-				8481E6041D421CCC001F818E /* DopeAction.swift */,
-				8481E6061D421F57001F818E /* TimeSyncer.swift */,
-				8481E60A1D42B81B001F818E /* ReportSyncer.swift */,
-				8481E60C1D42DB10001F818E /* CartridgeSyncer.swift */,
-				8481E60E1D42E25B001F818E /* TrackSyncer.swift */,
-			);
-			path = Synchronization;
 			sourceTree = "<group>";
 		};
 		8C900629ABE3B1BDE7CDD446AA99624D /* Support Files */ = {
@@ -375,6 +323,64 @@
 			path = SQLite.swift;
 			sourceTree = "<group>";
 		};
+		9B28DEB672ED845551E12578DC583CCD /* RESTfulAPI */ = {
+			isa = PBXGroup;
+			children = (
+				017EE535DC22F22259B94B13484C2C89 /* DopamineAPI.swift */,
+				F01EA6FBA4E15161E47FE9C8F0D80B2C /* JSONDataType.swift */,
+			);
+			path = RESTfulAPI;
+			sourceTree = "<group>";
+		};
+		A0516D6F21AD9CBD2E30CC3CC74525A1 /* DataStore */ = {
+			isa = PBXGroup;
+			children = (
+				821F1B6904E9BD62523D3B1218F05048 /* SQLCartridgeDataHelper.swift */,
+				D67428DE9D1F2702C775652E9294AD18 /* SQLDataHelperProtocol.swift */,
+				535D9790E1E822EC16CF74C1B808DE2A /* SQLiteDataStore.swift */,
+				135DE200AEA4998E7A629DF4E87CCE53 /* SQLReportedActionDataHelper.swift */,
+				76FA31A130B39032AEE9D290F681128E /* SQLTrackedActionDataHelper.swift */,
+			);
+			path = DataStore;
+			sourceTree = "<group>";
+		};
+		A537A462BC43245D102047A9E064B9F4 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				92F1C8B02B9983EBFD7A8D11326E0AB9 /* DopamineKit.modulemap */,
+				3EA4A93EE417B0B5E86394AB73DD1E96 /* DopamineKit.xcconfig */,
+				D73DCCF431B5191B4AB26F1F7AE1A630 /* DopamineKit-dummy.m */,
+				FA4F94149999DECD74BC7F875208CA96 /* DopamineKit-prefix.pch */,
+				956D37F1B2D2FF857D56CDFB2E0701B2 /* DopamineKit-umbrella.h */,
+				37DB89690C917CFCEFBDF2D16A573E39 /* Info.plist */,
+			);
+			name = "Support Files";
+			path = "Example/Pods/Target Support Files/DopamineKit";
+			sourceTree = "<group>";
+		};
+		B6950C33A7CE9DC913C71C98C9DC07F2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CCC8462C2C058536AA1B8237C2E71B12 /* DopamineKit.framework */,
+				4C01023615691E251FC847035C781684 /* Pods_DopamineKit_Example.framework */,
+				CD75507FE26F892EFFDB11D53DF66427 /* Pods_DopamineKit_Tests.framework */,
+				AD053B5C755989F71B58D427DF4FEC06 /* SQLite.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EBDFCB2A48F1C157F60FE0F0F37802E2 /* Synchronization */ = {
+			isa = PBXGroup;
+			children = (
+				3281D4DF77B8A94431E29D2749B50154 /* CartridgeSyncer.swift */,
+				1B01476367D487DC16DAA9AF496F79A0 /* DopeAction.swift */,
+				27F7007FCC39C8A390C6188798E1D32E /* ReportSyncer.swift */,
+				CF2453A7EDDB8A948489A7B978D0E38E /* TimeSyncer.swift */,
+				989E345612D7D56967DDC507EACE8D21 /* TrackSyncer.swift */,
+			);
+			path = Synchronization;
+			sourceTree = "<group>";
+		};
 		F8C245E8221D70827C0BD64A8AA995C6 /* Targets Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -382,18 +388,6 @@
 				97622B50585522774618D84B3AB6328B /* Pods-DopamineKit_Tests */,
 			);
 			name = "Targets Support Files";
-			sourceTree = "<group>";
-		};
-		FB88BEAB44E317DD41BD673C2B95C6E2 /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				8B999F80D9B9DB311CD3988C5C93F4F5 /* DopamineKit.h */,
-				C21963AA06060B425BBBC20DDE17E7E2 /* DopamineKit.swift */,
-				8481E6031D421CCC001F818E /* Synchronization */,
-				4802EB8110AB282A699761C11B1BBDE5 /* DataStore */,
-				2BDAF4D80A1EF6A3A116179F1B54E9E6 /* RESTfulAPI */,
-			);
-			path = Sources;
 			sourceTree = "<group>";
 		};
 		FF0C3B13C7E3230511330E4FB3253880 /* Pods-DopamineKit_Example */ = {
@@ -425,6 +419,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0C30CED5D16456A99D9C735ADB5C0B23 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC89502F3EFAEDD71FF25C2B106D4640 /* fts3_tokenizer.h in Headers */,
+				170051502412CB17150442B9353C7BD1 /* SQLite-Bridging.h in Headers */,
+				E5D57DA0DFC2B7A6A31BC03623BC73FF /* SQLite.h in Headers */,
+				6568D55EAFDFCC725AA214C4CBB67C49 /* SQLite.swift-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		588888CBD3210912CEA7D88E09282445 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -433,23 +438,12 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		6352616EEF6E511D781F43C5278ACB73 /* Headers */ = {
+		931EFDD42A33A98F617808C07662923F /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D771B9E4AD9A854E81FB5D5A9C3230D4 /* fts3_tokenizer.h in Headers */,
-				75FD8766C5602A6FB90B1AD9865B7DA7 /* SQLite-Bridging.h in Headers */,
-				29D69CA4CFC08A7738E9E0FFF9A47225 /* SQLite.h in Headers */,
-				59263E672520466CDB0C5683F2EE6A0B /* SQLite.swift-umbrella.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B717A61D21F2FF233BC108D9CBF6812F /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				84F48B1D3C69DE3D818FB8E0C1E6B478 /* DopamineKit-umbrella.h in Headers */,
-				545F1F51D6522EA76D7397DA029B923F /* DopamineKit.h in Headers */,
+				CBF7CCA3F6135C3367204CB248A0A6C8 /* DopamineKit-umbrella.h in Headers */,
+				ECFF076B3F18CD2215879A376F686F87 /* DopamineKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -472,43 +466,25 @@
 			);
 			name = "Pods-DopamineKit_Example";
 			productName = "Pods-DopamineKit_Example";
-			productReference = D439E63659A662FC303F0F404E31FC76 /* Pods_DopamineKit_Example.framework */;
+			productReference = 4C01023615691E251FC847035C781684 /* Pods_DopamineKit_Example.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		80B4242D698F4F97D68E04238E5CDAE1 /* SQLite.swift */ = {
+		686603462C0E4F35A1A3F772CCC89EE3 /* DopamineKit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2EF95379C97BE3A878F4D119B11BF5F2 /* Build configuration list for PBXNativeTarget "SQLite.swift" */;
+			buildConfigurationList = B6FB25321AFD120B6ECA8AB09A728318 /* Build configuration list for PBXNativeTarget "DopamineKit" */;
 			buildPhases = (
-				32ECB7B701194E66C5A13D014088BCF6 /* Sources */,
-				10FCC84D7893226B0FC0BBE4D5D421D9 /* Frameworks */,
-				6352616EEF6E511D781F43C5278ACB73 /* Headers */,
+				52AB82A6452191D1414222EAEF4B47AA /* Sources */,
+				63E8A05459635D16609856AB5770216A /* Frameworks */,
+				931EFDD42A33A98F617808C07662923F /* Headers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-			);
-			name = SQLite.swift;
-			productName = SQLite.swift;
-			productReference = 1DC63E2B075EE70F114032E7FA2A7431 /* SQLite.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		C0B7CCFF854298EBA53F5D5C33DF177A /* DopamineKit */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 7CA841B845A3DBCEC62A5F425861E033 /* Build configuration list for PBXNativeTarget "DopamineKit" */;
-			buildPhases = (
-				EF6C2F2FA3DDE7094D73A8505EA50331 /* Sources */,
-				56F55F890FAD6FC13E98B38AD7A55B64 /* Frameworks */,
-				AA1F09F70F71635DF7D34AB805BD9F7D /* Resources */,
-				B717A61D21F2FF233BC108D9CBF6812F /* Headers */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				9A07C675A39C96D7F1B33282B7391031 /* PBXTargetDependency */,
+				4CFD10EDC2DAD8856D7E29356ED76D9F /* PBXTargetDependency */,
 			);
 			name = DopamineKit;
 			productName = DopamineKit;
-			productReference = BABA84D9AE60273751C1BB43A1517C7D /* DopamineKit.framework */;
+			productReference = CCC8462C2C058536AA1B8237C2E71B12 /* DopamineKit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		DC1E24D560F9BCD4E9DDAE83C2EE6AC8 /* Pods-DopamineKit_Tests */ = {
@@ -525,7 +501,24 @@
 			);
 			name = "Pods-DopamineKit_Tests";
 			productName = "Pods-DopamineKit_Tests";
-			productReference = 4F18037DCEA76F6817E69D906A449AAF /* Pods_DopamineKit_Tests.framework */;
+			productReference = CD75507FE26F892EFFDB11D53DF66427 /* Pods_DopamineKit_Tests.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		E30C554E216ACEF8A261C51A606E5F10 /* SQLite.swift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C110E4B8173FE1F513BD40CF4B6F592D /* Build configuration list for PBXNativeTarget "SQLite.swift" */;
+			buildPhases = (
+				934D85A4A48EE97C02469D5FEA2A51E5 /* Sources */,
+				5467030396BBB45FD1CF986FD41EAEDD /* Frameworks */,
+				0C30CED5D16456A99D9C735ADB5C0B23 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SQLite.swift;
+			productName = SQLite.swift;
+			productReference = AD053B5C755989F71B58D427DF4FEC06 /* SQLite.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -545,52 +538,37 @@
 				en,
 			);
 			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
-			productRefGroup = 3F98BF8E0AB8139345AF78F8E225602D /* Products */;
+			productRefGroup = B6950C33A7CE9DC913C71C98C9DC07F2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C0B7CCFF854298EBA53F5D5C33DF177A /* DopamineKit */,
+				686603462C0E4F35A1A3F772CCC89EE3 /* DopamineKit */,
 				3763E9AC31807C710988C407A6EB3985 /* Pods-DopamineKit_Example */,
 				DC1E24D560F9BCD4E9DDAE83C2EE6AC8 /* Pods-DopamineKit_Tests */,
-				80B4242D698F4F97D68E04238E5CDAE1 /* SQLite.swift */,
+				E30C554E216ACEF8A261C51A606E5F10 /* SQLite.swift */,
 			);
 		};
 /* End PBXProject section */
 
-/* Begin PBXResourcesBuildPhase section */
-		AA1F09F70F71635DF7D34AB805BD9F7D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
-		32ECB7B701194E66C5A13D014088BCF6 /* Sources */ = {
+		52AB82A6452191D1414222EAEF4B47AA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98D6CF4B1D9E53006666FB70C2DE66B2 /* AggregateFunctions.swift in Sources */,
-				C5C753FD1A2A359C2D22385079C123A7 /* Blob.swift in Sources */,
-				9A1DEE0CA7DBF39617EFF7370634C61C /* Collation.swift in Sources */,
-				771F7979E63C3C4D6800B12B40058F8D /* Connection.swift in Sources */,
-				24D3953AE4E43CD88860C24D606B266E /* CoreFunctions.swift in Sources */,
-				16EF938593FED4FCEDEEFEA2C222D124 /* CustomFunctions.swift in Sources */,
-				778F21F34E5C06687AD327760B1A3B30 /* Expression.swift in Sources */,
-				9062894BC4B0972580FA208764D2D2D5 /* Foundation.swift in Sources */,
-				231774216328DDF036152F59DC60E5B2 /* FTS4.swift in Sources */,
-				F4DCB7BA80468F7DA6D430F75DDBDC24 /* Helpers.swift in Sources */,
-				0B296B9A07740970C43B0275E57EBEC5 /* Operators.swift in Sources */,
-				6584D7FA17022E584805846F8439B390 /* Query.swift in Sources */,
-				CA5FD1C2C2D186C48B02AAAB9C847452 /* R*Tree.swift in Sources */,
-				1BEE51B92D2F278DBDD8E30F94A3A8D2 /* Schema.swift in Sources */,
-				EB0391AE80EA63B2BAF34B350FD1A702 /* Setter.swift in Sources */,
-				164E9B1379AED74BA1A07595F31AADB1 /* SQLite-Bridging.m in Sources */,
-				187F5B015685A684D803CC74A0007B39 /* SQLite.swift-dummy.m in Sources */,
-				DF49C805BFA5ECD11218E2C283B7DCCF /* Statement.swift in Sources */,
-				83382260DDC4E5BEB82FD33C6F1BB917 /* Value.swift in Sources */,
+				BA46ACD515044B0AE59B52AA3292AB3E /* CartridgeSyncer.swift in Sources */,
+				9AC563108132E56542441785563D527D /* DopamineAPI.swift in Sources */,
+				155394462272A5C475F1EA39D294CA10 /* DopamineKit-dummy.m in Sources */,
+				1D7A9B8D94532EED09E1CA84C73901CC /* DopamineKit.swift in Sources */,
+				3008C39A53C577772957BA265821CB3C /* DopeAction.swift in Sources */,
+				A025474AF42F47F19D8453479D4BF241 /* JSONDataType.swift in Sources */,
+				2BFD506668D501F20284F90493352A27 /* ReportSyncer.swift in Sources */,
+				161B538D633B4FCD305C0998ECF9A3FB /* SQLCartridgeDataHelper.swift in Sources */,
+				3A052C75064BBDD86FA7D9A8ED572E2C /* SQLDataHelperProtocol.swift in Sources */,
+				1A3B059334A3D4CE6DBA671E77A23014 /* SQLiteDataStore.swift in Sources */,
+				35D53A95DD631F5DBCF9E7F80029F29B /* SQLReportedActionDataHelper.swift in Sources */,
+				47809196CF640C97A4F37D0A6129DFEF /* SQLTrackedActionDataHelper.swift in Sources */,
+				057189E6497DD8FD70D9856688020B22 /* TimeSyncer.swift in Sources */,
+				4B144B65005F56CDA843692940CF30C3 /* TrackSyncer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -602,32 +580,37 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		934D85A4A48EE97C02469D5FEA2A51E5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A89FD84056C6A18EBDF836D617D7033B /* AggregateFunctions.swift in Sources */,
+				E763E68AF597ACBD1AC24E21C89959B7 /* Blob.swift in Sources */,
+				C09A8B86FB754047DC8E9DCB324AEDB4 /* Collation.swift in Sources */,
+				CF654764ECB9671479C89C371653DF90 /* Connection.swift in Sources */,
+				E8DF494D5CEBE252A88CB82CAE683CB1 /* CoreFunctions.swift in Sources */,
+				2CDB638619BEF629B13E4D85A3ECC57D /* CustomFunctions.swift in Sources */,
+				EFAD11772DAFABD8C4DD589C2778C41F /* Expression.swift in Sources */,
+				8B1E635A6DD19834C7D9BD47AD2587A6 /* Foundation.swift in Sources */,
+				261FDC62DFAAF9153E1833FE2D574DEA /* FTS4.swift in Sources */,
+				790FDABB10F995D3972F19CDC9B463C2 /* Helpers.swift in Sources */,
+				44A553030C8F43289644597E12998205 /* Operators.swift in Sources */,
+				1CAC944A62867E1E192AA45EE91F971B /* Query.swift in Sources */,
+				A51F7E6C68BC63724C9F22808724A8FE /* R*Tree.swift in Sources */,
+				72378708954A6D345C9FBE6FE2546218 /* Schema.swift in Sources */,
+				BFB7C8DF736DE56ADF68618B2445DF37 /* Setter.swift in Sources */,
+				13556157B419DA29B01150A1AB7E7111 /* SQLite-Bridging.m in Sources */,
+				A8FED56A3BE9EEE66497438A4E0FD721 /* SQLite.swift-dummy.m in Sources */,
+				1E6757B991E3060065FC86B55ABB5E18 /* Statement.swift in Sources */,
+				145FC521FBC2068264F4470C2A67CF8D /* Value.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CF3A5A083BF5BDF6BECEBD42C6AC9E0F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				77DDEF96C19D3648450FDF1030575B7F /* Pods-DopamineKit_Tests-dummy.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		EF6C2F2FA3DDE7094D73A8505EA50331 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				844AEFFB1D3F03630018B31F /* SQLCartridgeDataHelper.swift in Sources */,
-				E10AD780FBCBC231299FC5F3797FC4D3 /* DopamineAPI.swift in Sources */,
-				8481E6071D421F57001F818E /* TimeSyncer.swift in Sources */,
-				8481E60F1D42E25B001F818E /* TrackSyncer.swift in Sources */,
-				8481E60B1D42B81B001F818E /* ReportSyncer.swift in Sources */,
-				85204E236F1DA4CDF8FA69ED1BA4FA79 /* DopamineKit-dummy.m in Sources */,
-				94EC2F3B3C8C6A016795F0E052A39248 /* DopamineKit.swift in Sources */,
-				844AEFF71D3E33E40018B31F /* JSONDataType.swift in Sources */,
-				309C6B1F4DB1AC5E447E83E94DAA5EEF /* SQLDataHelperProtocol.swift in Sources */,
-				8481E60D1D42DB10001F818E /* CartridgeSyncer.swift in Sources */,
-				8481E6051D421CCC001F818E /* DopeAction.swift in Sources */,
-				8E0B0F49C4D140EA0F84E14EAAF5FE00 /* SQLiteDataStore.swift in Sources */,
-				9DF99937BB063D794C1C267DDA40AC69 /* SQLTrackedActionDataHelper.swift in Sources */,
-				844AEFF91D3E3C730018B31F /* SQLReportedActionDataHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -637,20 +620,20 @@
 		2037536F3F2F08C313FF6E4DD5A474E1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = SQLite.swift;
-			target = 80B4242D698F4F97D68E04238E5CDAE1 /* SQLite.swift */;
+			target = E30C554E216ACEF8A261C51A606E5F10 /* SQLite.swift */;
 			targetProxy = 5074C3B026ADEEBE3BFE3DD83A4ED1BF /* PBXContainerItemProxy */;
 		};
 		39A4DC175660D414BC789337109B54B7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = DopamineKit;
-			target = C0B7CCFF854298EBA53F5D5C33DF177A /* DopamineKit */;
+			target = 686603462C0E4F35A1A3F772CCC89EE3 /* DopamineKit */;
 			targetProxy = 7B6E86FE1026A126F5FEEAF1138C009B /* PBXContainerItemProxy */;
 		};
-		9A07C675A39C96D7F1B33282B7391031 /* PBXTargetDependency */ = {
+		4CFD10EDC2DAD8856D7E29356ED76D9F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = SQLite.swift;
-			target = 80B4242D698F4F97D68E04238E5CDAE1 /* SQLite.swift */;
-			targetProxy = 9D33ECF6C22F2D4458F278F55B915DB7 /* PBXContainerItemProxy */;
+			target = E30C554E216ACEF8A261C51A606E5F10 /* SQLite.swift */;
+			targetProxy = C275DA9816BA34E31A13CACDCEC65A85 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -688,13 +671,13 @@
 			};
 			name = Release;
 		};
-		2CBE823567B62E27C5155AD75238F0EA /* Release */ = {
+		28F286C7053F403517FA7AE0A3F6D5BA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AA0E4D061169518AE1BB02B5F40BB4CA /* DopamineKit.xcconfig */;
+			baseConfigurationReference = 3EA4A93EE417B0B5E86394AB73DD1E96 /* DopamineKit.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -707,15 +690,16 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/DopamineKit/DopamineKit.modulemap";
-				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = DopamineKit;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Release;
+			name = Debug;
 		};
 		37D29E4DC2C9BC3ACAC280BB0C6F851B /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -792,36 +776,6 @@
 			};
 			name = Debug;
 		};
-		4CE106C1A455E6599DE8DA4977A03FDE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = AA0E4D061169518AE1BB02B5F40BB4CA /* DopamineKit.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/DopamineKit/DopamineKit-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/DopamineKit/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/DopamineKit/DopamineKit.modulemap";
-				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = DopamineKit;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
 		5812CE8166CC58D49BA19C16B5540476 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 288BF5FB588AF286DA9322FAB66617D0 /* Pods-DopamineKit_Tests.debug.xcconfig */;
@@ -889,7 +843,7 @@
 			};
 			name = Debug;
 		};
-		5D1CC4BEC9449E886BA1B3188236620C /* Debug */ = {
+		A0154033D0B0BDAD8681AA492058E449 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0A0EF42E8B92F8C58A8C7DFEE4D6DB07 /* SQLite.swift.xcconfig */;
 			buildSettings = {
@@ -918,6 +872,35 @@
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
+		};
+		A026BDAE0377265F081E8FEB662684D9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3EA4A93EE417B0B5E86394AB73DD1E96 /* DopamineKit.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/DopamineKit/DopamineKit-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/DopamineKit/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/DopamineKit/DopamineKit.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = DopamineKit;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
 		};
 		AAF678CED40D3499169D10F63CA0719E /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -957,7 +940,7 @@
 			};
 			name = Release;
 		};
-		D5178F06FA1CE879D62DC32F8FB40B09 /* Release */ = {
+		D719F5B29A47C05D4B9AAA074C968FC8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0A0EF42E8B92F8C58A8C7DFEE4D6DB07 /* SQLite.swift.xcconfig */;
 			buildSettings = {
@@ -998,15 +981,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2EF95379C97BE3A878F4D119B11BF5F2 /* Build configuration list for PBXNativeTarget "SQLite.swift" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5D1CC4BEC9449E886BA1B3188236620C /* Debug */,
-				D5178F06FA1CE879D62DC32F8FB40B09 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		6503825D4684E1FD23F2D6688C296D64 /* Build configuration list for PBXNativeTarget "Pods-DopamineKit_Example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1016,11 +990,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7CA841B845A3DBCEC62A5F425861E033 /* Build configuration list for PBXNativeTarget "DopamineKit" */ = {
+		B6FB25321AFD120B6ECA8AB09A728318 /* Build configuration list for PBXNativeTarget "DopamineKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4CE106C1A455E6599DE8DA4977A03FDE /* Debug */,
-				2CBE823567B62E27C5155AD75238F0EA /* Release */,
+				28F286C7053F403517FA7AE0A3F6D5BA /* Debug */,
+				A026BDAE0377265F081E8FEB662684D9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C110E4B8173FE1F513BD40CF4B6F592D /* Build configuration list for PBXNativeTarget "SQLite.swift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0154033D0B0BDAD8681AA492058E449 /* Debug */,
+				D719F5B29A47C05D4B9AAA074C968FC8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
