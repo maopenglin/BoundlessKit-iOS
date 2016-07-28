@@ -46,8 +46,7 @@ class TrackSyncer {
                 DopeAction(
                     actionID: action.actionID,
                     metaData: action.metaData,
-                    utc: action.utc,
-                    timezoneOffset: action.timezoneOffset)
+                    utc: action.utc )
             )
         }
         
@@ -71,8 +70,7 @@ class TrackSyncer {
                 actionID:
                 action.actionID,
                 metaData: action.metaData,
-                utc: action.utc,
-                timezoneOffset: action.timezoneOffset)
+                utc: action.utc )
             )
             else{
                 // if it couldnt be saved, send it

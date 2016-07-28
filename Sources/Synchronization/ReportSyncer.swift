@@ -47,8 +47,7 @@ class ReportSyncer {
                     actionID: action.actionID,
                     reinforcementDecision: action.reinforcementDecision,
                     metaData: action.metaData,
-                    utc: action.utc,
-                    timezoneOffset: action.timezoneOffset
+                    utc: action.utc
                 )
             )
         }
@@ -73,8 +72,7 @@ class ReportSyncer {
                 actionID: action.actionID,
                 reinforcementDecision: action.reinforcementDecision!,
                 metaData: action.metaData,
-                utc: action.utc,
-                timezoneOffset: action.timezoneOffset)
+                utc: action.utc)
             )
             else{
                 // if it couldnt be saved, send it
