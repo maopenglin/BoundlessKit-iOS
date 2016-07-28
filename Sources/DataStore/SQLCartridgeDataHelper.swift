@@ -80,13 +80,11 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
     static func dropTable(actionID: String) {
         guard let DB = SQLiteDataStore.sharedInstance.DDB, table = getTable(actionID, ifNotExists: false) else
         { return }
-        
-        let TABLE_NAME = TABLE_NAME_PREFIX + actionID
         do {
             let _ = try DB.run( table.drop(ifExists: true) )
-            DopamineKit.DebugLog("Dropped table:(\(TABLE_NAME))")
+            DopamineKit.DebugLog("Dropped table:(\(TABLE_NAME_PREFIX + actionID))")
         } catch {
-            DopamineKit.DebugLog("Error dropping table:(\(TABLE_NAME))")
+            DopamineKit.DebugLog("Error dropping table:(\(TABLE_NAME_PREFIX + actionID))")
         }
     }
     

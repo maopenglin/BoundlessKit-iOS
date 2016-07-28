@@ -98,9 +98,6 @@ class CartridgeSyncer {
                                             actionID: self.actionID,
                                             reinforcementDecision: decision)
                                     )
-                                    if rowId == nil {
-                                        DopamineKit.DebugLog("❌ Couldn't add \(decision) to \(self.actionID) sql cartridge")
-                                    }
                                 }
                                 DopamineKit.DebugLog("✅ \(self.actionID) refreshed!")
                             }
@@ -118,15 +115,13 @@ class CartridgeSyncer {
     func unload() -> String {
         var decision = "neutralFeedback"
         
-        if isFresh() {
-            if mutex_lock > 0 {
+        if mutex_lock > 0 && isFresh() {
                 mutex_lock-=1
                 if let rdSql = SQLCartridgeDataHelper.findFirst(actionID) {
                     decision = rdSql.reinforcementDecision
                     SQLCartridgeDataHelper.delete(rdSql)
                 }
                 mutex_lock+=1
-            }
         }
         
         if !isFresh() {

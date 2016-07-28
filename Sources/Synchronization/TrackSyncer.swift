@@ -32,7 +32,7 @@ class TrackSyncer {
     
     static func sync() {
         objc_sync_enter(instance)
-        defer{ objc_sync_exit(instance) }
+        defer{ objc_sync_exit(instance) }        
         
         let actions = SQLTrackedActionDataHelper.findAll()
         if actions.count == 0 {
