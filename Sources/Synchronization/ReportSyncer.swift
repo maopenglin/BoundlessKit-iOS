@@ -91,16 +91,6 @@ class ReportSyncer {
         DopamineKit.DebugLog("Stored \(rowId) actions.")
         
         // check if sync needs to be done
-        if SQLReportedActionDataHelper.count() >= ReportSyncer.getLogSize()
-        {
-            DopamineKit.DebugLog("\(SQLReportedActionDataHelper.count()) >= \(ReportSyncer.getLogSize())")
-        }
-        
-        if TimeSyncer.isExpired(ReportSyncer.TimeSyncerKey)
-        {
-            DopamineKit.DebugLog("\(TimeSyncer.progress(ReportSyncer.TimeSyncerKey))")
-        }
-        
         if SQLReportedActionDataHelper.count() >= ReportSyncer.getLogSize() ||
         TimeSyncer.isExpired(ReportSyncer.TimeSyncerKey)
         {

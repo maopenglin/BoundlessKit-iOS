@@ -21,7 +21,7 @@ typealias SQLReportedAction = (
 
 class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     
-    static let TABLE_NAME = "Reinforced_Actions"
+    static let TABLE_NAME = "Reported_Actions"
     
     static let table = Table(TABLE_NAME)
     static let index = Expression<Int64>("index")

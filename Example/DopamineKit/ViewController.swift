@@ -18,7 +18,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
-//        let _ = DopamineKit.instance
     }
     
     func action1Performed(){
@@ -26,8 +25,6 @@ class ViewController: UIViewController {
         // Reinforce the action to make it sticky!!
 //        DopamineKit.reinforce("action1", completion: {reinforcement in
         DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {reinforcement in
-            // So we don't run on the main thread
-            dispatch_async(dispatch_get_main_queue(), {
                 
                 // Update UI to display reinforcement decision on screen for learning purposes
                 self.responseLabel.text = reinforcement
@@ -70,7 +67,6 @@ class ViewController: UIViewController {
 //                // if `nil` or no duration is provided, the CandyBar will go away when the user taps it or `candybar.dismiss()` is used
 //                candybar.show(visibilityDuration)
                 
-            })
         })
     }
     

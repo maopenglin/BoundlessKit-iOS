@@ -55,7 +55,9 @@ public class DopamineKit : NSObject {
         let _ = sharedInstance
         let reinforcementDecision = CartridgeSyncer.forAction(actionID).unload()
         
-        completion(reinforcementDecision)
+        dispatch_async(dispatch_get_main_queue(), {
+            completion(reinforcementDecision)
+        })
         
         // store the action to be synced
         let action = DopeAction(actionID: actionID, reinforcementDecision: reinforcementDecision, metaData: metaData)
