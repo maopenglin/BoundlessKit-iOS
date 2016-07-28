@@ -126,31 +126,27 @@ public class DopamineAPI : NSObject{
                     
                     guard let responseURL = responseURL as? NSHTTPURLResponse else{
                         DopamineKit.DebugLog("❌ invalid response:\(error?.localizedDescription)")
+                        responseDict["error"] = error?.localizedDescription
                         return
                     }
                     
                     do {
                         // turn the response into a json object
                         responseDict = try NSJSONSerialization.JSONObjectWithData(responseData!, options: NSJSONReadingOptions()) as! [String: AnyObject]
-                        DopamineKit.DebugLog("\(type.str) call got response:\(responseDict.debugDescription)")
+                        DopamineKit.DebugLog("✅\(type.str) call got response:\(responseDict.debugDescription)")
                     } catch {
                         DopamineKit.DebugLog("❌ Error reading \(type.str) response data: \(responseData.debugDescription)")
                         return
                     }
                     
-                    
-                    if responseURL.statusCode != 200 {
-                        DopamineKit.DebugLog("❌ HTTP status code:\(responseURL.statusCode)")
-                    }
-                    
                 }
                 
                 // send request
-                DopamineKit.DebugLog("✅ Sending \(type.str) api call with payload: \(payload.description)")
+                DopamineKit.DebugLog("Sending \(type.str) api call with payload: \(payload.description)")
                 task.resume()
                 
             } catch {
-                DopamineKit.DebugLog("❌Error sending \(type.str) api call with payload:(\(payload.description))")
+                DopamineKit.DebugLog("Error sending \(type.str) api call with payload:(\(payload.description))")
             }
         }
     
@@ -257,12 +253,4 @@ public class DopamineAPI : NSObject{
             return defaultIdentity
         }
     }()
-}
-
-extension Dictionary {
-    mutating func update(other:Dictionary) {
-        for (key,value) in other {
-            self.updateValue(value, forKey:key)
-        }
-    }
 }

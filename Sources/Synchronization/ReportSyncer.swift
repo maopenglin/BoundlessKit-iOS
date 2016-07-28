@@ -52,13 +52,18 @@ class ReportSyncer {
             )
         }
         
-        SQLReportedActionDataHelper.dropTable()
-        SQLReportedActionDataHelper.createTable()
-        TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
+//        SQLReportedActionDataHelper.dropTable()
+//        SQLReportedActionDataHelper.createTable()
+//        TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
         
         DopamineAPI.report(reportedActions, completion: {
             response in
-            // TODO: if response['error'] != null { return }
+            if response["status"] as? Int == 200 {
+                for action in actions {
+                    SQLReportedActionDataHelper.delete(action)
+                }
+                TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
+            }
         })
     }
     
@@ -86,6 +91,16 @@ class ReportSyncer {
         DopamineKit.DebugLog("Stored \(rowId) actions.")
         
         // check if sync needs to be done
+        if SQLReportedActionDataHelper.count() >= ReportSyncer.getLogSize()
+        {
+            DopamineKit.DebugLog("\(SQLReportedActionDataHelper.count()) >= \(ReportSyncer.getLogSize())")
+        }
+        
+        if TimeSyncer.isExpired(ReportSyncer.TimeSyncerKey)
+        {
+            DopamineKit.DebugLog("\(TimeSyncer.progress(ReportSyncer.TimeSyncerKey))")
+        }
+        
         if SQLReportedActionDataHelper.count() >= ReportSyncer.getLogSize() ||
         TimeSyncer.isExpired(ReportSyncer.TimeSyncerKey)
         {

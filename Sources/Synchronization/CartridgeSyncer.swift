@@ -10,7 +10,7 @@ import Foundation
 
 class CartridgeSyncer {
     
-    private var mutex_lock:Int = 1
+    private var sql_mutex_lock:Int = 1
     
     private let defaults = NSUserDefaults.standardUserDefaults()
     private let DefaultsKey = "DopamineCartridgeSyncer"
@@ -61,8 +61,8 @@ class CartridgeSyncer {
     }
     
     func reload() {
-        if (mutex_lock > 0) {
-            mutex_lock-=1
+        if (sql_mutex_lock > 0) {
+            sql_mutex_lock-=1
         } else {
             return
         }
@@ -78,21 +78,22 @@ class CartridgeSyncer {
                     DopamineKit.DebugLog("Sending reported actions...")
                     ReportSyncer.sync()
                     
-                    self.dispatch_async_delayed(3) {
+                    self.dispatch_async_delayed(10) {
                         DopamineAPI.refresh(self.actionID, completion: {
                             response in
-                            defer { self.mutex_lock+=1 }
+                            defer { self.sql_mutex_lock+=1 }
                             if let cartridge = response["reinforcementCartridge"] as? [String],
                                 expiry = response["expiresIn"] as? Int
                             {
-                                SQLCartridgeDataHelper.dropTable(self.actionID)
-                                SQLCartridgeDataHelper.createTable(self.actionID)
+//                                SQLCartridgeDataHelper.dropTable(self.actionID)
+//                                SQLCartridgeDataHelper.createTable(self.actionID)
+                                SQLCartridgeDataHelper.deleteAll(self.actionID)
                                 
                                 TimeSyncer.reset(self.TimeSyncerKey + self.actionID, duration: expiry)
                                 self.setCartridgeInitialSize(cartridge.count)
                                 
                                 for decision in cartridge {
-                                    let rowId = SQLCartridgeDataHelper.insert(
+                                    let _ = SQLCartridgeDataHelper.insert(
                                         SQLCartridge(
                                             index:0,
                                             actionID: self.actionID,
@@ -115,13 +116,13 @@ class CartridgeSyncer {
     func unload() -> String {
         var decision = "neutralFeedback"
         
-        if mutex_lock > 0 && isFresh() {
-                mutex_lock-=1
+        if sql_mutex_lock > 0 && isFresh() {
+                sql_mutex_lock-=1
                 if let rdSql = SQLCartridgeDataHelper.findFirst(actionID) {
                     decision = rdSql.reinforcementDecision
                     SQLCartridgeDataHelper.delete(rdSql)
                 }
-                mutex_lock+=1
+                sql_mutex_lock+=1
         }
         
         if !isFresh() {

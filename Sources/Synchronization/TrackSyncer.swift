@@ -20,7 +20,7 @@ class TrackSyncer {
     private init() {
         let defaults = NSUserDefaults.standardUserDefaults()
         let standardSize = 10
-        if( defaults.valueForKey(TrackSyncer.DefaultsKey + TrackSyncer.LogSizeKey) == nil ){
+        if( defaults.valueForKey(TrackSyncer.DefaultsKey + TrackSyncer.LogSizeKey) == nil ) {
             defaults.setValue(standardSize, forKey: TrackSyncer.DefaultsKey + TrackSyncer.LogSizeKey)
         }
         TimeSyncer.create(TrackSyncer.TimeSyncerKey, ifNotExists: true)
@@ -50,13 +50,15 @@ class TrackSyncer {
             )
         }
         
-        SQLTrackedActionDataHelper.dropTable()
-        SQLTrackedActionDataHelper.createTable()
-        TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
-        
         DopamineAPI.track(trackedActions, completion: {
             response in
-            // TODO: if response['error'] == null { return }
+            if response["status"] as? Int == 200 {
+                for action in actions {
+                    SQLTrackedActionDataHelper.delete(action)
+                    TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
+                }
+                
+            }
         })
     }
     
@@ -82,6 +84,7 @@ class TrackSyncer {
         }
         
         DopamineKit.DebugLog("Stored \(rowId) tracked actions.")
+        
         if SQLTrackedActionDataHelper.count() >= TrackSyncer.getLogSize() ||
             TimeSyncer.isExpired(TrackSyncer.TimeSyncerKey)
         {

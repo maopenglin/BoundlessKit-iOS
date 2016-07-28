@@ -151,6 +151,22 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         
     }
     
+    static func deleteAll (actionID: String) {
+        guard let DB = SQLiteDataStore.sharedInstance.DDB, table = getTable(actionID, ifNotExists: false) else
+        { return }
+        
+        do {
+            let result = try DB.run(table.delete())
+            guard result == 1 else {
+                throw SQLDataAccessError.Delete_Error
+            }
+            DopamineKit.DebugLog("Deleted all for Table:\(TABLE_NAME_PREFIX+actionID) successful")
+        } catch {
+            DopamineKit.DebugLog("Delete all for Table:\(TABLE_NAME_PREFIX+actionID) failed")
+        }
+        
+    }
+    
     static func find(id: Int64) -> T? { return nil }
     
     static func find(actionID: String, id: Int64) -> T? {

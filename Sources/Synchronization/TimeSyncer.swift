@@ -30,9 +30,9 @@ class TimeSyncer {
     
     static func reset(key: String, duration: Int?=nil) {
         if let expiry = duration {
-            create(KEY_PREFIX + key + KEY_SUFFIX_START_TIME, duration: expiry, ifNotExists: false)
+            create(key, duration: expiry, ifNotExists: false)
         } else {
-            create(KEY_PREFIX + key + KEY_SUFFIX_START_TIME, ifNotExists: false)
+            create(key, ifNotExists: false)
         }
     }
     
