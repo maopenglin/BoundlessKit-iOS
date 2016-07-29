@@ -52,10 +52,6 @@ class ReportSyncer {
             )
         }
         
-//        SQLReportedActionDataHelper.dropTable()
-//        SQLReportedActionDataHelper.createTable()
-//        TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
-        
         DopamineAPI.report(reportedActions, completion: {
             response in
             if response["status"] as? Int == 200 {

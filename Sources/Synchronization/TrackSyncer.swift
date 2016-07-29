@@ -55,9 +55,8 @@ class TrackSyncer {
             if response["status"] as? Int == 200 {
                 for action in actions {
                     SQLTrackedActionDataHelper.delete(action)
-                    TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
                 }
-                
+                TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
             }
         })
     }
