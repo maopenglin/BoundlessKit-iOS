@@ -242,15 +242,16 @@ public class DopamineAPI : NSObject{
     
     // get the primary identity as a lazy computed variable
     lazy var primaryIdentity:String = {
-        let key = "DopaminePrimaryIdentity"
-        let defaults = NSUserDefaults.standardUserDefaults()
-        if let identity = defaults.valueForKey(key) as? String {
-            DopamineKit.DebugLog("primaryIdentity:(\(identity))")
-            return identity
-        } else {
-            let defaultIdentity = UIDevice.currentDevice().identifierForVendor!.UUIDString
-            defaults.setValue(defaultIdentity, forKey: key)
-            return defaultIdentity
-        }
+//        let key = "DopaminePrimaryIdentity"
+//        let defaults = NSUserDefaults.standardUserDefaults()
+//        if let identity = defaults.valueForKey(key) as? String {
+//            DopamineKit.DebugLog("primaryIdentity:(\(identity))")
+//            return identity
+//        } else {
+//            let defaultIdentity = UIDevice.currentDevice().identifierForVendor!.UUIDString
+//            defaults.setValue(defaultIdentity, forKey: key)
+//            return defaultIdentity
+//        }
+        return "D1C337DB-8C68-4369-B249-EAAF1BF9906E"
     }()
 }

@@ -10,8 +10,6 @@ import Foundation
 
 class CartridgeSyncer {
     
-    private var sql_mutex_lock:Int = 1
-    
     private let defaults = NSUserDefaults.standardUserDefaults()
     private let DefaultsKey = "DopamineCartridgeSyncer"
     private let TimeSyncerKey = "Cartridge"
@@ -33,7 +31,6 @@ class CartridgeSyncer {
     
     private init(actionID: String) {
         self.actionID = actionID
-        let defaults = NSUserDefaults.standardUserDefaults()
         let standardSize = 10
         let key = DefaultsKey + actionID + SizeKey
         if( defaults.valueForKey(key) == nil ){
@@ -57,56 +54,68 @@ class CartridgeSyncer {
     func isFresh() -> Bool {
         return
             SQLCartridgeDataHelper.count(actionID) > 1 &&
-            !TimeSyncer.isExpired(TimeSyncerKey + actionID)
+                !TimeSyncer.isExpired(TimeSyncerKey + actionID)
     }
     
+    private let queue = dispatch_queue_create("com.usedopamine.dopaminekit.synchronization.CartridgeSyncerQueue", nil)
+    private var reloadInProgress = false
     func reload() {
-        if (sql_mutex_lock > 0) {
-            sql_mutex_lock-=1
-        } else {
+        guard !reloadInProgress else {
             return
         }
+        reloadInProgress = true
         
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0)) {
+        dispatch_async(queue) {
             DopamineKit.DebugLog("Beginning reload...")
             
             self.dispatch_async_delayed(1) {
                 DopamineKit.DebugLog("Sending tracked actions...")
-                TrackSyncer.sync()
-                
-                self.dispatch_async_delayed(1) {
-                    DopamineKit.DebugLog("Sending reported actions...")
-                    ReportSyncer.sync()
-                    
-                    self.dispatch_async_delayed(10) {
-                        DopamineAPI.refresh(self.actionID, completion: {
-                            response in
-                            defer { self.sql_mutex_lock+=1 }
-                            if let cartridge = response["reinforcementCartridge"] as? [String],
-                                expiry = response["expiresIn"] as? Int
-                            {
-//                                SQLCartridgeDataHelper.dropTable(self.actionID)
-//                                SQLCartridgeDataHelper.createTable(self.actionID)
-                                SQLCartridgeDataHelper.deleteAll(self.actionID)
-                                
-                                TimeSyncer.reset(self.TimeSyncerKey + self.actionID, duration: expiry)
-                                self.setCartridgeInitialSize(cartridge.count)
-                                
-                                for decision in cartridge {
-                                    let _ = SQLCartridgeDataHelper.insert(
-                                        SQLCartridge(
-                                            index:0,
-                                            actionID: self.actionID,
-                                            reinforcementDecision: decision)
-                                    )
-                                }
-                                DopamineKit.DebugLog("✅ \(self.actionID) refreshed!")
-                            }
-                            else {
-                                DopamineKit.DebugLog("❌ Could not read cartridge for (\(self.actionID))")
+                TrackSyncer.sync(){
+                    status in
+                    guard status == 200 else {
+                        DopamineKit.DebugLog("Status not 200")
+                        self.reloadInProgress = false
+                        return
+                    }
+                    DopamineKit.DebugLog("Status 200")
+                    self.dispatch_async_delayed(1) {
+                        DopamineKit.DebugLog("Sending reported actions...")
+                        ReportSyncer.sync() {
+                            status in
+                            guard status == 200 else {
+                                self.reloadInProgress = false
+                                return
                             }
                             
-                        })
+                            self.dispatch_async_delayed(5) {
+                                DopamineAPI.refresh(self.actionID, completion: {
+                                    response in
+                                    defer { self.reloadInProgress = false }
+                                    if let cartridge = response["reinforcementCartridge"] as? [String],
+                                        expiry = response["expiresIn"] as? Int
+                                    {
+                                        SQLCartridgeDataHelper.deleteAll(self.actionID)
+                                        TimeSyncer.reset(self.TimeSyncerKey + self.actionID, duration: expiry)
+                                        self.setCartridgeInitialSize(cartridge.count)
+                                        
+                                        for decision in cartridge {
+                                            let _ = SQLCartridgeDataHelper.insert(
+                                                SQLCartridge(
+                                                    index:0,
+                                                    actionID: self.actionID,
+                                                    reinforcementDecision: decision)
+                                            )
+                                        }
+                                        DopamineKit.DebugLog("✅ \(self.actionID) refreshed!")
+                                    }
+                                    else {
+                                        DopamineKit.DebugLog("❌ Could not read cartridge for (\(self.actionID))")
+                                    }
+                                    
+                                })
+                            }
+                            
+                        }
                     }
                 }
             }
@@ -116,24 +125,21 @@ class CartridgeSyncer {
     func unload() -> String {
         var decision = "neutralFeedback"
         
-        if sql_mutex_lock > 0 && isFresh() {
-                sql_mutex_lock-=1
-                if let rdSql = SQLCartridgeDataHelper.findFirst(actionID) {
-                    decision = rdSql.reinforcementDecision
-                    SQLCartridgeDataHelper.delete(rdSql)
-                }
-                sql_mutex_lock+=1
+        if isFresh() {
+            if let result = SQLCartridgeDataHelper.pop(actionID) {
+                decision = result.reinforcementDecision
+            }
         }
         
         if !isFresh() {
             self.reload()
         }
-
+        
         return decision
     }
     
-    func dispatch_async_delayed(seconds: Int64, queue: dispatch_queue_t = dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), block: () -> ()) {
-        dispatch_after(dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), seconds * Int64(NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), block)
+    func dispatch_async_delayed(seconds: Int64, queue: dispatch_queue_t = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), block: () -> ()) {
+        dispatch_after(dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), seconds * Int64(NSEC_PER_SEC)), queue, block)
     }
     
 }

@@ -30,13 +30,18 @@ class ReportSyncer {
         return defaults.integerForKey(DefaultsKey + LogSizeKey)
     }
     
-    static func sync() {
-        objc_sync_enter(sharedInstance)
-        defer { objc_sync_exit(sharedInstance) }
+    private static var syncInProgress = false
+    
+    static func sync(completion: (Int) -> () = { _ in }) {
+        guard !syncInProgress else {
+            return
+        }
+        syncInProgress = true
         
         let actions = SQLReportedActionDataHelper.findAll()
         if actions.count == 0 {
             DopamineKit.DebugLog("No reported actions to sync.")
+            completion(200)
             return
         }
     
@@ -54,19 +59,21 @@ class ReportSyncer {
         
         DopamineAPI.report(reportedActions, completion: {
             response in
+            defer { syncInProgress = false }
             if response["status"] as? Int == 200 {
                 for action in actions {
                     SQLReportedActionDataHelper.delete(action)
                 }
                 TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
+                completion(200)
+            } else {
+                completion(404)
             }
         })
     }
     
     static func store(action: DopeAction) {
-        objc_sync_enter(sharedInstance)
-        defer{ objc_sync_exit(sharedInstance) }
-        
+        let _ = sharedInstance
         guard let rowId = SQLReportedActionDataHelper.insert(
             SQLReportedAction(
                 index:0,
@@ -84,9 +91,13 @@ class ReportSyncer {
                 return
         }
         
-        DopamineKit.DebugLog("Stored \(rowId) actions.")
-        
         // check if sync needs to be done
+        if SQLReportedActionDataHelper.count() >= ReportSyncer.getLogSize() {
+            DopamineKit.DebugLog("Count is too high: \(ReportSyncer.getLogSize())")
+        }
+        if TimeSyncer.isExpired(ReportSyncer.TimeSyncerKey) {
+            DopamineKit.DebugLog("Timer expired")
+        }
         if SQLReportedActionDataHelper.count() >= ReportSyncer.getLogSize() ||
         TimeSyncer.isExpired(ReportSyncer.TimeSyncerKey)
         {

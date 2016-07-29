@@ -21,6 +21,8 @@ typealias SQLReportedAction = (
 
 class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     
+    typealias T = SQLReportedAction
+    
     static let TABLE_NAME = "Reported_Actions"
     
     static let table = Table(TABLE_NAME)
@@ -30,148 +32,161 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     static let metaData = Expression<Blob?>("metadata")
     static let utc = Expression<Int64>("utc")
     
-    typealias T = SQLReportedAction
+    static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.ReportedActionsQueue", nil)
     
     static func createTable() {
-        guard let DB = SQLiteDataStore.sharedInstance.DDB else
-        {
-            DopamineKit.DebugLog("SQLite database never initialized.")
-            return
+        dispatch_async(tableQueue) {
+            guard let DB = SQLiteDataStore.sharedInstance.DDB else
+            {
+                DopamineKit.DebugLog("SQLite database never initialized.")
+                return
+            }
+            
+            do {
+                let _ = try DB.run( table.create(ifNotExists: true) {t in
+                    t.column(index, primaryKey: true)
+                    t.column(actionID)
+                    t.column(reinforcementDecision)
+                    t.column(metaData)
+                    t.column(utc)
+                    })
+                DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
+            } catch {
+                DopamineKit.DebugLog("Error creating table:(\(TABLE_NAME))")
+            }
         }
-        
-        do {
-            let _ = try DB.run( table.create(ifNotExists: true) {t in
-                t.column(index, primaryKey: true)
-                t.column(actionID)
-                t.column(reinforcementDecision)
-                t.column(metaData)
-                t.column(utc)
-                })
-            DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
-        } catch {
-            DopamineKit.DebugLog("Error creating table:(\(TABLE_NAME))")
-        }
-        
     }
     
     static func dropTable() {
-        guard let DB = SQLiteDataStore.sharedInstance.DDB else
-        {
-            DopamineKit.DebugLog("SQLite database never initialized.")
-            return
-        }
-        
-        do {
-            let _ = try DB.run( table.drop(ifExists: true) )
-            DopamineKit.DebugLog("Dropped table:(\(TABLE_NAME))")
-        } catch {
-            DopamineKit.DebugLog("Error dropping table:(\(TABLE_NAME))")
+        dispatch_async(tableQueue) {
+            guard let DB = SQLiteDataStore.sharedInstance.DDB else
+            {
+                DopamineKit.DebugLog("SQLite database never initialized.")
+                return
+            }
+            
+            do {
+                let _ = try DB.run( table.drop(ifExists: true) )
+                DopamineKit.DebugLog("Dropped table:(\(TABLE_NAME))")
+            } catch {
+                DopamineKit.DebugLog("Error dropping table:(\(TABLE_NAME))")
+            }
         }
     }
     
     static func insert(item: T) -> Int64? {
-        guard let DB = SQLiteDataStore.sharedInstance.DDB else
-        {
-            DopamineKit.DebugLog("SQLite database never initialized.")
-            return nil
+        var rowId:Int64?
+        dispatch_sync(tableQueue) {
+            guard let DB = SQLiteDataStore.sharedInstance.DDB else
+            {
+                DopamineKit.DebugLog("SQLite database never initialized.")
+                return
+            }
+            
+            let insert = table.insert(
+                actionID <- item.actionID,
+                reinforcementDecision <- item.reinforcementDecision,
+                metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue),
+                utc <- item.utc )
+            do {
+                rowId = try DB.run(insert)
+                DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID) reinforcementDecision:\(item.reinforcementDecision)")
+            } catch {
+                DopamineKit.DebugLog("Insert error for reported action with values actionID:(\(item.actionID)) metaData:(\(item.metaData)) utc:(\(item.utc))")
+                return
+            }
         }
-        
-        let insert = table.insert(
-            actionID <- item.actionID,
-            reinforcementDecision <- item.reinforcementDecision,
-            metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue),
-            utc <- item.utc )
-        do {
-            let rowId = try DB.run(insert)
-            DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID) reinforcementDecision:\(item.reinforcementDecision)")
-            return rowId
-        } catch {
-            DopamineKit.DebugLog("Insert error for reported action with values actionID:(\(item.actionID)) metaData:(\(item.metaData)) utc:(\(item.utc))")
-            return nil
-        }
+        return rowId
     }
     
     static func delete (item: T) {
-        guard let DB = SQLiteDataStore.sharedInstance.DDB else
-        {
-            DopamineKit.DebugLog("SQLite database never initialized.")
-            return
-        }
-        
-        let id = item.index
-        let query = table.filter(index == id)
-        do {
-            let tmp = try DB.run(query.delete())
-            guard tmp == 1 else {
-                throw SQLDataAccessError.Delete_Error
+        dispatch_async(tableQueue) {
+            guard let DB = SQLiteDataStore.sharedInstance.DDB else
+            {
+                DopamineKit.DebugLog("SQLite database never initialized.")
+                return
             }
-            DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) successful")
-        } catch {
-            DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) failed")
+            
+            let id = item.index
+            let query = table.filter(index == id)
+            do {
+                let tmp = try DB.run(query.delete())
+                guard tmp == 1 else {
+                    throw SQLDataAccessError.Delete_Error
+                }
+                DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) successful")
+            } catch {
+                DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) failed")
+            }
         }
-        
     }
     
     static func find(id: Int64) -> T? {
-        guard let DB = SQLiteDataStore.sharedInstance.DDB else
-        {
-            DopamineKit.DebugLog("SQLite database never initialized.")
-            return nil
-        }
-        
-        let query = table.filter(index == id)
-        do {
-            let items = try DB.prepare(query)
-            for item in  items {
-                return SQLReportedAction(
-                    index: item[index],
-                    actionID: item[actionID],
-                    reinforcementDecision: item[reinforcementDecision],
-                    metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
-                    utc: item[utc] )
+        var result:T?
+        dispatch_sync(tableQueue) {
+            guard let DB = SQLiteDataStore.sharedInstance.DDB else
+            {
+                DopamineKit.DebugLog("SQLite database never initialized.")
+                return
             }
-        } catch {
-            DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with id:\(id)")
+            
+            let query = table.filter(index == id)
+            do {
+                let items = try DB.prepare(query)
+                for item in  items {
+                    result = SQLReportedAction(
+                        index: item[index],
+                        actionID: item[actionID],
+                        reinforcementDecision: item[reinforcementDecision],
+                        metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
+                        utc: item[utc] )
+                }
+            } catch {
+                DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with id:\(id)")
+            }
         }
-        
-        return nil
+        return result
     }
     
     static func findAll() -> [T] {
-        guard let DB = SQLiteDataStore.sharedInstance.DDB else
-        {
-            DopamineKit.DebugLog("SQLite database never initialized.")
-            return []
-        }
-        
-        var results = [T]()
-        do {
-            let items = try DB.prepare(table)
-            for item in items {
-                results.append(SQLReportedAction(
-                    index: item[index] ,
-                    actionID: item[actionID],
-                    reinforcementDecision: item[reinforcementDecision],
-                    metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
-                    utc: item[utc] )
-                )
+        var results:[T] = []
+        dispatch_sync(tableQueue) {
+            guard let DB = SQLiteDataStore.sharedInstance.DDB else
+            {
+                DopamineKit.DebugLog("SQLite database never initialized.")
+                return
             }
-        } catch {
-            DopamineKit.DebugLog("Search error for Table:\(TABLE_NAME)")
+            
+            do {
+                let items = try DB.prepare(table)
+                for item in items {
+                    results.append(SQLReportedAction(
+                        index: item[index] ,
+                        actionID: item[actionID],
+                        reinforcementDecision: item[reinforcementDecision],
+                        metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
+                        utc: item[utc] )
+                    )
+                }
+            } catch {
+                DopamineKit.DebugLog("Search error for Table:\(TABLE_NAME)")
+            }
         }
-        
         return results
     }
     
     static func count() -> Int {
-        
-        guard let DB = SQLiteDataStore.sharedInstance.DDB else
-        {
-            DopamineKit.DebugLog("SQLite database never initialized.")
-            return 0
+        var result = 0
+        dispatch_sync(tableQueue) {
+            guard let DB = SQLiteDataStore.sharedInstance.DDB else
+            {
+                DopamineKit.DebugLog("SQLite database never initialized.")
+                return
+            }
+            
+            result = DB.scalar(table.count)
         }
-        
-        return DB.scalar(table.count)
+        return result
     }
     
 }

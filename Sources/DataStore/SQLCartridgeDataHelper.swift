@@ -19,12 +19,14 @@ typealias SQLCartridge = (
 
 class SQLCartridgeDataHelper : SQLDataHelperProtocol {
     
+    typealias T = SQLCartridge
+    
     static let TABLE_NAME_PREFIX = "Reinforcement_Decisions_for_"
     
     static let index = Expression<Int64>("index")
     static let reinforcementDecision = Expression<String>("reinforcementdecision")
     
-    typealias T = SQLCartridge
+    private static let tablesQueue:dispatch_queue_t = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.CartridgeQueue", nil)
     
     static func createTable() { }
     
@@ -36,9 +38,9 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         }
         
         let TABLE_NAME = TABLE_NAME_PREFIX + actionID
-        let table = Table(TABLE_NAME)
         
         do {
+            let table = Table(TABLE_NAME)
             let _ = try DB.run( table.create(ifNotExists: true) {t in
                 t.column(index, primaryKey: true)
                 t.column(reinforcementDecision)
@@ -50,8 +52,9 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
             DopamineKit.DebugLog("Error creating table:(\(TABLE_NAME))")
             return nil
         }
+        return nil
     }
-    
+
     static func getTable(actionID: String, ifNotExists: Bool=false) -> Table? {
         guard let DB = SQLiteDataStore.sharedInstance.DDB else
         {
@@ -80,33 +83,36 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
     static func dropTable(actionID: String) {
         guard let DB = SQLiteDataStore.sharedInstance.DDB, table = getTable(actionID, ifNotExists: false) else
         { return }
-        do {
-            let _ = try DB.run( table.drop(ifExists: true) )
-            DopamineKit.DebugLog("Dropped table:(\(TABLE_NAME_PREFIX + actionID))")
-        } catch {
-            DopamineKit.DebugLog("Error dropping table:(\(TABLE_NAME_PREFIX + actionID))")
+        dispatch_async(tablesQueue) {
+            do {
+                let _ = try DB.run( table.drop(ifExists: true) )
+                DopamineKit.DebugLog("Dropped table:(\(TABLE_NAME_PREFIX + actionID))")
+            } catch {
+                DopamineKit.DebugLog("Error dropping table:(\(TABLE_NAME_PREFIX + actionID))")
+            }
         }
     }
     
     static func dropTables() {
         guard let DB = SQLiteDataStore.sharedInstance.DDB else
         { return }
-        
-        do {
-            let stmt = try DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '\(TABLE_NAME_PREFIX)%'")
-            for row in stmt {
-                if let tableName = row[0] as? String {
-                    do {
-                        let table = Table(tableName)
-                        // TOFIX: doesn't delete table. goes to catch clause
-                        let _ = try DB.run( table.drop(ifExists: true) )
-                        DopamineKit.DebugLog("Dropped table:(\(tableName))")
-                    } catch {
-                        DopamineKit.DebugLog("Error dropping table:(\(tableName.debugDescription))")
+        dispatch_async(tablesQueue) {
+            do {
+                let stmt = try DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '\(TABLE_NAME_PREFIX)%'")
+                for row in stmt {
+                    if let tableName = row[0] as? String {
+                        do {
+                            let table = Table(tableName)
+                            // TOFIX: doesn't delete table. goes to catch clause
+                            let _ = try DB.run( table.drop(ifExists: true) )
+                            DopamineKit.DebugLog("Dropped table:(\(tableName))")
+                        } catch {
+                            DopamineKit.DebugLog("Error dropping table:(\(tableName.debugDescription))")
+                        }
                     }
                 }
-            }
-        } catch { }
+            } catch { }
+        }
     }
     
     static func insert(item: T) -> Int64? {
@@ -115,18 +121,20 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return nil
         }
-        
-        let TABLE_NAME = TABLE_NAME_PREFIX + item.actionID
-        let insert = table.insert(
-            reinforcementDecision <- item.reinforcementDecision )
-        do {
-            let rowId = try DB.run(insert)
-            DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\((rowId)) actionID:\((item.actionID)) and reinforcementDecision:(\(item.reinforcementDecision))")
-            return rowId
-        } catch {
-            DopamineKit.DebugLog("Insert error for cartridge table:(\(TABLE_NAME)) values actionID:(\(item.actionID)) and reinforcementDecision:(\(item.reinforcementDecision))")
-            return nil
+        var rowId:Int64?
+        dispatch_sync(tablesQueue) {
+            let TABLE_NAME = TABLE_NAME_PREFIX + item.actionID
+            let insert = table.insert(
+                reinforcementDecision <- item.reinforcementDecision )
+            do {
+                rowId = try DB.run(insert)
+                DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\((rowId)) actionID:\((item.actionID)) and reinforcementDecision:(\(item.reinforcementDecision))")
+            } catch {
+                DopamineKit.DebugLog("Insert error for cartridge table:(\(TABLE_NAME)) values actionID:(\(item.actionID)) and reinforcementDecision:(\(item.reinforcementDecision))")
+                return
+            }
         }
+        return rowId
     }
     
     static func delete (item: T) {
@@ -135,36 +143,36 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return
         }
-        
-        let TABLE_NAME = TABLE_NAME_PREFIX + item.actionID
-        let id = item.index
-        let query = table.filter(index == id)
-        do {
-            let tmp = try DB.run(query.delete())
-            guard tmp == 1 else {
-                throw SQLDataAccessError.Delete_Error
+        dispatch_async(tablesQueue) {
+            let TABLE_NAME = TABLE_NAME_PREFIX + item.actionID
+            let id = item.index
+            let query = table.filter(index == id)
+            do {
+                let tmp = try DB.run(query.delete())
+                guard tmp == 1 else {
+                    throw SQLDataAccessError.Delete_Error
+                }
+                DopamineKit.DebugLog("Deleted in Table:\(TABLE_NAME) row:\(id) actionID:\(item.actionID) reinforcementDecision:\(item.reinforcementDecision)")
+            } catch {
+                DopamineKit.DebugLog("❕Could not delete in Table:\(TABLE_NAME) row:\(id)")
             }
-            DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) actionID:\(item.actionID) reinforcementDecision:\(item.reinforcementDecision) successful")
-        } catch {
-            DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) failed")
         }
-        
     }
     
     static func deleteAll (actionID: String) {
         guard let DB = SQLiteDataStore.sharedInstance.DDB, table = getTable(actionID, ifNotExists: false) else
         { return }
-        
-        do {
-            let result = try DB.run(table.delete())
-            guard result == 1 else {
-                throw SQLDataAccessError.Delete_Error
+        dispatch_async(tablesQueue) {
+            do {
+                let result = try DB.run(table.delete())
+                guard result == 1 else {
+                    throw SQLDataAccessError.Delete_Error
+                }
+                DopamineKit.DebugLog("Deleted all for Table:\(TABLE_NAME_PREFIX+actionID)")
+            } catch {
+                DopamineKit.DebugLog("❕Could not delete Table:\(TABLE_NAME_PREFIX+actionID)")
             }
-            DopamineKit.DebugLog("Deleted all for Table:\(TABLE_NAME_PREFIX+actionID) successful")
-        } catch {
-            DopamineKit.DebugLog("Delete all for Table:\(TABLE_NAME_PREFIX+actionID) failed")
         }
-        
     }
     
     static func find(id: Int64) -> T? { return nil }
@@ -175,79 +183,87 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
             DopamineKit.DebugLog("SQLite database never initialized.")
             return nil
         }
-        
-        let TABLE_NAME = TABLE_NAME_PREFIX + actionID
-        let query = table.filter(index == id)
-        do {
-            let items = try DB.prepare(query)
-            for item in  items {
-                return SQLCartridge(
-                    index: item[index],
-                    actionID: actionID,
-                    reinforcementDecision: item[reinforcementDecision] )
+        var result:T?
+        dispatch_sync(tablesQueue) {
+            let TABLE_NAME = TABLE_NAME_PREFIX + actionID
+            let query = table.filter(index == id)
+            do {
+                let items = try DB.prepare(query)
+                for item in  items {
+                    result = SQLCartridge(
+                        index: item[index],
+                        actionID: actionID,
+                        reinforcementDecision: item[reinforcementDecision] )
+                }
+            } catch {
+                DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with id:\(id)")
             }
-        } catch {
-            DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with id:\(id)")
         }
-        
-        return nil
+        return result
     }
     
-    static func findFirst(actionID: String) -> T? {
-        guard let DB = SQLiteDataStore.sharedInstance.DDB, table = getTable(actionID, ifNotExists: false) else
-        {
-            DopamineKit.DebugLog("SQLite database never initialized.")
-            return nil
-        }
-        
-        let query = table.order(index.asc).limit(1)
-        do {
-            let items = try DB.prepare(query)
-            for item in  items {
-                return SQLCartridge(
-                    index: item[index],
-                    actionID: actionID,
-                    reinforcementDecision: item[reinforcementDecision] )
+    static func pop(actionID: String) -> T? {
+        var result:T?
+        dispatch_sync(tablesQueue) {
+            guard let DB = SQLiteDataStore.sharedInstance.DDB, table = getTable(actionID, ifNotExists: false) else
+            {
+                DopamineKit.DebugLog("SQLite database never initialized.")
+                return
             }
-        } catch {
-            DopamineKit.DebugLog("Table for:\(actionID) is empty")
+            
+            let query = table.order(index.asc).limit(1)
+            do {
+                let items = try DB.prepare(query)
+                for item in  items {
+                    let row = SQLCartridge(
+                        index: item[index],
+                        actionID: actionID,
+                        reinforcementDecision: item[reinforcementDecision] )
+                    result = row
+                    delete(row)
+                }
+            } catch {
+                DopamineKit.DebugLog("Table for:\(actionID) is empty")
+            }
         }
-        
-        return nil
+        return result
     }
     
     static func findAll() -> [T] { return [] }
     
     static func findAll(actionID:String) -> [T] {
+        var results:[T] = []
         guard let DB = SQLiteDataStore.sharedInstance.DDB, table = getTable(actionID, ifNotExists: false) else
         {
             DopamineKit.DebugLog("SQLite database never initialized.")
-            return []
+            return results
         }
-        
-        var results:[T] = []
-        do {
-            let items = try DB.prepare(table)
-            for item in items {
-                results.append(SQLCartridge(
-                    index: item[index],
-                    actionID: actionID,
-                    reinforcementDecision: item[reinforcementDecision] )
-                )
+        dispatch_sync(tablesQueue) {
+            var results:[T] = []
+            do {
+                let items = try DB.prepare(table)
+                for item in items {
+                    results.append(SQLCartridge(
+                        index: item[index],
+                        actionID: actionID,
+                        reinforcementDecision: item[reinforcementDecision] )
+                    )
+                }
+            } catch {
+                DopamineKit.DebugLog("Search error for Table:\(TABLE_NAME_PREFIX + actionID)")
             }
-        } catch {
-            DopamineKit.DebugLog("Search error for Table:\(TABLE_NAME_PREFIX + actionID)")
         }
-        
         return results
     }
     
     static func count(actionID: String) -> Int {
+        var result = 0
         guard let DB = SQLiteDataStore.sharedInstance.DDB, table = getTable(actionID, ifNotExists: false) else
-        {
-            return 0
+        { return result }
+        dispatch_sync(tablesQueue) {
+            result = DB.scalar(table.count)
         }
-        return DB.scalar(table.count)
+        return result
     }
     
 }
