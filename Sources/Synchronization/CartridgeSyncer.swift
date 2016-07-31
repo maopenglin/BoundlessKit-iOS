@@ -57,18 +57,22 @@ class CartridgeSyncer {
                 !TimeSyncer.isExpired(TimeSyncerKey + actionID)
     }
     
+    func shouldReload() -> Bool {
+        return SQLCartridgeDataHelper.count(actionID) <= 5 || TimeSyncer.isExpired(TimeSyncerKey + actionID)
+    }
+    
     private let queue = dispatch_queue_create("com.usedopamine.dopaminekit.synchronization.CartridgeSyncerQueue", nil)
     private var reloadInProgress = false
     func reload() {
-        guard !reloadInProgress else {
-            return
-        }
-        reloadInProgress = true
-        
         dispatch_async(queue) {
+            guard !self.reloadInProgress else {
+                return
+            }
+            self.reloadInProgress = true
+            
             DopamineKit.DebugLog("Beginning reload...")
             
-            self.dispatch_async_delayed(1) {
+            self.dispatch_async_delayed(1, queue: self.queue) {
                 DopamineKit.DebugLog("Sending tracked actions...")
                 TrackSyncer.sync(){
                     status in
@@ -78,7 +82,7 @@ class CartridgeSyncer {
                         return
                     }
                     DopamineKit.DebugLog("Status 200")
-                    self.dispatch_async_delayed(1) {
+                    self.dispatch_async_delayed(1, queue: self.queue) {
                         DopamineKit.DebugLog("Sending reported actions...")
                         ReportSyncer.sync() {
                             status in
@@ -87,7 +91,7 @@ class CartridgeSyncer {
                                 return
                             }
                             
-                            self.dispatch_async_delayed(5) {
+                            self.dispatch_async_delayed(5, queue: self.queue) {
                                 DopamineAPI.refresh(self.actionID, completion: {
                                     response in
                                     defer { self.reloadInProgress = false }
@@ -131,8 +135,8 @@ class CartridgeSyncer {
             }
         }
         
-        if !isFresh() {
-            self.reload()
+        if shouldReload() {
+            reload()
         }
         
         return decision
