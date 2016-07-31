@@ -33,41 +33,46 @@ class TrackSyncer {
     private static var syncInProgress = false
     
     static func sync(completion: (Int) -> () = { _ in }) {
-        guard !syncInProgress else {
-            return
-        }
-        syncInProgress = true
-        
-        let actions = SQLTrackedActionDataHelper.findAll()
-        if actions.count == 0 {
-            DopamineKit.DebugLog("No tracked actions to sync.")
-            completion(200)
-            return
-        }
-        
-        var trackedActions = Array<DopeAction>()
-        for action in  actions {
-            trackedActions.append(
-                DopeAction(
-                    actionID: action.actionID,
-                    metaData: action.metaData,
-                    utc: action.utc )
-            )
-        }
-        
-        DopamineAPI.track(trackedActions, completion: {
-            response in
-            defer { syncInProgress = false }
-            if response["status"] as? Int == 200 {
-                for action in actions {
-                    SQLTrackedActionDataHelper.delete(action)
-                }
-                TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
+            guard !syncInProgress else {
+                DopamineKit.DebugLog("Track sync already happening")
                 completion(200)
-            } else {
-                completion(404)
+                return
             }
-        })
+            syncInProgress = true
+            
+            let actions = SQLTrackedActionDataHelper.findAll()
+            if actions.count == 0 {
+                defer { syncInProgress = false }
+                DopamineKit.DebugLog("No tracked actions to sync.")
+                completion(200)
+                return
+            }
+            
+            var trackedActions = Array<DopeAction>()
+            for action in  actions {
+                trackedActions.append(
+                    DopeAction(
+                        actionID: action.actionID,
+                        metaData: action.metaData,
+                        utc: action.utc )
+                )
+            }
+            
+            DopamineAPI.track(trackedActions, completion: {
+                response in
+                defer { syncInProgress = false }
+                if response["status"] as? Int == 200 {
+                    for action in actions {
+                        SQLTrackedActionDataHelper.delete(action)
+                    }
+                    TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
+                    completion(200)
+                } else {
+                    completion(404)
+                }
+            })
+        }
     }
     
     static func store(action: DopeAction) {

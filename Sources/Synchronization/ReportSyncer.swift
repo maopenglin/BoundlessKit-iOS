@@ -33,43 +33,48 @@ class ReportSyncer {
     private static var syncInProgress = false
     
     static func sync(completion: (Int) -> () = { _ in }) {
-        guard !syncInProgress else {
-            return
-        }
-        syncInProgress = true
-        
-        let actions = SQLReportedActionDataHelper.findAll()
-        if actions.count == 0 {
-            DopamineKit.DebugLog("No reported actions to sync.")
-            completion(200)
-            return
-        }
-    
-        var reportedActions = Array<DopeAction>()
-        for action in actions {
-            reportedActions.append(
-                DopeAction(
-                    actionID: action.actionID,
-                    reinforcementDecision: action.reinforcementDecision,
-                    metaData: action.metaData,
-                    utc: action.utc
-                )
-            )
-        }
-        
-        DopamineAPI.report(reportedActions, completion: {
-            response in
-            defer { syncInProgress = false }
-            if response["status"] as? Int == 200 {
-                for action in actions {
-                    SQLReportedActionDataHelper.delete(action)
-                }
-                TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
+            guard !syncInProgress else {
+                DopamineKit.DebugLog("Report sync already happening")
                 completion(200)
-            } else {
-                completion(404)
+                return
             }
-        })
+            syncInProgress = true
+            
+            let actions = SQLReportedActionDataHelper.findAll()
+            if actions.count == 0 {
+                defer { syncInProgress = false }
+                DopamineKit.DebugLog("No reported actions to sync.")
+                completion(200)
+                return
+            }
+            
+            var reportedActions = Array<DopeAction>()
+            for action in actions {
+                reportedActions.append(
+                    DopeAction(
+                        actionID: action.actionID,
+                        reinforcementDecision: action.reinforcementDecision,
+                        metaData: action.metaData,
+                        utc: action.utc
+                    )
+                )
+            }
+            
+            DopamineAPI.report(reportedActions, completion: {
+                response in
+                defer { syncInProgress = false }
+                if response["status"] as? Int == 200 {
+                    for action in actions {
+                        SQLReportedActionDataHelper.delete(action)
+                    }
+                    TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
+                    completion(200)
+                } else {
+                    completion(404)
+                }
+            })
+        }
     }
     
     static func store(action: DopeAction) {
