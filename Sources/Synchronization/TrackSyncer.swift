@@ -32,6 +32,13 @@ class TrackSyncer {
     
     private static var syncInProgress = false
     
+    static func shouldSync() -> Bool {
+        return !syncInProgress && (
+            SQLTrackedActionDataHelper.count() >= TrackSyncer.getLogSize() ||
+            TimeSyncer.isExpired(TrackSyncer.TimeSyncerKey)
+        )
+    }
+    
     static func sync(completion: (Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
             guard !syncInProgress else {
@@ -50,7 +57,7 @@ class TrackSyncer {
             }
             
             var trackedActions = Array<DopeAction>()
-            for action in  actions {
+            for action in actions {
                 trackedActions.append(
                     DopeAction(
                         actionID: action.actionID,
@@ -94,10 +101,13 @@ class TrackSyncer {
                 return
         }
         
-        if SQLTrackedActionDataHelper.count() >= TrackSyncer.getLogSize() ||
-            TimeSyncer.isExpired(TrackSyncer.TimeSyncerKey)
+        if shouldSync()
         {
             sync()
+        }
+        
+        for cartridge in CartridgeSyncer.whichShouldReload() {
+            cartridge.reload()
         }
         
     }

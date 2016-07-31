@@ -36,10 +36,11 @@ public class DopamineKit : NSObject {
     ///
     public static func track(actionID: String, metaData: [String: AnyObject]? = nil) {
         let _ = sharedInstance
-        
+
         // store the action to be synced
         let action = DopeAction(actionID: actionID, metaData:metaData)
         TrackSyncer.store(action)
+//        SQLCartridgeDataHelper.dropTables()
     }
 
     /// This function sends an asynchronous reinforcement call for the specified actionID

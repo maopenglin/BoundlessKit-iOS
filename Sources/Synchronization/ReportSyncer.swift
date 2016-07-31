@@ -32,6 +32,13 @@ class ReportSyncer {
     
     private static var syncInProgress = false
     
+    static func shouldSync() -> Bool {
+        return !syncInProgress && (
+            SQLReportedActionDataHelper.count() >= ReportSyncer.getLogSize() ||
+            TimeSyncer.isExpired(ReportSyncer.TimeSyncerKey)
+        )
+    }
+    
     static func sync(completion: (Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
             guard !syncInProgress else {
@@ -96,15 +103,7 @@ class ReportSyncer {
                 return
         }
         
-        // check if sync needs to be done
-        if SQLReportedActionDataHelper.count() >= ReportSyncer.getLogSize() {
-            DopamineKit.DebugLog("Count is too high: \(ReportSyncer.getLogSize())")
-        }
-        if TimeSyncer.isExpired(ReportSyncer.TimeSyncerKey) {
-            DopamineKit.DebugLog("Timer expired")
-        }
-        if SQLReportedActionDataHelper.count() >= ReportSyncer.getLogSize() ||
-        TimeSyncer.isExpired(ReportSyncer.TimeSyncerKey)
+        if shouldSync()
         {
             sync()
         }

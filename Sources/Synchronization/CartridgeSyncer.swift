@@ -57,73 +57,115 @@ class CartridgeSyncer {
                 !TimeSyncer.isExpired(TimeSyncerKey + actionID)
     }
     
-    func shouldReload() -> Bool {
-        return SQLCartridgeDataHelper.count(actionID) <= 5 || TimeSyncer.isExpired(TimeSyncerKey + actionID)
+    static func whichShouldReload() -> [CartridgeSyncer] {
+        var needsReload:[CartridgeSyncer] = []
+        
+        for (name, cartirdge) in cartridges {
+            if cartirdge.shouldReload() {
+                needsReload.append(cartirdge)
+            }
+        }
+        
+        return needsReload
     }
     
-    private let queue = dispatch_queue_create("com.usedopamine.dopaminekit.synchronization.CartridgeSyncerQueue", nil)
+    func shouldReload() -> Bool {
+        return !reloadInProgress && (
+            SQLCartridgeDataHelper.count(actionID) <= 5 ||
+            TimeSyncer.isExpired(TimeSyncerKey + actionID)
+        )
+    }
+    
+    private static let queue = dispatch_queue_create("com.usedopamine.dopaminekit.synchronization.CartridgeSyncerQueue", nil)
+    static func reload(cartridge: CartridgeSyncer) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
+            DopamineKit.DebugLog("Beginning reload for \(cartridge.actionID)...")
+            var goodProgress = true
+            
+            sleep(1)
+            
+            if TrackSyncer.shouldSync() {
+                
+                DopamineKit.DebugLog("Sending tracked actions for \(cartridge.actionID) reload...")
+                TrackSyncer.sync() {
+                    status in
+                    guard status == 200 else {
+                        DopamineKit.DebugLog("Track failed during \(cartridge.actionID) cartridge reload. Dropping sync.")
+                        goodProgress = false
+                        return
+                    }
+                }
+            } else {
+                DopamineKit.DebugLog("Track does not need sync in \(cartridge.actionID) reload...")
+            }
+            
+            sleep(1)
+            if !goodProgress { return }
+            
+            if ReportSyncer.shouldSync() {
+                DopamineKit.DebugLog("Sending reported actions for \(cartridge.actionID) reload...")
+                ReportSyncer.sync() {
+                    status in
+                    guard status == 200 else {
+                        DopamineKit.DebugLog("Report failed during \(cartridge.actionID) cartridge reload. Dropping sync.")
+                        goodProgress = false
+                        return
+                    }
+                }
+            } else {
+                DopamineKit.DebugLog("Report does not need sync in \(cartridge.actionID) reload...")
+            }
+            
+            sleep(5)
+            if !goodProgress { return }
+            
+            if cartridge.shouldReload() {
+                    cartridge.reload()
+            } else {
+                DopamineKit.DebugLog("Sync dropped before the \(cartridge.actionID) cartridge could refresh.")
+                
+            }
+        }
+        
+    }
+    
+    
     private var reloadInProgress = false
     func reload() {
-        dispatch_async(queue) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
             guard !self.reloadInProgress else {
+                DopamineKit.DebugLog("Reload already happening for \(self.actionID)")
                 return
             }
             self.reloadInProgress = true
             
-            DopamineKit.DebugLog("Beginning reload...")
-            
-            self.dispatch_async_delayed(1, queue: self.queue) {
-                DopamineKit.DebugLog("Sending tracked actions...")
-                TrackSyncer.sync(){
-                    status in
-                    guard status == 200 else {
-                        DopamineKit.DebugLog("Status not 200")
-                        self.reloadInProgress = false
-                        return
+            DopamineAPI.refresh(self.actionID, completion: {
+                response in
+                defer { self.reloadInProgress = false }
+                if let cartridge = response["reinforcementCartridge"] as? [String],
+                    expiry = response["expiresIn"] as? Int
+                {
+                    SQLCartridgeDataHelper.deleteAll(self.actionID)
+                    TimeSyncer.reset(self.TimeSyncerKey + self.actionID, duration: expiry)
+                    self.setCartridgeInitialSize(cartridge.count)
+                    
+                    for decision in cartridge {
+                        let _ = SQLCartridgeDataHelper.insert(
+                            SQLCartridge(
+                                index:0,
+                                actionID: self.actionID,
+                                reinforcementDecision: decision)
+                        )
                     }
-                    DopamineKit.DebugLog("Status 200")
-                    self.dispatch_async_delayed(1, queue: self.queue) {
-                        DopamineKit.DebugLog("Sending reported actions...")
-                        ReportSyncer.sync() {
-                            status in
-                            guard status == 200 else {
-                                self.reloadInProgress = false
-                                return
-                            }
-                            
-                            self.dispatch_async_delayed(5, queue: self.queue) {
-                                DopamineAPI.refresh(self.actionID, completion: {
-                                    response in
-                                    defer { self.reloadInProgress = false }
-                                    if let cartridge = response["reinforcementCartridge"] as? [String],
-                                        expiry = response["expiresIn"] as? Int
-                                    {
-                                        SQLCartridgeDataHelper.deleteAll(self.actionID)
-                                        TimeSyncer.reset(self.TimeSyncerKey + self.actionID, duration: expiry)
-                                        self.setCartridgeInitialSize(cartridge.count)
-                                        
-                                        for decision in cartridge {
-                                            let _ = SQLCartridgeDataHelper.insert(
-                                                SQLCartridge(
-                                                    index:0,
-                                                    actionID: self.actionID,
-                                                    reinforcementDecision: decision)
-                                            )
-                                        }
-                                        DopamineKit.DebugLog("✅ \(self.actionID) refreshed!")
-                                    }
-                                    else {
-                                        DopamineKit.DebugLog("❌ Could not read cartridge for (\(self.actionID))")
-                                    }
-                                    
-                                })
-                            }
-                            
-                        }
-                    }
+                    DopamineKit.DebugLog("✅ \(self.actionID) refreshed!")
                 }
-            }
+                else {
+                    DopamineKit.DebugLog("❌ Could not read cartridge for (\(self.actionID))")
+                }
+                
+            })
         }
+        
     }
     
     func unload() -> String {
@@ -136,15 +178,15 @@ class CartridgeSyncer {
         }
         
         if shouldReload() {
-            reload()
+            CartridgeSyncer.reload(self)
         }
         
         return decision
     }
     
-    func dispatch_async_delayed(seconds: Int64, queue: dispatch_queue_t = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), block: () -> ()) {
-        dispatch_after(dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), seconds * Int64(NSEC_PER_SEC)), queue, block)
-    }
+//    static func dispatch_async_delayed(seconds: Int64, queue: dispatch_queue_t = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), block: () -> ()) {
+//        dispatch_after(dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), seconds * Int64(NSEC_PER_SEC)), queue, block)
+//    }
     
 }
 
