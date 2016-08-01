@@ -70,11 +70,11 @@ class TrackSyncer {
                 response in
                 defer { syncInProgress = false }
                 if response["status"] as? Int == 200 {
+                    defer { completion(200) }
                     for action in actions {
                         SQLTrackedActionDataHelper.delete(action)
                     }
                     TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
-                    completion(200)
                 } else {
                     completion(404)
                 }
@@ -101,14 +101,7 @@ class TrackSyncer {
                 return
         }
         
-        if shouldSync()
-        {
-            sync()
-        }
-        
-        for cartridge in CartridgeSyncer.whichShouldReload() {
-            cartridge.reload()
-        }
+        SyncCoordinator.sync()
         
     }
     

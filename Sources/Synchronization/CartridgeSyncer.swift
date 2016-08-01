@@ -76,64 +76,12 @@ class CartridgeSyncer {
         )
     }
     
-    static func reload() {
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
-            DopamineKit.DebugLog("Beginning reload for all cartridges...")
-            var goodProgress = true
-            
-            sleep(1)
-            
-            if TrackSyncer.shouldSync() {
-                
-                DopamineKit.DebugLog("Sending tracked actions for all cartridges reload...")
-                TrackSyncer.sync() {
-                    status in
-                    guard status == 200 else {
-                        DopamineKit.DebugLog("Track failed during all cartridges reload. Dropping sync.")
-                        goodProgress = false
-                        return
-                    }
-                }
-            } else {
-                DopamineKit.DebugLog("Track does not need sync in all cartridges reload...")
-            }
-            
-            sleep(1)
-            if !goodProgress { return }
-            
-            if ReportSyncer.shouldSync() {
-                DopamineKit.DebugLog("Sending reported actions for all cartridges reload...")
-                ReportSyncer.sync() {
-                    status in
-                    guard status == 200 else {
-                        DopamineKit.DebugLog("Report failed during all cartridges reload. Dropping sync.")
-                        goodProgress = false
-                        return
-                    }
-                }
-            } else {
-                DopamineKit.DebugLog("Report does not need sync in all cartridges reload...")
-            }
-            
-            sleep(5)
-            if !goodProgress { return }
-            
-            for (actionID, cartridge) in cartridges {
-                if cartridge.shouldReload() {
-                    cartridge.reload()
-                }
-            }
-            
-        }
-        
-    }
-    
-    
     private var reloadInProgress = false
-    func reload() {
+    func reload(completion: (Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
             guard !self.reloadInProgress else {
                 DopamineKit.DebugLog("Reload already happening for \(self.actionID)")
+                completion(200)
                 return
             }
             self.reloadInProgress = true
@@ -141,9 +89,11 @@ class CartridgeSyncer {
             DopamineAPI.refresh(self.actionID, completion: {
                 response in
                 defer { self.reloadInProgress = false }
-                if let cartridge = response["reinforcementCartridge"] as? [String],
-                    expiry = response["expiresIn"] as? Int
+                if response["status"] as? Int == 200,
+                    let cartridge = response["reinforcementCartridge"] as? [String],
+                    let expiry = response["expiresIn"] as? Int
                 {
+                    defer { completion(200) }
                     SQLCartridgeDataHelper.deleteAll(self.actionID)
                     TimeSyncer.reset(self.TimeSyncerKey + self.actionID, duration: expiry)
                     self.setCartridgeInitialSize(cartridge.count)
@@ -160,6 +110,7 @@ class CartridgeSyncer {
                 }
                 else {
                     DopamineKit.DebugLog("❌ Could not read cartridge for (\(self.actionID))")
+                    completion(404)
                 }
                 
             })
@@ -176,9 +127,7 @@ class CartridgeSyncer {
             }
         }
         
-        if shouldReload() {
-            CartridgeSyncer.reload()
-        }
+        SyncCoordinator.sync()
         
         return decision
     }

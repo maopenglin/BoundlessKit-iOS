@@ -72,11 +72,11 @@ class ReportSyncer {
                 response in
                 defer { syncInProgress = false }
                 if response["status"] as? Int == 200 {
+                    defer { completion(200) }
                     for action in actions {
                         SQLReportedActionDataHelper.delete(action)
                     }
                     TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
-                    completion(200)
                 } else {
                     completion(404)
                 }
@@ -103,10 +103,7 @@ class ReportSyncer {
                 return
         }
         
-        if shouldSync()
-        {
-            sync()
-        }
+        SyncCoordinator.sync()
     }
     
 }
