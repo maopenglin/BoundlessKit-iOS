@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		057189E6497DD8FD70D9856688020B22 /* TimeSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2453A7EDDB8A948489A7B978D0E38E /* TimeSyncer.swift */; };
 		10D276AC2D4CCE5BDFB16021DAB8A7B2 /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB44F0C85553660857F351B59660E399 /* SQLite.framework */; };
 		13556157B419DA29B01150A1AB7E7111 /* SQLite-Bridging.m in Sources */ = {isa = PBXBuildFile; fileRef = B2BBE1D49B1FEEBE4FA119D4EFEDB3ED /* SQLite-Bridging.m */; };
 		145FC521FBC2068264F4470C2A67CF8D /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84C8F00AF77BD72F5A2A43232F30314 /* Value.swift */; };
@@ -22,7 +21,6 @@
 		261FDC62DFAAF9153E1833FE2D574DEA /* FTS4.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E1491786CB78977109E7F1AF68DCA8 /* FTS4.swift */; };
 		2BFD506668D501F20284F90493352A27 /* ReportSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F7007FCC39C8A390C6188798E1D32E /* ReportSyncer.swift */; };
 		2CDB638619BEF629B13E4D85A3ECC57D /* CustomFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7903C387F9738F8BEA1FB1FB17A88892 /* CustomFunctions.swift */; };
-		3008C39A53C577772957BA265821CB3C /* DopeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B01476367D487DC16DAA9AF496F79A0 /* DopeAction.swift */; };
 		35D53A95DD631F5DBCF9E7F80029F29B /* SQLReportedActionDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135DE200AEA4998E7A629DF4E87CCE53 /* SQLReportedActionDataHelper.swift */; };
 		3A052C75064BBDD86FA7D9A8ED572E2C /* SQLDataHelperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D67428DE9D1F2702C775652E9294AD18 /* SQLDataHelperProtocol.swift */; };
 		44A553030C8F43289644597E12998205 /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280CCF42A7869EF20FF7AB7B0898368E /* Operators.swift */; };
@@ -35,6 +33,8 @@
 		78C019A6F177B14DCAC52B609C3DE31F /* Pods-DopamineKit_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = BCB50A43A300BE12D82B869B121CF3A8 /* Pods-DopamineKit_Example-dummy.m */; };
 		790FDABB10F995D3972F19CDC9B463C2 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B338CF0803DDE4D7D67626BF31133D5D /* Helpers.swift */; };
 		843829901D4ECA5A0082E410 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8438298F1D4ECA5A0082E410 /* SyncCoordinator.swift */; };
+		843829951D4ED01B0082E410 /* DopeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843829931D4ED01B0082E410 /* DopeAction.swift */; };
+		843829961D4ED01B0082E410 /* TimeSyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843829941D4ED01B0082E410 /* TimeSyncer.swift */; };
 		8B1E635A6DD19834C7D9BD47AD2587A6 /* Foundation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF03B633F34480A002F9568A44AC5DD6 /* Foundation.swift */; };
 		9AC563108132E56542441785563D527D /* DopamineAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 017EE535DC22F22259B94B13484C2C89 /* DopamineAPI.swift */; };
 		A025474AF42F47F19D8453479D4BF241 /* JSONDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01EA6FBA4E15161E47FE9C8F0D80B2C /* JSONDataType.swift */; };
@@ -96,7 +96,6 @@
 		176FB7D61215325FEF9AF904A93A4A45 /* Pods-DopamineKit_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-DopamineKit_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		184B8B0F6C485512E8398AA8757969F9 /* SQLite.swift-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SQLite.swift-prefix.pch"; sourceTree = "<group>"; };
 		18A5DF57ECD0BBED4FEAA9C31EFA84EC /* Pods-DopamineKit_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-DopamineKit_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
-		1B01476367D487DC16DAA9AF496F79A0 /* DopeAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeAction.swift; sourceTree = "<group>"; };
 		1B509B4439E05E972E58A507E755440B /* Collation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Collation.swift; path = SQLite/Typed/Collation.swift; sourceTree = "<group>"; };
 		27F7007FCC39C8A390C6188798E1D32E /* ReportSyncer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReportSyncer.swift; sourceTree = "<group>"; };
 		280CCF42A7869EF20FF7AB7B0898368E /* Operators.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Operators.swift; path = SQLite/Typed/Operators.swift; sourceTree = "<group>"; };
@@ -121,6 +120,8 @@
 		7903C387F9738F8BEA1FB1FB17A88892 /* CustomFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CustomFunctions.swift; path = SQLite/Typed/CustomFunctions.swift; sourceTree = "<group>"; };
 		821F1B6904E9BD62523D3B1218F05048 /* SQLCartridgeDataHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SQLCartridgeDataHelper.swift; sourceTree = "<group>"; };
 		8438298F1D4ECA5A0082E410 /* SyncCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
+		843829931D4ED01B0082E410 /* DopeAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DopeAction.swift; sourceTree = "<group>"; };
+		843829941D4ED01B0082E410 /* TimeSyncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSyncer.swift; sourceTree = "<group>"; };
 		919B4A12D2BBB42EB054E1EAC1590385 /* Blob.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Blob.swift; path = SQLite/Core/Blob.swift; sourceTree = "<group>"; };
 		92F1C8B02B9983EBFD7A8D11326E0AB9 /* DopamineKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = DopamineKit.modulemap; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -141,7 +142,6 @@
 		CCC8462C2C058536AA1B8237C2E71B12 /* DopamineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DopamineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD75507FE26F892EFFDB11D53DF66427 /* Pods_DopamineKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF03B633F34480A002F9568A44AC5DD6 /* Foundation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Foundation.swift; path = SQLite/Foundation.swift; sourceTree = "<group>"; };
-		CF2453A7EDDB8A948489A7B978D0E38E /* TimeSyncer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TimeSyncer.swift; sourceTree = "<group>"; };
 		D67428DE9D1F2702C775652E9294AD18 /* SQLDataHelperProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SQLDataHelperProtocol.swift; sourceTree = "<group>"; };
 		D73DCCF431B5191B4AB26F1F7AE1A630 /* DopamineKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "DopamineKit-dummy.m"; sourceTree = "<group>"; };
 		DB44F0C85553660857F351B59660E399 /* SQLite.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SQLite.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -264,6 +264,15 @@
 			);
 			sourceTree = "<group>";
 		};
+		843829921D4ED01B0082E410 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				843829931D4ED01B0082E410 /* DopeAction.swift */,
+				843829941D4ED01B0082E410 /* TimeSyncer.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		8C900629ABE3B1BDE7CDD446AA99624D /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -374,11 +383,10 @@
 		EBDFCB2A48F1C157F60FE0F0F37802E2 /* Synchronization */ = {
 			isa = PBXGroup;
 			children = (
+				843829921D4ED01B0082E410 /* Helpers */,
 				3281D4DF77B8A94431E29D2749B50154 /* CartridgeSyncer.swift */,
-				1B01476367D487DC16DAA9AF496F79A0 /* DopeAction.swift */,
 				27F7007FCC39C8A390C6188798E1D32E /* ReportSyncer.swift */,
 				8438298F1D4ECA5A0082E410 /* SyncCoordinator.swift */,
-				CF2453A7EDDB8A948489A7B978D0E38E /* TimeSyncer.swift */,
 				989E345612D7D56967DDC507EACE8D21 /* TrackSyncer.swift */,
 			);
 			path = Synchronization;
@@ -558,20 +566,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				843829961D4ED01B0082E410 /* TimeSyncer.swift in Sources */,
 				843829901D4ECA5A0082E410 /* SyncCoordinator.swift in Sources */,
 				BA46ACD515044B0AE59B52AA3292AB3E /* CartridgeSyncer.swift in Sources */,
 				9AC563108132E56542441785563D527D /* DopamineAPI.swift in Sources */,
 				155394462272A5C475F1EA39D294CA10 /* DopamineKit-dummy.m in Sources */,
 				1D7A9B8D94532EED09E1CA84C73901CC /* DopamineKit.swift in Sources */,
-				3008C39A53C577772957BA265821CB3C /* DopeAction.swift in Sources */,
 				A025474AF42F47F19D8453479D4BF241 /* JSONDataType.swift in Sources */,
 				2BFD506668D501F20284F90493352A27 /* ReportSyncer.swift in Sources */,
 				161B538D633B4FCD305C0998ECF9A3FB /* SQLCartridgeDataHelper.swift in Sources */,
 				3A052C75064BBDD86FA7D9A8ED572E2C /* SQLDataHelperProtocol.swift in Sources */,
 				1A3B059334A3D4CE6DBA671E77A23014 /* SQLiteDataStore.swift in Sources */,
 				35D53A95DD631F5DBCF9E7F80029F29B /* SQLReportedActionDataHelper.swift in Sources */,
+				843829951D4ED01B0082E410 /* DopeAction.swift in Sources */,
 				47809196CF640C97A4F37D0A6129DFEF /* SQLTrackedActionDataHelper.swift in Sources */,
-				057189E6497DD8FD70D9856688020B22 /* TimeSyncer.swift in Sources */,
 				4B144B65005F56CDA843692940CF30C3 /* TrackSyncer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
