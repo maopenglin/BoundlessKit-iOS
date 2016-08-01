@@ -8,49 +8,56 @@
 
 import Foundation
 
-class TrackSyncer {
+@objc
+class TrackSyncer : NSObject {
     
-    static private let sharedInstance: TrackSyncer = TrackSyncer()
+    static let sharedInstance: TrackSyncer = TrackSyncer()
     
-    private static let defaults = NSUserDefaults.standardUserDefaults()
-    private static let DefaultsKey = "DopamineTrackSyncer"
-    private static let TimeSyncerKey = "TrackLog"
-    private static let LogSizeKey = "LogSize"
+    private let defaults = NSUserDefaults.standardUserDefaults()
+    private let defaultsKey = "DopamineTrackSyncer"
     
-    private init() {
-        let defaults = NSUserDefaults.standardUserDefaults()
-        let standardSize = 10
-        if( defaults.valueForKey(TrackSyncer.DefaultsKey + TrackSyncer.LogSizeKey) == nil ) {
-            defaults.setValue(standardSize, forKey: TrackSyncer.DefaultsKey + TrackSyncer.LogSizeKey)
+    private let track: Track
+    
+    private override init() {
+        if let savedTrackData = defaults.objectForKey(defaultsKey) as? NSData {
+            let savedTrack = NSKeyedUnarchiver.unarchiveObjectWithData(savedTrackData) as! Track
+            track = savedTrack
+        } else {
+            track = Track()
+            defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(track), forKey: defaultsKey)
         }
-        TimeSyncer.create(TrackSyncer.TimeSyncerKey, ifNotExists: true)
     }
     
-    static func getLogSize() -> Int {
-        return defaults.integerForKey(DefaultsKey + LogSizeKey)
+    func updateTrack(suggestedSize: Int?=nil, timerMarker: Int64=Int64( 1000*NSDate().timeIntervalSince1970 ), timerLength: Int64?=nil) {
+        if let suggestedSize = suggestedSize {
+            track.suggestedSize = suggestedSize
+        }
+        track.timerMarker = timerMarker
+        if let timerLength = timerLength {
+            track.timerLength = timerLength
+        }
+        defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(track), forKey: defaultsKey)
     }
     
-    private static var syncInProgress = false
+    private var syncInProgress = false
     
-    static func shouldSync() -> Bool {
-        return !syncInProgress && (
-            SQLTrackedActionDataHelper.count() >= TrackSyncer.getLogSize() ||
-            TimeSyncer.isExpired(TrackSyncer.TimeSyncerKey)
-        )
+    func shouldSync() -> Bool {
+        return !syncInProgress && track.shouldSync()
     }
     
-    static func sync(completion: (Int) -> () = { _ in }) {
+    
+    func sync(completion: (Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
-            guard !syncInProgress else {
+            guard !self.syncInProgress else {
                 DopamineKit.DebugLog("Track sync already happening")
                 completion(200)
                 return
             }
-            syncInProgress = true
+            self.syncInProgress = true
             
             let actions = SQLTrackedActionDataHelper.findAll()
             if actions.count == 0 {
-                defer { syncInProgress = false }
+                defer { self.syncInProgress = false }
                 DopamineKit.DebugLog("No tracked actions to sync.")
                 completion(200)
                 return
@@ -68,13 +75,13 @@ class TrackSyncer {
             
             DopamineAPI.track(trackedActions, completion: {
                 response in
-                defer { syncInProgress = false }
+                defer { self.syncInProgress = false }
                 if response["status"] as? Int == 200 {
                     defer { completion(200) }
                     for action in actions {
                         SQLTrackedActionDataHelper.delete(action)
                     }
-                    TimeSyncer.reset(TrackSyncer.TimeSyncerKey)
+                    self.updateTrack()
                 } else {
                     completion(404)
                 }
@@ -82,8 +89,7 @@ class TrackSyncer {
         }
     }
     
-    static func store(action: DopeAction) {
-        let _ = sharedInstance
+    func store(action: DopeAction) {
         guard let rowId = SQLTrackedActionDataHelper.insert(
             SQLTrackedAction(
                 index:0,
@@ -101,7 +107,7 @@ class TrackSyncer {
                 return
         }
         
-        SyncCoordinator.sync()
+//        SyncCoordinator.sync()
         
     }
     

@@ -78,6 +78,24 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         return nil
     }
     
+    static func getTablesCount() -> Int {
+        guard let DB = SQLiteDataStore.sharedInstance.DDB else
+        {
+            DopamineKit.DebugLog("SQLite database never initialized.")
+            return 0
+        }
+        do {
+            let stmt = try DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '\(TABLE_NAME_PREFIX)%'")
+            var count = 0
+            for row in stmt {
+                count += 1
+            }
+            return count
+        } catch {
+            return 0
+        }
+    }
+    
     static func dropTable() { }
     
     static func dropTable(actionID: String) {

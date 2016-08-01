@@ -8,49 +8,55 @@
 
 import Foundation
 
-class ReportSyncer {
+@objc
+class ReportSyncer : NSObject {
     
-    static private let sharedInstance: ReportSyncer = ReportSyncer()
+    static let sharedInstance: ReportSyncer = ReportSyncer()
     
-    private static let defaults = NSUserDefaults.standardUserDefaults()
-    private static let DefaultsKey = "DopamineReportSyncer"
-    private static let TimeSyncerKey = "ReportLog"
-    private static let LogSizeKey = "LogSize"
+    private let defaults = NSUserDefaults.standardUserDefaults()
+    private let defaultsKey = "DopamineReportSyncer"
     
-    private init() {
-        let defaults = NSUserDefaults.standardUserDefaults()
-        let standardSize = 10
-        if( defaults.valueForKey(ReportSyncer.DefaultsKey + ReportSyncer.LogSizeKey) == nil ){
-            defaults.setValue(standardSize, forKey: ReportSyncer.DefaultsKey + ReportSyncer.LogSizeKey)
+    private let report: Report
+    
+    private override init() {
+        if let savedReportData = defaults.objectForKey(defaultsKey) as? NSData {
+            let savedReport = NSKeyedUnarchiver.unarchiveObjectWithData(savedReportData) as! Report
+            report = savedReport
+        } else {
+            report = Report()
+            defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(report), forKey: defaultsKey)
         }
-        TimeSyncer.create(ReportSyncer.TimeSyncerKey, ifNotExists: true)
     }
     
-    static func getLogSize() -> Int {
-        return defaults.integerForKey(DefaultsKey + LogSizeKey)
+    func updateReport(suggestedSize: Int?=nil, timerMarker: Int64=Int64( 1000*NSDate().timeIntervalSince1970 ), timerLength: Int64?=nil) {
+        if let suggestedSize = suggestedSize {
+            report.suggestedSize = suggestedSize
+        }
+        report.timerMarker = timerMarker
+        if let timerLength = timerLength {
+            report.timerLength = timerLength
+        }
+        defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(report), forKey: defaultsKey)
     }
     
-    private static var syncInProgress = false
+    private var syncInProgress = false
     
-    static func shouldSync() -> Bool {
-        return !syncInProgress && (
-            SQLReportedActionDataHelper.count() >= ReportSyncer.getLogSize() ||
-            TimeSyncer.isExpired(ReportSyncer.TimeSyncerKey)
-        )
+    func shouldSync() -> Bool {
+        return !syncInProgress && report.shouldSync()
     }
     
-    static func sync(completion: (Int) -> () = { _ in }) {
+    func sync(completion: (Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
-            guard !syncInProgress else {
+            guard !self.syncInProgress else {
                 DopamineKit.DebugLog("Report sync already happening")
                 completion(200)
                 return
             }
-            syncInProgress = true
+            self.syncInProgress = true
             
             let actions = SQLReportedActionDataHelper.findAll()
             if actions.count == 0 {
-                defer { syncInProgress = false }
+                defer { self.syncInProgress = false }
                 DopamineKit.DebugLog("No reported actions to sync.")
                 completion(200)
                 return
@@ -70,13 +76,13 @@ class ReportSyncer {
             
             DopamineAPI.report(reportedActions, completion: {
                 response in
-                defer { syncInProgress = false }
+                defer { self.syncInProgress = false }
                 if response["status"] as? Int == 200 {
                     defer { completion(200) }
                     for action in actions {
                         SQLReportedActionDataHelper.delete(action)
                     }
-                    TimeSyncer.reset(ReportSyncer.TimeSyncerKey)
+                    ReportSyncer.sharedInstance.updateReport()
                 } else {
                     completion(404)
                 }
@@ -84,8 +90,7 @@ class ReportSyncer {
         }
     }
     
-    static func store(action: DopeAction) {
-        let _ = sharedInstance
+    func store(action: DopeAction) {
         guard let rowId = SQLReportedActionDataHelper.insert(
             SQLReportedAction(
                 index:0,
@@ -103,7 +108,7 @@ class ReportSyncer {
                 return
         }
         
-        SyncCoordinator.sync()
+//        SyncCoordinator.sync()
     }
     
 }
