@@ -76,55 +76,54 @@ class CartridgeSyncer {
         )
     }
     
-    private static let queue = dispatch_queue_create("com.usedopamine.dopaminekit.synchronization.CartridgeSyncerQueue", nil)
-    static func reload(cartridge: CartridgeSyncer) {
+    static func reload() {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
-            DopamineKit.DebugLog("Beginning reload for \(cartridge.actionID)...")
+            DopamineKit.DebugLog("Beginning reload for all cartridges...")
             var goodProgress = true
             
             sleep(1)
             
             if TrackSyncer.shouldSync() {
                 
-                DopamineKit.DebugLog("Sending tracked actions for \(cartridge.actionID) reload...")
+                DopamineKit.DebugLog("Sending tracked actions for all cartridges reload...")
                 TrackSyncer.sync() {
                     status in
                     guard status == 200 else {
-                        DopamineKit.DebugLog("Track failed during \(cartridge.actionID) cartridge reload. Dropping sync.")
+                        DopamineKit.DebugLog("Track failed during all cartridges reload. Dropping sync.")
                         goodProgress = false
                         return
                     }
                 }
             } else {
-                DopamineKit.DebugLog("Track does not need sync in \(cartridge.actionID) reload...")
+                DopamineKit.DebugLog("Track does not need sync in all cartridges reload...")
             }
             
             sleep(1)
             if !goodProgress { return }
             
             if ReportSyncer.shouldSync() {
-                DopamineKit.DebugLog("Sending reported actions for \(cartridge.actionID) reload...")
+                DopamineKit.DebugLog("Sending reported actions for all cartridges reload...")
                 ReportSyncer.sync() {
                     status in
                     guard status == 200 else {
-                        DopamineKit.DebugLog("Report failed during \(cartridge.actionID) cartridge reload. Dropping sync.")
+                        DopamineKit.DebugLog("Report failed during all cartridges reload. Dropping sync.")
                         goodProgress = false
                         return
                     }
                 }
             } else {
-                DopamineKit.DebugLog("Report does not need sync in \(cartridge.actionID) reload...")
+                DopamineKit.DebugLog("Report does not need sync in all cartridges reload...")
             }
             
             sleep(5)
             if !goodProgress { return }
             
-            if cartridge.shouldReload() {
+            for (actionID, cartridge) in cartridges {
+                if cartridge.shouldReload() {
                     cartridge.reload()
-            } else {
-                DopamineKit.DebugLog("Sync dropped before the \(cartridge.actionID) cartridge could refresh.")
-                
+                }
             }
+            
         }
         
     }
@@ -178,15 +177,11 @@ class CartridgeSyncer {
         }
         
         if shouldReload() {
-            CartridgeSyncer.reload(self)
+            CartridgeSyncer.reload()
         }
         
         return decision
     }
-    
-//    static func dispatch_async_delayed(seconds: Int64, queue: dispatch_queue_t = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), block: () -> ()) {
-//        dispatch_after(dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), seconds * Int64(NSEC_PER_SEC)), queue, block)
-//    }
     
 }
 
