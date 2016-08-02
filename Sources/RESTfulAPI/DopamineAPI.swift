@@ -124,7 +124,7 @@ public class DopamineAPI : NSObject{
                     var responseDict: [String : AnyObject] = [:]
                     defer { completion(responseDict) }
                     
-                    guard let responseURL = responseURL as? NSHTTPURLResponse else{
+                    if responseURL == nil {
                         DopamineKit.DebugLog("❌ invalid response:\(error?.localizedDescription)")
                         responseDict["error"] = error?.localizedDescription
                         return

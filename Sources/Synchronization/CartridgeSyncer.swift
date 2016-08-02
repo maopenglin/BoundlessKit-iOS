@@ -11,7 +11,7 @@ import Foundation
 @objc
 class CartridgeSyncer : NSObject {
     
-    public static let sharedInstance = CartridgeSyncer()
+    static let sharedInstance = CartridgeSyncer()
     
     private let defaults = NSUserDefaults.standardUserDefaults()
     private let defaultsKey = "DopamineCartridgeSyncer"
@@ -119,8 +119,6 @@ class CartridgeSyncer : NSObject {
                 decision = result.reinforcementDecision
             }
         }
-        
-//        SyncCoordinator.sync()
         
         return decision
     }

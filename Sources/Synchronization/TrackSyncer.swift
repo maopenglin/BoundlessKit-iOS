@@ -90,7 +90,7 @@ class TrackSyncer : NSObject {
     }
     
     func store(action: DopeAction) {
-        guard let rowId = SQLTrackedActionDataHelper.insert(
+        guard let _ = SQLTrackedActionDataHelper.insert(
             SQLTrackedAction(
                 index:0,
                 actionID:
@@ -106,9 +106,6 @@ class TrackSyncer : NSObject {
                 })
                 return
         }
-        
-//        SyncCoordinator.sync()
-        
     }
     
     

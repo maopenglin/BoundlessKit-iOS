@@ -69,7 +69,7 @@ public class SyncCoordinator {
                 for (actionID, cartridge) in cartridges where goodProgress {
                     cartridgeSyncer.sync(cartridge){status in
                         guard status == 200 else {
-                            DopamineKit.DebugLog("Refresh failed during sync. Halting sync.")
+                            DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
                             goodProgress = false
                             return
                         }

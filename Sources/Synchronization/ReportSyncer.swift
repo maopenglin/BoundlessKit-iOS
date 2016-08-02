@@ -91,7 +91,7 @@ class ReportSyncer : NSObject {
     }
     
     func store(action: DopeAction) {
-        guard let rowId = SQLReportedActionDataHelper.insert(
+        guard let _ = SQLReportedActionDataHelper.insert(
             SQLReportedAction(
                 index:0,
                 actionID: action.actionID,
@@ -107,8 +107,6 @@ class ReportSyncer : NSObject {
                 })
                 return
         }
-        
-//        SyncCoordinator.sync()
     }
     
 }

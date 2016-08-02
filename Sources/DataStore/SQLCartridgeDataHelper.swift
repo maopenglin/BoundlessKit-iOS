@@ -50,7 +50,6 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
             return table
         } catch {
             DopamineKit.DebugLog("Error creating table:(\(TABLE_NAME))")
-            return nil
         }
         return nil
     }
@@ -87,7 +86,7 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         do {
             let stmt = try DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '\(TABLE_NAME_PREFIX)%'")
             var count = 0
-            for row in stmt {
+            for _ in stmt {
                 count += 1
             }
             return count
@@ -257,7 +256,6 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
             return results
         }
         dispatch_sync(tablesQueue) {
-            var results:[T] = []
             do {
                 let items = try DB.prepare(table)
                 for item in items {
