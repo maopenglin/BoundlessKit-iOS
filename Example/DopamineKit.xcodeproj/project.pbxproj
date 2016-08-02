@@ -16,6 +16,8 @@
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		841F3B151D39D9A700E2A948 /* DopamineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841F3B0D1D39D2CB00E2A948 /* DopamineKit.framework */; };
 		841F3B171D39D9B600E2A948 /* DopamineKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 841F3B0D1D39D2CB00E2A948 /* DopamineKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		844AEFB61D3DCD1A0018B31F /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844AEFB51D3DCD1A0018B31F /* SQLite.framework */; };
+		844AEFB71D3DCD310018B31F /* SQLite.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 844AEFB51D3DCD1A0018B31F /* SQLite.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		844FAF971D36EC860014A9D6 /* DopamineProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 844FAF961D36EC860014A9D6 /* DopamineProperties.plist */; };
 		8499E5E31D38FF4200234E18 /* DopamineDemoProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8499E5E21D38FF4200234E18 /* DopamineDemoProperties.plist */; };
 		84A1D9231D38866900CFC1AF /* Pods_DopamineKit_Tests.framework in Resources */ = {isa = PBXBuildFile; fileRef = 41CA94244391DE7FF95AD75E /* Pods_DopamineKit_Tests.framework */; };
@@ -39,6 +41,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				844AEFB71D3DCD310018B31F /* SQLite.framework in CopyFiles */,
 				841F3B171D39D9B600E2A948 /* DopamineKit.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -63,6 +66,7 @@
 		6CA3FBD2E806F6C71EFAD7D9 /* DopamineKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = DopamineKit.podspec; path = ../DopamineKit.podspec; sourceTree = "<group>"; };
 		83D85254AEE0F2D7F728BC87 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		841F3B0D1D39D2CB00E2A948 /* DopamineKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DopamineKit.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/DopamineKit-bqzpbftalgimbyaujrgefxksivjl/Build/Products/Debug-iphonesimulator/DopamineKit/DopamineKit.framework"; sourceTree = "<group>"; };
+		844AEFB51D3DCD1A0018B31F /* SQLite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SQLite.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/DopamineKit-bqzpbftalgimbyaujrgefxksivjl/Build/Products/Debug-iphonesimulator/SQLite.swift/SQLite.framework"; sourceTree = "<group>"; };
 		844FAF961D36EC860014A9D6 /* DopamineProperties.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DopamineProperties.plist; sourceTree = "<group>"; };
 		8499E5E21D38FF4200234E18 /* DopamineDemoProperties.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DopamineDemoProperties.plist; sourceTree = "<group>"; };
 		84A1D8DF1D380C2800CFC1AF /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE.txt; path = ../LICENSE.txt; sourceTree = "<group>"; };
@@ -83,6 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				844AEFB61D3DCD1A0018B31F /* SQLite.framework in Frameworks */,
 				841F3B151D39D9A700E2A948 /* DopamineKit.framework in Frameworks */,
 				3EAF6CE685587330896DA57A /* Pods_DopamineKit_Tests.framework in Frameworks */,
 			);
@@ -94,6 +99,7 @@
 		371B6FD4DE95B934A99E01DE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				844AEFB51D3DCD1A0018B31F /* SQLite.framework */,
 				841F3B0D1D39D2CB00E2A948 /* DopamineKit.framework */,
 				8DF9C7A08429EDAA6D4D30C2 /* Pods_DopamineKit_Example.framework */,
 				41CA94244391DE7FF95AD75E /* Pods_DopamineKit_Tests.framework */,
