@@ -106,10 +106,12 @@ class Tests: XCTestCase {
         let asyncExpectation = expectationWithDescription("Reinforcement decision simple")
         DopamineKit.reinforce("action1", completion: {response in
             NSLog("DopamineKitTest reinforce resulted in:\(response)")
-            asyncExpectation.fulfill()
+//            asyncExpectation.fulfill()
         })
         
-        waitForExpectationsWithTimeout(10, handler: {error in
+        sleep(4)
+        asyncExpectation.fulfill()
+        waitForExpectationsWithTimeout(5, handler: {error in
             XCTAssertNil(error, "DopamineKitTest error: reinforce request timed out")
         })
     }

@@ -40,8 +40,10 @@ class Track : NSObject, NSCoding {
         if SQLTrackedActionDataHelper.count() >= suggestedSize {
             DopamineKit.DebugLog("Track has \(SQLTrackedActionDataHelper.count()) actions and should only have \(suggestedSize)")
         }
-        if (timerMarker + timerLength) < currentTime {
+        else if (timerMarker + timerLength) < currentTime {
             DopamineKit.DebugLog("Track has expired at \(timerMarker + timerLength) and it is \(currentTime) now.")
+        } else {
+            DopamineKit.DebugLog("Track has \(SQLTrackedActionDataHelper.count())/\(suggestedSize) actions and last synced \(timerMarker) with a timer set \(timerLength)ms from now so does not need sync...")
         }
         return SQLTrackedActionDataHelper.count() >= suggestedSize ||
             (timerMarker + timerLength) < currentTime

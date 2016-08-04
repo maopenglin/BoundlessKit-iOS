@@ -40,8 +40,10 @@ class Report : NSObject, NSCoding {
         if SQLReportedActionDataHelper.count() >= suggestedSize {
             DopamineKit.DebugLog("Report has \(SQLReportedActionDataHelper.count()) actions and should only have \(suggestedSize)")
         }
-        if (timerMarker + timerLength) < currentTime {
+        else if (timerMarker + timerLength) < currentTime {
             DopamineKit.DebugLog("Report has expired at \(timerMarker + timerLength) and it is \(currentTime) now.")
+        } else {
+            DopamineKit.DebugLog("Report has \(SQLReportedActionDataHelper.count())/\(suggestedSize) actions and last synced \(timerMarker) with a timer set \(timerLength)ms from now so does not need sync...")
         }
         
         

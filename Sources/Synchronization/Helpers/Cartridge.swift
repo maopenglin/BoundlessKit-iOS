@@ -13,6 +13,8 @@ class Cartridge : NSObject, NSCoding {
     
     var actionID: String
     var size: Int
+    private static let capacityToSync = 0.25
+    private static let minimumSize = 2
     var timerMarker: Int64
     var timerLength: Int64
     
@@ -48,19 +50,25 @@ class Cartridge : NSObject, NSCoding {
     func isFresh() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         return
-            SQLCartridgeDataHelper.count(actionID) > 1 &&
+            SQLCartridgeDataHelper.count(actionID) >= 1 &&
                 (timerMarker + timerLength) >= currentTime
+    }
+    
+    func isSizeToSync() -> Bool {
+        let count = SQLCartridgeDataHelper.count(actionID)
+        return count < Cartridge.minimumSize ||
+            Double(count) / Double(size) <= Cartridge.capacityToSync
     }
     
     func shouldSync() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
-        if SQLCartridgeDataHelper.count(actionID) <= 5 {
-            DopamineKit.DebugLog("Cartridge \(actionID) has \(SQLCartridgeDataHelper.count(actionID)) decisions and needs at least \(5)")
+        if isSizeToSync() {
+            DopamineKit.DebugLog("Cartridge \(actionID) has \(SQLCartridgeDataHelper.count(actionID))/\(size) decisions and needs at least \(Cartridge.minimumSize) decisions or \(Cartridge.capacityToSync*100)%% capacity")
         }
         if (timerMarker + timerLength) < currentTime {
             DopamineKit.DebugLog("Cartridge \(actionID) has expired at \(timerMarker + timerLength) and it is \(currentTime) now.")
         }
-        return SQLCartridgeDataHelper.count(actionID) <= 5 ||
+        return isSizeToSync() ||
             (timerMarker + timerLength) < currentTime
     }
     

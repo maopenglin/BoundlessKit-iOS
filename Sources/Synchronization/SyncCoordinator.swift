@@ -40,8 +40,6 @@ public class SyncCoordinator {
                     }
                 }
                 sleep(1)
-            } else {
-                DopamineKit.DebugLog("Track has \(SQLTrackedActionDataHelper.count()) actions so does not need sync...")
             }
             
             if !goodProgress { return }
@@ -57,8 +55,6 @@ public class SyncCoordinator {
                     }
                 }
                 sleep(5)
-            } else {
-                DopamineKit.DebugLog("Report has \(SQLReportedActionDataHelper.count()) actions so does not need sync...")
             }
             
             if !goodProgress { return }
@@ -76,8 +72,6 @@ public class SyncCoordinator {
                     }
                     sleep(1)
                 }
-            } else {
-                DopamineKit.DebugLog("There are \(SQLCartridgeDataHelper.getTablesCount()) cartridges and none need to reload!")
             }
         }
     }
