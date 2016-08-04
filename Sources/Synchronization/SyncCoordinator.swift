@@ -30,7 +30,7 @@ public class SyncCoordinator {
             var goodProgress = true
             
             if trackSyncer.shouldSync() {
-                DopamineKit.DebugLog("Sending \(SQLTrackedActionDataHelper.count()) tracked actions for all cartridges reload...")
+                DopamineKit.DebugLog("Sending \(SQLTrackedActionDataHelper.count()) tracked actions...")
                 trackSyncer.sync() {
                     status in
                     guard status == 200 else {
