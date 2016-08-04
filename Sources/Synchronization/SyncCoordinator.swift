@@ -9,11 +9,13 @@
 import Foundation
 
 public class SyncCoordinator {
+    
     static let sharedInstance = SyncCoordinator()
     
     private init() { }
     
     static private var syncInProgress = false
+    
     static func sync() {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
             guard !syncInProgress else {

@@ -9,7 +9,6 @@
 import Foundation
 import SQLite
 
-
 enum SQLDataAccessError: ErrorType {
     case Datastore_Connection_Error
     case Insert_Error
@@ -20,9 +19,9 @@ enum SQLDataAccessError: ErrorType {
 
 public class SQLiteDataStore : NSObject{
     
-    let DDB: Connection?
-    
     public static let sharedInstance: SQLiteDataStore = SQLiteDataStore()
+    
+    let DDB: Connection?
     
     private override init() {
         var path = "DopamineDB.sqlite"

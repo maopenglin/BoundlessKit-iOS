@@ -39,7 +39,7 @@ class CartridgeSyncer : NSObject {
         }
     }
     
-    func updateCartridge(cartridge: Cartridge, size: Int?, timerMarker: Int64=Int64( 1000*NSDate().timeIntervalSince1970 ), timerLength: Int64?) {
+    private func updateCartridge(cartridge: Cartridge, size: Int?, timerMarker: Int64=Int64( 1000*NSDate().timeIntervalSince1970 ), timerLength: Int64?) {
         if let size = size {
             cartridge.size = size
         }

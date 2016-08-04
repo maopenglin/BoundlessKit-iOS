@@ -8,23 +8,23 @@
 
 import Foundation
 
-let clientOSVersion = UIDevice.currentDevice().systemVersion
-let clientSDKVersion = "4.0.0.beta"
-let clientOS = "iOS"
-
 public class DopamineAPI : NSObject{
     
-    private let dopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/"
-//    private let dopamineAPIURL = "https://api.usedopamine.com/v3/app/"
+    static let sharedInstance: DopamineAPI = DopamineAPI()
     
-    static let instance: DopamineAPI = DopamineAPI()
+    //    private static let dopamineAPIURL = "https://api.usedopamine.com/v3/app/"
+    private static let dopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/"
+    private static let clientSDKVersion = "4.0.0.beta"
+    private static let clientOS = "iOS"
+    private static let clientOSVersion = UIDevice.currentDevice().systemVersion
+    
     private override init() {
         super.init()
     }
     
     public static func track(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
         // create dict with credentials
-        var payload = instance.configurationData
+        var payload = sharedInstance.configurationData
         
         // add tracked events to payload
         var trackedActionsJSONArray = Array<AnyObject>()
@@ -36,14 +36,14 @@ public class DopamineAPI : NSObject{
         payload["utc"] = 1000*NSDate().timeIntervalSince1970
         payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
         
-        instance.send(.Track, payload: payload, completion: {response in
+        sharedInstance.send(.Track, payload: payload, completion: {response in
             completion(response)
         })
         
     }
 
     public static func report(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
-        var payload = instance.configurationData
+        var payload = sharedInstance.configurationData
         
         var reinforcedActionsArray = Array<AnyObject>()
         for action in actions{
@@ -54,14 +54,14 @@ public class DopamineAPI : NSObject{
         payload["utc"] = 1000*NSDate().timeIntervalSince1970
         payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
         
-        instance.send(.Report, payload: payload, completion: {response in
+        sharedInstance.send(.Report, payload: payload, completion: {response in
             completion(response)
         })
     }
     
     
     public static func refresh(actionID: String, completion: ([String:AnyObject]) -> ()){
-        var payload = instance.configurationData
+        var payload = sharedInstance.configurationData
         
         payload["actionID"] = actionID
         
@@ -69,7 +69,7 @@ public class DopamineAPI : NSObject{
         payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
         
         DopamineKit.DebugLog("Refreshing \(actionID)...")
-        instance.send(.Refresh, payload: payload, completion:  { response in
+        sharedInstance.send(.Refresh, payload: payload, completion:  { response in
             completion(response)
         })
     }
@@ -103,7 +103,7 @@ public class DopamineAPI : NSObject{
     ///     - completion: A closure with the reinforcement response passed in as a `String`.
     private func send(type: CallType, payload: [String:AnyObject], timeout:NSTimeInterval = 3, completion: [String: AnyObject] -> Void) {
         
-        let baseURL = NSURL(string: dopamineAPIURL)!
+        let baseURL = NSURL(string: DopamineAPI.dopamineAPIURL)!
         guard let url = NSURL(string: type.str, relativeToURL: baseURL) else {
             DopamineKit.DebugLog("Could not construct url:() with path ()")
             return
@@ -116,7 +116,7 @@ public class DopamineAPI : NSObject{
                 request.HTTPMethod = "POST"
                 request.timeoutInterval = timeout
                 let jsonPayload = try NSJSONSerialization.dataWithJSONObject(payload, options: NSJSONWritingOptions())
-//                DopamineKit.DebugLog("sending raw payload:\(jsonPayload.debugDescription)")
+//                DopamineKit.DebugLog("sending raw payload:\(jsonPayload.debugDescription)")   // hex 16 chars
                 request.HTTPBody = jsonPayload
                 
                 // request handler

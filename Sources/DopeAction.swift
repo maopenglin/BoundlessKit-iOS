@@ -8,8 +8,6 @@
 
 import Foundation
 
-
-
 public struct DopeAction {
     
     public var actionID:String

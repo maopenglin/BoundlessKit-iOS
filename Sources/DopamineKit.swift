@@ -13,8 +13,8 @@ import SQLite
 @objc
 public class DopamineKit : NSObject {
     
-    // Singleton pattern
     public static let sharedInstance: DopamineKit = DopamineKit()
+    
     private let dataStore:SQLiteDataStore = SQLiteDataStore.sharedInstance
     private let cartridgeSyncer = CartridgeSyncer.sharedInstance
     private let trackSyncer = TrackSyncer.sharedInstance
@@ -23,11 +23,6 @@ public class DopamineKit : NSObject {
     private override init() {
         dataStore.createTables()
     }
-    
-    deinit {
-        
-    }
-    
         
     /// This function sends an asynchronous tracking call for the specified actionID
     ///
@@ -88,9 +83,5 @@ public class DopamineKit : NSObject {
             NSLog("[\(fileName):\(line):\(functionSignature)] - \(message)")
 //        #endif
     }
-        
-    
-    
-    
 
 }

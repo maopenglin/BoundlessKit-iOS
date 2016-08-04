@@ -28,7 +28,7 @@ class ReportSyncer : NSObject {
         }
     }
     
-    func updateReport(suggestedSize: Int?=nil, timerMarker: Int64=Int64( 1000*NSDate().timeIntervalSince1970 ), timerLength: Int64?=nil) {
+    private func updateReport(suggestedSize: Int?=nil, timerMarker: Int64=Int64( 1000*NSDate().timeIntervalSince1970 ), timerLength: Int64?=nil) {
         if let suggestedSize = suggestedSize {
             report.suggestedSize = suggestedSize
         }

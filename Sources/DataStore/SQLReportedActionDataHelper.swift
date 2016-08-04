@@ -9,7 +9,6 @@
 import Foundation
 import SQLite
 
-
 typealias SQLReportedAction = (
     index: Int64,
     actionID: String,
@@ -17,7 +16,6 @@ typealias SQLReportedAction = (
     metaData: [String:AnyObject]?,
     utc: Int64
 )
-
 
 class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     

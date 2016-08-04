@@ -9,14 +9,12 @@
 import Foundation
 import SQLite
 
-
 typealias SQLTrackedAction = (
     index: Int64,
     actionID: String,
     metaData: [String:AnyObject]?,
     utc: Int64
 )
-
 
 public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     

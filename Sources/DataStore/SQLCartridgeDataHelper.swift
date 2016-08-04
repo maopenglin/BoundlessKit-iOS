@@ -9,13 +9,11 @@
 import Foundation
 import SQLite
 
-
 typealias SQLCartridge = (
     index: Int64,
     actionID: String,
     reinforcementDecision: String
 )
-
 
 class SQLCartridgeDataHelper : SQLDataHelperProtocol {
     
