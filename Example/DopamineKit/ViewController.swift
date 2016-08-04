@@ -22,8 +22,10 @@ class ViewController: UIViewController {
                 self.flash(self.responseLabel)
             
                 // Now you should use `response` to call a reward function paired on the Dopamine Developer Dashboard
-                
+            
+            
                 // Try out CandyBar as a form of reinforcement!
+                // The functions paired here are medaltStar, stars, and thumbsUp
                 var reinforcerType:CandyIcon
                 var title:String?
                 var subtitle:String?
