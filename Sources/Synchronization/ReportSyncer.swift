@@ -69,8 +69,8 @@ class ReportSyncer : NSObject {
                         actionID: action.actionID,
                         reinforcementDecision: action.reinforcementDecision,
                         metaData: action.metaData,
-                        utc: action.utc
-                    )
+                        utc: action.utc,
+                        deviceTimezoneOffset: action.deviceTimezoneOffset )
                 )
             }
             
@@ -97,7 +97,8 @@ class ReportSyncer : NSObject {
                 actionID: action.actionID,
                 reinforcementDecision: action.reinforcementDecision!,
                 metaData: action.metaData,
-                utc: action.utc)
+                utc: action.utc,
+                deviceTimezoneOffset: action.deviceTimezoneOffset )
             )
             else{
                 // if it couldnt be saved, send it

@@ -13,7 +13,8 @@ typealias SQLTrackedAction = (
     index: Int64,
     actionID: String,
     metaData: [String:AnyObject]?,
-    utc: Int64
+    utc: Int64,
+    deviceTimezoneOffset: Int64
 )
 
 public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
@@ -27,6 +28,7 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     static let actionID = Expression<String>("actionid")
     static let metaData = Expression<Blob?>("metadata")
     static let utc = Expression<Int64>("utc")
+    static let deviceTimezoneOffset = Expression<Int64>("deviceTimezoneOffset")
     
     static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.TrackedActionsQueue", nil)
     
@@ -43,6 +45,7 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
                     t.column(actionID)
                     t.column(metaData)
                     t.column(utc)
+                    t.column(deviceTimezoneOffset)
                     })
                 DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
             } catch {
@@ -80,7 +83,8 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
             let insert = table.insert(
                 actionID <- item.actionID,
                 metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue),
-                utc <- item.utc )
+                utc <- item.utc,
+                deviceTimezoneOffset <- item.deviceTimezoneOffset )
             do {
                 rowId = try DB.run(insert)
                 DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID)")
@@ -133,7 +137,8 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
                         index: item[index] ,
                         actionID: item[actionID],
                         metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
-                        utc: item[utc] )
+                        utc: item[utc],
+                        deviceTimezoneOffset: item[deviceTimezoneOffset] )
                 }
             } catch {
                 DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with id:\(id)")
@@ -158,7 +163,8 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
                         index: item[index],
                         actionID: item[actionID],
                         metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
-                        utc: item[utc] )
+                        utc: item[utc],
+                        deviceTimezoneOffset: item[deviceTimezoneOffset] )
                     )
                 }
             } catch {

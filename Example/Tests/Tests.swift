@@ -106,6 +106,12 @@ class Tests: XCTestCase {
         let asyncExpectation = expectationWithDescription("Reinforcement decision simple")
         DopamineKit.reinforce("action1", completion: {response in
             NSLog("DopamineKitTest reinforce resulted in:\(response)")
+            
+            
+        })
+        DopamineKit.reinforce("action1", completion: {response in
+            NSLog("DopamineKitTest reinforce resulted in:\(response)")
+            sleep(5)
             asyncExpectation.fulfill()
         })
         

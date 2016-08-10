@@ -29,9 +29,13 @@ public class SyncCoordinator {
             let trackSyncer = TrackSyncer.sharedInstance
             let reportSyncer = ReportSyncer.sharedInstance
             
+            let cartridges = cartridgeSyncer.whichShouldSync()
+            let reportShouldSync = cartridges.count > 0 || reportSyncer.shouldSync()
+            let trackerShouldSync = reportShouldSync || trackSyncer.shouldSync()
+            
             var goodProgress = true
             
-            if trackSyncer.shouldSync() {
+            if trackerShouldSync {
                 DopamineKit.DebugLog("Sending \(SQLTrackedActionDataHelper.count()) tracked actions...")
                 trackSyncer.sync() {
                     status in
@@ -46,7 +50,7 @@ public class SyncCoordinator {
             
             if !goodProgress { return }
             
-            if reportSyncer.shouldSync() {
+            if reportShouldSync {
                 DopamineKit.DebugLog("Sending \(SQLReportedActionDataHelper.count()) reported actions...")
                 reportSyncer.sync() {
                     status in
@@ -61,7 +65,6 @@ public class SyncCoordinator {
             
             if !goodProgress { return }
             
-            let cartridges = cartridgeSyncer.whichShouldSync()
             if cartridges.count > 0 {
                 DopamineKit.DebugLog("Refreshing \(cartridges.count)/\(SQLCartridgeDataHelper.getTablesCount()) cartidges.")
                 for (actionID, cartridge) in cartridges where goodProgress {
@@ -72,7 +75,7 @@ public class SyncCoordinator {
                             return
                         }
                     }
-                    sleep(1)
+//                    sleep(1)
                 }
             }
         }

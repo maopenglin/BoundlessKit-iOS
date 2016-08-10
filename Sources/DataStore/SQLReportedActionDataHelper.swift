@@ -14,7 +14,8 @@ typealias SQLReportedAction = (
     actionID: String,
     reinforcementDecision: String,
     metaData: [String:AnyObject]?,
-    utc: Int64
+    utc: Int64,
+    deviceTimezoneOffset: Int64
 )
 
 class SQLReportedActionDataHelper : SQLDataHelperProtocol {
@@ -29,6 +30,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     static let reinforcementDecision = Expression<String>("reinforcementdecision")
     static let metaData = Expression<Blob?>("metadata")
     static let utc = Expression<Int64>("utc")
+    static let deviceTimezoneOffset = Expression<Int64>("deviceTimezoneOffset")
     
     static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.ReportedActionsQueue", nil)
     
@@ -47,6 +49,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                     t.column(reinforcementDecision)
                     t.column(metaData)
                     t.column(utc)
+                    t.column(deviceTimezoneOffset)
                     })
                 DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
             } catch {
@@ -85,7 +88,8 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                 actionID <- item.actionID,
                 reinforcementDecision <- item.reinforcementDecision,
                 metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue),
-                utc <- item.utc )
+                utc <- item.utc,
+                deviceTimezoneOffset <- item.deviceTimezoneOffset )
             do {
                 rowId = try DB.run(insert)
                 DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID) reinforcementDecision:\(item.reinforcementDecision)")
@@ -108,10 +112,8 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
             let id = item.index
             let query = table.filter(index == id)
             do {
-                let tmp = try DB.run(query.delete())
-                guard tmp == 1 else {
-                    throw SQLDataAccessError.Delete_Error
-                }
+                let numDeleted = try DB.run(query.delete())
+                
                 DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) successful")
             } catch {
                 DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) failed")
@@ -137,7 +139,8 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                         actionID: item[actionID],
                         reinforcementDecision: item[reinforcementDecision],
                         metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
-                        utc: item[utc] )
+                        utc: item[utc],
+                        deviceTimezoneOffset: item[deviceTimezoneOffset] )
                 }
             } catch {
                 DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with id:\(id)")
@@ -163,7 +166,8 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                         actionID: item[actionID],
                         reinforcementDecision: item[reinforcementDecision],
                         metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
-                        utc: item[utc] )
+                        utc: item[utc],
+                        deviceTimezoneOffset: item[deviceTimezoneOffset] )
                     )
                 }
             } catch {

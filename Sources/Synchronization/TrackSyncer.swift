@@ -68,7 +68,8 @@ class TrackSyncer : NSObject {
                     DopeAction(
                         actionID: action.actionID,
                         metaData: action.metaData,
-                        utc: action.utc )
+                        utc: action.utc,
+                        deviceTimezoneOffset: action.deviceTimezoneOffset )
                 )
             }
             
@@ -91,11 +92,11 @@ class TrackSyncer : NSObject {
     func store(action: DopeAction) {
         guard let _ = SQLTrackedActionDataHelper.insert(
             SQLTrackedAction(
-                index:0,
-                actionID:
-                action.actionID,
+                index: 0,
+                actionID: action.actionID,
                 metaData: action.metaData,
-                utc: action.utc )
+                utc: action.utc,
+                deviceTimezoneOffset: action.deviceTimezoneOffset )
             )
             else{
                 // if it couldnt be saved, send it

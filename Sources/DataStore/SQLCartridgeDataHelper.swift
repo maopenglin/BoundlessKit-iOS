@@ -179,13 +179,10 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         { return }
         dispatch_async(tablesQueue) {
             do {
-                let result = try DB.run(table.delete())
-                guard result == 1 else {
-                    throw SQLDataAccessError.Delete_Error
-                }
-                DopamineKit.DebugLog("Deleted all for Table:\(TABLE_NAME_PREFIX+actionID)")
+                let numDeleted = try DB.run(table.delete())
+                DopamineKit.DebugLog("Deleted \(numDeleted) from Table:\(TABLE_NAME_PREFIX+actionID)")
             } catch {
-                DopamineKit.DebugLog("❕Could not delete Table:\(TABLE_NAME_PREFIX+actionID)")
+                DopamineKit.DebugLog("❕Could not delete from Table:\(TABLE_NAME_PREFIX+actionID)")
             }
         }
     }
