@@ -12,9 +12,8 @@ public class DopamineAPI : NSObject{
     
     static let sharedInstance: DopamineAPI = DopamineAPI()
     
-    //    private static let dopamineAPIURL = "https://api.usedopamine.com/v3/app/"
-    private static let dopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/"
-    private static let clientSDKVersion = "4.0.0.beta"
+    private static let dopamineAPIURL = "https://api.usedopamine.com/v4/app/"
+    private static let clientSDKVersion = "4.0.0"
     private static let clientOS = "iOS"
     private static let clientOSVersion = UIDevice.currentDevice().systemVersion
     
@@ -161,14 +160,6 @@ public class DopamineAPI : NSObject{
         // add an identity key
         dict["primaryIdentity"] = self.primaryIdentity
         
-//        if(true){
-//            dict["appID"] = "570ffc491b4c6e9869482fbf"
-//            dict["versionID"] = "testing"
-//            dict["secret"] = "20af24a85fa00938a5247709fed395c31c89b142"
-//            return dict
-//        }
-        
-//        /* commented out for DEBUG code abouve
         // create a credentials dict from .plist
         let credentialsFilename = "DopamineProperties"
         var path:String
@@ -219,22 +210,19 @@ public class DopamineAPI : NSObject{
         }
         
         return dict
- 
-//         */
     }()
     
     // get the primary identity as a lazy computed variable
     lazy var primaryIdentity:String = {
-//        let key = "DopaminePrimaryIdentity"
-//        let defaults = NSUserDefaults.standardUserDefaults()
-//        if let identity = defaults.valueForKey(key) as? String {
-//            DopamineKit.DebugLog("primaryIdentity:(\(identity))")
-//            return identity
-//        } else {
-//            let defaultIdentity = UIDevice.currentDevice().identifierForVendor!.UUIDString
-//            defaults.setValue(defaultIdentity, forKey: key)
-//            return defaultIdentity
-//        }
-        return "D1C337DB-8C68-4369-B249-EAAF1BF9906E"
+        let key = "DopaminePrimaryIdentity"
+        let defaults = NSUserDefaults.standardUserDefaults()
+        if let identity = defaults.valueForKey(key) as? String {
+            DopamineKit.DebugLog("primaryIdentity:(\(identity))")
+            return identity
+        } else {
+            let defaultIdentity = UIDevice.currentDevice().identifierForVendor!.UUIDString
+            defaults.setValue(defaultIdentity, forKey: key)
+            return defaultIdentity
+        }
     }()
 }

@@ -74,14 +74,14 @@ public class DopamineKit : NSObject {
     ///     - line?: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
     internal static func DebugLog(message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
-//        #if DEBUG
+        #if DEBUG
             var functionSignature:String = function
             if let parameterNames = functionSignature.rangeOfString("\\((.*?)\\)", options: .RegularExpressionSearch){
                 functionSignature.replaceRange(parameterNames, with: "()")
             }
             let fileName = NSString(string: filePath).lastPathComponent.componentsSeparatedByString(".")[0]
             NSLog("[\(fileName):\(line):\(functionSignature)] - \(message)")
-//        #endif
+        #endif
     }
 
 }

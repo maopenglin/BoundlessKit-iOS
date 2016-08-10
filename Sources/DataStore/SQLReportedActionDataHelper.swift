@@ -114,7 +114,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
             do {
                 let numDeleted = try DB.run(query.delete())
                 
-                DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) successful")
+                DopamineKit.DebugLog("Delete \(numDeleted) items from Table:\(TABLE_NAME) row:\(id) successful")
             } catch {
                 DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) failed")
             }
