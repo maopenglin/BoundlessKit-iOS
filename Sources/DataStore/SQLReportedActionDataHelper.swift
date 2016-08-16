@@ -15,7 +15,7 @@ typealias SQLReportedAction = (
     reinforcementDecision: String,
     metaData: [String:AnyObject]?,
     utc: Int64,
-    deviceTimezoneOffset: Int64
+    timezoneOffset: Int64
 )
 
 class SQLReportedActionDataHelper : SQLDataHelperProtocol {
@@ -30,7 +30,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     static let reinforcementDecision = Expression<String>("reinforcementdecision")
     static let metaData = Expression<Blob?>("metadata")
     static let utc = Expression<Int64>("utc")
-    static let deviceTimezoneOffset = Expression<Int64>("deviceTimezoneOffset")
+    static let timezoneOffset = Expression<Int64>("timezoneoffset")
     
     static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.ReportedActionsQueue", nil)
     
@@ -49,7 +49,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                     t.column(reinforcementDecision)
                     t.column(metaData)
                     t.column(utc)
-                    t.column(deviceTimezoneOffset)
+                    t.column(timezoneOffset)
                     })
                 DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
             } catch {
@@ -89,7 +89,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                 reinforcementDecision <- item.reinforcementDecision,
                 metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue),
                 utc <- item.utc,
-                deviceTimezoneOffset <- item.deviceTimezoneOffset )
+                timezoneOffset <- item.timezoneOffset )
             do {
                 rowId = try DB.run(insert)
                 DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID) reinforcementDecision:\(item.reinforcementDecision)")
@@ -140,7 +140,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                         reinforcementDecision: item[reinforcementDecision],
                         metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
                         utc: item[utc],
-                        deviceTimezoneOffset: item[deviceTimezoneOffset] )
+                        timezoneOffset: item[timezoneOffset] )
                 }
             } catch {
                 DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with id:\(id)")
@@ -167,7 +167,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                         reinforcementDecision: item[reinforcementDecision],
                         metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
                         utc: item[utc],
-                        deviceTimezoneOffset: item[deviceTimezoneOffset] )
+                        timezoneOffset: item[timezoneOffset] )
                     )
                 }
             } catch {

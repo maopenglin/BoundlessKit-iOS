@@ -14,32 +14,32 @@ public struct DopeAction {
     public var reinforcementDecision:String?
     public var metaData:[String: AnyObject]?
     public var utc:Int64
-    public var deviceTimezoneOffset:Int64
+    public var timezoneOffset:Int64
     
     public init(actionID:String,
                 reinforcementDecision:String? = nil,
                 metaData:[String:AnyObject]? = nil,
                 utc:Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ),
-                deviceTimezoneOffset:Int64 = Int64( 1000*NSTimeZone.defaultTimeZone().secondsFromGMT ))
+                timezoneOffset:Int64 = Int64( 1000*NSTimeZone.defaultTimeZone().secondsFromGMT ))
     {
         self.actionID = actionID
         self.reinforcementDecision = reinforcementDecision
         self.metaData = metaData
         self.utc = utc
-        self.deviceTimezoneOffset = deviceTimezoneOffset
+        self.timezoneOffset = timezoneOffset
     }
     
     public func toJSONType() -> AnyObject {
-        var dict: [String:AnyObject] = [:]
+        var jsonObject: [String:AnyObject] = [:]
         
-        dict["actionID"] = self.actionID
-        dict["metaData"] = self.metaData
-        dict["reinforcementDecision"] = self.reinforcementDecision
-        dict["time"] = [
+        jsonObject["actionID"] = self.actionID
+        jsonObject["reinforcementDecision"] = self.reinforcementDecision
+        jsonObject["metaData"] = self.metaData
+        jsonObject["time"] = [
             ["timeType":"utc", "value": NSNumber( longLong:self.utc )],
-            ["timeType":"deviceTimezoneOffset", "value": NSNumber( longLong:self.deviceTimezoneOffset )]
+            ["timeType":"deviceTimezoneOffset", "value": NSNumber( longLong:self.timezoneOffset )]
         ]
         
-        return dict
+        return jsonObject
     }
 }

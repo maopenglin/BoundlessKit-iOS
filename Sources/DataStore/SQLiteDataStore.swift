@@ -28,7 +28,7 @@ public class SQLiteDataStore : NSObject{
         if let dirs: [NSString] = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.AllDomainsMask, true) as [NSString] {
             let dir = dirs[0]
             path = dir.stringByAppendingPathComponent(path);
-            NSLog("Sqlite db path:\(path)")
+            DopamineKit.DebugLog("Sqlite db path:\(path)")
         }
         
         do {

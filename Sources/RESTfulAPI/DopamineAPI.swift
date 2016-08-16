@@ -110,45 +110,45 @@ public class DopamineAPI : NSObject{
         }
         
         DopamineKit.DebugLog("Preparing \(type.str) api call to \(url.absoluteString)...")
-            do {
-                let request = NSMutableURLRequest(URL: url)
-                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.HTTPMethod = "POST"
-                request.timeoutInterval = timeout
-                let jsonPayload = try NSJSONSerialization.dataWithJSONObject(payload, options: NSJSONWritingOptions())
-//                DopamineKit.DebugLog("sending raw payload:\(jsonPayload.debugDescription)")   // hex 16 chars
-                request.HTTPBody = jsonPayload
+        do {
+            let request = NSMutableURLRequest(URL: url)
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.HTTPMethod = "POST"
+            request.timeoutInterval = timeout
+            let jsonPayload = try NSJSONSerialization.dataWithJSONObject(payload, options: NSJSONWritingOptions())
+//            DopamineKit.DebugLog("sending raw payload:\(jsonPayload.debugDescription)")   // hex 16 chars
+            request.HTTPBody = jsonPayload
+            
+            // request handler
+            let task = session.dataTaskWithRequest(request) { responseData, responseURL, error in
+                var responseDict: [String : AnyObject] = [:]
+                defer { completion(responseDict) }
                 
-                // request handler
-                let task = session.dataTaskWithRequest(request) { responseData, responseURL, error in
-                    var responseDict: [String : AnyObject] = [:]
-                    defer { completion(responseDict) }
-                    
-                    if responseURL == nil {
-                        DopamineKit.DebugLog("❌ invalid response:\(error?.localizedDescription)")
-                        responseDict["error"] = error?.localizedDescription
-                        return
-                    }
-                    
-                    do {
-                        // turn the response into a json object
-                        responseDict = try NSJSONSerialization.JSONObjectWithData(responseData!, options: NSJSONReadingOptions()) as! [String: AnyObject]
-                        DopamineKit.DebugLog("✅\(type.str) call got response:\(responseDict.debugDescription)")
-                    } catch {
-                        DopamineKit.DebugLog("❌ Error reading \(type.str) response data: \(responseData.debugDescription)")
-                        return
-                    }
-                    
+                if responseURL == nil {
+                    DopamineKit.DebugLog("❌ invalid response:\(error?.localizedDescription)")
+                    responseDict["error"] = error?.localizedDescription
+                    return
                 }
                 
-                // send request
-                DopamineKit.DebugLog("Sending \(type.str) api call with payload: \(payload.description)")
-                task.resume()
+                do {
+                    // turn the response into a json object
+                    responseDict = try NSJSONSerialization.JSONObjectWithData(responseData!, options: NSJSONReadingOptions()) as! [String: AnyObject]
+                    DopamineKit.DebugLog("✅\(type.str) call got response:\(responseDict.debugDescription)")
+                } catch {
+                    DopamineKit.DebugLog("❌ Error reading \(type.str) response data: \(responseData.debugDescription)")
+                    return
+                }
                 
-            } catch {
-                DopamineKit.DebugLog("Error sending \(type.str) api call with payload:(\(payload.description))")
             }
+            
+            // send request
+            DopamineKit.DebugLog("Sending \(type.str) api call with payload: \(payload.description)")
+            task.resume()
+            
+        } catch {
+            DopamineKit.DebugLog("Error sending \(type.str) api call with payload:(\(payload.description))")
         }
+    }
     
     public static var testCredentialPath:String?
     // compile the static elements of the request call
