@@ -43,33 +43,28 @@ class Cartridge : NSObject, NSCoding {
 
     func isExpired() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
-        return SQLCartridgeDataHelper.count(actionID) == 0 ||
-                (timerMarker + timerLength) < currentTime
+        let result = (timerMarker + timerLength) < currentTime
+        
+        DopamineKit.DebugLog("Cartridge \(actionID) expire\(result ? "ed" : "s") at \(timerMarker + timerLength) and it is \(currentTime) now.")
+        
+        return result
     }
     
     func isFresh() -> Bool {
-        let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
-        return
-            SQLCartridgeDataHelper.count(actionID) >= 1 &&
-                (timerMarker + timerLength) >= currentTime
+        return SQLCartridgeDataHelper.count(actionID) >= 1 && !isExpired()
     }
     
     func isSizeToSync() -> Bool {
         let count = SQLCartridgeDataHelper.count(actionID)
-        return count < Cartridge.minimumSize ||
-            Double(count) / Double(size) <= Cartridge.capacityToSync
+        let result = count < Cartridge.minimumSize || Double(count) / Double(size) <= Cartridge.capacityToSync;
+        
+        DopamineKit.DebugLog("Cartridge \(actionID) has \(count)/\(size) decisions and \(result ? "does" : "does not") need to sync since it needs at least \(Cartridge.minimumSize) decisions or \(Cartridge.capacityToSync*100)%% capacity.")
+        
+        return result
     }
     
     func shouldSync() -> Bool {
-        let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
-        if isSizeToSync() {
-            DopamineKit.DebugLog("Cartridge \(actionID) has \(SQLCartridgeDataHelper.count(actionID))/\(size) decisions and needs at least \(Cartridge.minimumSize) decisions or \(Cartridge.capacityToSync*100)%% capacity")
-        }
-        if (timerMarker + timerLength) < currentTime {
-            DopamineKit.DebugLog("Cartridge \(actionID) has expired at \(timerMarker + timerLength) and it is \(currentTime) now.")
-        }
-        return isSizeToSync() ||
-            (timerMarker + timerLength) < currentTime
+        return isExpired() || isSizeToSync()
     }
     
 }

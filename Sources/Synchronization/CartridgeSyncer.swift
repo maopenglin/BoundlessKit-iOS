@@ -39,7 +39,7 @@ class CartridgeSyncer : NSObject {
         }
     }
     
-    private func updateCartridge(cartridge: Cartridge, size: Int?, timerMarker: Int64=Int64( 1000*NSDate().timeIntervalSince1970 ), timerLength: Int64?) {
+    private func updateTriggerFor(cartridge: Cartridge, size: Int?, timerMarker: Int64=Int64( 1000*NSDate().timeIntervalSince1970 ), timerLength: Int64?) {
         if let size = size {
             cartridge.size = size
         }
@@ -63,7 +63,6 @@ class CartridgeSyncer : NSObject {
         for (actionID, cartridge) in cartridges {
             if shouldSync(actionID, cartridge: cartridge) {
                 needsReload[actionID] = cartridge
-                DopamineKit.DebugLog("\(actionID) needs to reload")
             }
         }
         
@@ -88,7 +87,7 @@ class CartridgeSyncer : NSObject {
                 {
                     defer { completion(200) }
                     SQLCartridgeDataHelper.deleteAll(cartridge.actionID)
-                    self.updateCartridge(cartridge, size: cartridgeValues.count, timerLength: Int64(expiry))
+                    self.updateTriggerFor(cartridge, size: cartridgeValues.count, timerLength: Int64(expiry))
                     
                     for decision in cartridgeValues {
                         let _ = SQLCartridgeDataHelper.insert(

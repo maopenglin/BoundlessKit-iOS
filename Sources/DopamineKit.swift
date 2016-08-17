@@ -15,15 +15,8 @@ public class DopamineKit : NSObject {
     
     public static let sharedInstance: DopamineKit = DopamineKit()
     
-    private let dataStore:SQLiteDataStore = SQLiteDataStore.sharedInstance
-    private let cartridgeSyncer = CartridgeSyncer.sharedInstance
-    private let trackSyncer = TrackSyncer.sharedInstance
-    private let reportSyncer = ReportSyncer.sharedInstance
+    private let syncCoordinator = SyncCoordinator.sharedInstance
     
-    private override init() {
-        dataStore.createTables()
-    }
-        
     /// This function sends an asynchronous tracking call for the specified actionID
     ///
     /// - parameters:
@@ -37,8 +30,7 @@ public class DopamineKit : NSObject {
 
         // store the action to be synced
         let action = DopeAction(actionID: actionID, metaData:metaData)
-        si.trackSyncer.store(action)
-        SyncCoordinator.sync()
+        si.syncCoordinator.storeTrackedAction(action)
     }
 
     /// This function sends an asynchronous reinforcement call for the specified actionID
@@ -52,7 +44,7 @@ public class DopamineKit : NSObject {
     ///
     public static func reinforce(actionID: String, metaData: [String: AnyObject]? = nil, completion: (String) -> ()) {
         let si = sharedInstance
-        let reinforcementDecision = si.cartridgeSyncer.unload(actionID)
+        let reinforcementDecision = si.syncCoordinator.removeReinforcementDecisionFor(actionID)
         
         dispatch_async(dispatch_get_main_queue(), {
             completion(reinforcementDecision)
@@ -60,8 +52,7 @@ public class DopamineKit : NSObject {
         
         // store the action to be synced
         let action = DopeAction(actionID: actionID, reinforcementDecision: reinforcementDecision, metaData: metaData)
-        si.reportSyncer.store(action)
-        SyncCoordinator.sync()
+        si.syncCoordinator.storeReinforcedAction(action)
     }
     
     
