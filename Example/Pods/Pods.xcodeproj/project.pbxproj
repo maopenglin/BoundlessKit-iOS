@@ -44,6 +44,7 @@
 		C16519FBC4278441062E9545D8012585 /* SQLReportedActionDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737DBFF2FE5278F8A9904F67097724F0 /* SQLReportedActionDataHelper.swift */; };
 		C26EF6A82141E061DD2A084D404DBE7C /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0652CFB007BBA46B92138A30E2F0513 /* Connection.swift */; };
 		CBFF23536D0E10CC07A9BCD21DAD6EFF /* SQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = C069E20DDEF64B34B672C03C3CD47AF7 /* SQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CD225361A45920AA8424E17B37FD9242 /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB44F0C85553660857F351B59660E399 /* SQLite.framework */; };
 		D0F04EDFD481400BAC1EA574C0B15723 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B338CF0803DDE4D7D67626BF31133D5D /* Helpers.swift */; };
 		D3F834A7B242233B5C720D4DBB248628 /* FTS4.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E1491786CB78977109E7F1AF68DCA8 /* FTS4.swift */; };
 		D912695BAF7F35659C59C1907FE92538 /* SQLTrackedActionDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA74F9E968210AC8DAD4AABF42A4ED2 /* SQLTrackedActionDataHelper.swift */; };
@@ -189,6 +190,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FD04EB4384CE11E309020202C7A88779 /* Foundation.framework in Frameworks */,
+				CD225361A45920AA8424E17B37FD9242 /* SQLite.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -12,8 +12,8 @@ public class DopamineAPI : NSObject{
     
     static let sharedInstance: DopamineAPI = DopamineAPI()
     
-//    private static let dopamineAPIURL = "https://api.usedopamine.com/v4/app/"
-    private static let dopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/"
+    private static let dopamineAPIURL = "https://api.usedopamine.com/v4/app/"
+//    private static let dopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/"
     private static let clientSDKVersion = "4.0.0"
     private static let clientOS = "iOS"
     private static let clientOSVersion = UIDevice.currentDevice().systemVersion
