@@ -52,7 +52,7 @@ public class DopamineKit : NSObject {
         
         // store the action to be synced
         let action = DopeAction(actionID: actionID, reinforcementDecision: reinforcementDecision, metaData: metaData)
-        si.syncCoordinator.storeReinforcedAction(action)
+        si.syncCoordinator.storeReportedAction(action)
     }
     
     

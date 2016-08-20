@@ -28,7 +28,7 @@ public class SyncCoordinator {
         sync()
     }
     
-    public func storeReinforcedAction(reportedAction: DopeAction) {
+    public func storeReportedAction(reportedAction: DopeAction) {
         reportSyncer.store(reportedAction)
         sync()
     }
