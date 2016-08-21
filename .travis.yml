@@ -11,5 +11,6 @@ before_install:
 - gem install cocoapods -v '~> 1.1.0.beta.1' # Since Travis is not always on latest version
 - pod install --project-directory=Example
 script:
-- set -o pipefail && xcodebuild test -workspace Example/DopamineKit.xcworkspace -scheme DopamineKit-Example -sdk iphonesimulator9.3 ONLY_ACTIVE_ARCH=YES | xcpretty
+# - set -o pipefail && xcodebuild test -workspace Example/DopamineKit.xcworkspace -scheme DopamineKit-Example -sdk iphonesimulator9.3 ONLY_ACTIVE_ARCH=YES | xcpretty
+- xcodebuild -workspace Example/DopamineKit.xcworkspace -scheme DopamineKit-Example -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
 - pod lib lint
