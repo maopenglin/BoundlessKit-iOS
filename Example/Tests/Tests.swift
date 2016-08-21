@@ -44,8 +44,9 @@ class Tests: XCTestCase {
     func testTrackingRequestSimple() {
         let asyncExpectation = expectationWithDescription("Tracking request simpole")
         DopamineKit.track("tracktestsimple")
-        sleep(4)
+        sleep(1)
         asyncExpectation.fulfill()
+        
         waitForExpectationsWithTimeout(5, handler: {error in
             XCTAssertNil(error, "DopamineKitTest error: track request timed out")
         })
@@ -57,7 +58,7 @@ class Tests: XCTestCase {
         let asyncExpectation = expectationWithDescription("Tracking request with metadata")
         let metaData:[String:AnyObject] = ["key":"value", "number":2.2]
         DopamineKit.track("tracktestwithmetadata", metaData: metaData)
-        sleep(4)
+        sleep(1)
         asyncExpectation.fulfill()
         waitForExpectationsWithTimeout(5, handler: {error in
             XCTAssertNil(error, "DopamineKitTest error: track request timed out")
@@ -67,11 +68,11 @@ class Tests: XCTestCase {
     /// Test multiple (3) DopamineKit.track() called back to back
     ///
     func testTrackingMultiple() {
-        let asyncExpectation = expectationWithDescription("Multiple racking request")
+        let asyncExpectation = expectationWithDescription("Multiple tracking request")
         DopamineKit.track("tracktestwithmetadata13")
         DopamineKit.track("tracktestwithmetadata2")
         DopamineKit.track("tracktestwithmetadata13")
-        sleep(4)
+        sleep(3)
         asyncExpectation.fulfill()
         waitForExpectationsWithTimeout(5, handler: {error in
             XCTAssertNil(error, "DopamineKitTest error: track request timed out")
@@ -83,10 +84,10 @@ class Tests: XCTestCase {
     ///
     func testPerformanceExample() {
         self.measureBlock {
-            
-            let numRequests = 100
+            DopamineKit.track("tracktestwithmetadata13")
+            let numRequests = 10
             for _ in 1...numRequests{
-                self.testTrackingRequestSimple()
+                DopamineKit.track("performanceTest")
             }
             
         }
@@ -137,20 +138,5 @@ class Tests: XCTestCase {
             XCTAssertNil(error, "DopamineKitTest error: reinforce request timed out")
         })
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
 }
