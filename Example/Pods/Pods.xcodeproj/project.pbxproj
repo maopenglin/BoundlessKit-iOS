@@ -29,6 +29,8 @@
 		78C019A6F177B14DCAC52B609C3DE31F /* Pods-DopamineKit_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = BCB50A43A300BE12D82B869B121CF3A8 /* Pods-DopamineKit_Example-dummy.m */; };
 		7B16C28F371E0F62184E8F366095C15B /* R*Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84DB78283823A3B7F6E11103F659531 /* R*Tree.swift */; };
 		7DFCA6AD1D12E40F70176755C929E63B /* fts3_tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = E0DC67512C037897FF9B19B0F4BC616F /* fts3_tokenizer.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		84EF26911D6930B600B6C954 /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB44F0C85553660857F351B59660E399 /* SQLite.framework */; };
+		84EF26921D6930D700B6C954 /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB44F0C85553660857F351B59660E399 /* SQLite.framework */; };
 		8C672B33324F1DDF15CAD9CA2AB42406 /* JSONDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7460C11DDEB6448EF3D26F6DBAF8484B /* JSONDataType.swift */; };
 		8F65FB0C9B4B895A83ADDF6D37939B11 /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55842CACC1AA5359DE0F6BD1C563C69 /* Query.swift */; };
 		AA10F3004D3853425CB64F72B64185B3 /* Blob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919B4A12D2BBB42EB054E1EAC1590385 /* Blob.swift */; };
@@ -44,7 +46,6 @@
 		C16519FBC4278441062E9545D8012585 /* SQLReportedActionDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737DBFF2FE5278F8A9904F67097724F0 /* SQLReportedActionDataHelper.swift */; };
 		C26EF6A82141E061DD2A084D404DBE7C /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0652CFB007BBA46B92138A30E2F0513 /* Connection.swift */; };
 		CBFF23536D0E10CC07A9BCD21DAD6EFF /* SQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = C069E20DDEF64B34B672C03C3CD47AF7 /* SQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CD225361A45920AA8424E17B37FD9242 /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB44F0C85553660857F351B59660E399 /* SQLite.framework */; };
 		D0F04EDFD481400BAC1EA574C0B15723 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B338CF0803DDE4D7D67626BF31133D5D /* Helpers.swift */; };
 		D3F834A7B242233B5C720D4DBB248628 /* FTS4.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E1491786CB78977109E7F1AF68DCA8 /* FTS4.swift */; };
 		D912695BAF7F35659C59C1907FE92538 /* SQLTrackedActionDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA74F9E968210AC8DAD4AABF42A4ED2 /* SQLTrackedActionDataHelper.swift */; };
@@ -165,6 +166,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84EF26911D6930B600B6C954 /* SQLite.framework in Frameworks */,
 				EA871CE6963BE8278CAFAEF9823A93A9 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -189,8 +191,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84EF26921D6930D700B6C954 /* SQLite.framework in Frameworks */,
 				FD04EB4384CE11E309020202C7A88779 /* Foundation.framework in Frameworks */,
-				CD225361A45920AA8424E17B37FD9242 /* SQLite.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
