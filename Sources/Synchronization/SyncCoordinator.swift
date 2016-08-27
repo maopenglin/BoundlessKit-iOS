@@ -15,7 +15,7 @@ public class SyncCoordinator {
     private let dataStore:SQLiteDataStore = SQLiteDataStore.sharedInstance
     private let trackSyncer = TrackSyncer.sharedInstance;
     private let reportSyncer = ReportSyncer.sharedInstance;
-    private let cartridgeSyncer = CartridgeSyncer.sharedInstance;
+//    private let cartridgeSyncer = CartridgeSyncer.sharedInstance;
     
     private var syncInProgress = false
     
@@ -24,17 +24,18 @@ public class SyncCoordinator {
     }
     
     public func storeTrackedAction(trackedAction: DopeAction) {
-        trackSyncer.store(trackedAction)
+        trackSyncer.track.add(trackedAction)
         sync()
     }
     
     public func storeReportedAction(reportedAction: DopeAction) {
-        reportSyncer.store(reportedAction)
+        reportSyncer.report.add(reportedAction)
         sync()
     }
     
     public func removeReinforcementDecisionFor(actionID: String) -> String {
-        return cartridgeSyncer.unload(actionID)
+//        return cartridgeSyncer.unload(actionID)
+        return "neutralResponse"
     }
     
     func sync() {
@@ -46,9 +47,9 @@ public class SyncCoordinator {
             self.syncInProgress = true
             defer { self.syncInProgress = false }
             
-            let cartridges = self.cartridgeSyncer.whichShouldSync()
-            let reportShouldSync = cartridges.count > 0 || self.reportSyncer.shouldSync()
-            let trackerShouldSync = reportShouldSync || self.trackSyncer.shouldSync()
+//            let cartridges = self.cartridgeSyncer.whichShouldSync()
+            let reportShouldSync = /*cartridges.count > 0 ||*/ self.reportSyncer.report.isTriggered()
+            let trackerShouldSync = reportShouldSync || self.trackSyncer.track.isTriggered()
             
             var goodProgress = true
             
@@ -82,19 +83,19 @@ public class SyncCoordinator {
             
             if !goodProgress { return }
             
-            if cartridges.count > 0 {
-                DopamineKit.DebugLog("Refreshing \(cartridges.count)/\(SQLCartridgeDataHelper.getTablesCount()) cartidges.")
-                for (actionID, cartridge) in cartridges where goodProgress {
-                    self.cartridgeSyncer.sync(cartridge){status in
-                        guard status == 200 else {
-                            DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
-                            goodProgress = false
-                            return
-                        }
-                    }
-//                    sleep(1)
-                }
-            }
+//            if cartridges.count > 0 {
+//                DopamineKit.DebugLog("Refreshing \(cartridges.count)/\(SQLCartridgeDataHelper.getTablesCount()) cartidges.")
+//                for (actionID, cartridge) in cartridges where goodProgress {
+//                    self.cartridgeSyncer.sync(cartridge){status in
+//                        guard status == 200 else {
+//                            DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
+//                            goodProgress = false
+//                            return
+//                        }
+//                    }
+////                    sleep(1)
+//                }
+//            }
         }
     }
 }
