@@ -109,11 +109,9 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
             let id = item.index
             let query = table.filter(index == id)
             do {
-                let tmp = try DB.run(query.delete())
-                guard tmp == 1 else {
-                    throw SQLDataAccessError.Delete_Error
-                }
-                DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) successful")
+                let numDeleted = try DB.run(query.delete())
+                
+                DopamineKit.DebugLog("Deleted \(numDeleted) items from Table:\(TABLE_NAME) row:\(id) successful")
             } catch {
                 DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) failed")
             }

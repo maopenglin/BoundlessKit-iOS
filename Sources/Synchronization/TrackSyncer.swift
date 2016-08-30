@@ -13,11 +13,19 @@ class TrackSyncer : NSObject {
     
     static let sharedInstance: TrackSyncer = TrackSyncer()
     
-    let track = Track()
+    private let track = Track()
     
     private var syncInProgress = false
     
     private override init() { }
+    
+    func store(action: DopeAction) {
+        track.add(action)
+    }
+    
+    func shouldSync() -> Bool {
+        return track.isTriggered()
+    }
     
     func sync(completion: (Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){

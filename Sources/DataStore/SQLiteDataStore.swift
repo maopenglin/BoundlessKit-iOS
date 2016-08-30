@@ -49,6 +49,7 @@ public class SQLiteDataStore : NSObject{
         
         SQLTrackedActionDataHelper.createTable()
         SQLReportedActionDataHelper.createTable()
+        SQLCartridgeDataHelper.createTable()
     }
     
     public func dropTables(){
@@ -59,7 +60,7 @@ public class SQLiteDataStore : NSObject{
         
         SQLTrackedActionDataHelper.dropTable()
         SQLReportedActionDataHelper.dropTable()
-        SQLCartridgeDataHelper.dropTables()
+        SQLCartridgeDataHelper.dropTable()
     }
     
 }

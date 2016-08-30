@@ -1,77 +1,111 @@
-////
-////  CartridgeSyncer.swift
-////  Pods
-////
-////  Created by Akash Desai on 7/22/16.
-////
-////
 //
-//import Foundation
+//  CartridgeSyncer.swift
+//  Pods
 //
-//@objc
-//class CartridgeSyncer : NSObject {
-//    
-//    private let cartridge: Cartridge
-//    
-//    private var syncInProgress = false
-//    
-//    init(actionID: String) {
-//        cartridge = Cartridge.init(actionID: actionID)
-//    }
-//    
-//    func sync(completion: (Int) -> () = { _ in }) {
-//        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
-//            guard !self.syncInProgress else {
-//                DopamineKit.DebugLog("Reload already happening")
-//                completion(200)
-//                return
-//            }
-//            
-//            self.syncInProgress = true
-//            DopamineAPI.refresh(self.cartridge.actionID, completion: { response in
-//                defer { self.syncInProgress = false }
-//                if response["status"] as? Int == 200,
-//                    let cartridgeValues = response["reinforcementCartridge"] as? [String],
-//                    let expiry = response["expiresIn"] as? Int
-//                {
-//                    defer { completion(200) }
-//                    
-//                    SQLCartridgeDataHelper.deleteAll(cartridge.actionID)
-//                    for decision in cartridgeValues {
-//                        let _ = SQLCartridgeDataHelper.insert(
-//                            SQLCartridge(
-//                                index:0,
-//                                actionID: cartridge.actionID,
-//                                reinforcementDecision: decision)
-//                        )
-//                    }
-//                    self.updateTriggerFor(cartridge, size: cartridgeValues.count, timerExpiresIn: Int64(expiry))
-//                    
-//                    DopamineKit.DebugLog("✅ \(cartridge.actionID) refreshed!")
-//                }
-//                else {
-//                    DopamineKit.DebugLog("❌ Could not read cartridge for (\(cartridge.actionID))")
-//                    completion(404)
-//                }
-//                
-//            })
-//        }
-//    }
-//    
-//    func unload(actionID: String) -> String {
-//        var decision = "neutralFeedback"
-//        
-//        let cartridge = getCartridgeForAction(actionID)
-//        
-//        if cartridge.isFresh() {
-//            if let result = SQLCartridgeDataHelper.pop(actionID) {
-//                decision = result.reinforcementDecision
+//  Created by Akash Desai on 7/22/16.
+//
+//
+
+import Foundation
+
+@objc
+class CartridgeSyncer : NSObject {
+    
+    static let sharedInstance: CartridgeSyncer = CartridgeSyncer()
+    
+    private let defaults = NSUserDefaults.standardUserDefaults()
+    private let defaultsActionIDSetKey = "DopamineActionIDSet"
+    
+    private var cartridges:[String:Cartridge] = [:]
+//    private var actionIDSet:Set<String> {
+//        get {
+//            if let savedActionIDSetData = defaults.objectForKey(defaultsActionIDSetKey) as? NSData,
+//                let savedActionIDSet = NSKeyedUnarchiver.unarchiveObjectWithData(savedActionIDSetData) as? Set<String> {
+//                return savedActionIDSet
+//            } else {
+//                return []
 //            }
 //        }
-//        
-//        return decision
+//        set(newActionIDSet) {
+//            DopamineKit.DebugLog("Inside actionIDSet set()")
+//            defaults.setObject(newActionIDSet, forKey: defaultsActionIDSetKey)
+//        }
 //    }
-//    
-//}
-//
-//
+    
+    private var syncInProgress = false
+    
+    private override init() {
+        if let savedActionIDSetData = defaults.objectForKey(defaultsActionIDSetKey) as? [String] {
+            for actionID in savedActionIDSetData {
+                cartridges[actionID] = Cartridge(actionID: actionID)
+            }
+        }
+    }
+    
+    func unloadReinforcementDecisionForAction(action: DopeAction) -> String {
+        let cartridge = getCartridgeForActionID(action.actionID)
+        return cartridge.remove()
+    }
+    
+    func whichShouldSync() -> [String] {
+        var cartridgesToSync:[String] = []
+        for (actionID, cartridge) in cartridges {
+            if cartridge.isTriggered() {
+                cartridgesToSync.append(actionID)
+            }
+        }
+        return cartridgesToSync
+    }
+    
+    func sync(actionID: String, completion: (Int) -> () = { _ in }) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
+            guard !self.syncInProgress else {
+                DopamineKit.DebugLog("Cartridge sync already happening")
+                completion(200)
+                return
+            }
+            
+            self.syncInProgress = true
+            let cartridge = self.getCartridgeForActionID(actionID)
+            
+            DopamineAPI.refresh(cartridge.actionID) { response in
+                defer { self.syncInProgress = false }
+                if response["status"] as? Int == 200,
+                    let cartridgeDecisions = response["reinforcementCartridge"] as? [String],
+                    let expiresIn = response["expiresIn"] as? Int
+                {
+                    defer { completion(200) }
+                    
+                    cartridge.removeAll()
+                    for decision in cartridgeDecisions {
+                        cartridge.add(decision)
+                    }
+                    cartridge.updateTriggers(cartridgeDecisions.count, timerExpiresIn: Int64(expiresIn) )
+                    
+                    DopamineKit.DebugLog("✅ \(cartridge.actionID) refreshed!")
+                }
+                else {
+                    DopamineKit.DebugLog("❌ Could not read cartridge for (\(cartridge.actionID))")
+                    completion(404)
+                }
+            }
+        }
+    }
+    
+    
+    
+    private func getCartridgeForActionID(actionID: String) -> Cartridge {
+        if let cartridge = cartridges[actionID] {
+            return cartridge
+        } else {
+            let cartridge = Cartridge(actionID: actionID)
+            cartridges[actionID] = cartridge
+            let actionIDs = cartridges.keys.sort()
+            defaults.setObject(actionIDs, forKey: defaultsActionIDSetKey)
+            return cartridge
+        }
+    }
+    
+}
+
+

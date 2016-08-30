@@ -74,7 +74,7 @@ class Report : NSObject, NSCoding {
     }
     
     private func isSizeToSync() -> Bool {
-        let count = SQLTrackedActionDataHelper.count()
+        let count = SQLReportedActionDataHelper.count()
         let isSize = count >= sizeToSync
         DopamineKit.DebugLog("Report has \(count)/\(sizeToSync) actions so \(isSize ? "does" : "doesn't") need to sync...")
         return isSize

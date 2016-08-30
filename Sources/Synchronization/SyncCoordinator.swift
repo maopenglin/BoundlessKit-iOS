@@ -8,14 +8,14 @@
 
 import Foundation
 
-public class SyncCoordinator {
+class SyncCoordinator {
     
     static let sharedInstance = SyncCoordinator()
     
     private let dataStore:SQLiteDataStore = SQLiteDataStore.sharedInstance
     private let trackSyncer = TrackSyncer.sharedInstance;
     private let reportSyncer = ReportSyncer.sharedInstance;
-//    private let cartridgeSyncer = CartridgeSyncer.sharedInstance;
+    private let cartridgeSyncer = CartridgeSyncer.sharedInstance;
     
     private var syncInProgress = false
     
@@ -23,22 +23,22 @@ public class SyncCoordinator {
         dataStore.createTables()
     }
     
-    public func storeTrackedAction(trackedAction: DopeAction) {
-        trackSyncer.track.add(trackedAction)
-        sync()
+    func storeTrackedAction(trackedAction: DopeAction) {
+        trackSyncer.store(trackedAction)
+        performSync()
     }
     
-    public func storeReportedAction(reportedAction: DopeAction) {
-        reportSyncer.report.add(reportedAction)
-        sync()
+    func storeReportedAction(reportedAction: DopeAction) {
+        reportSyncer.store(reportedAction)
+        performSync()
     }
     
-    public func removeReinforcementDecisionFor(actionID: String) -> String {
-//        return cartridgeSyncer.unload(actionID)
-        return "neutralResponse"
+    func removeReinforcementDecisionFor(reinforceableAction: DopeAction) -> String {
+        return cartridgeSyncer.unloadReinforcementDecisionForAction(reinforceableAction)
+//        return "neutralResponse"
     }
     
-    func sync() {
+    private func performSync() {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
             guard !self.syncInProgress else {
                 DopamineKit.DebugLog("Sync already happening")
@@ -47,9 +47,9 @@ public class SyncCoordinator {
             self.syncInProgress = true
             defer { self.syncInProgress = false }
             
-//            let cartridges = self.cartridgeSyncer.whichShouldSync()
-            let reportShouldSync = /*cartridges.count > 0 ||*/ self.reportSyncer.report.isTriggered()
-            let trackerShouldSync = reportShouldSync || self.trackSyncer.track.isTriggered()
+            let cartridgesToSync = self.cartridgeSyncer.whichShouldSync()
+            let reportShouldSync = cartridgesToSync.count>0 || self.reportSyncer.shouldSync()
+            let trackerShouldSync = reportShouldSync || self.trackSyncer.shouldSync()
             
             var goodProgress = true
             
@@ -83,19 +83,16 @@ public class SyncCoordinator {
             
             if !goodProgress { return }
             
-//            if cartridges.count > 0 {
-//                DopamineKit.DebugLog("Refreshing \(cartridges.count)/\(SQLCartridgeDataHelper.getTablesCount()) cartidges.")
-//                for (actionID, cartridge) in cartridges where goodProgress {
-//                    self.cartridgeSyncer.sync(cartridge){status in
-//                        guard status == 200 else {
-//                            DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
-//                            goodProgress = false
-//                            return
-//                        }
-//                    }
-////                    sleep(1)
-//                }
-//            }
+            DopamineKit.DebugLog("Refreshing \(cartridgesToSync.count) cartidges.")
+            for actionID in cartridgesToSync where goodProgress {
+                self.cartridgeSyncer.sync(actionID) { status in
+                    guard status == 200 else {
+                        DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
+                        goodProgress = false
+                        return
+                    }
+                }
+            }
         }
     }
 }

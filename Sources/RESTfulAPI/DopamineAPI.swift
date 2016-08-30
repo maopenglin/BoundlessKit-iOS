@@ -22,7 +22,7 @@ public class DopamineAPI : NSObject{
         super.init()
     }
     
-    public static func track(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
+    static func track(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
         // create dict with credentials
         var payload = sharedInstance.configurationData
         
@@ -42,7 +42,7 @@ public class DopamineAPI : NSObject{
         
     }
 
-    public static func report(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
+    static func report(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
         var payload = sharedInstance.configurationData
         
         var reinforcedActionsArray = Array<AnyObject>()
@@ -60,7 +60,7 @@ public class DopamineAPI : NSObject{
     }
     
     
-    public static func refresh(actionID: String, completion: ([String:AnyObject]) -> ()){
+    static func refresh(actionID: String, completion: ([String:AnyObject]) -> ()){
         var payload = sharedInstance.configurationData
         
         payload["actionID"] = actionID

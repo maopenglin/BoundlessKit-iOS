@@ -13,11 +13,19 @@ class ReportSyncer : NSObject {
     
     static let sharedInstance: ReportSyncer = ReportSyncer()
     
-    let report = Report()
+    private let report = Report()
     
     private var syncInProgress = false
     
     private override init() { }
+    
+    func store(action: DopeAction) {
+        report.add(action)
+    }
+    
+    func shouldSync() -> Bool {
+        return report.isTriggered()
+    }
     
     func sync(completion: (Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
