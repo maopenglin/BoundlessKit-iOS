@@ -18,7 +18,7 @@ public class SyncCoordinator {
     
     private var syncInProgress = false
     
-    /// Creates SQLite tables and performs a sync
+    /// Initializer for SyncCoordinator performs a sync
     ///
     private init() {
         performSync()
