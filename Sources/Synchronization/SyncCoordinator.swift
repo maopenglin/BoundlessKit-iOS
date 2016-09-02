@@ -10,21 +10,20 @@ import Foundation
 
 public class SyncCoordinator {
     
-    public static let sharedInstance = SyncCoordinator()
+    static let sharedInstance = SyncCoordinator()
     
-    private let dataStore:SQLiteDataStore = SQLiteDataStore.sharedInstance
     private let trackSyncer = TrackSyncer.sharedInstance;
     private let reportSyncer = ReportSyncer.sharedInstance;
     private let cartridgeSyncer = CartridgeSyncer.sharedInstance;
     
     private var syncInProgress = false
     
-    /// Creates SQLite tables and performs a sync
-    ///
-    private init() {
-        dataStore.createTables()
-        performSync()
-    }
+//    /// Creates SQLite tables and performs a sync
+//    ///
+//    private init() {
+//        dataStore.createTables()
+//        performSync()
+//    }
     
     /// Stores a tracked action to be synced
     ///
@@ -77,7 +76,7 @@ public class SyncCoordinator {
             var goodProgress = true
             
             if trackerShouldSync {
-                DopamineKit.DebugLog("Sending \(SQLTrackedActionDataHelper.count()) tracked actions...")
+//                DopamineKit.DebugLog("Sending \(SQLTrackedActionDataHelper.count()) tracked actions...")
                 self.trackSyncer.sync() {
                     status in
                     guard status == 200 else {
@@ -92,7 +91,7 @@ public class SyncCoordinator {
             if !goodProgress { return }
             
             if reportShouldSync {
-                DopamineKit.DebugLog("Sending \(SQLReportedActionDataHelper.count()) reported actions...")
+//                DopamineKit.DebugLog("Sending \(SQLReportedActionDataHelper.count()) reported actions...")
                 self.reportSyncer.sync() {
                     status in
                     guard status == 200 else {
@@ -140,9 +139,9 @@ public class SyncCoordinator {
     
     /// Resets the sync triggers
     ///
-    public func makeClean() {
-        trackSyncer.makeClean()
-        reportSyncer.makeClean()
-        cartridgeSyncer.makeClean()
+    public func resetSyncers() {
+        trackSyncer.reset()
+        reportSyncer.reset()
+        cartridgeSyncer.reset()
     }
 }

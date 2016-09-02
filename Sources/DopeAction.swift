@@ -8,13 +8,13 @@
 
 import Foundation
 
-public struct DopeAction {
+struct DopeAction {
     
-    public var actionID:String
-    public var reinforcementDecision:String?
-    public var metaData:[String: AnyObject]?
-    public var utc:Int64
-    public var timezoneOffset:Int64
+    var actionID:String
+    var reinforcementDecision:String?
+    var metaData:[String: AnyObject]?
+    var utc:Int64
+    var timezoneOffset:Int64
     
     /// This function initializes a DopeAction
     ///
@@ -25,7 +25,7 @@ public struct DopeAction {
     ///     - utc: Time the action occured in utc milliseconds. Defaults to the current time.
     ///     - timezoneOffset: Local timezone offset for the time the action occured in milliseconds. Defaults to the current device timezone.
     ///
-    public init(actionID:String,
+    init(actionID:String,
                 reinforcementDecision:String? = nil,
                 metaData:[String:AnyObject]? = nil,
                 utc:Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ),
@@ -40,7 +40,7 @@ public struct DopeAction {
     
     /// This function converts a DopeAction to a JSON compatible Object
     ///
-    public func toJSONType() -> AnyObject {
+    func toJSONType() -> AnyObject {
         var jsonObject: [String:AnyObject] = [:]
         
         jsonObject["actionID"] = self.actionID

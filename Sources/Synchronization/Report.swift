@@ -86,7 +86,7 @@ class Report : NSObject, NSCoding {
     
     /// Clears the saved report from NSUserDefaults and resets triggers
     ///
-    func clean() {
+    func resetTriggers() {
         self.sizeToSync = 15
         self.timerStartsAt = 0
         self.timerExpiresIn = 172800000

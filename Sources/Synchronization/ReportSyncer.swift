@@ -64,6 +64,7 @@ class ReportSyncer : NSObject {
                 completion(200)
                 self.report.updateTriggers()
             } else {
+                DopamineKit.DebugLog("Sending \(dopeActions.count) reported actions...")
                 DopamineAPI.report(dopeActions, completion: { response in
                     defer { self.syncInProgress = false }
                     if response["status"] as? Int == 200 {
@@ -81,10 +82,10 @@ class ReportSyncer : NSObject {
         }
     }
     
-    /// Resets the sync triggers
+    /// Removes saved sync triggers from memory
     ///
-    func makeClean() {
-        report.clean()
+    func reset() {
+        report.resetTriggers()
     }
     
 }

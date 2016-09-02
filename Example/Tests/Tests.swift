@@ -15,8 +15,11 @@ class Tests: XCTestCase {
     }
     
     override func tearDown() {
-//        SyncCoordinator.sharedInstance.makeClean()        // clears the sync triggers
-//        SQLiteDataStore.sharedInstance.dropTables()       // clears the stored actions and reinforcement decisions
+        
+        dopamineKit.syncCoordinator.resetSyncers()        // removes the sync triggers from NSUserDefaults
+        dopamineKit.dataStore.dropTables()                // clears the stored actions and reinforcement decisions
+        dopamineKit.dataStore.createTables()              // recreates the stored actions and reinforcement decisions tables
+                                                            // if tables are dropped and not recreated, errors ensue when running all tests at once
 
         super.tearDown()
     }
@@ -26,10 +29,12 @@ class Tests: XCTestCase {
     //*-*  Test variables
     //*-*
     ////////////////////////////////////////
+    let dopamineKit = DopamineKit.sharedInstance
     
     let sleepTimeForTrack: UInt32 = 10
     let sleepTimeForReinforce: UInt32 = 10
     let standardExpectationTimeout: NSTimeInterval = 20
+    
     let metaData: [String:AnyObject] = ["string":"str", "boolsArray":[true, false], "numbersArray" : ["int":Int(1), "double":Double(2.2), "float":Float(3.3)] ]
     
     

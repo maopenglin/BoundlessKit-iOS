@@ -23,14 +23,14 @@ public class SQLiteDataStore : NSObject{
     
     let DDB: Connection?
     
-    /// Creates the SQLite database specific to DopamineKit
+    /// Creates a SQLite database and tables for DopamineKit
     ///
     private override init() {
         var path = "DopamineDB.sqlite"
         if let dirs: [NSString] = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.AllDomainsMask, true) as [NSString] {
             let dir = dirs[0]
             path = dir.stringByAppendingPathComponent(path);
-            DopamineKit.DebugLog("Sqlite db path:\(path)")
+            DopamineKit.DebugLog("DopamineKit SQLite db path:\(path)")
         }
         
         do {
@@ -41,6 +41,8 @@ public class SQLiteDataStore : NSObject{
         }
         
         super.init()
+        
+        createTables()
     }
     
     /// Creates all the tables needed for DopamineKit

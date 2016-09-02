@@ -86,7 +86,7 @@ class Cartridge : NSObject, NSCoding {
     
     /// Clears the saved cartridge from NSUserDefaults and resets triggers
     ///
-    func clean() {
+    func resetTriggers() {
         self.initialSize = 0
         self.timerStartsAt = 0
         self.timerExpiresIn = 0

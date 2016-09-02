@@ -65,6 +65,7 @@ class TrackSyncer : NSObject {
                 self.track.updateTriggers()
                 return
             } else {
+                DopamineKit.DebugLog("Sending \(dopeActions.count) tracked actions...")
                 DopamineAPI.track(dopeActions, completion: { response in
                     defer { self.syncInProgress = false }
                     if response["status"] as? Int == 200 {
@@ -81,10 +82,10 @@ class TrackSyncer : NSObject {
         }
     }
     
-    /// Resets the sync triggers
+    /// Removes saved sync triggers from memory
     ///
-    func makeClean() {
-        track.clean()
+    func reset() {
+        track.resetTriggers()
     }
     
 }

@@ -18,6 +18,8 @@ class CartridgeSyncer : NSObject {
     private let defaultsActionIDSetKey = "DopamineActionIDSet"
     private let defaults = NSUserDefaults.standardUserDefaults()
     
+    /// All the cartridges
+    ///
     private var cartridges:[String:Cartridge] = [:]
     
     private var syncInProgress = false
@@ -30,11 +32,23 @@ class CartridgeSyncer : NSObject {
         }
     }
     
+    /// Unloads a cartridge for an action
+    ///
+    /// - parameters:
+    ///     - action: An action to be reinforced.
+    ///
+    /// - returns:
+    ///     A reinforcement decision for the given action.
+    ///
     func unloadReinforcementDecisionForAction(action: DopeAction) -> String {
         let cartridge = getCartridgeForActionID(action.actionID)
         return cartridge.remove()
     }
     
+    /// Checks if any cartridge has been triggered to sync yet
+    ///
+    /// - returns: Whether a cartridge needs to sync.
+    ///
     func shouldSync() -> Bool {
         for (_, cartridge) in cartridges {
             if cartridge.isTriggered() {
@@ -45,6 +59,10 @@ class CartridgeSyncer : NSObject {
         return false
     }
     
+    /// Checks which cartridges have been triggered to sync
+    ///
+    /// - returns: An array of the actionIDs for cartridges that need to sync.
+    ///
     func whichShouldSync() -> [String] {
         var actionIDsToSync: [String] = []
         for (actionID, cartridge) in cartridges {
@@ -55,6 +73,11 @@ class CartridgeSyncer : NSObject {
         return actionIDsToSync
     }
     
+    /// Sends tracked actions over the DopamineAPI
+    ///
+    /// - parameters:
+    ///     - completion(Int): takes the http response status code as a parameter.
+    ///
     func sync(actionID: String, completion: (Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
             guard !self.syncInProgress else {
@@ -91,7 +114,15 @@ class CartridgeSyncer : NSObject {
     }
     
     
-    
+    /// Retrieves a cartidge for a given action, or creates a cartidge if one doesn't exist
+    ///
+    /// - parameters:
+    ///     - actionID: The action to retrieve a cartridge for. 
+    ///                 If a cartridge doesn't exist, one is created and saved.
+    ///
+    /// - returns:
+    ///     A cartridge for the given actionID.
+    ///
     private func getCartridgeForActionID(actionID: String) -> Cartridge {
         if let cartridge = cartridges[actionID] {
             return cartridge
@@ -104,9 +135,11 @@ class CartridgeSyncer : NSObject {
         }
     }
     
-    func makeClean() {
+    /// Removes all saved cartridge actionIDs and cartridge triggers from memory
+    ///
+    func reset() {
         for (_, cartridge) in cartridges {
-            cartridge.clean()
+            cartridge.resetTriggers()
         }
         cartridges.removeAll()
         defaults.removeObjectForKey(defaultsActionIDSetKey)

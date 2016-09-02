@@ -13,9 +13,10 @@ import SQLite
 @objc
 public class DopamineKit : NSObject {
     
-    static let sharedInstance: DopamineKit = DopamineKit()
+    public static let sharedInstance: DopamineKit = DopamineKit()
     
-    private let syncCoordinator = SyncCoordinator.sharedInstance
+    public let dataStore = SQLiteDataStore.sharedInstance
+    public let syncCoordinator = SyncCoordinator.sharedInstance
     
     /// This function sends an asynchronous tracking call for the specified actionID
     ///

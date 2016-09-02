@@ -12,7 +12,6 @@ import DopamineKit
 class ViewController: UIViewController {
     
     func action1Performed(){
-
         // Reinforce the action to make it sticky!!
         DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {
             reinforcement in
@@ -85,6 +84,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
+        let _ = DopamineKit.sharedInstance
     }
     
     func loadBasicUI(){
