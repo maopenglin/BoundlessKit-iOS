@@ -9,15 +9,14 @@
 import Foundation
 import SQLite
 
-
 typealias SQLReportedAction = (
     index: Int64,
     actionID: String,
     reinforcementDecision: String,
     metaData: [String:AnyObject]?,
-    utc: Int64
+    utc: Int64,
+    timezoneOffset: Int64
 )
-
 
 class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     
@@ -31,9 +30,14 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     static let reinforcementDecision = Expression<String>("reinforcementdecision")
     static let metaData = Expression<Blob?>("metadata")
     static let utc = Expression<Int64>("utc")
+    static let timezoneOffset = Expression<Int64>("timezoneoffset")
     
     static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.ReportedActionsQueue", nil)
     
+    /// Creates a SQLite table for reported actions
+    ///
+    /// Called in SQLiteDataStore.sharedInstance.createTables()
+    ///
     static func createTable() {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -49,6 +53,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                     t.column(reinforcementDecision)
                     t.column(metaData)
                     t.column(utc)
+                    t.column(timezoneOffset)
                     })
                 DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
             } catch {
@@ -57,6 +62,10 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
+    /// Drops the table for reported actions
+    ///
+    /// Called in SQLiteDataStore.sharedInstance.dropTables()
+    ///
     static func dropTable() {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -74,6 +83,14 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
+    /// Inserts a reported action into the SQLite table
+    ///
+    /// - parameters:
+    ///     - item: A sql row with meaningful values for all columns except index.
+    ///
+    /// - returns:
+    ///     The row the item was added into.
+    ///
     static func insert(item: T) -> Int64? {
         var rowId:Int64?
         dispatch_sync(tableQueue) {
@@ -87,7 +104,8 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                 actionID <- item.actionID,
                 reinforcementDecision <- item.reinforcementDecision,
                 metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue),
-                utc <- item.utc )
+                utc <- item.utc,
+                timezoneOffset <- item.timezoneOffset )
             do {
                 rowId = try DB.run(insert)
                 DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID) reinforcementDecision:\(item.reinforcementDecision)")
@@ -99,6 +117,11 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         return rowId
     }
     
+    /// Deletes a reported action from the SQLite table
+    ///
+    /// - parameters:
+    ///     - item: A sql row with the index to delete.
+    ///
     static func delete (item: T) {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -110,17 +133,20 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
             let id = item.index
             let query = table.filter(index == id)
             do {
-                let tmp = try DB.run(query.delete())
-                guard tmp == 1 else {
-                    throw SQLDataAccessError.Delete_Error
-                }
-                DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) successful")
+                let numDeleted = try DB.run(query.delete())
+                
+                DopamineKit.DebugLog("Deleted \(numDeleted) items from Table:\(TABLE_NAME) row:\(id) successful")
             } catch {
                 DopamineKit.DebugLog("Delete for Table:\(TABLE_NAME) row:\(id) failed")
             }
         }
     }
     
+    /// Finds a reported action by id from the SQLite table
+    ///
+    /// - parameters:
+    ///     - id: The index to find the reported action.
+    ///
     static func find(id: Int64) -> T? {
         var result:T?
         dispatch_sync(tableQueue) {
@@ -139,7 +165,8 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                         actionID: item[actionID],
                         reinforcementDecision: item[reinforcementDecision],
                         metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
-                        utc: item[utc] )
+                        utc: item[utc],
+                        timezoneOffset: item[timezoneOffset] )
                 }
             } catch {
                 DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with id:\(id)")
@@ -148,6 +175,10 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         return result
     }
     
+    /// Finds all reported actions from the SQLite table
+    ///
+    /// - returns: All rows from the reported actions table.
+    ///
     static func findAll() -> [T] {
         var results:[T] = []
         dispatch_sync(tableQueue) {
@@ -165,7 +196,8 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                         actionID: item[actionID],
                         reinforcementDecision: item[reinforcementDecision],
                         metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
-                        utc: item[utc] )
+                        utc: item[utc],
+                        timezoneOffset: item[timezoneOffset] )
                     )
                 }
             } catch {
@@ -175,6 +207,8 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         return results
     }
     
+    /// How many rows total are in the reported actions table
+    ///
     static func count() -> Int {
         var result = 0
         dispatch_sync(tableQueue) {

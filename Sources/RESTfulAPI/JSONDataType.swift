@@ -9,5 +9,7 @@
 import Foundation
 
 protocol JSONDataType {
+    
     func toJSONType() -> AnyObject
+    
 }

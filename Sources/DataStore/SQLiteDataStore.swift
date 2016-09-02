@@ -9,7 +9,6 @@
 import Foundation
 import SQLite
 
-
 enum SQLDataAccessError: ErrorType {
     case Datastore_Connection_Error
     case Insert_Error
@@ -20,15 +19,18 @@ enum SQLDataAccessError: ErrorType {
 
 public class SQLiteDataStore : NSObject{
     
+    static let sharedInstance: SQLiteDataStore = SQLiteDataStore()
+    
     let DDB: Connection?
     
-    public static let sharedInstance: SQLiteDataStore = SQLiteDataStore()
-    
+    /// Creates a SQLite database and tables for DopamineKit
+    ///
     private override init() {
         var path = "DopamineDB.sqlite"
         if let dirs: [NSString] = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.AllDomainsMask, true) as [NSString] {
             let dir = dirs[0]
             path = dir.stringByAppendingPathComponent(path);
+            DopamineKit.DebugLog("DopamineKit SQLite db path:\(path)")
         }
         
         do {
@@ -39,8 +41,12 @@ public class SQLiteDataStore : NSObject{
         }
         
         super.init()
+        
+        createTables()
     }
     
+    /// Creates all the tables needed for DopamineKit
+    ///
     func createTables(){
         guard let _ = DDB else {
             DopamineKit.DebugLog("No connection to SQLite")
@@ -49,8 +55,11 @@ public class SQLiteDataStore : NSObject{
         
         SQLTrackedActionDataHelper.createTable()
         SQLReportedActionDataHelper.createTable()
+        SQLCartridgeDataHelper.createTable()
     }
     
+    /// Drops all tables used in DopamineKit
+    ///
     func dropTables(){
         guard let _ = DDB else {
             DopamineKit.DebugLog("No connection to SQLite")
@@ -59,7 +68,14 @@ public class SQLiteDataStore : NSObject{
         
         SQLTrackedActionDataHelper.dropTable()
         SQLReportedActionDataHelper.dropTable()
-        SQLCartridgeDataHelper.dropTables()
+        SQLCartridgeDataHelper.dropTable()
+    }
+    
+    /// Drops and the Creates all tables
+    ///
+    public func clearTables() {
+        dropTables()
+        createTables()
     }
     
 }

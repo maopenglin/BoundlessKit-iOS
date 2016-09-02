@@ -8,34 +8,49 @@
 
 import Foundation
 
-
-
-public struct DopeAction {
+struct DopeAction {
     
-    public var actionID:String
-    public var reinforcementDecision:String?
-    public var metaData:[String: AnyObject]?
-    public var utc:Int64
+    var actionID:String
+    var reinforcementDecision:String?
+    var metaData:[String: AnyObject]?
+    var utc:Int64
+    var timezoneOffset:Int64
     
-    public init(actionID:String,
+    /// This function initializes a DopeAction
+    ///
+    /// - parameters:
+    ///     - actionID: The name for the action.
+    ///     - reinforcementDecision?: Reinforcement decision for the action if one has been made. Defaults to `nil`.
+    ///     - metaData?: JSON formattable action details. Defaults to `nil`.
+    ///     - utc: Time the action occured in utc milliseconds. Defaults to the current time.
+    ///     - timezoneOffset: Local timezone offset for the time the action occured in milliseconds. Defaults to the current device timezone.
+    ///
+    init(actionID:String,
                 reinforcementDecision:String? = nil,
                 metaData:[String:AnyObject]? = nil,
-                utc:Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ))
+                utc:Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ),
+                timezoneOffset:Int64 = Int64( 1000*NSTimeZone.defaultTimeZone().secondsFromGMT ))
     {
         self.actionID = actionID
         self.reinforcementDecision = reinforcementDecision
         self.metaData = metaData
         self.utc = utc
+        self.timezoneOffset = timezoneOffset
     }
     
-    public func toJSONType() -> AnyObject {
-        var dict: [String:AnyObject] = [:]
+    /// This function converts a DopeAction to a JSON compatible Object
+    ///
+    func toJSONType() -> AnyObject {
+        var jsonObject: [String:AnyObject] = [:]
         
-        dict["actionID"] = self.actionID
-        dict["metaData"] = self.metaData
-        dict["reinforcementDecision"] = self.reinforcementDecision
-        dict["time"] = [["timeType":"utc", "value": NSNumber( longLong:self.utc )]]
+        jsonObject["actionID"] = self.actionID
+        jsonObject["reinforcementDecision"] = self.reinforcementDecision
+        jsonObject["metaData"] = self.metaData
+        jsonObject["time"] = [
+            ["timeType":"utc", "value": NSNumber( longLong:self.utc )],
+            ["timeType":"deviceTimezoneOffset", "value": NSNumber( longLong:self.timezoneOffset )]
+        ]
         
-        return dict
+        return jsonObject
     }
 }

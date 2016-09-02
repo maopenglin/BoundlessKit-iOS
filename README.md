@@ -1,6 +1,6 @@
 # DopamineKit
 
-[![CI Status](http://img.shields.io/travis/DopamineLabs/DopamineKit-iOS.svg?style=flat) ](https://travis-ci.org/DopamineLabs/DopamineKit-iOS)
+<!--[![CI Status](http://img.shields.io/travis/DopamineLabs/DopamineKit-iOS.svg?style=flat) ](https://travis-ci.org/DopamineLabs/DopamineKit-iOS)-->
 [![Version](https://img.shields.io/cocoapods/v/DopamineKit.svg?style=flat)](http://cocoapods.org/pods/DopamineKit)
 [![License](https://img.shields.io/cocoapods/l/DopamineKit.svg?style=flat)](http://cocoapods.org/pods/DopamineKit)
 [![Platform](https://img.shields.io/cocoapods/p/DopamineKit.svg?style=flat)](http://cocoapods.org/pods/DopamineKit)
@@ -21,10 +21,15 @@ A simple "To Do List" iOS App is included in the [DopamineKit-iOS-HelloWorld rep
 
   1. First, make sure you have received your API key and other credentials, which are in the configuration file __DopamineProperties.plist__ automatically generated from the [Dopamine Developer Dashboard](http://dashboard.usedopamine.com). 
 
-  2. Import the DopamineKit framework by using [CocoaPods](https://cocoapods.org/) (the Pod name is `DopamineKit`), or by [directly downloading](
+  2. Drag __DopamineProperties.plist__ into your project group. Ensure that the .plist was added to app target > Build Phases > Copy Bundle Resources as shown in the image below.  
+
+  3. Import the DopamineKit framework by using [CocoaPods](https://cocoapods.org/) (the Pod name is `DopamineKit`), or by [directly downloading](
 https://github.com/DopamineLabs/DopamineKit-iOS-binary/) the framework.
 
-  3. Import the DopamineKit framework
+  ![Workspace snapshot](readme/TestApp with DopamineKit and DopamineProperties.png)
+    *Shown is a Swift project using the CocoaPods dependency manager*
+    
+  4. Import the DopamineKit framework
 
   ```swift
   // Swift
@@ -36,11 +41,6 @@ https://github.com/DopamineLabs/DopamineKit-iOS-binary/) the framework.
   #import <DopamineKit/DopamineKit-Swift.h>
   ```
   
-  4. Move __DopamineProperties.plist__ into your app directory 
-
-    ![Workspace snapshot](readme/TestApp with DopamineKit and DopamineProperties.png)
-    *Shown is a Swift project using the CocoaPods dependency manager*
-  
   5. Start using Dopamine! The main features of DopamineAPI are the `reinforce()` and `track()` functions. These should be added as a response to any of the _actions_ to be reinforced or tracked.
   
 
@@ -50,21 +50,22 @@ https://github.com/DopamineLabs/DopamineKit-iOS-binary/) the framework.
 
   ```swift
   // Swift
-  DopamineKit.reinforce("some_action", completion: {reinforcement in
-		// Multiple reinforcements can help increase the surprise factor!
+  DopamineKit.reinforce("some_action", completion: {
+  reinforcement in
+		
 		switch(reinforcement){
-			// DopamineKit provides a standard reinforcement UIView but
-			// you can also use any UI components you made like
-			// self.showInspirationalQuote() or self.showFunnyMeme()
+			// Use any rewarding UI components you made like, 
+			// self.showInspirationalQuote() or self.showFunnyMeme().
+			// For now, we'll try out Dopamine's CandyBar for a simple reward.
 
 		case "thumbsUp" :
-			CandyBar.init(title: "Great job!", icon: Candy.ThumbsUp).show(duration: 1.2)
+			CandyBar(title: "Great job!", icon: Candy.ThumbsUp).show(duration: 1.2)
                                 
 		case "stars" :
-			CandyBar.init(title: "Great job!", icon: Candy.Stars).show(duration: 1.2)
+			CandyBar(title: "Great job!", icon: Candy.Stars).show(duration: 1.2)
                                 
 		case "medalStar" :
-			CandyBar.init(title: "Great job!", icon: Candy.MedalStar).show(duration: 1.2)
+			CandyBar(title: "Great job!", icon: Candy.MedalStar).show(duration: 1.2)
                             
 		default:
 			// Show nothing! This is called a neutral response, 
