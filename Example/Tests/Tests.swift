@@ -16,10 +16,8 @@ class Tests: XCTestCase {
     
     override func tearDown() {
         
-        dopamineKit.syncCoordinator.resetSyncers()        // removes the sync triggers from NSUserDefaults
-        dopamineKit.dataStore.dropTables()                // clears the stored actions and reinforcement decisions
-        dopamineKit.dataStore.createTables()              // recreates the stored actions and reinforcement decisions tables
-                                                            // if tables are dropped and not recreated, errors ensue when running all tests at once
+        dopamineKit.syncCoordinator.resetSyncers()          // removes the sync triggers from NSUserDefaults
+        dopamineKit.dataStore.clearTables()                 // clears the stored actions and reinforcement decisions from SQLite
 
         super.tearDown()
     }

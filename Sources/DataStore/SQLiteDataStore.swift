@@ -19,7 +19,7 @@ enum SQLDataAccessError: ErrorType {
 
 public class SQLiteDataStore : NSObject{
     
-    public static let sharedInstance: SQLiteDataStore = SQLiteDataStore()
+    static let sharedInstance: SQLiteDataStore = SQLiteDataStore()
     
     let DDB: Connection?
     
@@ -47,7 +47,7 @@ public class SQLiteDataStore : NSObject{
     
     /// Creates all the tables needed for DopamineKit
     ///
-    public func createTables(){
+    func createTables(){
         guard let _ = DDB else {
             DopamineKit.DebugLog("No connection to SQLite")
             return
@@ -60,7 +60,7 @@ public class SQLiteDataStore : NSObject{
     
     /// Drops all tables used in DopamineKit
     ///
-    public func dropTables(){
+    func dropTables(){
         guard let _ = DDB else {
             DopamineKit.DebugLog("No connection to SQLite")
             return
@@ -69,6 +69,13 @@ public class SQLiteDataStore : NSObject{
         SQLTrackedActionDataHelper.dropTable()
         SQLReportedActionDataHelper.dropTable()
         SQLCartridgeDataHelper.dropTable()
+    }
+    
+    /// Drops and the Creates all tables
+    ///
+    public func clearTables() {
+        dropTables()
+        createTables()
     }
     
 }

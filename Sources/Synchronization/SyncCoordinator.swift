@@ -18,12 +18,11 @@ public class SyncCoordinator {
     
     private var syncInProgress = false
     
-//    /// Creates SQLite tables and performs a sync
-//    ///
-//    private init() {
-//        dataStore.createTables()
-//        performSync()
-//    }
+    /// Creates SQLite tables and performs a sync
+    ///
+    private init() {
+        performSync()
+    }
     
     /// Stores a tracked action to be synced
     ///
