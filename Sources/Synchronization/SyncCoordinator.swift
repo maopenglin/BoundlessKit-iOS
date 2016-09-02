@@ -75,7 +75,6 @@ public class SyncCoordinator {
             var goodProgress = true
             
             if trackerShouldSync {
-//                DopamineKit.DebugLog("Sending \(SQLTrackedActionDataHelper.count()) tracked actions...")
                 self.trackSyncer.sync() {
                     status in
                     guard status == 200 else {
@@ -90,7 +89,6 @@ public class SyncCoordinator {
             if !goodProgress { return }
             
             if reportShouldSync {
-//                DopamineKit.DebugLog("Sending \(SQLReportedActionDataHelper.count()) reported actions...")
                 self.reportSyncer.sync() {
                     status in
                     guard status == 200 else {
