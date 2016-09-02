@@ -17,7 +17,7 @@ typealias SQLTrackedAction = (
     timezoneOffset: Int64
 )
 
-public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
+class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     
     typealias T = SQLTrackedAction
     
@@ -32,6 +32,10 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     
     static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.TrackedActionsQueue", nil)
     
+    /// Creates a SQLite table for tracked actions
+    ///
+    /// Called in SQLiteDataStore.sharedInstance.createTables()
+    ///
     static func createTable() {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -54,7 +58,11 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
-    public static func dropTable() {
+    /// Drops the table for tracked actions
+    ///
+    /// Called in SQLiteDataStore.sharedInstance.dropTables()
+    ///
+    static func dropTable() {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
             {
@@ -70,6 +78,14 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
+    /// Inserts a tracked action into the SQLite table
+    ///
+    /// - parameters:
+    ///     - item: A sql row with meaningful values for all columns except index.
+    ///
+    /// - returns:
+    ///     The row the item was added into.
+    ///
     static func insert(item: T) -> Int64? {
         var rowId:Int64?
         dispatch_sync(tableQueue) {
@@ -98,6 +114,11 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
         return rowId
     }
     
+    /// Deletes a tracked action from the SQLite table
+    ///
+    /// - parameters:
+    ///     - item: A sql row with the index to delete.
+    ///
     static func delete (item: T) {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -118,6 +139,11 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
+    /// Finds a tracked action by id from the SQLite table
+    ///
+    /// - parameters:
+    ///     - id: The index to find the tracked action.
+    ///
     static func find(id: Int64) -> T? {
         var result:SQLTrackedAction?
         dispatch_sync(tableQueue) {
@@ -145,6 +171,10 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
         return result
     }
     
+    /// Finds all tracked actions from the SQLite table
+    ///
+    /// - returns: All rows from the tracked actions table.
+    ///
     static func findAll() -> [T] {
         var results:[T] = []
         dispatch_sync(tableQueue) {
@@ -172,6 +202,8 @@ public class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
         return results
     }
     
+    /// How many rows total are in the tracked actions table
+    ///
     static func count() -> Int {
         var result = 0
         dispatch_sync(tableQueue) {

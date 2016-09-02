@@ -34,6 +34,10 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     
     static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.ReportedActionsQueue", nil)
     
+    /// Creates a SQLite table for reported actions
+    ///
+    /// Called in SQLiteDataStore.sharedInstance.createTables()
+    ///
     static func createTable() {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -58,6 +62,10 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
+    /// Drops the table for reported actions
+    ///
+    /// Called in SQLiteDataStore.sharedInstance.dropTables()
+    ///
     static func dropTable() {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -75,6 +83,14 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
+    /// Inserts a reported action into the SQLite table
+    ///
+    /// - parameters:
+    ///     - item: A sql row with meaningful values for all columns except index.
+    ///
+    /// - returns:
+    ///     The row the item was added into.
+    ///
     static func insert(item: T) -> Int64? {
         var rowId:Int64?
         dispatch_sync(tableQueue) {
@@ -101,6 +117,11 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         return rowId
     }
     
+    /// Deletes a reported action from the SQLite table
+    ///
+    /// - parameters:
+    ///     - item: A sql row with the index to delete.
+    ///
     static func delete (item: T) {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -121,6 +142,11 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
+    /// Finds a reported action by id from the SQLite table
+    ///
+    /// - parameters:
+    ///     - id: The index to find the reported action.
+    ///
     static func find(id: Int64) -> T? {
         var result:T?
         dispatch_sync(tableQueue) {
@@ -149,6 +175,10 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         return result
     }
     
+    /// Finds all reported actions from the SQLite table
+    ///
+    /// - returns: All rows from the reported actions table.
+    ///
     static func findAll() -> [T] {
         var results:[T] = []
         dispatch_sync(tableQueue) {
@@ -177,6 +207,8 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         return results
     }
     
+    /// How many rows total are in the reported actions table
+    ///
     static func count() -> Int {
         var result = 0
         dispatch_sync(tableQueue) {

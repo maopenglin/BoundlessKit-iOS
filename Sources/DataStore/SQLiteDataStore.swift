@@ -23,6 +23,8 @@ public class SQLiteDataStore : NSObject{
     
     let DDB: Connection?
     
+    /// Creates the SQLite database specific to DopamineKit
+    ///
     private override init() {
         var path = "DopamineDB.sqlite"
         if let dirs: [NSString] = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.AllDomainsMask, true) as [NSString] {
@@ -41,7 +43,9 @@ public class SQLiteDataStore : NSObject{
         super.init()
     }
     
-    func createTables(){
+    /// Creates all the tables needed for DopamineKit
+    ///
+    public func createTables(){
         guard let _ = DDB else {
             DopamineKit.DebugLog("No connection to SQLite")
             return
@@ -52,6 +56,8 @@ public class SQLiteDataStore : NSObject{
         SQLCartridgeDataHelper.createTable()
     }
     
+    /// Drops all tables used in DopamineKit
+    ///
     public func dropTables(){
         guard let _ = DDB else {
             DopamineKit.DebugLog("No connection to SQLite")

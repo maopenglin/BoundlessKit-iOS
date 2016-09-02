@@ -22,67 +22,6 @@ public class DopamineAPI : NSObject{
         super.init()
     }
     
-    static func track(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
-        // create dict with credentials
-        var payload = sharedInstance.configurationData
-        
-        // add tracked events to payload
-        var trackedActionsJSONArray = Array<AnyObject>()
-        for action in actions{
-            trackedActionsJSONArray.append(action.toJSONType())
-        }
-        payload["actions"] = trackedActionsJSONArray
-        
-        payload["utc"] = 1000*NSDate().timeIntervalSince1970
-        payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
-        
-        sharedInstance.send(.Track, payload: payload, completion: {response in
-            completion(response)
-        })
-        
-    }
-
-    static func report(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
-        var payload = sharedInstance.configurationData
-        
-        var reinforcedActionsArray = Array<AnyObject>()
-        for action in actions{
-            reinforcedActionsArray.append(action.toJSONType())
-        }
-        payload["actions"] = reinforcedActionsArray
-        
-        payload["utc"] = 1000*NSDate().timeIntervalSince1970
-        payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
-        
-        sharedInstance.send(.Report, payload: payload, completion: {response in
-            completion(response)
-        })
-    }
-    
-    
-    static func refresh(actionID: String, completion: ([String:AnyObject]) -> ()){
-        var payload = sharedInstance.configurationData
-        
-        payload["actionID"] = actionID
-        
-        payload["utc"] = 1000*NSDate().timeIntervalSince1970
-        payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
-        
-        DopamineKit.DebugLog("Refreshing \(actionID)...")
-        sharedInstance.send(.Refresh, payload: payload, completion:  { response in
-            completion(response)
-        })
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    lazy var session = NSURLSession.sharedSession()
     private enum CallType{
         case Track, Report, Refresh
         var str:String{ switch self{
@@ -93,16 +32,84 @@ public class DopamineAPI : NSObject{
         }
     }
     
+    /// Send an array of actions to the DopamineAPI's `/track` path
+    ///
+    /// - parameters:
+    ///     - actions: An array of actions to send.
+    ///     - completion: A closure to handle the JSON formatted response.
+    ///
+    static func track(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
+        // create dict with credentials
+        var payload = sharedInstance.configurationData
+        
+        // get JSON formatted actions
+        var trackedActionsJSONArray = Array<AnyObject>()
+        for action in actions{
+            trackedActionsJSONArray.append(action.toJSONType())
+        }
+        
+        payload["actions"] = trackedActionsJSONArray
+        payload["utc"] = 1000*NSDate().timeIntervalSince1970
+        payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
+        
+        sharedInstance.send(.Track, payload: payload, completion: {response in
+            completion(response)
+        })
+    }
+
+    /// Send an array of actions to the DopamineAPI's `/report` path
+    ///
+    /// - parameters:
+    ///     - actions: An array of actions to send.
+    ///     - completion: A closure to handle the JSON formatted response.
+    ///
+    static func report(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
+        var payload = sharedInstance.configurationData
+        
+        var reinforcedActionsArray = Array<AnyObject>()
+        for action in actions{
+            reinforcedActionsArray.append(action.toJSONType())
+        }
+        
+        payload["actions"] = reinforcedActionsArray
+        payload["utc"] = 1000*NSDate().timeIntervalSince1970
+        payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
+        
+        sharedInstance.send(.Report, payload: payload, completion: {response in
+            completion(response)
+        })
+    }
+    
+    /// Send an actionID to the DopamineAPI's `/refresh` path to generate a new cartridge of reinforcement decisions
+    ///
+    /// - parameters:
+    ///     - actionID: The actionID that needs reinforcement decisions.
+    ///     - completion: A closure to handle the JSON formatted response.
+    ///
+    static func refresh(actionID: String, completion: ([String:AnyObject]) -> ()){
+        var payload = sharedInstance.configurationData
+        
+        payload["actionID"] = actionID
+        payload["utc"] = 1000*NSDate().timeIntervalSince1970
+        payload["timezoneOffset"] = 1000*NSTimeZone.defaultTimeZone().secondsFromGMT
+        
+        DopamineKit.DebugLog("Refreshing \(actionID)...")
+        sharedInstance.send(.Refresh, payload: payload, completion:  { response in
+            completion(response)
+        })
+    }
+    
+    private lazy var session = NSURLSession.sharedSession()
+    
     /// This function sends a request to the DopamineAPI
     ///
     /// - parameters:
-    ///     - callType: "track" or "reinforce".
-    ///     - actionID: Descriptive name of the action.
-    ///     - metaData?: Event info as a set of key-value pairs that can be sent with a tracking call. The value should JSON formattable like an NSNumber or NSString. Defaults to `nil`.
-    ///     - secondaryIdentity?: An additional idetification string. Defaults to `nil`.
-    ///     - completion: A closure with the reinforcement response passed in as a `String`.
+    ///     - callType: The type of call to send.
+    ///     - payload: A JSON compatible dictionary to send.
+    ///     - timeout: A timeout, in seconds, for the request. Defaults to 3 seconds.
+    ///     - completion: A closure with a JSON formatted dictionary.
+    ///
     private func send(type: CallType, payload: [String:AnyObject], timeout:NSTimeInterval = 3, completion: [String: AnyObject] -> Void) {
-        
         let baseURL = NSURL(string: DopamineAPI.dopamineAPIURL)!
         guard let url = NSURL(string: type.str, relativeToURL: baseURL) else {
             DopamineKit.DebugLog("Could not construct url:() with path ()")
@@ -150,9 +157,15 @@ public class DopamineAPI : NSObject{
         }
     }
     
+    /// A modifiable credentials path used for running tests
+    ///
     public static var testCredentialPath:String?
-    // compile the static elements of the request call
-    lazy var configurationData: [String: AnyObject] = {
+    
+    /// Computes the basic fields for a request call
+    ///
+    /// Add this to your payload before calling `send()`
+    ///
+    private lazy var configurationData: [String: AnyObject] = {
         
         var dict: [String: AnyObject] = [ "clientOS": "iOS",
                                           "clientOSVersion": clientOSVersion,
@@ -213,8 +226,11 @@ public class DopamineAPI : NSObject{
         return dict
     }()
     
-    // get the primary identity as a lazy computed variable
-    lazy var primaryIdentity:String = {
+    /// Computes a primary identity for the user
+    ///
+    /// This variable computes an identity for the user and saves it to NSUserDefaults for future use.
+    ///
+    private lazy var primaryIdentity:String = {
         let key = "DopaminePrimaryIdentity"
         let defaults = NSUserDefaults.standardUserDefaults()
         if let identity = defaults.valueForKey(key) as? String {

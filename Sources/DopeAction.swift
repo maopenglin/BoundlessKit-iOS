@@ -16,6 +16,15 @@ public struct DopeAction {
     public var utc:Int64
     public var timezoneOffset:Int64
     
+    /// This function initializes a DopeAction
+    ///
+    /// - parameters:
+    ///     - actionID: The name for the action.
+    ///     - reinforcementDecision?: Reinforcement decision for the action if one has been made. Defaults to `nil`.
+    ///     - metaData?: JSON formattable action details. Defaults to `nil`.
+    ///     - utc: Time the action occured in utc milliseconds. Defaults to the current time.
+    ///     - timezoneOffset: Local timezone offset for the time the action occured in milliseconds. Defaults to the current device timezone.
+    ///
     public init(actionID:String,
                 reinforcementDecision:String? = nil,
                 metaData:[String:AnyObject]? = nil,
@@ -29,6 +38,8 @@ public struct DopeAction {
         self.timezoneOffset = timezoneOffset
     }
     
+    /// This function converts a DopeAction to a JSON compatible Object
+    ///
     public func toJSONType() -> AnyObject {
         var jsonObject: [String:AnyObject] = [:]
         

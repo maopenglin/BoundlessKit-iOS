@@ -13,20 +13,40 @@ class ReportSyncer : NSObject {
     
     static let sharedInstance: ReportSyncer = ReportSyncer()
     
-    private let report = Report()
+    private let report = Report.sharedInstance
     
     private var syncInProgress = false
     
     private override init() { }
     
+    /// Stores an action to be synced
+    ///
     func store(action: DopeAction) {
         report.add(action)
     }
     
+    /// Modifies the number of reported actions to trigger a sync
+    ///
+    /// - parameters:
+    ///     - size: The number of reported actions to trigger a sync.
+    ///
+    func setSizeToSync(size: Int?) {
+        report.updateTriggers(size, timerStartsAt: nil, timerExpiresIn: nil)
+    }
+    
+    /// Check if a sync has been triggered
+    ///
+    /// - returns: Whether the report needs to sync.
+    ///
     func shouldSync() -> Bool {
         return report.isTriggered()
     }
     
+    /// Sends reinforced actions over the DopamineAPI
+    ///
+    /// - parameters:
+    ///     - completion(Int): takes the http response status code as a parameter.
+    ///
     func sync(completion: (Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
             guard !self.syncInProgress else {
@@ -59,6 +79,12 @@ class ReportSyncer : NSObject {
             }
             
         }
+    }
+    
+    /// Resets the sync triggers
+    ///
+    func makeClean() {
+        report.clean()
     }
     
 }

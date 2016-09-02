@@ -20,7 +20,7 @@ public class DopamineKit : NSObject {
     /// This function sends an asynchronous tracking call for the specified actionID
     ///
     /// - parameters:
-    ///     - actionID: Descriptive name of the action.
+    ///     - actionID: Descriptive name for the action.
     ///     - metaData?: Action details i.e. calories or streak_count. 
     ///                  Must be JSON formattable (Number, String, Bool, Array, Object).
     ///                  Defaults to `nil`.
@@ -34,11 +34,11 @@ public class DopamineKit : NSObject {
     /// This function sends an asynchronous reinforcement call for the specified actionID
     ///
     /// - parameters:
-    ///     - actionID: Descriptive name of the action.
+    ///     - actionID: Action name configured on the Dopamine Dashboard
     ///     - metaData?: Action details i.e. calories or streak_count.
     ///                  Must be JSON formattable (Number, String, Bool, Array, Object).
     ///                  Defaults to `nil`.
-    ///     - completion: A closure with the reinforcement response passed in as a `String`.
+    ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
     public static func reinforce(actionID: String, metaData: [String: AnyObject]? = nil, completion: (String) -> ()) {
         var action = DopeAction(actionID: actionID, metaData: metaData)

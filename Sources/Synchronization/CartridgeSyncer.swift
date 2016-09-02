@@ -13,24 +13,12 @@ class CartridgeSyncer : NSObject {
     
     static let sharedInstance: CartridgeSyncer = CartridgeSyncer()
     
-    private let defaults = NSUserDefaults.standardUserDefaults()
+    /// Used to store actionIDs so cartridges can be loaded on init()
+    ///
     private let defaultsActionIDSetKey = "DopamineActionIDSet"
+    private let defaults = NSUserDefaults.standardUserDefaults()
     
     private var cartridges:[String:Cartridge] = [:]
-//    private var actionIDSet:Set<String> {
-//        get {
-//            if let savedActionIDSetData = defaults.objectForKey(defaultsActionIDSetKey) as? NSData,
-//                let savedActionIDSet = NSKeyedUnarchiver.unarchiveObjectWithData(savedActionIDSetData) as? Set<String> {
-//                return savedActionIDSet
-//            } else {
-//                return []
-//            }
-//        }
-//        set(newActionIDSet) {
-//            DopamineKit.DebugLog("Inside actionIDSet set()")
-//            defaults.setObject(newActionIDSet, forKey: defaultsActionIDSetKey)
-//        }
-//    }
     
     private var syncInProgress = false
     
@@ -47,14 +35,24 @@ class CartridgeSyncer : NSObject {
         return cartridge.remove()
     }
     
-    func whichShouldSync() -> [String] {
-        var cartridgesToSync:[String] = []
-        for (actionID, cartridge) in cartridges {
+    func shouldSync() -> Bool {
+        for (_, cartridge) in cartridges {
             if cartridge.isTriggered() {
-                cartridgesToSync.append(actionID)
+                return true
             }
         }
-        return cartridgesToSync
+        DopamineKit.DebugLog("No cartridges to sync.")
+        return false
+    }
+    
+    func whichShouldSync() -> [String] {
+        var actionIDsToSync: [String] = []
+        for (actionID, cartridge) in cartridges {
+            if cartridge.isTriggered() {
+                actionIDsToSync.append(actionID)
+            }
+        }
+        return actionIDsToSync
     }
     
     func sync(actionID: String, completion: (Int) -> () = { _ in }) {
@@ -105,6 +103,15 @@ class CartridgeSyncer : NSObject {
             return cartridge
         }
     }
+    
+    func makeClean() {
+        for (_, cartridge) in cartridges {
+            cartridge.clean()
+        }
+        cartridges.removeAll()
+        defaults.removeObjectForKey(defaultsActionIDSetKey)
+    }
+    
     
 }
 

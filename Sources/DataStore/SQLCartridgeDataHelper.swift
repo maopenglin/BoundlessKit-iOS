@@ -28,6 +28,10 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
     
     private static let tableQueue:dispatch_queue_t = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.ReinforcementDecisionsQueue", nil)
     
+    /// Creates a SQLite table for reinforcement decisions
+    ///
+    /// Called in SQLiteDataStore.sharedInstance.createTables()
+    ///
     static func createTable() {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -50,6 +54,10 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         }
     }
     
+    /// Drops the table for reinforcement decisions
+    ///
+    /// Called in SQLiteDataStore.sharedInstance.dropTables()
+    ///
     static func dropTable() {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -67,6 +75,14 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         }
     }
     
+    /// Inserts a reinforcement decisions into the SQLite table
+    ///
+    /// - parameters:
+    ///     - item: A sql row with meaningful values for all columns except index.
+    ///
+    /// - returns:
+    ///     The row the item was added into.
+    ///
     static func insert(item: T) -> Int64? {
         var rowId:Int64?
         dispatch_sync(tableQueue) {
@@ -91,6 +107,11 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         return rowId
     }
     
+    /// Deletes a reinforcement decision from the SQLite table
+    ///
+    /// - parameters:
+    ///     - item: A sql row with the index to delete.
+    ///
     static func delete (item: T) {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -111,6 +132,11 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         }
     }
     
+    /// Deletes all reinforcement decisions from the SQLite table for a specific actionID
+    ///
+    /// - parameters:
+    ///     - action: The actionID to filter for and delete from the table.
+    ///
     static func deleteAllFor (action: String) {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
@@ -130,6 +156,10 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         }
     }
     
+    /// Finds all reinforcement decisions from the SQLite table
+    ///
+    /// - returns: All rows from the reinforcement decisions table.
+    ///
     static func findAll() -> [T] {
         var results:[T] = []
         dispatch_sync(tableQueue) {
@@ -155,6 +185,13 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         return results
     }
     
+    /// Used to unload a reinforcement decision from a cartridge
+    ///
+    /// - parameters:
+    ///     - action: The actionID to find the first reinforcement decision for.
+    ///
+    /// - returns: The first row for the given actionID
+    ///
     static func findFirstFor(action: String) -> T? {
         var result:T?
         dispatch_sync(tableQueue) {
@@ -181,6 +218,8 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         return result
     }
     
+    /// How many rows total are in the reinforcement decisions table
+    ///
     static func count() -> Int {
         var result = 0
         dispatch_sync(tableQueue) {
@@ -195,6 +234,11 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
         return result
     }
     
+    /// How many rows are in the reinforcement decisions table for a specific actionID
+    ///
+    /// - parameters:
+    ///     - action: The actionID to filter the table
+    ///
     static func countFor(action: String) -> Int {
         var result = 0
         dispatch_sync(tableQueue) {
