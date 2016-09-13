@@ -23,6 +23,8 @@ class Track : NSObject, NSCoding {
     private var timerStartsAt: Int64
     private var timerExpiresIn: Int64
     
+    private var syncInProgress = false
+    
     /// Loads the track from NSUserDefaults or creates a new one and saves it to NSUserDefaults
     ///
     /// - parameters:
@@ -84,9 +86,9 @@ class Track : NSObject, NSCoding {
         defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(self), forKey: defaultsKey)
     }
     
-    /// Clears the saved track from NSUserDefaults and resets triggers
+    /// Clears the saved track sync triggers from NSUserDefaults
     ///
-    func resetTriggers() {
+    func removeTriggers() {
         self.sizeToSync = 15
         self.timerStartsAt = 0
         self.timerExpiresIn = 172800000
@@ -108,7 +110,7 @@ class Track : NSObject, NSCoding {
     private func timerDidExpire() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartsAt + timerExpiresIn)
-        DopamineKit.DebugLog("Track timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so \(isExpired ? "does" : "doesn't") need to sync...")
+        DopamineKit.DebugLog("Track timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
         return isExpired
     }
     
@@ -119,7 +121,7 @@ class Track : NSObject, NSCoding {
     private func isSizeToSync() -> Bool {
         let count = SQLTrackedActionDataHelper.count()
         let isSize = count >= sizeToSync
-        DopamineKit.DebugLog("Track has \(count)/\(sizeToSync) actions so \(isSize ? "does" : "doesn't") need to sync...")
+        DopamineKit.DebugLog("Track has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isSize
     }
     
@@ -129,52 +131,62 @@ class Track : NSObject, NSCoding {
     ///     - action: The action to be stored.
     ///
     func add(action: DopeAction) {
-        guard let _ = SQLTrackedActionDataHelper.insert(
-            SQLTrackedAction(
-                index: 0,
-                actionID: action.actionID,
-                metaData: action.metaData,
-                utc: action.utc,
-                timezoneOffset: action.timezoneOffset )
-            )
+        let actionRecord = SQLTrackedAction(
+            index: 0,
+            actionID: action.actionID,
+            metaData: action.metaData,
+            utc: action.utc,
+            timezoneOffset: action.timezoneOffset
+        )
+        guard let _ = SQLTrackedActionDataHelper.insert(actionRecord)
             else{
                 // if it couldnt be saved, send it
                 DopamineKit.DebugLog("SQLiteDataStore error, sending single action track")
-                DopamineAPI.track([action], completion: { response in
+                DopamineAPI.track([actionRecord], completion: { response in
                     
                 })
                 return
         }
     }
     
-    /// Removes a tracked action, to be used after an action has been synced over the DopamineAPI
+    /// Sends tracked actions over the DopamineAPI
     ///
     /// - parameters:
-    ///     - action: The sql row to delete.
+    ///     - completion(Int): takes the http response status code as a parameter.
     ///
-    func remove(action: SQLTrackedAction) {
-        SQLTrackedActionDataHelper.delete(action)
-    }
-    
-    /// Retrieve all tracked actions
-    ///
-    /// - returns: (sqlRows, dopeActions)
-    ///     - sqlRows: The sql rows for tracked actions. Pass into `remove()` after successful sync.
-    ///     - dopeActions: The tracked actions to be synced over DopamineAPI.
-    ///
-    func getActions() -> (Array<SQLTrackedAction>, Array<DopeAction>) {
-        var trackedActions = Array<DopeAction>()
-        let sqlActions = SQLTrackedActionDataHelper.findAll()
-        for action in sqlActions {
-            trackedActions.append(
-                DopeAction(
-                    actionID: action.actionID,
-                    metaData: action.metaData,
-                    utc: action.utc,
-                    timezoneOffset: action.timezoneOffset )
-            )
+    func sync(completion: (Int) -> () = { _ in }) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
+            guard !self.syncInProgress else {
+                DopamineKit.DebugLog("Track sync already happening")
+                completion(200)
+                return
+            }
+            self.syncInProgress = true
+            
+            let sqlActions = SQLTrackedActionDataHelper.findAll()
+            
+            if sqlActions.count == 0 {
+                defer { self.syncInProgress = false }
+                DopamineKit.DebugLog("No tracked actions to sync.")
+                completion(200)
+                self.updateTriggers()
+                return
+            } else {
+                DopamineKit.DebugLog("Sending \(sqlActions.count) tracked actions...")
+                DopamineAPI.track(sqlActions) { response in
+                    defer { self.syncInProgress = false }
+                    if response["status"] as? Int == 200 {
+                        defer { completion(200) }
+                        for action in sqlActions {
+                            SQLTrackedActionDataHelper.delete(action)
+                        }
+                        self.updateTriggers()
+                    } else {
+                        completion(404)
+                    }
+                }
+            }
         }
-        return (sqlActions, trackedActions)
     }
     
 }

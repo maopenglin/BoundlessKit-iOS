@@ -205,11 +205,11 @@ class SQLCartridgeDataHelper : SQLDataHelperProtocol {
             do {
                 let items = try DB.prepare(query)
                 for item in  items {
-                    let row = SQLCartridge(
+                    result = SQLCartridge(
                         index: item[index],
                         actionID: item[actionID],
                         reinforcementDecision: item[reinforcementDecision] )
-                    result = row
+                     break
                 }
             } catch {
                 DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with actionID:\(action)")

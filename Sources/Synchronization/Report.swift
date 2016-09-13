@@ -23,6 +23,8 @@ class Report : NSObject, NSCoding {
     private var timerStartsAt: Int64
     private var timerExpiresIn: Int64
     
+    private var syncInProgress = false
+    
     /// Loads the report from NSUserDefaults or creates a new one and saves it to NSUserDefaults
     ///
     /// - parameters:
@@ -84,9 +86,9 @@ class Report : NSObject, NSCoding {
         defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(self), forKey: defaultsKey)
     }
     
-    /// Clears the saved report from NSUserDefaults and resets triggers
+    /// Clears the saved report sync triggers from NSUserDefaults
     ///
-    func resetTriggers() {
+    func removeTriggers() {
         self.sizeToSync = 15
         self.timerStartsAt = 0
         self.timerExpiresIn = 172800000
@@ -108,7 +110,7 @@ class Report : NSObject, NSCoding {
     private func timerDidExpire() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartsAt + timerExpiresIn)
-        DopamineKit.DebugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so \(isExpired ? "does" : "doesn't") need to sync...")
+        DopamineKit.DebugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
         return isExpired
     }
     
@@ -119,7 +121,7 @@ class Report : NSObject, NSCoding {
     private func isSizeToSync() -> Bool {
         let count = SQLReportedActionDataHelper.count()
         let isSize = count >= sizeToSync
-        DopamineKit.DebugLog("Report has \(count)/\(sizeToSync) actions so \(isSize ? "does" : "doesn't") need to sync...")
+        DopamineKit.DebugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isSize
     }
     
@@ -129,54 +131,63 @@ class Report : NSObject, NSCoding {
     ///     - action: The action to be stored.
     ///
     func add(action: DopeAction) {
-        guard let _ = SQLReportedActionDataHelper.insert(
-            SQLReportedAction(
-                index:0,
-                actionID: action.actionID,
-                reinforcementDecision: action.reinforcementDecision!,
-                metaData: action.metaData,
-                utc: action.utc,
-                timezoneOffset: action.timezoneOffset )
-            )
+        let recordedAction = SQLReportedAction(
+            index:0,
+            actionID: action.actionID,
+            reinforcementDecision: action.reinforcementDecision!,
+            metaData: action.metaData,
+            utc: action.utc,
+            timezoneOffset: action.timezoneOffset
+        )
+        guard let _ = SQLReportedActionDataHelper.insert(recordedAction)
             else{
                 // if it couldnt be saved, send it
                 DopamineKit.DebugLog("SQLiteDataStore error, sending single action report")
-                DopamineAPI.report([action], completion: {
-                    response in
+                DopamineAPI.report([recordedAction], completion: { response in
+                    
                 })
                 return
         }
     }
     
-    /// Removes a reported action, to be used after an action has been synced over the DopamineAPI
+    /// Sends reinforced actions over the DopamineAPI
     ///
     /// - parameters:
-    ///     - action: The sql row to delete.
+    ///     - completion(Int): takes the http response status code as a parameter.
     ///
-    func remove(action: SQLReportedAction) {
-        SQLReportedActionDataHelper.delete(action);
-    }
-    
-    /// Retrieve all reported actions
-    ///
-    /// - returns: (sqlRows, dopeActions)
-    ///     - sqlRows: The sql rows for reported actions. Pass into `remove()` after successful sync.
-    ///     - dopeActions: The reported actions to be synced over DopamineAPI.
-    ///
-    func getActions() -> (Array<SQLReportedAction>, Array<DopeAction>) {
-        var reportedActions = Array<DopeAction>()
-        let sqlActions = SQLReportedActionDataHelper.findAll()
-        for action in sqlActions {
-            reportedActions.append(
-                DopeAction(
-                    actionID: action.actionID,
-                    reinforcementDecision: action.reinforcementDecision,
-                    metaData: action.metaData,
-                    utc: action.utc,
-                    timezoneOffset: action.timezoneOffset )
-            )
+    func sync(completion: (Int) -> () = { _ in }) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
+            guard !self.syncInProgress else {
+                DopamineKit.DebugLog("Report sync already happening")
+                completion(200)
+                return
+            }
+            self.syncInProgress = true
+            
+            let sqlActions = SQLReportedActionDataHelper.findAll()
+            
+            if sqlActions.count == 0 {
+                defer { self.syncInProgress = false }
+                DopamineKit.DebugLog("No reported actions to sync.")
+                completion(200)
+                self.updateTriggers()
+            } else {
+                DopamineKit.DebugLog("Sending \(sqlActions.count) reported actions...")
+                DopamineAPI.report(sqlActions, completion: { response in
+                    defer { self.syncInProgress = false }
+                    if response["status"] as? Int == 200 {
+                        defer { completion(200) }
+                        for action in sqlActions {
+                            SQLReportedActionDataHelper.delete(action);
+                        }
+                        self.updateTriggers()
+                    } else {
+                        completion(404)
+                    }
+                })
+            }
+            
         }
-        return (sqlActions, reportedActions)
     }
     
 }
