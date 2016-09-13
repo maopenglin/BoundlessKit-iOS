@@ -13,7 +13,8 @@ public class DopamineAPI : NSObject{
     static let sharedInstance: DopamineAPI = DopamineAPI()
     
     private static let dopamineAPIURL = "https://api.usedopamine.com/v4/app/"
-    private static let clientSDKVersion = "4.0.1"
+//    private static let dopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/"
+    private static let clientSDKVersion = "4.0.2"
     private static let clientOS = "iOS"
     private static let clientOSVersion = UIDevice.currentDevice().systemVersion
     
@@ -37,14 +38,14 @@ public class DopamineAPI : NSObject{
     ///     - actions: An array of actions to send.
     ///     - completion: A closure to handle the JSON formatted response.
     ///
-    static func track(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
+    static func track(actions: [SQLTrackedAction], completion: ([String:AnyObject]) -> ()){
         // create dict with credentials
         var payload = sharedInstance.configurationData
         
         // get JSON formatted actions
         var trackedActionsJSONArray = Array<AnyObject>()
         for action in actions{
-            trackedActionsJSONArray.append(action.toJSONType())
+            trackedActionsJSONArray.append(SQLTrackedActionDataHelper.decodeJSONForItem(action))
         }
         
         payload["actions"] = trackedActionsJSONArray
@@ -62,12 +63,12 @@ public class DopamineAPI : NSObject{
     ///     - actions: An array of actions to send.
     ///     - completion: A closure to handle the JSON formatted response.
     ///
-    static func report(actions: [DopeAction], completion: ([String:AnyObject]) -> ()){
+    static func report(actions: [SQLReportedAction], completion: ([String:AnyObject]) -> ()){
         var payload = sharedInstance.configurationData
         
         var reinforcedActionsArray = Array<AnyObject>()
         for action in actions{
-            reinforcedActionsArray.append(action.toJSONType())
+            reinforcedActionsArray.append(SQLReportedActionDataHelper.decodeJSONForItem(action))
         }
         
         payload["actions"] = reinforcedActionsArray

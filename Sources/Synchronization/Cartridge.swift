@@ -25,6 +25,7 @@ class Cartridge : NSObject, NSCoding {
     private static let capacityToSync = 0.25
     private static let minimumSize = 2
     
+    private var syncInProgress = false
     
     /// Loads a cartridge from NSUserDefaults or creates a new cartridge and saves it to NSUserDefaults
     ///
@@ -84,9 +85,9 @@ class Cartridge : NSObject, NSCoding {
         defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(self), forKey: defaultsKey())
     }
     
-    /// Clears the saved cartridge from NSUserDefaults and resets triggers
+    /// Clears the saved cartridge sync triggers from NSUserDefaults
     ///
-    func resetTriggers() {
+    func removeTriggers() {
         self.initialSize = 0
         self.timerStartsAt = 0
         self.timerExpiresIn = 0
@@ -154,6 +155,44 @@ class Cartridge : NSObject, NSCoding {
     ///
     func removeAll() {
         SQLCartridgeDataHelper.deleteAllFor(actionID)
+    }
+    
+    /// Sends tracked actions over the DopamineAPI
+    ///
+    /// - parameters:
+    ///     - completion(Int): takes the http response status code as a parameter.
+    ///
+    func sync(completion: (Int) -> () = { _ in }) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
+            guard !self.syncInProgress else {
+                DopamineKit.DebugLog("Cartridge sync for \(self.actionID) already happening")
+                completion(200)
+                return
+            }
+            self.syncInProgress = true
+            
+            DopamineAPI.refresh(self.actionID) { response in
+                defer { self.syncInProgress = false }
+                if response["status"] as? Int == 200,
+                    let cartridgeDecisions = response["reinforcementCartridge"] as? [String],
+                    let expiresIn = response["expiresIn"] as? Int
+                {
+                    defer { completion(200) }
+                    
+                    self.removeAll()
+                    for decision in cartridgeDecisions {
+                        self.add(decision)
+                    }
+                    self.updateTriggers(cartridgeDecisions.count, timerExpiresIn: Int64(expiresIn) )
+                    
+                    DopamineKit.DebugLog("✅ \(self.actionID) refreshed!")
+                }
+                else {
+                    DopamineKit.DebugLog("❌ Could not read cartridge for (\(self.actionID))")
+                    completion(404)
+                }
+            }
+        }
     }
     
 }

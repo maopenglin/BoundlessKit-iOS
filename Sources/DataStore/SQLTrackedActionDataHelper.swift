@@ -22,13 +22,13 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     typealias T = SQLTrackedAction
     
     static let TABLE_NAME = "Tracked_Actions"
-    
     static let table = Table(TABLE_NAME)
+    
     static let index = Expression<Int64>("index")
-    static let actionID = Expression<String>("actionid")
-    static let metaData = Expression<Blob?>("metadata")
     static let utc = Expression<Int64>("utc")
     static let timezoneOffset = Expression<Int64>("timezoneoffset")
+    static let actionID = Expression<String>("actionid")
+    static let metaData = Expression<Blob?>("metadata")
     
     static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.TrackedActionsQueue", nil)
     
@@ -46,11 +46,12 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
             do {
                 let _ = try DB.run( table.create(ifNotExists: true) {t in
                     t.column(index, primaryKey: true)
-                    t.column(actionID)
-                    t.column(metaData)
                     t.column(utc)
                     t.column(timezoneOffset)
-                    })
+                    t.column(actionID)
+                    t.column(metaData)
+                    }
+                )
                 DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
             } catch {
                 DopamineKit.DebugLog("Error creating table:(\(TABLE_NAME))")
@@ -92,22 +93,21 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
             {
                 DopamineKit.DebugLog("SQLite database never initialized.")
-                rowId = nil
                 return
             }
             
             let insert = table.insert(
                 actionID <- item.actionID,
-                metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue),
                 utc <- item.utc,
-                timezoneOffset <- item.timezoneOffset )
+                timezoneOffset <- item.timezoneOffset,
+                metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue)
+            )
             do {
                 rowId = try DB.run(insert)
                 DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID)")
                 return
             } catch {
                 DopamineKit.DebugLog("Insert error for tracked action values: actionID:(\(item.actionID)) metaData:(\(item.metaData)) utc:(\(item.utc))")
-                rowId = nil
                 return
             }
         }
@@ -156,13 +156,15 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
             let query = table.filter(index == id)
             do {
                 let items = try DB.prepare(query)
-                for item:Row in  items {
+                for item in  items {
                     result = SQLTrackedAction(
-                        index: item[index] ,
-                        actionID: item[actionID],
-                        metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
+                        index: item[index],
                         utc: item[utc],
-                        timezoneOffset: item[timezoneOffset] )
+                        timezoneOffset: item[timezoneOffset],
+                        actionID: item[actionID],
+                        metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject]
+                    )
+                    break
                 }
             } catch {
                 DopamineKit.DebugLog("Search error for row in Table:\(TABLE_NAME) with id:\(id)")
@@ -189,10 +191,11 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
                 for item in items {
                     results.append( SQLTrackedAction(
                         index: item[index],
-                        actionID: item[actionID],
-                        metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject],
                         utc: item[utc],
-                        timezoneOffset: item[timezoneOffset] )
+                        timezoneOffset: item[timezoneOffset],
+                        actionID: item[actionID],
+                        metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject]
+                        )
                     )
                 }
             } catch {
@@ -215,6 +218,21 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
             result = DB.scalar(table.count)
         }
         return result
+    }
+    
+    /// Converts the item into a JSON object
+    ///
+    static func decodeJSONForItem(item: T) -> [String: AnyObject] {
+        var jsonObject: [String:AnyObject] = [:]
+        
+        jsonObject["actionID"] = item.actionID
+        jsonObject["metaData"] = item.metaData
+        jsonObject["time"] = [
+            ["timeType":"utc", "value": NSNumber( longLong:item.utc )],
+            ["timeType":"deviceTimezoneOffset", "value": NSNumber( longLong:item.timezoneOffset )]
+        ]
+        
+        return jsonObject
     }
     
 }

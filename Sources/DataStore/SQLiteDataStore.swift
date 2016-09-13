@@ -56,6 +56,7 @@ public class SQLiteDataStore : NSObject{
         SQLTrackedActionDataHelper.createTable()
         SQLReportedActionDataHelper.createTable()
         SQLCartridgeDataHelper.createTable()
+        SQLSyncOverviewDataHelper.createTable()
     }
     
     /// Drops all tables used in DopamineKit
@@ -69,6 +70,7 @@ public class SQLiteDataStore : NSObject{
         SQLTrackedActionDataHelper.dropTable()
         SQLReportedActionDataHelper.dropTable()
         SQLCartridgeDataHelper.dropTable()
+        SQLSyncOverviewDataHelper.dropTable()
     }
     
     /// Drops and the Creates all tables

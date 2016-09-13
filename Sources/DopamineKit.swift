@@ -43,7 +43,7 @@ public class DopamineKit : NSObject {
     ///
     public static func reinforce(actionID: String, metaData: [String: AnyObject]? = nil, completion: (String) -> ()) {
         var action = DopeAction(actionID: actionID, metaData: metaData)
-        action.reinforcementDecision =  sharedInstance.syncCoordinator.removeReinforcementDecisionFor(action)
+        action.reinforcementDecision =  sharedInstance.syncCoordinator.retrieveReinforcementDecisionFor(actionID)
         
         dispatch_async(dispatch_get_main_queue(), {
             completion(action.reinforcementDecision!)

@@ -1,40 +1,44 @@
 //
-//  SQLReportedActionDataHelper.swift
+//  SQLSyncOverviewDataHelper.swift
 //  Pods
 //
-//  Created by Akash Desai on 7/18/16.
+//  Created by Akash Desai on 9/12/16.
 //
 //
 
 import Foundation
 import SQLite
 
-typealias SQLReportedAction = (
+typealias SQLSyncOverview = (
     index: Int64,
-    actionID: String,
-    reinforcementDecision: String,
-    metaData: [String:AnyObject]?,
     utc: Int64,
-    timezoneOffset: Int64
+    timezoneOffset: Int64,
+    totalSyncTime: Int64,
+    cause: String,
+    track: [String: AnyObject],
+    report: [String: AnyObject],
+    cartridges: [[String: AnyObject]]?
 )
 
-class SQLReportedActionDataHelper : SQLDataHelperProtocol {
+class SQLSyncOverviewDataHelper : SQLDataHelperProtocol {
     
-    typealias T = SQLReportedAction
+    typealias T = SQLSyncOverview
     
-    static let TABLE_NAME = "Reported_Actions"
+    static let TABLE_NAME = "Sync_Overviews"
     static let table = Table(TABLE_NAME)
     
     static let index = Expression<Int64>("index")
     static let utc = Expression<Int64>("utc")
     static let timezoneOffset = Expression<Int64>("timezoneoffset")
-    static let actionID = Expression<String>("actionid")
-    static let reinforcementDecision = Expression<String>("reinforcementdecision")
-    static let metaData = Expression<Blob?>("metadata")
+    static let totalSyncTime = Expression<Int64>("totalsynctime")
+    static let cause = Expression<String>("cause")
+    static let track = Expression<Blob>("track")
+    static let report = Expression<Blob>("report")
+    static let cartridges = Expression<Blob?>("cartridges")
     
-    static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.ReportedActionsQueue", nil)
+    static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.SyncOverviewQueue", nil)
     
-    /// Creates a SQLite table for reported actions
+    /// Creates a SQLite table for sync overviews
     ///
     /// Called in SQLiteDataStore.sharedInstance.createTables()
     ///
@@ -45,15 +49,16 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                 DopamineKit.DebugLog("SQLite database never initialized.")
                 return
             }
-            
             do {
                 let _ = try DB.run( table.create(ifNotExists: true) {t in
                     t.column(index, primaryKey: true)
                     t.column(utc)
                     t.column(timezoneOffset)
-                    t.column(actionID)
-                    t.column(reinforcementDecision)
-                    t.column(metaData)
+                    t.column(totalSyncTime)
+                    t.column(cause)
+                    t.column(track)
+                    t.column(report)
+                    t.column(cartridges)
                     }
                 )
                 DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
@@ -63,7 +68,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
-    /// Drops the table for reported actions
+    /// Drops the table for sync overviews
     ///
     /// Called in SQLiteDataStore.sharedInstance.dropTables()
     ///
@@ -74,7 +79,6 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                 DopamineKit.DebugLog("SQLite database never initialized.")
                 return
             }
-            
             do {
                 let _ = try DB.run( table.drop(ifExists: true) )
                 DopamineKit.DebugLog("Dropped table:(\(TABLE_NAME))")
@@ -84,7 +88,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
-    /// Inserts a reported action into the SQLite table
+    /// Inserts a sync overview into the SQLite table
     ///
     /// - parameters:
     ///     - item: A sql row with meaningful values for all columns except index.
@@ -98,28 +102,33 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
             {
                 DopamineKit.DebugLog("SQLite database never initialized.")
+                rowId = nil
                 return
             }
             
             let insert = table.insert(
                 utc <- item.utc,
                 timezoneOffset <- item.timezoneOffset,
-                actionID <- item.actionID,
-                reinforcementDecision <- item.reinforcementDecision,
-                metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue)
+                totalSyncTime <- item.totalSyncTime,
+                cause <- item.cause,
+                track <- NSKeyedArchiver.archivedDataWithRootObject(item.track).datatypeValue,
+                report <- NSKeyedArchiver.archivedDataWithRootObject(item.report).datatypeValue,
+                cartridges <- (item.cartridges==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.cartridges!).datatypeValue)
             )
             do {
                 rowId = try DB.run(insert)
-                DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID) reinforcementDecision:\(item.reinforcementDecision)")
+                DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) for sync caused by:\(item.cause)")
+                return
             } catch {
-                DopamineKit.DebugLog("Insert error for reported action with values actionID:(\(item.actionID)) metaData:(\(item.metaData)) utc:(\(item.utc))")
+                DopamineKit.DebugLog("Insert error for inserting sync overview caused by:\(item.cause)")
+                rowId = nil
                 return
             }
         }
         return rowId
     }
     
-    /// Deletes a reported action from the SQLite table
+    /// Deletes a sync over from the SQLite table
     ///
     /// - parameters:
     ///     - item: A sql row with the index to delete.
@@ -144,13 +153,13 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
-    /// Finds a reported action by id from the SQLite table
+    /// Finds a sync overview by id from the SQLite table
     ///
     /// - parameters:
-    ///     - id: The index to find the reported action.
+    ///     - id: The index for the sync overview row.
     ///
     static func find(id: Int64) -> T? {
-        var result:T?
+        var result:SQLSyncOverview?
         dispatch_sync(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
             {
@@ -162,13 +171,15 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
             do {
                 let items = try DB.prepare(query)
                 for item in  items {
-                    result = SQLReportedAction(
+                    result = SQLSyncOverview(
                         index: item[index],
                         utc: item[utc],
                         timezoneOffset: item[timezoneOffset],
-                        actionID: item[actionID],
-                        reinforcementDecision: item[reinforcementDecision],
-                        metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject]
+                        totalSyncTime: item[totalSyncTime],
+                        cause:item[cause],
+                        track: NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[track])) as! [String: AnyObject],
+                        report: NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[report])) as! [String: AnyObject],
+                        cartridges: item[cartridges]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[cartridges]!)) as? [[String: AnyObject]]
                     )
                     break
                 }
@@ -179,9 +190,9 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         return result
     }
     
-    /// Finds all reported actions from the SQLite table
+    /// Finds all sync overviews from the SQLite table
     ///
-    /// - returns: All rows from the reported actions table.
+    /// - returns: All rows from the sync overview table.
     ///
     static func findAll() -> [T] {
         var results:[T] = []
@@ -195,13 +206,15 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
             do {
                 let items = try DB.prepare(table)
                 for item in items {
-                    results.append( SQLReportedAction(
+                    results.append( SQLSyncOverview(
                         index: item[index],
                         utc: item[utc],
                         timezoneOffset: item[timezoneOffset],
-                        actionID: item[actionID],
-                        reinforcementDecision: item[reinforcementDecision],
-                        metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject]
+                        totalSyncTime: item[totalSyncTime],
+                        cause:item[cause],
+                        track: NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[track])) as! [String: AnyObject],
+                        report: NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[report])) as! [String: AnyObject],
+                        cartridges: item[cartridges]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[cartridges]!)) as? [[String: AnyObject]]
                         )
                     )
                 }
@@ -212,7 +225,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         return results
     }
     
-    /// How many rows total are in the reported actions table
+    /// How many rows total are in the sync overview table
     ///
     static func count() -> Int {
         var result = 0
@@ -222,26 +235,9 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                 DopamineKit.DebugLog("SQLite database never initialized.")
                 return
             }
-            
             result = DB.scalar(table.count)
         }
         return result
-    }
-    
-    /// Converts the item into a JSON object
-    ///
-    static func decodeJSONForItem(item: T) -> [String: AnyObject] {
-        var jsonObject: [String:AnyObject] = [:]
-        
-        jsonObject["actionID"] = item.actionID
-        jsonObject["reinforcementDecision"] = item.reinforcementDecision
-        jsonObject["metaData"] = item.metaData
-        jsonObject["time"] = [
-            ["timeType":"utc", "value": NSNumber( longLong:item.utc )],
-            ["timeType":"deviceTimezoneOffset", "value": NSNumber( longLong:item.timezoneOffset )]
-        ]
-        
-        return jsonObject
     }
     
 }
