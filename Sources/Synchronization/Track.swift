@@ -66,6 +66,15 @@ class Track : NSObject, NSCoding {
         DopamineKit.DebugLog("Encoded TrackSyncer with sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
+    func decodeJSONForTriggers() -> [String: AnyObject]{
+        return [
+            "size" : SQLTrackedActionDataHelper.count(),
+            defaultsSizeToSync : sizeToSync,
+            defaultsTimerStartsAt : Int(timerStartsAt),
+            defaultsTimerExpiresIn : Int(timerExpiresIn)
+        ]
+    }
+    
     /// Updates the sync triggers
     ///
     /// - parameters:
@@ -152,13 +161,13 @@ class Track : NSObject, NSCoding {
     /// Sends tracked actions over the DopamineAPI
     ///
     /// - parameters:
-    ///     - completion(Int): takes the http response status code as a parameter.
+    ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if there were no actions to sync.
     ///
-    func sync(completion: (Int) -> () = { _ in }) {
+    func sync(recorder: SyncOverview, completion: (statusCode: Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
             guard !self.syncInProgress else {
                 DopamineKit.DebugLog("Track sync already happening")
-                completion(200)
+                completion(statusCode: 0)
                 return
             }
             self.syncInProgress = true
@@ -168,21 +177,25 @@ class Track : NSObject, NSCoding {
             if sqlActions.count == 0 {
                 defer { self.syncInProgress = false }
                 DopamineKit.DebugLog("No tracked actions to sync.")
-                completion(200)
+                completion(statusCode: 0)
                 self.updateTriggers()
                 return
             } else {
                 DopamineKit.DebugLog("Sending \(sqlActions.count) tracked actions...")
+//                let startTimeForCall = 1000*NSDate().timeIntervalSince1970
                 DopamineAPI.track(sqlActions) { response in
+//                    let endTimeForCall = 1000*NSDate().timeIntervalSince1970
                     defer { self.syncInProgress = false }
-                    if response["status"] as? Int == 200 {
-                        defer { completion(200) }
-                        for action in sqlActions {
-                            SQLTrackedActionDataHelper.delete(action)
+                    if let responseStatusCode = response["status"] as? Int {
+                        completion(statusCode: responseStatusCode)
+                        if responseStatusCode == 200 {
+                            for action in sqlActions {
+                                SQLTrackedActionDataHelper.delete(action)
+                            }
+                            self.updateTriggers()
                         }
-                        self.updateTriggers()
                     } else {
-                        completion(404)
+                        completion(statusCode: 404)
                     }
                 }
             }

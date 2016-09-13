@@ -10,29 +10,43 @@ import Foundation
 
 struct SyncOverview {
     
-    var utc: Int64
-    var timezoneOffset: Int64
-    var totalSyncTime: Int64
-    var cause: String
-    var track: [String: AnyObject]
-    var report: [String: AnyObject]
-    var cartridges: [[String: AnyObject]]
+    private var utc: Int64
+    private var timezoneOffset: Int64
+    private var totalSyncTime: Int64
+    private var cause: String
+    private var trackTriggers: [String: AnyObject]
+    private var reportTriggers: [String: AnyObject]
+    private var cartridgesTriggers: [[String: AnyObject]]
     
     init(utc: Int64=Int64(1000*NSDate().timeIntervalSince1970),
          timezoneOffset: Int64=Int64(1000*NSTimeZone.defaultTimeZone().secondsFromGMT),
          totalSyncTime: Int64,
          cause: String,
-         track: [String: AnyObject],
-         report: [String: AnyObject],
-         cartridges: [[String: AnyObject]]
+         trackTriggers: [String: AnyObject],
+         reportTriggers: [String: AnyObject],
+         cartridgeTriggers: [[String: AnyObject]]
         ) {
         self.utc = utc
         self.timezoneOffset = timezoneOffset
         self.totalSyncTime = totalSyncTime
         self.cause = cause
-        self.track = track
-        self.report = report
-        self.cartridges = cartridges
+        self.trackTriggers = trackTriggers
+        self.reportTriggers = reportTriggers
+        self.cartridgesTriggers = cartridgeTriggers
+    }
+    
+    static func startRecordingSync(cause: String, track: Track, report: Report, cartridges: [String: Cartridge]) -> SyncOverview {
+        var recording = SyncOverview(totalSyncTime: 0,
+                                     cause: cause,
+                                     trackTriggers: track.decodeJSONForTriggers(),
+                                     reportTriggers: report.decodeJSONForTriggers(),
+                                     cartridgeTriggers: [])
+        
+        for (_, cartridge) in cartridges {
+            recording.cartridgesTriggers.append(cartridge.decodeJSONForTriggers())
+        }
+        
+        return recording
     }
     
 }

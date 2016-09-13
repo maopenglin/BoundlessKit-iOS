@@ -71,6 +71,17 @@ class Cartridge : NSObject, NSCoding {
         DopamineKit.DebugLog("Encoded cartridge for actionID: \(actionID) with initialSize:\(initialSize) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
+    func decodeJSONForTriggers() -> [String: AnyObject]{
+        return [
+            defaultsActionID : actionID,
+            "size" : SQLCartridgeDataHelper.countFor(actionID),
+            defaultsInitialSize : initialSize,
+            "capacityToSync" : Cartridge.capacityToSync,
+            defaultsTimerStartsAt : Int(timerStartsAt),
+            defaultsTimerExpiresIn : Int(timerExpiresIn)
+        ]
+    }
+    
     /// Updates the sync triggers
     ///
     /// - parameters:
@@ -160,34 +171,33 @@ class Cartridge : NSObject, NSCoding {
     /// Sends tracked actions over the DopamineAPI
     ///
     /// - parameters:
-    ///     - completion(Int): takes the http response status code as a parameter.
+    ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if the cartridge is already being synced by another thread.
     ///
     func sync(completion: (Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
             guard !self.syncInProgress else {
                 DopamineKit.DebugLog("Cartridge sync for \(self.actionID) already happening")
-                completion(200)
+                completion(0)
                 return
             }
             self.syncInProgress = true
             
             DopamineAPI.refresh(self.actionID) { response in
                 defer { self.syncInProgress = false }
-                if response["status"] as? Int == 200,
+                if let responseStatusCode = response["status"] as? Int,
                     let cartridgeDecisions = response["reinforcementCartridge"] as? [String],
                     let expiresIn = response["expiresIn"] as? Int
                 {
-                    defer { completion(200) }
-                    
-                    self.removeAll()
-                    for decision in cartridgeDecisions {
-                        self.add(decision)
+                    completion(responseStatusCode)
+                    if responseStatusCode == 200 {
+                        self.removeAll()
+                        for decision in cartridgeDecisions {
+                            self.add(decision)
+                        }
+                        self.updateTriggers(cartridgeDecisions.count, timerExpiresIn: Int64(expiresIn) )
+                        DopamineKit.DebugLog("✅ \(self.actionID) refreshed!")
                     }
-                    self.updateTriggers(cartridgeDecisions.count, timerExpiresIn: Int64(expiresIn) )
-                    
-                    DopamineKit.DebugLog("✅ \(self.actionID) refreshed!")
-                }
-                else {
+                } else {
                     DopamineKit.DebugLog("❌ Could not read cartridge for (\(self.actionID))")
                     completion(404)
                 }

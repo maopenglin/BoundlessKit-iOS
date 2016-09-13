@@ -66,6 +66,15 @@ class Report : NSObject, NSCoding {
         DopamineKit.DebugLog("Encoded report with sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
+    func decodeJSONForTriggers() -> [String: AnyObject]{
+        return [
+            "size" : SQLReportedActionDataHelper.count(),
+            defaultsSizeToSync : sizeToSync,
+            defaultsTimerStartsAt : Int(timerStartsAt),
+            defaultsTimerExpiresIn : Int(timerExpiresIn)
+        ]
+    }
+    
     /// Updates the sync triggers
     ///
     /// - parameters:
@@ -153,13 +162,13 @@ class Report : NSObject, NSCoding {
     /// Sends reinforced actions over the DopamineAPI
     ///
     /// - parameters:
-    ///     - completion(Int): takes the http response status code as a parameter.
+    ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if there were no actions to sync.
     ///
-    func sync(completion: (Int) -> () = { _ in }) {
+    func sync(completion: (statusCode: Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
             guard !self.syncInProgress else {
                 DopamineKit.DebugLog("Report sync already happening")
-                completion(200)
+                completion(statusCode: 0)
                 return
             }
             self.syncInProgress = true
@@ -169,20 +178,22 @@ class Report : NSObject, NSCoding {
             if sqlActions.count == 0 {
                 defer { self.syncInProgress = false }
                 DopamineKit.DebugLog("No reported actions to sync.")
-                completion(200)
+                completion(statusCode: 0)
                 self.updateTriggers()
             } else {
                 DopamineKit.DebugLog("Sending \(sqlActions.count) reported actions...")
                 DopamineAPI.report(sqlActions, completion: { response in
                     defer { self.syncInProgress = false }
-                    if response["status"] as? Int == 200 {
-                        defer { completion(200) }
-                        for action in sqlActions {
-                            SQLReportedActionDataHelper.delete(action);
+                    if let responseStatusCode = response["status"] as? Int {
+                        completion(statusCode: responseStatusCode)
+                        if responseStatusCode == 200 {
+                            for action in sqlActions {
+                                SQLReportedActionDataHelper.delete(action);
+                            }
+                            self.updateTriggers()
                         }
-                        self.updateTriggers()
                     } else {
-                        completion(404)
+                        completion(statusCode: 404)
                     }
                 })
             }

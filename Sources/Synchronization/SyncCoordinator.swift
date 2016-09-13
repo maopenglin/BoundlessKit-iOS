@@ -87,27 +87,41 @@ public class SyncCoordinator {
             
             // since a cartridge might be triggered during the sleep time,
             // lazily check which are triggered
-            var anyCartridgeShouldSync = false
+            var someCartridgeToSync: Cartridge?
             for (_, cartridge) in self.cartridgeSyncers {
                 if cartridge.isTriggered() {
-                    anyCartridgeShouldSync = true
+                    someCartridgeToSync = cartridge
                     break
                 }
             }
-            let reportShouldSync = anyCartridgeShouldSync || self.reportSyncer.isTriggered()
-            let trackerShouldSync = reportShouldSync || self.trackSyncer.isTriggered()
+            let reportShouldSync = (someCartridgeToSync != nil) || self.reportSyncer.isTriggered()
+            let trackShouldSync = reportShouldSync || self.trackSyncer.isTriggered()
+            
+            var syncCause = "No sync necessary."
+            if (someCartridgeToSync != nil) {
+                syncCause = "Cartridge \(someCartridgeToSync?.actionID) needs to sync."
+            } else if (reportShouldSync) {
+                syncCause = "Report needs to sync."
+            } else if (trackShouldSync) {
+                syncCause = "Track needs to sync."
+            } else {
+                return
+            }
+            let syncOverview = SyncOverview.startRecordingSync(syncCause, track: self.trackSyncer, report: self.reportSyncer, cartridges: self.cartridgeSyncers)
             
             var goodProgress = true
             
-            if trackerShouldSync {
-                self.trackSyncer.sync() { status in
-                    guard status == 200 else {
+            if trackShouldSync {
+                self.trackSyncer.sync(syncOverview) { status in
+                    guard status == 200 || status == 0 else {
                         DopamineKit.DebugLog("Track failed during sync. Halting sync.")
                         goodProgress = false
                         return
                     }
+                    if status==0 {
+                        sleep(1)
+                    }
                 }
-                sleep(1)
             }
             
             if !goodProgress { return }
