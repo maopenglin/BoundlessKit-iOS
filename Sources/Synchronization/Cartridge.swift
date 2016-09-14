@@ -71,6 +71,8 @@ class Cartridge : NSObject, NSCoding {
         DopamineKit.DebugLog("Encoded cartridge for actionID: \(actionID) with initialSize:\(initialSize) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
+    /// Decodes a JSON compatible object of the sync triggers
+    ///
     func decodeJSONForTriggers() -> [String: AnyObject]{
         return [
             defaultsActionID : actionID,

@@ -66,6 +66,8 @@ class Report : NSObject, NSCoding {
         DopamineKit.DebugLog("Encoded report with sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
+    /// Decodes a JSON compatible object of the sync triggers
+    ///
     func decodeJSONForTriggers() -> [String: AnyObject]{
         return [
             "size" : SQLReportedActionDataHelper.count(),
@@ -150,7 +152,7 @@ class Report : NSObject, NSCoding {
         )
         guard let _ = SQLReportedActionDataHelper.insert(recordedAction)
             else{
-                // if it couldnt be saved, send it
+                // if it couldnt be saved, send it right away
                 DopamineKit.DebugLog("SQLiteDataStore error, sending single action report")
                 DopamineAPI.report([recordedAction], completion: { response in
                     
