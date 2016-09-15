@@ -75,6 +75,7 @@ s.source_files = "Sources/**/*"
 
 s.public_header_files = "Sources/**/*.h"
 
-s.dependency 'SQLite.swift'
+#s.dependency 'SQLite.swift'
+s.frameworks = 'CoreData'
 
 end

@@ -13,15 +13,15 @@ class TrackSyncer : NSObject {
     
     static let sharedInstance: TrackSyncer = TrackSyncer()
     
-    private let track = Track.sharedInstance
+    fileprivate let track = Track.sharedInstance
     
-    private var syncInProgress = false
+    fileprivate var syncInProgress = false
     
-    private override init() { }
+    fileprivate override init() { }
     
     /// Stores an action to be synced
     ///
-    func store(action: DopeAction) {
+    func store(_ action: DopeAction) {
         track.add(action)
     }
     
@@ -30,7 +30,7 @@ class TrackSyncer : NSObject {
     /// - parameters:
     ///     - size: The number of tracked actions to trigger a sync.
     ///
-    func setSizeToSync(size: Int?) {
+    func setSizeToSync(_ size: Int?) {
         track.updateTriggers(size, timerStartsAt: nil, timerExpiresIn: nil)
     }
     
@@ -47,8 +47,8 @@ class TrackSyncer : NSObject {
     /// - parameters:
     ///     - completion(Int): takes the http response status code as a parameter.
     ///
-    func sync(completion: (Int) -> () = { _ in }) {
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
+    func sync(_ completion: @escaping (Int) -> () = { _ in }) {
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
                 DopamineKit.DebugLog("Track sync already happening")
                 completion(200)

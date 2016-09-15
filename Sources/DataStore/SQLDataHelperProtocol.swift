@@ -12,7 +12,7 @@ protocol SQLDataHelperProtocol {
     associatedtype T
     static func createTable() -> Void
     static func dropTable() -> Void
-    static func insert(item: T) -> Int64?
-    static func delete(item: T) -> Void
+    static func insert(_ item: T) -> Int64?
+    static func delete(_ item: T) -> Void
     static func findAll() -> [T]
 }

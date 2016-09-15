@@ -12,26 +12,26 @@ import UIKit
 /// Look at `DopamineKit/Resources/CandyIcons.xcassets` to see what each icon looks like.
 ///
 @objc public enum CandyIcon : Int{
-    case None = 0, Certificate, Crown, Crown2, MedalStar, RibbonStar, Stars, Stopwatch, ThumbsUp, TrophyHand, TrophyStar, WreathStar
+    case none = 0, certificate, crown, crown2, medalStar, ribbonStar, stars, stopwatch, thumbsUp, trophyHand, trophyStar, wreathStar
     
     internal var filename:String{
         switch self{
-        case .Certificate: return "certificate"
-        case .Crown: return "crown"
-        case .Crown2: return "crown2"
-        case .MedalStar: return "medalStar"
-        case .RibbonStar: return "ribbonStar"
-        case .Stars: return "stars"
-        case .Stopwatch: return "stopwatchOne"
-        case .ThumbsUp: return "thumbsUp"
-        case .TrophyHand: return "trophyHand"
-        case .TrophyStar: return "trophyStar"
-        case .WreathStar: return "wreathStar"
+        case .certificate: return "certificate"
+        case .crown: return "crown"
+        case .crown2: return "crown2"
+        case .medalStar: return "medalStar"
+        case .ribbonStar: return "ribbonStar"
+        case .stars: return "stars"
+        case .stopwatch: return "stopwatchOne"
+        case .thumbsUp: return "thumbsUp"
+        case .trophyHand: return "trophyHand"
+        case .trophyStar: return "trophyStar"
+        case .wreathStar: return "wreathStar"
         default: return ""
         }
     }
     
     internal var image:UIImage?{
-        return UIImage(named: filename, inBundle:NSBundle.mainBundle(), compatibleWithTraitCollection: nil)
+        return UIImage(named: filename, in:Bundle.main, compatibleWith: nil)
     }
 }

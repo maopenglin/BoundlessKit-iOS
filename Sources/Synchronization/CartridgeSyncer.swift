@@ -15,17 +15,17 @@ class CartridgeSyncer : NSObject {
     
     /// Used to store actionIDs so cartridges can be loaded on init()
     ///
-    private let defaultsActionIDSetKey = "DopamineActionIDSet"
-    private let defaults = NSUserDefaults.standardUserDefaults()
+    fileprivate let defaultsActionIDSetKey = "DopamineActionIDSet"
+    fileprivate let defaults = UserDefaults.standard
     
     /// All the cartridges
     ///
-    private var cartridges:[String:Cartridge] = [:]
+    fileprivate var cartridges:[String:Cartridge] = [:]
     
-    private var syncInProgress = false
+    fileprivate var syncInProgress = false
     
-    private override init() {
-        if let savedActionIDSetData = defaults.objectForKey(defaultsActionIDSetKey) as? [String] {
+    fileprivate override init() {
+        if let savedActionIDSetData = defaults.object(forKey: defaultsActionIDSetKey) as? [String] {
             for actionID in savedActionIDSetData {
                 cartridges[actionID] = Cartridge(actionID: actionID)
             }
@@ -40,7 +40,7 @@ class CartridgeSyncer : NSObject {
     /// - returns:
     ///     A reinforcement decision for the given action.
     ///
-    func unloadReinforcementDecisionForAction(action: DopeAction) -> String {
+    func unloadReinforcementDecisionForAction(_ action: DopeAction) -> String {
         let cartridge = getCartridgeForActionID(action.actionID)
         return cartridge.remove()
     }
@@ -78,8 +78,8 @@ class CartridgeSyncer : NSObject {
     /// - parameters:
     ///     - completion(Int): takes the http response status code as a parameter.
     ///
-    func sync(actionID: String, completion: (Int) -> () = { _ in }) {
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
+    func sync(_ actionID: String, completion: @escaping (Int) -> () = { _ in }) {
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
                 DopamineKit.DebugLog("Cartridge sync already happening")
                 completion(200)
@@ -123,14 +123,14 @@ class CartridgeSyncer : NSObject {
     /// - returns:
     ///     A cartridge for the given actionID.
     ///
-    private func getCartridgeForActionID(actionID: String) -> Cartridge {
+    fileprivate func getCartridgeForActionID(_ actionID: String) -> Cartridge {
         if let cartridge = cartridges[actionID] {
             return cartridge
         } else {
             let cartridge = Cartridge(actionID: actionID)
             cartridges[actionID] = cartridge
-            let actionIDs = cartridges.keys.sort()
-            defaults.setObject(actionIDs, forKey: defaultsActionIDSetKey)
+            let actionIDs = cartridges.keys.sorted()
+            defaults.set(actionIDs, forKey: defaultsActionIDSetKey)
             return cartridge
         }
     }
@@ -142,7 +142,7 @@ class CartridgeSyncer : NSObject {
             cartridge.resetTriggers()
         }
         cartridges.removeAll()
-        defaults.removeObjectForKey(defaultsActionIDSetKey)
+        defaults.removeObject(forKey: defaultsActionIDSetKey)
     }
     
     

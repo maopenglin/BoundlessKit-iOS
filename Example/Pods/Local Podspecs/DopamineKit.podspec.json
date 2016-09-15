@@ -19,10 +19,5 @@
     "tag": "4.0.1"
   },
   "source_files": "Sources/**/*",
-  "public_header_files": "Sources/**/*.h",
-  "dependencies": {
-    "SQLite.swift": [
-
-    ]
-  }
+  "public_header_files": "Sources/**/*.h"
 }

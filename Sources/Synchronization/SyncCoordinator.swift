@@ -8,19 +8,19 @@
 
 import Foundation
 
-public class SyncCoordinator {
+open class SyncCoordinator {
     
     static let sharedInstance = SyncCoordinator()
     
-    private let trackSyncer = TrackSyncer.sharedInstance;
-    private let reportSyncer = ReportSyncer.sharedInstance;
-    private let cartridgeSyncer = CartridgeSyncer.sharedInstance;
+    fileprivate let trackSyncer = TrackSyncer.sharedInstance;
+    fileprivate let reportSyncer = ReportSyncer.sharedInstance;
+    fileprivate let cartridgeSyncer = CartridgeSyncer.sharedInstance;
     
-    private var syncInProgress = false
+    fileprivate var syncInProgress = false
     
     /// Initializer for SyncCoordinator performs a sync
     ///
-    private init() {
+    fileprivate init() {
         performSync()
     }
     
@@ -29,7 +29,7 @@ public class SyncCoordinator {
     /// - parameters: 
     ///     - trackedAction: A tracked action.
     ///
-    func storeTrackedAction(trackedAction: DopeAction) {
+    func storeTrackedAction(_ trackedAction: DopeAction) {
         trackSyncer.store(trackedAction)
         performSync()
     }
@@ -39,7 +39,7 @@ public class SyncCoordinator {
     /// - parameters:
     ///     - reportedAction: A reinforced action.
     ///
-    func storeReportedAction(reportedAction: DopeAction) {
+    func storeReportedAction(_ reportedAction: DopeAction) {
         reportSyncer.store(reportedAction)
         performSync()
     }
@@ -52,15 +52,15 @@ public class SyncCoordinator {
     /// - returns:
     ///     A reinforcement decision
     ///
-    func removeReinforcementDecisionFor(reinforceableAction: DopeAction) -> String {
+    func removeReinforcementDecisionFor(_ reinforceableAction: DopeAction) -> String {
         return cartridgeSyncer.unloadReinforcementDecisionForAction(reinforceableAction)
     }
     
     /// Checks which syners have been triggered, and syncs them in an order 
     /// that allows time for the DopamineAPI to generate cartridges
     ///
-    public func performSync() {
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
+    open func performSync() {
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async {
             guard !self.syncInProgress else {
                 DopamineKit.DebugLog("Sync already happening")
                 return
@@ -121,7 +121,7 @@ public class SyncCoordinator {
     /// - parameters:
     ///     - size: The number of tracked actions to trigger a sync.
     ///
-    public func setTrackSizeToSync(size: Int?) {
+    open func setTrackSizeToSync(_ size: Int?) {
         trackSyncer.setSizeToSync(size)
     }
     
@@ -130,13 +130,13 @@ public class SyncCoordinator {
     /// - parameters:
     ///     - size: The number of reported actions to trigger a sync.
     ///
-    public func setReportSizeToSync(size: Int?) {
+    open func setReportSizeToSync(_ size: Int?) {
         reportSyncer.setSizeToSync(size)
     }
     
     /// Resets the sync triggers
     ///
-    public func resetSyncers() {
+    open func resetSyncers() {
         trackSyncer.reset()
         reportSyncer.reset()
         cartridgeSyncer.reset()

@@ -28,8 +28,8 @@ struct DopeAction {
     init(actionID:String,
                 reinforcementDecision:String? = nil,
                 metaData:[String:AnyObject]? = nil,
-                utc:Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ),
-                timezoneOffset:Int64 = Int64( 1000*NSTimeZone.defaultTimeZone().secondsFromGMT ))
+                utc:Int64 = Int64( 1000*Date().timeIntervalSince1970 ),
+                timezoneOffset:Int64 = Int64( 1000*NSTimeZone.default.secondsFromGMT() ))
     {
         self.actionID = actionID
         self.reinforcementDecision = reinforcementDecision
@@ -43,14 +43,15 @@ struct DopeAction {
     func toJSONType() -> AnyObject {
         var jsonObject: [String:AnyObject] = [:]
         
-        jsonObject["actionID"] = self.actionID
-        jsonObject["reinforcementDecision"] = self.reinforcementDecision
-        jsonObject["metaData"] = self.metaData
+        jsonObject["actionID"] = self.actionID as AnyObject?
+        jsonObject["reinforcementDecision"] = self.reinforcementDecision as AnyObject?
+        jsonObject["metaData"] = self.metaData as AnyObject?
+//        let timeArray = Array<String>()
         jsonObject["time"] = [
-            ["timeType":"utc", "value": NSNumber( longLong:self.utc )],
-            ["timeType":"deviceTimezoneOffset", "value": NSNumber( longLong:self.timezoneOffset )]
-        ]
+            ["timeType":"utc", "value": NSNumber(value: self.utc as Int64)],
+            ["timeType":"deviceTimezoneOffset", "value": NSNumber(value: self.timezoneOffset as Int64)]
+        ]  as AnyObject
         
-        return jsonObject
+        return jsonObject as AnyObject
     }
 }

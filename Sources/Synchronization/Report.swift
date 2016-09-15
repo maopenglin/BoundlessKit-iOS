@@ -13,15 +13,15 @@ class Report : NSObject, NSCoding {
     
     static let sharedInstance = Report()
     
-    private let defaults = NSUserDefaults.standardUserDefaults()
-    private let defaultsKey = "DopamineReport"
-    private let defaultsSizeToSync = "sizeToSync"
-    private let defaultsTimerStartsAt = "timerStartsAt"
-    private let defaultsTimerExpiresIn = "timerExpiresIn"
+    fileprivate let defaults = UserDefaults.standard
+    fileprivate let defaultsKey = "DopamineReport"
+    fileprivate let defaultsSizeToSync = "sizeToSync"
+    fileprivate let defaultsTimerStartsAt = "timerStartsAt"
+    fileprivate let defaultsTimerExpiresIn = "timerExpiresIn"
     
-    private var sizeToSync: Int
-    private var timerStartsAt: Int64
-    private var timerExpiresIn: Int64
+    fileprivate var sizeToSync: Int
+    fileprivate var timerStartsAt: Int64
+    fileprivate var timerExpiresIn: Int64
     
     /// Loads the report from NSUserDefaults or creates a new one and saves it to NSUserDefaults
     ///
@@ -30,9 +30,9 @@ class Report : NSObject, NSCoding {
     ///     - timerStartsAt: The start time for a sync timer. Defaults to 0.
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
-    private init(sizeToSync: Int = 15, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 172800000) {
-        if let savedReportData = defaults.objectForKey(defaultsKey) as? NSData,
-            let savedReport = NSKeyedUnarchiver.unarchiveObjectWithData(savedReportData) as? Report {
+    fileprivate init(sizeToSync: Int = 15, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 172800000) {
+        if let savedReportData = defaults.object(forKey: defaultsKey) as? Data,
+            let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData) as? Report {
             self.sizeToSync = savedReport.sizeToSync;
             self.timerStartsAt = savedReport.timerStartsAt;
             self.timerExpiresIn = savedReport.timerExpiresIn;
@@ -42,25 +42,25 @@ class Report : NSObject, NSCoding {
             self.timerStartsAt = timerStartsAt;
             self.timerExpiresIn = timerExpiresIn;
             super.init()
-            defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(self), forKey: defaultsKey)
+            defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
         }
     }
     
     /// Decodes a saved report from NSUserDefaults
     ///
     required init(coder aDecoder: NSCoder) {
-        self.sizeToSync = aDecoder.decodeIntegerForKey(defaultsSizeToSync)
-        self.timerStartsAt = aDecoder.decodeInt64ForKey(defaultsTimerStartsAt)
-        self.timerExpiresIn = aDecoder.decodeInt64ForKey(defaultsTimerExpiresIn)
+        self.sizeToSync = aDecoder.decodeInteger(forKey: defaultsSizeToSync)
+        self.timerStartsAt = aDecoder.decodeInt64(forKey: defaultsTimerStartsAt)
+        self.timerExpiresIn = aDecoder.decodeInt64(forKey: defaultsTimerExpiresIn)
         DopamineKit.DebugLog("Decoded report with sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Encodes a report and saves it to NSUserDefaults
     ///
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeInteger(sizeToSync, forKey: defaultsSizeToSync)
-        aCoder.encodeInt64(timerStartsAt, forKey: defaultsTimerStartsAt)
-        aCoder.encodeInt64(timerExpiresIn, forKey: defaultsTimerExpiresIn)
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(sizeToSync, forKey: defaultsSizeToSync)
+        aCoder.encode(timerStartsAt, forKey: defaultsTimerStartsAt)
+        aCoder.encode(timerExpiresIn, forKey: defaultsTimerExpiresIn)
         DopamineKit.DebugLog("Encoded report with sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
@@ -71,7 +71,7 @@ class Report : NSObject, NSCoding {
     ///     - timerStartsAt: The start time for a sync timer. Defaults to the current time.
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to previous timerExpiresIn.
     ///
-    func updateTriggers(sizeToSync: Int?=nil, timerStartsAt: Int64?=Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64?=nil) {
+    func updateTriggers(_ sizeToSync: Int?=nil, timerStartsAt: Int64?=Int64( 1000*Date().timeIntervalSince1970 ), timerExpiresIn: Int64?=nil) {
         if let sizeToSync = sizeToSync {
             self.sizeToSync = sizeToSync
         }
@@ -81,7 +81,7 @@ class Report : NSObject, NSCoding {
         if let timerExpiresIn = timerExpiresIn {
             self.timerExpiresIn = timerExpiresIn
         }
-        defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(self), forKey: defaultsKey)
+        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
     
     /// Clears the saved report from NSUserDefaults and resets triggers
@@ -90,7 +90,7 @@ class Report : NSObject, NSCoding {
         self.sizeToSync = 15
         self.timerStartsAt = 0
         self.timerExpiresIn = 172800000
-        defaults.removeObjectForKey(defaultsKey)
+        defaults.removeObject(forKey: defaultsKey)
     }
     
     /// Check whether the report has been triggered for a sync
@@ -105,8 +105,8 @@ class Report : NSObject, NSCoding {
     ///
     /// - returns: Whether the timer has expired.
     ///
-    private func timerDidExpire() -> Bool {
-        let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
+    fileprivate func timerDidExpire() -> Bool {
+        let currentTime = Int64( 1000*Date().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartsAt + timerExpiresIn)
         DopamineKit.DebugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so \(isExpired ? "does" : "doesn't") need to sync...")
         return isExpired
@@ -116,7 +116,7 @@ class Report : NSObject, NSCoding {
     ///
     /// - returns: Whether there are enough reported actions to trigger a sync.
     ///
-    private func isSizeToSync() -> Bool {
+    fileprivate func isSizeToSync() -> Bool {
         let count = SQLReportedActionDataHelper.count()
         let isSize = count >= sizeToSync
         DopamineKit.DebugLog("Report has \(count)/\(sizeToSync) actions so \(isSize ? "does" : "doesn't") need to sync...")
@@ -128,7 +128,7 @@ class Report : NSObject, NSCoding {
     /// - parameters:
     ///     - action: The action to be stored.
     ///
-    func add(action: DopeAction) {
+    func add(_ action: DopeAction) {
         guard let _ = SQLReportedActionDataHelper.insert(
             SQLReportedAction(
                 index:0,
@@ -153,7 +153,7 @@ class Report : NSObject, NSCoding {
     /// - parameters:
     ///     - action: The sql row to delete.
     ///
-    func remove(action: SQLReportedAction) {
+    func remove(_ action: SQLReportedAction) {
         SQLReportedActionDataHelper.delete(action);
     }
     
