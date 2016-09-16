@@ -6,9 +6,14 @@
 //
 //
 
-import Foundation
-
-struct DopeAction {
+@objc
+internal class DopeAction : NSObject, NSCoding {
+    
+    private let actionIDKey = "actionID"
+    private let reinforcementDecisionKey = "reinforcementDecision"
+    private let metaDataKey = "metaData"
+    private let utcKey = "utc"
+    private let timezoneOffsetKey = "timezoneOffset"
     
     var actionID:String
     var reinforcementDecision:String?
@@ -38,6 +43,26 @@ struct DopeAction {
         self.timezoneOffset = timezoneOffset
     }
     
+    /// Decodes a saved action from NSUserDefaults
+    ///
+    required init(coder aDecoder: NSCoder) {
+        self.actionID = aDecoder.decodeObject(forKey: actionIDKey) as! String
+        self.reinforcementDecision = aDecoder.decodeObject(forKey: reinforcementDecisionKey) as? String
+        self.metaData = aDecoder.decodeObject(forKey: metaDataKey) as? [String:AnyObject]
+        self.utc = aDecoder.decodeInt64(forKey: utcKey)
+        self.timezoneOffset = aDecoder.decodeInt64(forKey: timezoneOffsetKey)
+    }
+    
+    /// Encodes an action and saves it to NSUserDefaults
+    ///
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(actionID, forKey: actionIDKey)
+        aCoder.encode(reinforcementDecision, forKey: reinforcementDecisionKey)
+        aCoder.encode(metaData, forKey: metaDataKey)
+        aCoder.encode(utc, forKey: utcKey)
+        aCoder.encode(timezoneOffset, forKey: timezoneOffsetKey)
+    }
+    
     /// This function converts a DopeAction to a JSON compatible Object
     ///
     func toJSONType() -> AnyObject {
@@ -46,11 +71,10 @@ struct DopeAction {
         jsonObject["actionID"] = self.actionID as AnyObject?
         jsonObject["reinforcementDecision"] = self.reinforcementDecision as AnyObject?
         jsonObject["metaData"] = self.metaData as AnyObject?
-//        let timeArray = Array<String>()
         jsonObject["time"] = [
             ["timeType":"utc", "value": NSNumber(value: self.utc as Int64)],
             ["timeType":"deviceTimezoneOffset", "value": NSNumber(value: self.timezoneOffset as Int64)]
-        ]  as AnyObject
+        ] as AnyObject
         
         return jsonObject as AnyObject
     }

@@ -6,16 +6,12 @@
 //  Copyright © 2016 Dopamine Labs. All rights reserved.
 //
 
-import Foundation
-import UIKit
-
 @objc
 open class DopamineKit : NSObject {
     
-    open static let sharedInstance: DopamineKit = DopamineKit()
+    public static let sharedInstance: DopamineKit = DopamineKit()
     
-    open let dataStore = SQLiteDataStore.sharedInstance
-    open let syncCoordinator = SyncCoordinator.sharedInstance
+    public let syncCoordinator = SyncCoordinator.sharedInstance
     
     /// This function sends an asynchronous tracking call for the specified actionID
     ///
@@ -28,7 +24,7 @@ open class DopamineKit : NSObject {
     open static func track(_ actionID: String, metaData: [String: AnyObject]? = nil) {
         // store the action to be synced
         let action = DopeAction(actionID: actionID, metaData:metaData)
-        sharedInstance.syncCoordinator.storeTrackedAction(action)
+        sharedInstance.syncCoordinator.store(trackedAction: action)
     }
 
     /// This function sends an asynchronous reinforcement call for the specified actionID
@@ -41,15 +37,15 @@ open class DopamineKit : NSObject {
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
     open static func reinforce(_ actionID: String, metaData: [String: AnyObject]? = nil, completion: @escaping (String) -> ()) {
-        var action = DopeAction(actionID: actionID, metaData: metaData)
-        action.reinforcementDecision =  sharedInstance.syncCoordinator.removeReinforcementDecisionFor(action)
+        let action = DopeAction(actionID: actionID, metaData: metaData)
+        action.reinforcementDecision =  sharedInstance.syncCoordinator.retrieveReinforcementDecisionFor(actionID: action.actionID)
         
         DispatchQueue.main.async(execute: {
             completion(action.reinforcementDecision!)
         })
         
         // store the action to be synced
-        sharedInstance.syncCoordinator.storeReportedAction(action)
+        sharedInstance.syncCoordinator.store(reportedAction: action)
     }
     
     

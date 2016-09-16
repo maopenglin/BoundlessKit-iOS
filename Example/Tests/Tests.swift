@@ -16,8 +16,7 @@ class Tests: XCTestCase {
     
     override func tearDown() {
         let dopamineKit = DopamineKit.sharedInstance
-        dopamineKit.syncCoordinator.resetSyncers()          // removes the sync triggers from NSUserDefaults
-        dopamineKit.dataStore.clearTables()                 // clears the stored actions and reinforcement decisions from SQLite
+        dopamineKit.syncCoordinator.eraseSyncers()          // clears the sync state, recorded actions, and cartridges
 
         super.tearDown()
     }

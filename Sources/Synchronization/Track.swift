@@ -6,22 +6,24 @@
 //
 //
 
-import Foundation
-
 @objc
-class Track : NSObject, NSCoding {
+internal class Track : NSObject, NSCoding {
     
     static let sharedInstance = Track()
     
-    fileprivate let defaults = UserDefaults.standard
-    fileprivate let defaultsKey = "DopamineTrack"
-    fileprivate let defaultsSizeToSync = "sizeToSync"
-    fileprivate let defaultsTimerStartsAt = "timerStartsAt"
-    fileprivate let defaultsTimerExpiresIn = "timerExpiresIn"
+    private let defaults = UserDefaults.standard
+    private let defaultsKey = "DopamineTrack"
+    private let trackedActionsKey = "trackedActions"
+    private let sizeToSyncKey = "sizeToSync"
+    private let timerStartsAtKey = "timerStartsAt"
+    private let timerExpiresInKey = "timerExpiresIn"
     
-    fileprivate var sizeToSync: Int
-    fileprivate var timerStartsAt: Int64
-    fileprivate var timerExpiresIn: Int64
+    private var trackedActions: [DopeAction] = []
+    private var sizeToSync: Int
+    private var timerStartsAt: Int64
+    private var timerExpiresIn: Int64
+    
+    private var syncInProgress = false
     
     /// Loads the track from NSUserDefaults or creates a new one and saves it to NSUserDefaults
     ///
@@ -30,9 +32,10 @@ class Track : NSObject, NSCoding {
     ///     - timerStartsAt: The start time for a sync timer. Defaults to 0.
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
-    fileprivate init(sizeToSync: Int = 15, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 172800000) {
-        if let savedTrackData = defaults.object(forKey: defaultsKey) as? Data,
-            let savedTrack = NSKeyedUnarchiver.unarchiveObject(with: savedTrackData) as? Track {
+    private init(sizeToSync: Int = 15, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 172800000) {
+        if let savedTrackData = defaults.object(forKey: defaultsKey) as? NSData,
+            let savedTrack = NSKeyedUnarchiver.unarchiveObject(with: savedTrackData as Data) as? Track {
+            self.trackedActions = savedTrack.trackedActions
             self.sizeToSync = savedTrack.sizeToSync;
             self.timerStartsAt = savedTrack.timerStartsAt;
             self.timerExpiresIn = savedTrack.timerExpiresIn;
@@ -49,19 +52,21 @@ class Track : NSObject, NSCoding {
     /// Decodes a saved track from NSUserDefaults
     ///
     required init(coder aDecoder: NSCoder) {
-        self.sizeToSync = aDecoder.decodeInteger(forKey: defaultsSizeToSync)
-        self.timerStartsAt = aDecoder.decodeInt64(forKey: defaultsTimerStartsAt)
-        self.timerExpiresIn = aDecoder.decodeInt64(forKey: defaultsTimerExpiresIn)
-        DopamineKit.DebugLog("Decoded TrackSyncer with sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+        self.trackedActions = aDecoder.decodeObject(forKey: trackedActionsKey) as! [DopeAction]
+        self.sizeToSync = aDecoder.decodeInteger(forKey: sizeToSyncKey)
+        self.timerStartsAt = aDecoder.decodeInt64(forKey: timerStartsAtKey)
+        self.timerExpiresIn = aDecoder.decodeInt64(forKey: timerExpiresInKey)
+        DopamineKit.DebugLog("Decoded TrackSyncer with trackedActions:\(trackedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Encodes a track and saves it to NSUserDefaults
     ///
     func encode(with aCoder: NSCoder) {
-        aCoder.encode(sizeToSync, forKey: defaultsSizeToSync)
-        aCoder.encode(timerStartsAt, forKey: defaultsTimerStartsAt)
-        aCoder.encode(timerExpiresIn, forKey: defaultsTimerExpiresIn)
-        DopamineKit.DebugLog("Encoded TrackSyncer with sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+        aCoder.encode(trackedActions, forKey: trackedActionsKey)
+        aCoder.encode(sizeToSync, forKey: sizeToSyncKey)
+        aCoder.encode(timerStartsAt, forKey: timerStartsAtKey)
+        aCoder.encode(timerExpiresIn, forKey: timerExpiresInKey)
+        DopamineKit.DebugLog("Encoded TrackSyncer with trackedActions:\(trackedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Updates the sync triggers
@@ -71,7 +76,7 @@ class Track : NSObject, NSCoding {
     ///     - timerStartsAt: The start time for a sync timer. Defaults to the current time.
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to previous timerExpiresIn.
     ///
-    func updateTriggers(_ sizeToSync: Int?=nil, timerStartsAt: Int64?=Int64( 1000*Date().timeIntervalSince1970 ), timerExpiresIn: Int64?=nil) {
+    func updateTriggers(sizeToSync: Int?=nil, timerStartsAt: Int64?=Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64?=nil) {
         if let sizeToSync = sizeToSync {
             self.sizeToSync = sizeToSync
         }
@@ -84,12 +89,13 @@ class Track : NSObject, NSCoding {
         defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
     
-    /// Clears the saved track from NSUserDefaults and resets triggers
+    /// Clears the saved track sync triggers from NSUserDefaults
     ///
-    func resetTriggers() {
+    func erase() {
+        self.trackedActions.removeAll()
         self.sizeToSync = 15
         self.timerStartsAt = 0
-        self.timerExpiresIn = 172800000
+        self.timerExpiresIn = 0
         defaults.removeObject(forKey: defaultsKey)
     }
     
@@ -105,10 +111,10 @@ class Track : NSObject, NSCoding {
     ///
     /// - returns: Whether the timer has expired.
     ///
-    fileprivate func timerDidExpire() -> Bool {
-        let currentTime = Int64( 1000*Date().timeIntervalSince1970 )
+    private func timerDidExpire() -> Bool {
+        let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartsAt + timerExpiresIn)
-        DopamineKit.DebugLog("Track timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so \(isExpired ? "does" : "doesn't") need to sync...")
+        DopamineKit.DebugLog("Track timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
         return isExpired
     }
     
@@ -116,10 +122,10 @@ class Track : NSObject, NSCoding {
     ///
     /// - returns: Whether there are enough tracked actions to trigger a sync.
     ///
-    fileprivate func isSizeToSync() -> Bool {
-        let count = SQLTrackedActionDataHelper.count()
+    private func isSizeToSync() -> Bool {
+        let count = trackedActions.count
         let isSize = count >= sizeToSync
-        DopamineKit.DebugLog("Track has \(count)/\(sizeToSync) actions so \(isSize ? "does" : "doesn't") need to sync...")
+        DopamineKit.DebugLog("Track has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isSize
     }
     
@@ -128,53 +134,47 @@ class Track : NSObject, NSCoding {
     /// - parameters:
     ///     - action: The action to be stored.
     ///
-    func add(_ action: DopeAction) {
-        guard let _ = SQLTrackedActionDataHelper.insert(
-            SQLTrackedAction(
-                index: 0,
-                actionID: action.actionID,
-                metaData: action.metaData,
-                utc: action.utc,
-                timezoneOffset: action.timezoneOffset )
-            )
-            else{
-                // if it couldnt be saved, send it
-                DopamineKit.DebugLog("SQLiteDataStore error, sending single action track")
-                DopamineAPI.track([action], completion: { response in
-                    
-                })
-                return
-        }
+    func add(action: DopeAction) {
+        trackedActions.append(action)
+        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
     
-    /// Removes a tracked action, to be used after an action has been synced over the DopamineAPI
+    /// Sends tracked actions over the DopamineAPI
     ///
     /// - parameters:
-    ///     - action: The sql row to delete.
+    ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if there were no actions to sync.
     ///
-    func remove(_ action: SQLTrackedAction) {
-        SQLTrackedActionDataHelper.delete(action)
-    }
-    
-    /// Retrieve all tracked actions
-    ///
-    /// - returns: (sqlRows, dopeActions)
-    ///     - sqlRows: The sql rows for tracked actions. Pass into `remove()` after successful sync.
-    ///     - dopeActions: The tracked actions to be synced over DopamineAPI.
-    ///
-    func getActions() -> (Array<SQLTrackedAction>, Array<DopeAction>) {
-        var trackedActions = Array<DopeAction>()
-        let sqlActions = SQLTrackedActionDataHelper.findAll()
-        for action in sqlActions {
-            trackedActions.append(
-                DopeAction(
-                    actionID: action.actionID,
-                    metaData: action.metaData,
-                    utc: action.utc,
-                    timezoneOffset: action.timezoneOffset )
-            )
+    func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
+            guard !self.syncInProgress else {
+                DopamineKit.DebugLog("Track sync already happening")
+                completion(0)
+                return
+            }
+            self.syncInProgress = true
+            
+            if self.trackedActions.count == 0 {
+                defer { self.syncInProgress = false }
+                DopamineKit.DebugLog("No tracked actions to sync.")
+                completion(0)
+                self.updateTriggers()
+                return
+            } else {
+                DopamineKit.DebugLog("Sending \(self.trackedActions.count) tracked actions...")
+                DopamineAPI.track(self.trackedActions) { response in
+                    defer { self.syncInProgress = false }
+                    if let responseStatusCode = response["status"] as? Int {
+                        completion(responseStatusCode)
+                        if responseStatusCode == 200 {
+                            self.trackedActions.removeAll()
+                            self.updateTriggers()
+                        }
+                    } else {
+                        completion(404)
+                    }
+                }
+            }
         }
-        return (sqlActions, trackedActions)
     }
     
 }
