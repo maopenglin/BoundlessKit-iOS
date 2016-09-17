@@ -6,6 +6,8 @@
 //
 //
 
+import Foundation
+
 @objc
 internal class DopeAction : NSObject, NSCoding {
     

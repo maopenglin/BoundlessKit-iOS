@@ -6,6 +6,8 @@
 //
 //
 
+import Foundation
+
 public class DopamineAPI : NSObject{
     
     internal static let sharedInstance: DopamineAPI = DopamineAPI()

@@ -6,6 +6,8 @@
 //
 //
 
+import Foundation
+
 public class SyncCoordinator {
     
     internal static let sharedInstance = SyncCoordinator()

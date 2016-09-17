@@ -6,6 +6,8 @@
 //  Copyright © 2016 Dopamine Labs. All rights reserved.
 //
 
+import Foundation
+
 @objc
 open class DopamineKit : NSObject {
     
