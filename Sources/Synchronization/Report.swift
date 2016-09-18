@@ -9,19 +9,23 @@
 import Foundation
 
 @objc
-class Report : NSObject, NSCoding {
+internal class Report : NSObject, NSCoding {
     
     static let sharedInstance = Report()
     
-    private let defaults = NSUserDefaults.standardUserDefaults()
+    private let defaults = UserDefaults.standard
     private let defaultsKey = "DopamineReport"
-    private let defaultsSizeToSync = "sizeToSync"
-    private let defaultsTimerStartsAt = "timerStartsAt"
-    private let defaultsTimerExpiresIn = "timerExpiresIn"
+    private let reportedActionsKey = "reportedActions"
+    private let sizeToSyncKey = "sizeToSync"
+    private let timerStartsAtKey = "timerStartsAt"
+    private let timerExpiresInKey = "timerExpiresIn"
     
+    private var reportedActions: [DopeAction] = []
     private var sizeToSync: Int
     private var timerStartsAt: Int64
     private var timerExpiresIn: Int64
+    
+    private var syncInProgress = false
     
     /// Loads the report from NSUserDefaults or creates a new one and saves it to NSUserDefaults
     ///
@@ -31,39 +35,42 @@ class Report : NSObject, NSCoding {
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
     private init(sizeToSync: Int = 15, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 172800000) {
-        if let savedReportData = defaults.objectForKey(defaultsKey) as? NSData,
-            let savedReport = NSKeyedUnarchiver.unarchiveObjectWithData(savedReportData) as? Report {
-            self.sizeToSync = savedReport.sizeToSync;
-            self.timerStartsAt = savedReport.timerStartsAt;
-            self.timerExpiresIn = savedReport.timerExpiresIn;
+        if let savedReportData = defaults.object(forKey: defaultsKey) as? NSData,
+            let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData as Data) as? Report {
+            self.reportedActions = savedReport.reportedActions
+            self.sizeToSync = savedReport.sizeToSync
+            self.timerStartsAt = savedReport.timerStartsAt
+            self.timerExpiresIn = savedReport.timerExpiresIn
             super.init()
         } else {
             self.sizeToSync = sizeToSync;
             self.timerStartsAt = timerStartsAt;
             self.timerExpiresIn = timerExpiresIn;
             super.init()
-            defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(self), forKey: defaultsKey)
+            defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
         }
     }
     
     /// Decodes a saved report from NSUserDefaults
     ///
     required init(coder aDecoder: NSCoder) {
-        self.sizeToSync = aDecoder.decodeIntegerForKey(defaultsSizeToSync)
-        self.timerStartsAt = aDecoder.decodeInt64ForKey(defaultsTimerStartsAt)
-        self.timerExpiresIn = aDecoder.decodeInt64ForKey(defaultsTimerExpiresIn)
-        DopamineKit.DebugLog("Decoded report with sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+        self.reportedActions = aDecoder.decodeObject(forKey: reportedActionsKey) as! [DopeAction]
+        self.sizeToSync = aDecoder.decodeInteger(forKey: sizeToSyncKey)
+        self.timerStartsAt = aDecoder.decodeInt64(forKey: timerStartsAtKey)
+        self.timerExpiresIn = aDecoder.decodeInt64(forKey: timerExpiresInKey)
+        DopamineKit.DebugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Encodes a report and saves it to NSUserDefaults
     ///
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeInteger(sizeToSync, forKey: defaultsSizeToSync)
-        aCoder.encodeInt64(timerStartsAt, forKey: defaultsTimerStartsAt)
-        aCoder.encodeInt64(timerExpiresIn, forKey: defaultsTimerExpiresIn)
-        DopamineKit.DebugLog("Encoded report with sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(reportedActions, forKey: reportedActionsKey)
+        aCoder.encode(sizeToSync, forKey: sizeToSyncKey)
+        aCoder.encode(timerStartsAt, forKey: timerStartsAtKey)
+        aCoder.encode(timerExpiresIn, forKey: timerExpiresInKey)
+        DopamineKit.DebugLog("Encoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
-    
+
     /// Updates the sync triggers
     ///
     /// - parameters:
@@ -81,16 +88,17 @@ class Report : NSObject, NSCoding {
         if let timerExpiresIn = timerExpiresIn {
             self.timerExpiresIn = timerExpiresIn
         }
-        defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(self), forKey: defaultsKey)
+        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
     
-    /// Clears the saved report from NSUserDefaults and resets triggers
+    /// Clears the saved report sync triggers from NSUserDefaults
     ///
-    func resetTriggers() {
+    func erase() {
+        self.reportedActions.removeAll()
         self.sizeToSync = 15
         self.timerStartsAt = 0
-        self.timerExpiresIn = 172800000
-        defaults.removeObjectForKey(defaultsKey)
+        self.timerExpiresIn = 0
+        defaults.removeObject(forKey: defaultsKey)
     }
     
     /// Check whether the report has been triggered for a sync
@@ -108,7 +116,7 @@ class Report : NSObject, NSCoding {
     private func timerDidExpire() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartsAt + timerExpiresIn)
-        DopamineKit.DebugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so \(isExpired ? "does" : "doesn't") need to sync...")
+        DopamineKit.DebugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
         return isExpired
     }
     
@@ -117,9 +125,9 @@ class Report : NSObject, NSCoding {
     /// - returns: Whether there are enough reported actions to trigger a sync.
     ///
     private func isSizeToSync() -> Bool {
-        let count = SQLReportedActionDataHelper.count()
+        let count = reportedActions.count
         let isSize = count >= sizeToSync
-        DopamineKit.DebugLog("Report has \(count)/\(sizeToSync) actions so \(isSize ? "does" : "doesn't") need to sync...")
+        DopamineKit.DebugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isSize
     }
     
@@ -129,54 +137,46 @@ class Report : NSObject, NSCoding {
     ///     - action: The action to be stored.
     ///
     func add(action: DopeAction) {
-        guard let _ = SQLReportedActionDataHelper.insert(
-            SQLReportedAction(
-                index:0,
-                actionID: action.actionID,
-                reinforcementDecision: action.reinforcementDecision!,
-                metaData: action.metaData,
-                utc: action.utc,
-                timezoneOffset: action.timezoneOffset )
-            )
-            else{
-                // if it couldnt be saved, send it
-                DopamineKit.DebugLog("SQLiteDataStore error, sending single action report")
-                DopamineAPI.report([action], completion: {
-                    response in
-                })
-                return
-        }
+        reportedActions.append(action)
+        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
     
-    /// Removes a reported action, to be used after an action has been synced over the DopamineAPI
+    /// Sends reinforced actions over the DopamineAPI
     ///
     /// - parameters:
-    ///     - action: The sql row to delete.
+    ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if there were no actions to sync.
     ///
-    func remove(action: SQLReportedAction) {
-        SQLReportedActionDataHelper.delete(action);
-    }
-    
-    /// Retrieve all reported actions
-    ///
-    /// - returns: (sqlRows, dopeActions)
-    ///     - sqlRows: The sql rows for reported actions. Pass into `remove()` after successful sync.
-    ///     - dopeActions: The reported actions to be synced over DopamineAPI.
-    ///
-    func getActions() -> (Array<SQLReportedAction>, Array<DopeAction>) {
-        var reportedActions = Array<DopeAction>()
-        let sqlActions = SQLReportedActionDataHelper.findAll()
-        for action in sqlActions {
-            reportedActions.append(
-                DopeAction(
-                    actionID: action.actionID,
-                    reinforcementDecision: action.reinforcementDecision,
-                    metaData: action.metaData,
-                    utc: action.utc,
-                    timezoneOffset: action.timezoneOffset )
-            )
+    func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
+            guard !self.syncInProgress else {
+                DopamineKit.DebugLog("Report sync already happening")
+                completion(0)
+                return
+            }
+            self.syncInProgress = true
+            
+            if self.reportedActions.count == 0 {
+                defer { self.syncInProgress = false }
+                DopamineKit.DebugLog("No reported actions to sync.")
+                completion(0)
+                self.updateTriggers()
+            } else {
+                DopamineKit.DebugLog("Sending \(self.reportedActions.count) reported actions...")
+                DopamineAPI.report(self.reportedActions, completion: { response in
+                    defer { self.syncInProgress = false }
+                    if let responseStatusCode = response["status"] as? Int {
+                        completion(responseStatusCode)
+                        if responseStatusCode == 200 {
+                            self.reportedActions.removeAll()
+                            self.updateTriggers()
+                        }
+                    } else {
+                        completion(404)
+                    }
+                })
+            }
+            
         }
-        return (sqlActions, reportedActions)
     }
     
 }

@@ -7,16 +7,17 @@
 //
 
 import Foundation
-import UIKit
-import SQLite
 
 @objc
-public class DopamineKit : NSObject {
+open class DopamineKit : NSObject {
     
     public static let sharedInstance: DopamineKit = DopamineKit()
     
-    public let dataStore = SQLiteDataStore.sharedInstance
     public let syncCoordinator = SyncCoordinator.sharedInstance
+    
+    private override init() {
+        super.init()
+    }
     
     /// This function sends an asynchronous tracking call for the specified actionID
     ///
@@ -26,10 +27,10 @@ public class DopamineKit : NSObject {
     ///                  Must be JSON formattable (Number, String, Bool, Array, Object).
     ///                  Defaults to `nil`.
     ///
-    public static func track(actionID: String, metaData: [String: AnyObject]? = nil) {
+    open static func track(_ actionID: String, metaData: [String: AnyObject]? = nil) {
         // store the action to be synced
         let action = DopeAction(actionID: actionID, metaData:metaData)
-        sharedInstance.syncCoordinator.storeTrackedAction(action)
+        sharedInstance.syncCoordinator.store(trackedAction: action)
     }
 
     /// This function sends an asynchronous reinforcement call for the specified actionID
@@ -41,16 +42,16 @@ public class DopamineKit : NSObject {
     ///                  Defaults to `nil`.
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
-    public static func reinforce(actionID: String, metaData: [String: AnyObject]? = nil, completion: (String) -> ()) {
-        var action = DopeAction(actionID: actionID, metaData: metaData)
-        action.reinforcementDecision =  sharedInstance.syncCoordinator.removeReinforcementDecisionFor(action)
+    open static func reinforce(_ actionID: String, metaData: [String: AnyObject]? = nil, completion: @escaping (String) -> ()) {
+        let action = DopeAction(actionID: actionID, metaData: metaData)
+        action.reinforcementDecision =  sharedInstance.syncCoordinator.retrieveReinforcementDecisionFor(actionID: action.actionID)
         
-        dispatch_async(dispatch_get_main_queue(), {
+        DispatchQueue.main.async(execute: {
             completion(action.reinforcementDecision!)
         })
         
         // store the action to be synced
-        sharedInstance.syncCoordinator.storeReportedAction(action)
+        sharedInstance.syncCoordinator.store(reportedAction: action)
     }
     
     
@@ -62,13 +63,13 @@ public class DopamineKit : NSObject {
     ///     - function?: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line?: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    internal static func DebugLog(message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
+    internal static func DebugLog(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
         #if DEBUG
             var functionSignature:String = function
-            if let parameterNames = functionSignature.rangeOfString("\\((.*?)\\)", options: .RegularExpressionSearch){
-                functionSignature.replaceRange(parameterNames, with: "()")
+            if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
+                functionSignature.replaceSubrange(parameterNames, with: "()")
             }
-            let fileName = NSString(string: filePath).lastPathComponent.componentsSeparatedByString(".")[0]
+            let fileName = NSString(string: filePath).lastPathComponent.components(separatedBy: ",")[0]
             NSLog("[\(fileName):\(line):\(functionSignature)] - \(message)")
         #endif
     }

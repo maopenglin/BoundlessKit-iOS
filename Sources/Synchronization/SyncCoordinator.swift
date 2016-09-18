@@ -10,17 +10,27 @@ import Foundation
 
 public class SyncCoordinator {
     
-    static let sharedInstance = SyncCoordinator()
+    internal static let sharedInstance = SyncCoordinator()
     
-    private let trackSyncer = TrackSyncer.sharedInstance;
-    private let reportSyncer = ReportSyncer.sharedInstance;
-    private let cartridgeSyncer = CartridgeSyncer.sharedInstance;
+    /// Used to store actionIDs so cartridges can be loaded on init()
+    ///
+    private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet"
+    private let defaults = UserDefaults.standard
+    
+    private let trackSyncer = Track.sharedInstance
+    private let reportSyncer = Report.sharedInstance
+    private var cartridgeSyncers:[String:Cartridge] = [:]
     
     private var syncInProgress = false
     
     /// Initializer for SyncCoordinator performs a sync
     ///
     private init() {
+        if let savedActionIDSetData = defaults.object(forKey: cartridgeActionIDSetKey) as? [String] {
+            for actionID in savedActionIDSetData {
+                cartridgeSyncers[actionID] = Cartridge(actionID: actionID)
+            }
+        }
         performSync()
     }
     
@@ -29,8 +39,8 @@ public class SyncCoordinator {
     /// - parameters: 
     ///     - trackedAction: A tracked action.
     ///
-    func storeTrackedAction(trackedAction: DopeAction) {
-        trackSyncer.store(trackedAction)
+    internal func store(trackedAction: DopeAction) {
+        trackSyncer.add(action: trackedAction)
         performSync()
     }
     
@@ -39,8 +49,8 @@ public class SyncCoordinator {
     /// - parameters:
     ///     - reportedAction: A reinforced action.
     ///
-    func storeReportedAction(reportedAction: DopeAction) {
-        reportSyncer.store(reportedAction)
+    internal func store(reportedAction: DopeAction) {
+        reportSyncer.add(action: reportedAction)
         performSync()
     }
     
@@ -52,15 +62,22 @@ public class SyncCoordinator {
     /// - returns:
     ///     A reinforcement decision
     ///
-    func removeReinforcementDecisionFor(reinforceableAction: DopeAction) -> String {
-        return cartridgeSyncer.unloadReinforcementDecisionForAction(reinforceableAction)
+    internal func retrieveReinforcementDecisionFor(actionID: String) -> String {
+        if let cartridge = cartridgeSyncers[actionID] {
+            return cartridge.remove()
+        } else {
+            let cartridge = Cartridge(actionID: actionID)
+            cartridgeSyncers[actionID] = cartridge
+            defaults.set(cartridgeSyncers.keys.sorted(), forKey: cartridgeActionIDSetKey)
+            return cartridge.remove()
+        }
     }
     
     /// Checks which syners have been triggered, and syncs them in an order 
     /// that allows time for the DopamineAPI to generate cartridges
     ///
     public func performSync() {
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
                 DopamineKit.DebugLog("Sync already happening")
                 return
@@ -68,48 +85,54 @@ public class SyncCoordinator {
             self.syncInProgress = true
             defer { self.syncInProgress = false }
             
-            let anyCartridgeShouldSync = self.cartridgeSyncer.shouldSync()
-            let reportShouldSync = anyCartridgeShouldSync || self.reportSyncer.shouldSync()
-            let trackerShouldSync = reportShouldSync || self.trackSyncer.shouldSync()
+            // since a cartridge might be triggered during the sleep time,
+            // lazily check which are triggered
+            var someCartridgeToSync: Cartridge?
+            for (_, cartridge) in self.cartridgeSyncers {
+                if cartridge.isTriggered() {
+                    someCartridgeToSync = cartridge
+                    break
+                }
+            }
+            let reportShouldSync = (someCartridgeToSync != nil) || self.reportSyncer.isTriggered()
+            let trackShouldSync = reportShouldSync || self.trackSyncer.isTriggered()
             
             var goodProgress = true
             
-            if trackerShouldSync {
-                self.trackSyncer.sync() {
-                    status in
-                    guard status == 200 else {
+            if trackShouldSync {
+                self.trackSyncer.sync() { status in
+                    guard status == 200 || status == 0 else {
                         DopamineKit.DebugLog("Track failed during sync. Halting sync.")
                         goodProgress = false
                         return
                     }
                 }
+                
                 sleep(1)
-            }
-            
-            if !goodProgress { return }
-            
-            if reportShouldSync {
-                self.reportSyncer.sync() {
-                    status in
-                    guard status == 200 else {
-                        DopamineKit.DebugLog("Report failed during sync. Halting sync.")
-                        goodProgress = false
-                        return
+                if !goodProgress { return }
+                
+                if reportShouldSync {
+                    self.reportSyncer.sync() { status in
+                        guard status == 200 || status == 0 else {
+                            DopamineKit.DebugLog("Report failed during sync. Halting sync.")
+                            goodProgress = false
+                            return
+                        }
                     }
                 }
+                
                 sleep(5)
-            }
-            
-            if !goodProgress { return }
-            
-            let cartridgesToSync = self.cartridgeSyncer.whichShouldSync()
-            DopamineKit.DebugLog("Refreshing \(cartridgesToSync.count) cartidges.")
-            for actionID in cartridgesToSync where goodProgress {
-                self.cartridgeSyncer.sync(actionID) { status in
-                    guard status == 200 else {
-                        DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
-                        goodProgress = false
-                        return
+                if !goodProgress { return }
+                
+                // since a cartridge might be triggered during the sleep time,
+                // lazily check which are triggered
+                for (actionID, cartridge) in self.cartridgeSyncers where goodProgress && cartridge.isTriggered() {
+                    cartridge.sync() { status in
+                        guard status == 200 else {
+                            DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
+                            goodProgress = false
+                            return
+                        }
                     }
                 }
             }
@@ -121,8 +144,8 @@ public class SyncCoordinator {
     /// - parameters:
     ///     - size: The number of tracked actions to trigger a sync.
     ///
-    public func setTrackSizeToSync(size: Int?) {
-        trackSyncer.setSizeToSync(size)
+    public func setSizeToSync(forTrack size: Int?) {
+        trackSyncer.updateTriggers(sizeToSync: size, timerStartsAt: nil, timerExpiresIn: nil)
     }
     
     /// Modifies the number of reported actions to trigger a sync
@@ -130,15 +153,19 @@ public class SyncCoordinator {
     /// - parameters:
     ///     - size: The number of reported actions to trigger a sync.
     ///
-    public func setReportSizeToSync(size: Int?) {
-        reportSyncer.setSizeToSync(size)
+    public func setSizeToSync(forReport size: Int?) {
+        reportSyncer.updateTriggers(sizeToSync: size, timerStartsAt: nil, timerExpiresIn: nil)
     }
     
-    /// Resets the sync triggers
+    /// Erase the sync objects along with their data
     ///
-    public func resetSyncers() {
-        trackSyncer.reset()
-        reportSyncer.reset()
-        cartridgeSyncer.reset()
+    public func eraseSyncers() {
+        trackSyncer.erase()
+        reportSyncer.erase()
+        for (_, cartridge) in cartridgeSyncers {
+            cartridge.erase()
+        }
+        cartridgeSyncers.removeAll()
+        defaults.removeObject(forKey: cartridgeActionIDSetKey)
     }
 }

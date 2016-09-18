@@ -16,8 +16,8 @@ Pod::Spec.new do |s|
 #
 
 s.name             = "DopamineKit"
-s.version          = "4.0.1"
-s.summary          = "A framework to use DopamineLabs machine learning API"
+s.version          = "4.1.0"
+s.summary          = "A framework to use DopamineLabs machine learning API written in Swift 3"
 
 s.description      = <<-DESC
 Make your iOS app habit-forming using the DopamineAPI.
@@ -75,6 +75,7 @@ s.source_files = "Sources/**/*"
 
 s.public_header_files = "Sources/**/*.h"
 
-s.dependency 'SQLite.swift'
+#s.dependency 'SQLite.swift'
+s.frameworks = 'CoreData'
 
 end
