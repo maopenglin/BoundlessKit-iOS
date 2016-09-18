@@ -15,6 +15,10 @@ open class DopamineKit : NSObject {
     
     public let syncCoordinator = SyncCoordinator.sharedInstance
     
+    private override init() {
+        super.init()
+    }
+    
     /// This function sends an asynchronous tracking call for the specified actionID
     ///
     /// - parameters:
