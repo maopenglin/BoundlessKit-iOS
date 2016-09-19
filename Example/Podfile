@@ -5,8 +5,6 @@ target 'DopamineKit_Example' do
 
 target 'DopamineKit_Tests' do
     inherit! :search_paths
-
-    
     
   end
 end
