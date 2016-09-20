@@ -18,6 +18,8 @@
 		77DDEF96C19D3648450FDF1030575B7F /* Pods-DopamineKit_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C52B24D3596967BD4F17CA99753F541 /* Pods-DopamineKit_Tests-dummy.m */; };
 		7FCA9B9A585081FF9A8126A5EDFA86AE /* DopamineKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AEEA467B356923135B55508B249986D /* DopamineKit-dummy.m */; };
 		80D06A41D78CAE3534778A15BAB5EBAA /* Cartridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C1F1FD2A79A6FE888021154168E7F4 /* Cartridge.swift */; };
+		84825BC81D90DAD600B0EF7A /* SyncOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84825BC71D90DAD600B0EF7A /* SyncOverview.swift */; };
+		84825BCA1D90DF4A00B0EF7A /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84825BC91D90DF4A00B0EF7A /* Telemetry.swift */; };
 		89452633DF6A2A07C2284BA614CE8CAE /* Pods-DopamineKit_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 613E0AB4F58AD2A5F39FF738DC2E8E37 /* Pods-DopamineKit_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8A716A75738D9B55B8F21853C16DD946 /* DopamineKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30ADCE25971F8DC3264D0F391495B4C6 /* DopamineKit.swift */; };
 		8E4E37CF8DEFFD49603FA76E67E831C3 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DAAA973CED8F50431CF78F8E39F3461 /* Track.swift */; };
@@ -62,6 +64,8 @@
 		69C1F1FD2A79A6FE888021154168E7F4 /* Cartridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Cartridge.swift; sourceTree = "<group>"; };
 		7309A0960A75E85B66321E4E8CCF00D3 /* Pods_DopamineKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555C005FD3F95381466C1E2DE4D4F46 /* Pods-DopamineKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Example-resources.sh"; sourceTree = "<group>"; };
+		84825BC71D90DAD600B0EF7A /* SyncOverview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncOverview.swift; sourceTree = "<group>"; };
+		84825BC91D90DF4A00B0EF7A /* Telemetry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		94E602D2C33E2E9FC4082B1F07DC8F3E /* Pods-DopamineKit_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-DopamineKit_Example.modulemap"; sourceTree = "<group>"; };
 		B337D74C4940AAFDBB9CA8CAF75B6DC0 /* DopamineKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DopamineKit-prefix.pch"; sourceTree = "<group>"; };
@@ -125,6 +129,8 @@
 			children = (
 				69C1F1FD2A79A6FE888021154168E7F4 /* Cartridge.swift */,
 				289D85F755522CB83D274FE6360A7058 /* DopeAction.swift */,
+				84825BC91D90DF4A00B0EF7A /* Telemetry.swift */,
+				84825BC71D90DAD600B0EF7A /* SyncOverview.swift */,
 				4355B7D1B5E7D256EC433126B09A90C5 /* Report.swift */,
 				E788B8E4A80D04E17AFF7ADB7EC56783 /* SyncCoordinator.swift */,
 				4DAAA973CED8F50431CF78F8E39F3461 /* Track.swift */,
@@ -373,6 +379,8 @@
 			files = (
 				80D06A41D78CAE3534778A15BAB5EBAA /* Cartridge.swift in Sources */,
 				C04850EAF61AE1E54EB8C6498DD0016A /* DopamineAPI.swift in Sources */,
+				84825BC81D90DAD600B0EF7A /* SyncOverview.swift in Sources */,
+				84825BCA1D90DF4A00B0EF7A /* Telemetry.swift in Sources */,
 				7FCA9B9A585081FF9A8126A5EDFA86AE /* DopamineKit-dummy.m in Sources */,
 				8A716A75738D9B55B8F21853C16DD946 /* DopamineKit.swift in Sources */,
 				04A8496533BFE85DFC1AA8F6FBEBDA81 /* DopeAction.swift in Sources */,

@@ -8,27 +8,33 @@
 
 import Foundation
 
+
+
 public class DopamineAPI : NSObject{
+    
+    /// Valid API actions appeneded to the DopamineAPI URL
+    ///
+    internal enum CallType{
+        case track, report, refresh, sync
+        var str:String{ switch self{
+        case .track: return "track"
+        case .report: return "report"
+        case .refresh: return "refresh"
+        case .sync: return "sync"
+            }
+        }
+    }
     
     internal static let sharedInstance: DopamineAPI = DopamineAPI()
     
-    private static let dopamineAPIURL = "https://api.usedopamine.com/v4/app/"
-    private static let clientSDKVersion = "4.1.0"
+//    private static let dopamineAPIURL = "https://api.usedopamine.com/v4/app/"
+    private static let dopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/"
+    private static let clientSDKVersion = "4.1.1"
     private static let clientOS = "iOS"
     private static let clientOSVersion = UIDevice.current.systemVersion
     
     private override init() {
         super.init()
-    }
-    
-    private enum CallType{
-        case track, report, refresh
-        var str:String{ switch self{
-        case .track: return "track"
-        case .report: return "report"
-        case .refresh: return "refresh"
-            }
-        }
     }
     
     /// Send an array of actions to the DopamineAPI's `/track` path
@@ -48,8 +54,8 @@ public class DopamineAPI : NSObject{
         }
         
         payload["actions"] = trackedActionsJSONArray as AnyObject?
-        payload["utc"] = (1000*Date().timeIntervalSince1970) as AnyObject
-        payload["timezoneOffset"] = (1000*NSTimeZone.default.secondsFromGMT()) as AnyObject
+        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000) as AnyObject
+        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000) as AnyObject
         
         sharedInstance.send(call: .track, with: payload, completion: {response in
             completion(response)
@@ -71,8 +77,8 @@ public class DopamineAPI : NSObject{
         }
         
         payload["actions"] = reinforcedActionsArray as AnyObject?
-        payload["utc"] = (1000*Date().timeIntervalSince1970) as AnyObject
-        payload["timezoneOffset"] = (1000*NSTimeZone.default.secondsFromGMT()) as AnyObject
+        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000) as AnyObject
+        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000) as AnyObject
         
         sharedInstance.send(call: .report, with: payload, completion: {response in
             completion(response)
@@ -89,11 +95,35 @@ public class DopamineAPI : NSObject{
         var payload = sharedInstance.configurationData
         
         payload["actionID"] = actionID as AnyObject?
-        payload["utc"] = (1000*Date().timeIntervalSince1970) as AnyObject
-        payload["timezoneOffset"] = (1000*NSTimeZone.default.secondsFromGMT()) as AnyObject
+        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000) as AnyObject
+        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000) as AnyObject
         
         DopamineKit.DebugLog("Refreshing \(actionID)...")
         sharedInstance.send(call: .refresh, with: payload, completion:  { response in
+            completion(response)
+        })
+    }
+    
+    ///!! Send an actionID to the DopamineAPI's `/refresh` path to generate a new cartridge of reinforcement decisions
+    ///!!
+    ///!! - parameters:
+    ///!!     - actionID: The actionID that needs reinforcement decisions.
+    ///!!!     - completion: A closure to handle the JSON formatted response.
+    ///!!
+    internal static func sync(_ syncOverviews: [SyncOverview], completion: @escaping ([String:AnyObject]) -> ()){
+        var payload = sharedInstance.configurationData
+        
+        var syncOverviewJSONArray: [AnyObject] = []
+        for syncOverview in syncOverviews {
+            syncOverviewJSONArray.append(syncOverview.toJSONType())
+        }
+        payload["syncOverviews"] = syncOverviewJSONArray as AnyObject?
+        payload["exceptions"] = [] as AnyObject
+        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000) as AnyObject
+        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000) as AnyObject
+        
+//        DopamineKit.DebugLog("Refreshing \(actionID)...")
+        sharedInstance.send(call: .sync, with: payload, completion:  { response in
             completion(response)
         })
     }
@@ -125,6 +155,7 @@ public class DopamineAPI : NSObject{
 //            DopamineKit.DebugLog("sending raw payload:\(jsonPayload.debugDescription)")   // hex 16 chars
             request.httpBody = jsonPayload
             
+            let callStartTime = Int64( NSDate().timeIntervalSince1970 )*1000
             let task = session.dataTask(with: request, completionHandler: { responseData, responseURL, error in
                 var responseDict: [String : AnyObject] = [:]
                 defer { completion(responseDict) }
@@ -139,6 +170,19 @@ public class DopamineAPI : NSObject{
                     // turn the response into a json object
                     responseDict = try JSONSerialization.jsonObject(with: responseData!, options: JSONSerialization.ReadingOptions()) as! [String: AnyObject]
                     DopamineKit.DebugLog("✅\(type.str) call got response:\(responseDict.debugDescription)")
+                    switch type {
+                    case .track:
+                        Telemetry.setResponseForTrackSync(responseDict["status"] as? Int, whichStartedAt: callStartTime)
+                    case .report:
+                        Telemetry.setResponseForReportSync(responseDict["status"] as? Int, whichStartedAt: callStartTime)
+                    case .refresh:
+                        if let actionID = payload["actionID"] as? String {
+                            Telemetry.setResponseForCartridgeSync(forAction: actionID, responseDict["status"] as? Int, whichStartedAt: callStartTime)
+                        }
+                    case .sync:
+                        break
+                    }
+                    
                 } catch {
                     DopamineKit.DebugLog("❌ Error reading \(type.str) response data: \(responseData.debugDescription)")
                     return

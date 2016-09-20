@@ -14,8 +14,8 @@ public class SyncCoordinator {
     
     /// Used to store actionIDs so cartridges can be loaded on init()
     ///
-    private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet"
     private let defaults = UserDefaults.standard
+    private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet"
     
     private let trackSyncer = Track.sharedInstance
     private let reportSyncer = Report.sharedInstance
@@ -31,6 +31,7 @@ public class SyncCoordinator {
                 cartridgeSyncers[actionID] = Cartridge(actionID: actionID)
             }
         }
+        self.setSizeToSync(forTrack: 3)
         performSync()
     }
     
@@ -100,6 +101,16 @@ public class SyncCoordinator {
             var goodProgress = true
             
             if trackShouldSync {
+                var syncCause: String
+                if let cartridgeToSync = someCartridgeToSync {
+                    syncCause = "Cartridge \(cartridgeToSync.actionName()) needs to sync."
+                } else if (reportShouldSync) {
+                    syncCause = "Report needs to sync."
+                } else {
+                    syncCause = "Track needs to sync."
+                }
+                Telemetry.startRecordingSync(cause: syncCause, track: self.trackSyncer, report: self.reportSyncer, cartridges: self.cartridgeSyncers)
+//                var callStartTime = Int64(NSDate()
                 self.trackSyncer.sync() { status in
                     guard status == 200 || status == 0 else {
                         DopamineKit.DebugLog("Track failed during sync. Halting sync.")
@@ -127,13 +138,22 @@ public class SyncCoordinator {
                 // since a cartridge might be triggered during the sleep time,
                 // lazily check which are triggered
                 for (actionID, cartridge) in self.cartridgeSyncers where goodProgress && cartridge.isTriggered() {
+//                    let startTime = Int64( NSDate().timeIntervalSince1970*1000 )
                     cartridge.sync() { status in
+//                        Telemetry.setResponseForCartridgeSync(forAction: actionID, status, whichStartedAt: startTime)
                         guard status == 200 else {
                             DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
                             goodProgress = false
                             return
                         }
                     }
+                }
+                sleep(3)
+                if goodProgress {
+                    let syncOverviews = Telemetry.stopRecordingSync()
+                    DopamineAPI.sync(syncOverviews, completion: {
+                        _ in
+                    })
                 }
             }
         }
