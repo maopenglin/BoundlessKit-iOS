@@ -14,8 +14,8 @@ public class SyncCoordinator {
     
     /// Used to store actionIDs so cartridges can be loaded on init()
     ///
-    private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet"
     private let defaults = UserDefaults.standard
+    private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet"
     
     private let trackSyncer = Track.sharedInstance
     private let reportSyncer = Report.sharedInstance
@@ -31,6 +31,7 @@ public class SyncCoordinator {
                 cartridgeSyncers[actionID] = Cartridge(actionID: actionID)
             }
         }
+        self.setSizeToSync(forTrack: 3)
         performSync()
     }
     
@@ -97,13 +98,24 @@ public class SyncCoordinator {
             let reportShouldSync = (someCartridgeToSync != nil) || self.reportSyncer.isTriggered()
             let trackShouldSync = reportShouldSync || self.trackSyncer.isTriggered()
             
-            var goodProgress = true
-            
             if trackShouldSync {
+                var syncCause: String
+                if let cartridgeToSync = someCartridgeToSync {
+                    syncCause = "Cartridge \(cartridgeToSync.actionName()) needs to sync."
+                } else if (reportShouldSync) {
+                    syncCause = "Report needs to sync."
+                } else {
+                    syncCause = "Track needs to sync."
+                }
+                
+                Telemetry.startRecordingSync(cause: syncCause, track: self.trackSyncer, report: self.reportSyncer, cartridges: self.cartridgeSyncers)
+                var goodProgress = true
+                
                 self.trackSyncer.sync() { status in
                     guard status == 200 || status == 0 else {
                         DopamineKit.DebugLog("Track failed during sync. Halting sync.")
                         goodProgress = false
+                        Telemetry.stopRecordingSync(successfullySynced: false)
                         return
                     }
                 }
@@ -116,6 +128,7 @@ public class SyncCoordinator {
                         guard status == 200 || status == 0 else {
                             DopamineKit.DebugLog("Report failed during sync. Halting sync.")
                             goodProgress = false
+                            Telemetry.stopRecordingSync(successfullySynced: false)
                             return
                         }
                     }
@@ -131,10 +144,16 @@ public class SyncCoordinator {
                         guard status == 200 else {
                             DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
                             goodProgress = false
+                            Telemetry.stopRecordingSync(successfullySynced: false)
                             return
                         }
                     }
                 }
+                
+                sleep(3)
+                if !goodProgress { return }
+                
+                Telemetry.stopRecordingSync(successfullySynced: true)
             }
         }
     }

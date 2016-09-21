@@ -29,6 +29,10 @@ internal class Cartridge : NSObject, NSCoding {
     
     private var syncInProgress = false
     
+    /// Returns the actionID associated with this cartridge
+    ///
+    func actionName() -> String { return actionID }
+    
     /// Loads a cartridge from NSUserDefaults or creates a new cartridge and saves it to NSUserDefaults
     ///
     /// - parameters:
@@ -182,6 +186,19 @@ internal class Cartridge : NSObject, NSCoding {
                 }
             }
         }
+    }
+    
+    /// This function returns a snapshot of this instance as a JSON compatible Object
+    ///
+    func toJSONType() -> AnyObject {
+        return [
+            actionIDKey : actionID as AnyObject,
+            "size" : reinforcementDecisions.count as AnyObject,
+            initialSizeKey : initialSize as AnyObject,
+            "capacityToSync" : Cartridge.capacityToSync as AnyObject,
+            timerStartsAtKey : NSNumber(value: timerStartsAt) as AnyObject,
+            timerExpiresInKey : NSNumber(value: timerExpiresIn) as AnyObject
+        ] as AnyObject
     }
     
 }
