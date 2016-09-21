@@ -98,8 +98,6 @@ public class SyncCoordinator {
             let reportShouldSync = (someCartridgeToSync != nil) || self.reportSyncer.isTriggered()
             let trackShouldSync = reportShouldSync || self.trackSyncer.isTriggered()
             
-            var goodProgress = true
-            
             if trackShouldSync {
                 var syncCause: String
                 if let cartridgeToSync = someCartridgeToSync {
@@ -109,12 +107,15 @@ public class SyncCoordinator {
                 } else {
                     syncCause = "Track needs to sync."
                 }
+                
                 Telemetry.startRecordingSync(cause: syncCause, track: self.trackSyncer, report: self.reportSyncer, cartridges: self.cartridgeSyncers)
-//                var callStartTime = Int64(NSDate()
+                var goodProgress = true
+                
                 self.trackSyncer.sync() { status in
                     guard status == 200 || status == 0 else {
                         DopamineKit.DebugLog("Track failed during sync. Halting sync.")
                         goodProgress = false
+                        Telemetry.stopRecordingSync(successfullySynced: false)
                         return
                     }
                 }
@@ -127,6 +128,7 @@ public class SyncCoordinator {
                         guard status == 200 || status == 0 else {
                             DopamineKit.DebugLog("Report failed during sync. Halting sync.")
                             goodProgress = false
+                            Telemetry.stopRecordingSync(successfullySynced: false)
                             return
                         }
                     }
@@ -142,6 +144,7 @@ public class SyncCoordinator {
                         guard status == 200 else {
                             DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
                             goodProgress = false
+                            Telemetry.stopRecordingSync(successfullySynced: false)
                             return
                         }
                     }
@@ -150,11 +153,7 @@ public class SyncCoordinator {
                 sleep(3)
                 if !goodProgress { return }
                 
-                let syncOverviews = Telemetry.stopRecordingSync()
-                DopamineAPI.sync(syncOverviews, completion: {
-                    _ in
-                })
-                
+                Telemetry.stopRecordingSync(successfullySynced: true)
             }
         }
     }

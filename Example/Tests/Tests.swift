@@ -15,9 +15,8 @@ class Tests: XCTestCase {
     }
     
     override func tearDown() {
-        let dopamineKit = DopamineKit.sharedInstance
-        dopamineKit.syncCoordinator.eraseSyncers()          // clears the sync state, recorded actions, and cartridges
-
+        DopamineKit.syncCoordinator.eraseSyncers()          // clears the sync state, recorded actions, and cartridges
+        
         super.tearDown()
     }
     

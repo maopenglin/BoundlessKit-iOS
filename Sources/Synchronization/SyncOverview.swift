@@ -9,16 +9,17 @@
 import Foundation
 internal class SyncOverview : NSObject, NSCoding {
     
-    let utcKey = "utc"
-    let timezoneOffsetKey = "timezoneOffset"
-    let totalSyncTimeKey = "totalSyncTime"
-    let causeKey = "cause"
-    let trackKey = "track"
-    let reportKey = "report"
-    let cartridgesKey = "cartridges"
-    let syncResponseKey = "syncResponse"
-    let roundTripTimeKey = "roundTripTime"
-    let statusKey = "status"
+    static let utcKey = "utc"
+    static let timezoneOffsetKey = "timezoneOffset"
+    static let totalSyncTimeKey = "totalSyncTime"
+    static let causeKey = "cause"
+    static let trackKey = "track"
+    static let reportKey = "report"
+    static let cartridgesKey = "cartridges"
+    static let syncResponseKey = "syncResponse"
+    static let roundTripTimeKey = "roundTripTime"
+    static let statusKey = "status"
+    static let errorKey = "error"
     
     var utc: Int64
     var timezoneOffset: Int64
@@ -48,25 +49,25 @@ internal class SyncOverview : NSObject, NSCoding {
     /// Decodes a saved overview from NSUserDefaults
     ///
     required init(coder aDecoder: NSCoder) {
-        self.utc = aDecoder.decodeInt64(forKey: utcKey)
-        self.timezoneOffset = aDecoder.decodeInt64(forKey: timezoneOffsetKey)
-        self.totalSyncTime = aDecoder.decodeInt64(forKey: totalSyncTimeKey)
-        self.cause = aDecoder.decodeObject(forKey: causeKey) as! String
-        self.trackTriggers = aDecoder.decodeObject(forKey: trackKey) as! [String: AnyObject]
-        self.reportTriggers = aDecoder.decodeObject(forKey: reportKey) as! [String: AnyObject]
-        self.cartridgesTriggers = aDecoder.decodeObject(forKey: cartridgesKey) as! [String: [String: AnyObject]]
+        self.utc = aDecoder.decodeInt64(forKey: SyncOverview.utcKey)
+        self.timezoneOffset = aDecoder.decodeInt64(forKey: SyncOverview.timezoneOffsetKey)
+        self.totalSyncTime = aDecoder.decodeInt64(forKey: SyncOverview.totalSyncTimeKey)
+        self.cause = aDecoder.decodeObject(forKey: SyncOverview.causeKey) as! String
+        self.trackTriggers = aDecoder.decodeObject(forKey: SyncOverview.trackKey) as! [String: AnyObject]
+        self.reportTriggers = aDecoder.decodeObject(forKey: SyncOverview.reportKey) as! [String: AnyObject]
+        self.cartridgesTriggers = aDecoder.decodeObject(forKey: SyncOverview.cartridgesKey) as! [String: [String: AnyObject]]
     }
     
     /// Encodes an overview and saves it to NSUserDefaults
     ///
     func encode(with aCoder: NSCoder) {
-        aCoder.encode(utc, forKey: utcKey)
-        aCoder.encode(timezoneOffset, forKey: timezoneOffsetKey)
-        aCoder.encode(totalSyncTime, forKey: totalSyncTimeKey)
-        aCoder.encode(cause, forKey: causeKey)
-        aCoder.encode(trackTriggers, forKey: trackKey)
-        aCoder.encode(reportTriggers, forKey: reportKey)
-        aCoder.encode(cartridgesTriggers, forKey: cartridgesKey)
+        aCoder.encode(utc, forKey: SyncOverview.utcKey)
+        aCoder.encode(timezoneOffset, forKey: SyncOverview.timezoneOffsetKey)
+        aCoder.encode(totalSyncTime, forKey: SyncOverview.totalSyncTimeKey)
+        aCoder.encode(cause, forKey: SyncOverview.causeKey)
+        aCoder.encode(trackTriggers, forKey: SyncOverview.trackKey)
+        aCoder.encode(reportTriggers, forKey: SyncOverview.reportKey)
+        aCoder.encode(cartridgesTriggers, forKey: SyncOverview.cartridgesKey)
     }
     
     /// This function converts a DopeAction to a JSON compatible Object
@@ -74,13 +75,13 @@ internal class SyncOverview : NSObject, NSCoding {
     func toJSONType() -> AnyObject {
         var jsonObject: [String:AnyObject] = [:]
         
-        jsonObject[utcKey] = NSNumber(value: utc) as AnyObject
-        jsonObject[timezoneOffsetKey] = NSNumber(value: timezoneOffset) as AnyObject
-        jsonObject[totalSyncTimeKey] = NSNumber(value: totalSyncTime) as AnyObject
-        jsonObject[causeKey] = cause as AnyObject
-        jsonObject[trackKey] = trackTriggers as AnyObject
-        jsonObject[reportKey] = reportTriggers as AnyObject
-        jsonObject[cartridgesKey] = cartridgesTriggers as AnyObject
+        jsonObject[SyncOverview.utcKey] = NSNumber(value: utc) as AnyObject
+        jsonObject[SyncOverview.timezoneOffsetKey] = NSNumber(value: timezoneOffset) as AnyObject
+        jsonObject[SyncOverview.totalSyncTimeKey] = NSNumber(value: totalSyncTime) as AnyObject
+        jsonObject[SyncOverview.causeKey] = cause as AnyObject
+        jsonObject[SyncOverview.trackKey] = trackTriggers as AnyObject
+        jsonObject[SyncOverview.reportKey] = reportTriggers as AnyObject
+        jsonObject[SyncOverview.cartridgesKey] = cartridgesTriggers as AnyObject
         DopamineKit.DebugLog(jsonObject.description)
         return jsonObject as AnyObject
     }

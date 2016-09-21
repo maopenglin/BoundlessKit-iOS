@@ -83,7 +83,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
-        let _ = DopamineKit.sharedInstance
+        DopamineKit.syncCoordinator.performSync()
     }
     
     func loadBasicUI(){
