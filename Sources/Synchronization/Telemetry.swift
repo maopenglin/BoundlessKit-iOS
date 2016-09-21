@@ -52,7 +52,7 @@ internal class Telemetry {
             if let syncOverview = Telemetry.currentSyncOverview {
                 var syncResponse: [String: AnyObject] = [:]
                 syncResponse[syncOverview.utcKey] = NSNumber(value: startedAt) as AnyObject
-                syncResponse[syncOverview.roundTripTimeKey] = NSNumber(value: Int64(NSDate().timeIntervalSince1970) * 1000 - startedAt) as AnyObject
+                syncResponse[syncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt) as AnyObject
                 syncResponse[syncOverview.statusKey] = status as AnyObject?
                 
                 syncOverview.trackTriggers[syncOverview.syncResponseKey] = syncResponse as AnyObject
@@ -71,7 +71,7 @@ internal class Telemetry {
             if let syncOverview = Telemetry.currentSyncOverview {
                 var syncResponse: [String: AnyObject] = [:]
                 syncResponse[syncOverview.utcKey] = NSNumber(value: startedAt) as AnyObject
-                syncResponse[syncOverview.roundTripTimeKey] = NSNumber(value: Int64(NSDate().timeIntervalSince1970) * 1000 - startedAt) as AnyObject
+                syncResponse[syncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt) as AnyObject
                 syncResponse[syncOverview.statusKey] = status as AnyObject?
                 
                 syncOverview.reportTriggers[syncOverview.syncResponseKey] = syncResponse as AnyObject
@@ -91,7 +91,7 @@ internal class Telemetry {
             if let syncOverview = Telemetry.currentSyncOverview {
                 var syncResponse: [String: AnyObject] = [:]
                 syncResponse[syncOverview.utcKey] = NSNumber(value: startedAt) as AnyObject
-                syncResponse[syncOverview.roundTripTimeKey] = NSNumber(value: Int64(NSDate().timeIntervalSince1970) * 1000 - startedAt) as AnyObject
+                syncResponse[syncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt) as AnyObject
                 syncResponse[syncOverview.statusKey] = status as AnyObject?
                 
                 syncOverview.cartridgesTriggers[actionID] = [syncOverview.syncResponseKey: syncResponse as AnyObject]
@@ -108,7 +108,7 @@ internal class Telemetry {
         var syncOverviewArray: [SyncOverview] = []
         queue.sync {
             if let syncOverview = Telemetry.currentSyncOverview {
-                syncOverview.totalSyncTime = Int64(NSDate().timeIntervalSince1970 * 1000) - syncOverview.utc
+                syncOverview.totalSyncTime = Int64(1000*NSDate().timeIntervalSince1970) - syncOverview.utc
                 syncOverviewArray.append(syncOverview)
             }
             currentSyncOverview = nil

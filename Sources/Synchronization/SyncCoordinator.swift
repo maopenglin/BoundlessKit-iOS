@@ -138,9 +138,7 @@ public class SyncCoordinator {
                 // since a cartridge might be triggered during the sleep time,
                 // lazily check which are triggered
                 for (actionID, cartridge) in self.cartridgeSyncers where goodProgress && cartridge.isTriggered() {
-//                    let startTime = Int64( NSDate().timeIntervalSince1970*1000 )
                     cartridge.sync() { status in
-//                        Telemetry.setResponseForCartridgeSync(forAction: actionID, status, whichStartedAt: startTime)
                         guard status == 200 else {
                             DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
                             goodProgress = false
@@ -148,13 +146,15 @@ public class SyncCoordinator {
                         }
                     }
                 }
+                
                 sleep(3)
-                if goodProgress {
-                    let syncOverviews = Telemetry.stopRecordingSync()
-                    DopamineAPI.sync(syncOverviews, completion: {
-                        _ in
-                    })
-                }
+                if !goodProgress { return }
+                
+                let syncOverviews = Telemetry.stopRecordingSync()
+                DopamineAPI.sync(syncOverviews, completion: {
+                    _ in
+                })
+                
             }
         }
     }
