@@ -1,5 +1,5 @@
 PODS:
-  - DopamineKit (4.1.0)
+  - DopamineKit (4.1.1)
 
 DEPENDENCIES:
   - DopamineKit (from `../`)
@@ -9,8 +9,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  DopamineKit: 142ac88eee9f4983693f396b7152fc10ae4fc470
+  DopamineKit: f713cea3d4ab92364bb65b26aca460ffd31c4fdb
 
-PODFILE CHECKSUM: cb0429e6ff770be6198f062ac46d62120f5bd5a9
+PODFILE CHECKSUM: f13d6918437eed16bfc7f3ec9d2ccc157be03ef8
 
 COCOAPODS: 1.1.0.rc.2
