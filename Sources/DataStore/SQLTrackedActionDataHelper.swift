@@ -26,9 +26,9 @@ class SQLTrackedActionDataHelper : SQLDataHelperProtocol {
     
     static let index = Expression<Int64>("index")
     static let utc = Expression<Int64>("utc")
-    static let timezoneOffset = Expression<Int64>("timezoneoffset")
-    static let actionID = Expression<String>("actionid")
-    static let metaData = Expression<Blob?>("metadata")
+    static let timezoneOffset = Expression<Int64>("timezoneOffset")
+    static let actionID = Expression<String>("actionID")
+    static let metaData = Expression<Blob?>("metaData")
     
     static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.TrackedActionsQueue", nil)
     

@@ -1,5 +1,5 @@
 PODS:
-  - DopamineKit (4.0.1):
+  - DopamineKit (4.0.2):
     - SQLite.swift
   - SQLite.swift (0.10.1)
 
@@ -11,9 +11,9 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  DopamineKit: 99b36114a07b6cbdd72de501262e7e37ef726440
+  DopamineKit: 865cd6f74b19f3787e945279532b0b79df35b9fa
   SQLite.swift: 6a6e4b034efc317ce4e203b6af2d3024fee2b570
 
 PODFILE CHECKSUM: f7a2a88eec9e8c08a7a37ef4dc76787bd54e0ce4
 
-COCOAPODS: 1.0.1
+COCOAPODS: 1.1.0.rc.2

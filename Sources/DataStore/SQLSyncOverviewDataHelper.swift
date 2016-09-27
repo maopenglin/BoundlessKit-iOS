@@ -29,13 +29,13 @@ class SQLSyncOverviewDataHelper : SQLDataHelperProtocol {
     
     static let index = Expression<Int64>("index")
     static let utc = Expression<Int64>("utc")
-    static let timezoneOffset = Expression<Int64>("timezoneoffset")
-    static let totalSyncTime = Expression<Int64>("totalsynctime")
+    static let timezoneOffset = Expression<Int64>("timezoneOffset")
+    static let totalSyncTime = Expression<Int64>("totalSyncTime")
     static let cause = Expression<String>("cause")
     static let track = Expression<Blob>("track")
     static let report = Expression<Blob>("report")
     static let cartridges = Expression<Blob?>("cartridges")
-    
+        
     static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.SyncOverviewQueue", nil)
     
     /// Creates a SQLite table for sync overviews
@@ -45,7 +45,7 @@ class SQLSyncOverviewDataHelper : SQLDataHelperProtocol {
     static func createTable() {
         dispatch_async(tableQueue) {
             guard let DB = SQLiteDataStore.sharedInstance.DDB else
-            {
+            { utc.template
                 DopamineKit.DebugLog("SQLite database never initialized.")
                 return
             }
@@ -128,7 +128,7 @@ class SQLSyncOverviewDataHelper : SQLDataHelperProtocol {
         return rowId
     }
     
-    /// Deletes a sync over from the SQLite table
+    /// Deletes a sync overview from the SQLite table
     ///
     /// - parameters:
     ///     - item: A sql row with the index to delete.
@@ -238,6 +238,22 @@ class SQLSyncOverviewDataHelper : SQLDataHelperProtocol {
             result = DB.scalar(table.count)
         }
         return result
+    }
+    
+    /// Converts the item into a JSON object
+    ///
+    static func decodeJSONForItem(item: T) -> [String:AnyObject] {
+        var jsonObject: [String:AnyObject] = [:]
+        
+        jsonObject["utc"] = NSNumber(longLong: item.utc)
+        jsonObject["timezoneOffset"] = NSNumber(longLong: item.timezoneOffset)
+        jsonObject["totalSyncTime"] = NSNumber(longLong: item.totalSyncTime)
+        jsonObject["cause"] = item.cause
+        jsonObject["track"] = item.track
+        jsonObject["report"] = item.report
+        jsonObject["cartridges"] = item.cartridges
+        
+        return jsonObject
     }
     
 }

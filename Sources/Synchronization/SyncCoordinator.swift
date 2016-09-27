@@ -97,58 +97,64 @@ public class SyncCoordinator {
             let reportShouldSync = (someCartridgeToSync != nil) || self.reportSyncer.isTriggered()
             let trackShouldSync = reportShouldSync || self.trackSyncer.isTriggered()
             
-            var syncCause = "No sync necessary."
-            if (someCartridgeToSync != nil) {
-                syncCause = "Cartridge \(someCartridgeToSync?.actionID) needs to sync."
-            } else if (reportShouldSync) {
-                syncCause = "Report needs to sync."
-            } else if (trackShouldSync) {
-                syncCause = "Track needs to sync."
-            } else {
-                return
-            }
-            let syncOverview = SyncOverview.startRecordingSync(syncCause, track: self.trackSyncer, report: self.reportSyncer, cartridges: self.cartridgeSyncers)
-            
-            var goodProgress = true
-            
             if trackShouldSync {
-                self.trackSyncer.sync(syncOverview) { status in
+                var syncCause = "No sync necessary."
+                if let cartridgeToSync = someCartridgeToSync {
+                    syncCause = "Cartridge \(cartridgeToSync.actionID) needs to sync."
+                } else if (reportShouldSync) {
+                    syncCause = "Report needs to sync."
+                } else if (trackShouldSync) {
+                    syncCause = "Track needs to sync."
+                } else {
+                    return
+                }
+                Telemetry.startRecordingSync(syncCause, track: self.trackSyncer, report: self.reportSyncer, cartridges: self.cartridgeSyncers)
+                
+                var goodProgress = true
+                
+                self.trackSyncer.sync() { status in
                     guard status == 200 || status == 0 else {
                         DopamineKit.DebugLog("Track failed during sync. Halting sync.")
                         goodProgress = false
-                        return
-                    }
-                    if status==0 {
-                        sleep(1)
-                    }
-                }
-            }
-            
-            if !goodProgress { return }
-            
-            if reportShouldSync {
-                self.reportSyncer.sync() { status in
-                    guard status == 200 else {
-                        DopamineKit.DebugLog("Report failed during sync. Halting sync.")
-                        goodProgress = false
+                        Telemetry.stopRecordingSync(andSendOverview: false)
                         return
                     }
                 }
+                
+                sleep(1)
+                if !goodProgress { return }
+                
+                if reportShouldSync {
+                    self.reportSyncer.sync() { status in
+                        guard status == 200 || status == 0 else {
+                            DopamineKit.DebugLog("Report failed during sync. Halting sync.")
+                            goodProgress = false
+                            Telemetry.stopRecordingSync(andSendOverview: false)
+                            return
+                        }
+                    }
+                }
+                
                 sleep(5)
-            }
-            
-            if !goodProgress { return }
-            
-            // since a cartridge might be triggered during the sleep time,
-            // lazily check which are triggered
-            for (actionID, cartridge) in self.cartridgeSyncers where cartridge.isTriggered() {
-                cartridge.sync() { status in
-                    guard status == 200 else {
-                        DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
-                        goodProgress = false
-                        return
+                if !goodProgress { return }
+                
+                // since a cartridge might be triggered during the sleep time,
+                // lazily check which are triggered
+                for (actionID, cartridge) in self.cartridgeSyncers where cartridge.isTriggered() {
+                    cartridge.sync() { status in
+                        guard status == 200 else {
+                            DopamineKit.DebugLog("Refresh for \(actionID) failed during sync. Halting sync.")
+                            goodProgress = false
+                            Telemetry.stopRecordingSync(andSendOverview: false)
+                            return
+                        }
                     }
                 }
+                
+                sleep(3)
+                if !goodProgress { return }
+                
+                Telemetry.stopRecordingSync(andSendOverview: true)
             }
         }
     }

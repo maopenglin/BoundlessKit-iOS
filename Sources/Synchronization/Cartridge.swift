@@ -13,15 +13,18 @@ class Cartridge : NSObject, NSCoding {
     
     private let defaults = NSUserDefaults.standardUserDefaults()
     private func defaultsKey() -> String { return "DopamineCartridgeSyncerFor" + self.actionID }
-    private let defaultsActionID = "actionID"
-    private let defaultsInitialSize = "initialSize"
-    private let defaultsTimerStartsAt = "timerStartsAt"
-    private let defaultsTimerExpiresIn = "timerExpiresIn"
+    
+    private static let actionIDKey = "actionID"
+    private static let initialSizeKey = "initialSize"
+    private static let sizeKey = "size"
+    private static let capacityToSyncKey = "capacityToSync"
+    private static let timerStartsAtKey = "timerStartsAt"
+    private static let timerExpiresInKey = "timerExpiresIn"
     
     var actionID: String
-    private var initialSize: Int = 0
-    private var timerStartsAt: Int64 = 0
-    private var timerExpiresIn: Int64 = 0
+    private var initialSize: Int
+    private var timerStartsAt: Int64
+    private var timerExpiresIn: Int64
     private static let capacityToSync = 0.25
     private static let minimumSize = 2
     
@@ -31,12 +34,12 @@ class Cartridge : NSObject, NSCoding {
     ///
     /// - parameters:
     ///     - actionID: The name of an action configured on the Dopamine Dashboard.
-    ///     - initialSize: The cartridge size at full capacity.
-    ///     - timerStartsAt: The start time for a sync timer.
-    ///     - timerExpiresIn: The timer length for a sync timer.
     ///
-    init(actionID: String, initialSize: Int=0, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 0) {
+    init(actionID: String) {
         self.actionID = actionID
+        self.initialSize = 0
+        self.timerStartsAt = 0 // set to 0 to force sync if new
+        self.timerExpiresIn = 0
         super.init()
         if let savedCartridgeData = defaults.objectForKey(defaultsKey()) as? NSData,
             let savedCartridge = NSKeyedUnarchiver.unarchiveObjectWithData(savedCartridgeData) as? Cartridge {
@@ -44,9 +47,6 @@ class Cartridge : NSObject, NSCoding {
             self.timerStartsAt = savedCartridge.timerStartsAt
             self.timerExpiresIn = savedCartridge.timerExpiresIn
         } else {
-            self.initialSize = initialSize;
-            self.timerStartsAt = timerStartsAt;
-            self.timerExpiresIn = timerExpiresIn;
             defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(self), forKey: defaultsKey())
         }
     }
@@ -54,33 +54,33 @@ class Cartridge : NSObject, NSCoding {
     /// Decodes a saved cartridge from NSUserDefaults
     ///
     required init(coder aDecoder: NSCoder) {
-        self.actionID = aDecoder.decodeObjectForKey(defaultsActionID) as! String
-        self.initialSize = aDecoder.decodeIntegerForKey(defaultsInitialSize)
-        self.timerStartsAt = aDecoder.decodeInt64ForKey(defaultsTimerStartsAt)
-        self.timerExpiresIn = aDecoder.decodeInt64ForKey(defaultsTimerExpiresIn)
+        self.actionID = aDecoder.decodeObjectForKey(Cartridge.actionIDKey) as! String
+        self.initialSize = aDecoder.decodeIntegerForKey(Cartridge.initialSizeKey)
+        self.timerStartsAt = aDecoder.decodeInt64ForKey(Cartridge.timerStartsAtKey)
+        self.timerExpiresIn = aDecoder.decodeInt64ForKey(Cartridge.timerExpiresInKey)
         DopamineKit.DebugLog("Decoded cartridge for actionID:\(actionID) with initialSize:\(initialSize) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Encodes a cartridge and saves it to NSUserDefaults
     ///
     func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(actionID, forKey: defaultsActionID)
-        aCoder.encodeInteger(initialSize, forKey: defaultsInitialSize)
-        aCoder.encodeInt64(timerStartsAt, forKey: defaultsTimerStartsAt)
-        aCoder.encodeInt64(timerExpiresIn, forKey: defaultsTimerExpiresIn)
+        aCoder.encodeObject(actionID, forKey: Cartridge.actionIDKey)
+        aCoder.encodeInteger(initialSize, forKey: Cartridge.initialSizeKey)
+        aCoder.encodeInt64(timerStartsAt, forKey: Cartridge.timerStartsAtKey)
+        aCoder.encodeInt64(timerExpiresIn, forKey: Cartridge.timerExpiresInKey)
         DopamineKit.DebugLog("Encoded cartridge for actionID: \(actionID) with initialSize:\(initialSize) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
-    /// Decodes a JSON compatible object of the sync triggers
+    /// Returns a JSON compatible object of the sync triggers
     ///
     func decodeJSONForTriggers() -> [String: AnyObject]{
         return [
-            defaultsActionID : actionID,
-            "size" : SQLCartridgeDataHelper.countFor(actionID),
-            defaultsInitialSize : initialSize,
-            "capacityToSync" : Cartridge.capacityToSync,
-            defaultsTimerStartsAt : Int(timerStartsAt),
-            defaultsTimerExpiresIn : Int(timerExpiresIn)
+            Cartridge.actionIDKey : actionID,
+            Cartridge.sizeKey : SQLCartridgeDataHelper.countFor(actionID),
+            Cartridge.initialSizeKey : initialSize,
+            Cartridge.capacityToSyncKey : Cartridge.capacityToSync,
+            Cartridge.timerStartsAtKey : NSNumber(longLong: timerStartsAt),
+            Cartridge.timerExpiresInKey : NSNumber(longLong: timerExpiresIn)
         ]
     }
     

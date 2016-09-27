@@ -21,6 +21,10 @@ public class SQLiteDataStore : NSObject{
     
     static let sharedInstance: SQLiteDataStore = SQLiteDataStore()
     
+    let defaults = NSUserDefaults.standardUserDefaults()
+    let defaultsKey = "DopamineSQLiteVersion"
+    
+    private let DatabaseVersion: Int = 2
     let DDB: Connection?
     
     /// Creates a SQLite database and tables for DopamineKit
@@ -42,7 +46,10 @@ public class SQLiteDataStore : NSObject{
         
         super.init()
         
-        createTables()
+        if defaults.integerForKey(defaultsKey) != DatabaseVersion {
+            clearTables()
+            defaults.setInteger(DatabaseVersion, forKey: defaultsKey)
+        }
     }
     
     /// Creates all the tables needed for DopamineKit
@@ -57,6 +64,7 @@ public class SQLiteDataStore : NSObject{
         SQLReportedActionDataHelper.createTable()
         SQLCartridgeDataHelper.createTable()
         SQLSyncOverviewDataHelper.createTable()
+        SQLDopeExceptionDataHelper.createTable()
     }
     
     /// Drops all tables used in DopamineKit
@@ -71,6 +79,7 @@ public class SQLiteDataStore : NSObject{
         SQLReportedActionDataHelper.dropTable()
         SQLCartridgeDataHelper.dropTable()
         SQLSyncOverviewDataHelper.dropTable()
+        SQLDopeExceptionDataHelper.dropTable()
     }
     
     /// Drops and the Creates all tables

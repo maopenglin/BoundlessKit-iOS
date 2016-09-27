@@ -15,9 +15,11 @@ class Track : NSObject, NSCoding {
     
     private let defaults = NSUserDefaults.standardUserDefaults()
     private let defaultsKey = "DopamineTrack"
-    private let defaultsSizeToSync = "sizeToSync"
-    private let defaultsTimerStartsAt = "timerStartsAt"
-    private let defaultsTimerExpiresIn = "timerExpiresIn"
+    
+    private let sizeKey = "size"
+    private let sizeToSyncKey = "sizeToSync"
+    private let timerStartsAtKey = "timerStartsAt"
+    private let timerExpiresInKey = "timerExpiresIn"
     
     private var sizeToSync: Int
     private var timerStartsAt: Int64
@@ -27,22 +29,17 @@ class Track : NSObject, NSCoding {
     
     /// Loads the track from NSUserDefaults or creates a new one and saves it to NSUserDefaults
     ///
-    /// - parameters:
-    ///     - sizeToSync: The number of tracked actions to trigger a sync. Defaults to 15.
-    ///     - timerStartsAt: The start time for a sync timer. Defaults to 0.
-    ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
-    ///
-    private init(sizeToSync: Int = 15, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 172800000) {
+    override private init() {
         if let savedTrackData = defaults.objectForKey(defaultsKey) as? NSData,
             let savedTrack = NSKeyedUnarchiver.unarchiveObjectWithData(savedTrackData) as? Track {
-            self.sizeToSync = savedTrack.sizeToSync;
-            self.timerStartsAt = savedTrack.timerStartsAt;
-            self.timerExpiresIn = savedTrack.timerExpiresIn;
+            self.sizeToSync = savedTrack.sizeToSync
+            self.timerStartsAt = savedTrack.timerStartsAt
+            self.timerExpiresIn = savedTrack.timerExpiresIn
             super.init()
         } else {
-            self.sizeToSync = sizeToSync;
-            self.timerStartsAt = timerStartsAt;
-            self.timerExpiresIn = timerExpiresIn;
+            self.sizeToSync = 15
+            self.timerStartsAt = Int64(1000*NSDate().timeIntervalSince1970)
+            self.timerExpiresIn = 172800000
             super.init()
             defaults.setObject(NSKeyedArchiver.archivedDataWithRootObject(self), forKey: defaultsKey)
         }
@@ -51,18 +48,18 @@ class Track : NSObject, NSCoding {
     /// Decodes a saved track from NSUserDefaults
     ///
     required init(coder aDecoder: NSCoder) {
-        self.sizeToSync = aDecoder.decodeIntegerForKey(defaultsSizeToSync)
-        self.timerStartsAt = aDecoder.decodeInt64ForKey(defaultsTimerStartsAt)
-        self.timerExpiresIn = aDecoder.decodeInt64ForKey(defaultsTimerExpiresIn)
+        self.sizeToSync = aDecoder.decodeIntegerForKey(sizeToSyncKey)
+        self.timerStartsAt = aDecoder.decodeInt64ForKey(timerStartsAtKey)
+        self.timerExpiresIn = aDecoder.decodeInt64ForKey(timerExpiresInKey)
         DopamineKit.DebugLog("Decoded TrackSyncer with sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Encodes a track and saves it to NSUserDefaults
     ///
     func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeInteger(sizeToSync, forKey: defaultsSizeToSync)
-        aCoder.encodeInt64(timerStartsAt, forKey: defaultsTimerStartsAt)
-        aCoder.encodeInt64(timerExpiresIn, forKey: defaultsTimerExpiresIn)
+        aCoder.encodeInteger(sizeToSync, forKey: sizeToSyncKey)
+        aCoder.encodeInt64(timerStartsAt, forKey: timerStartsAtKey)
+        aCoder.encodeInt64(timerExpiresIn, forKey: timerExpiresInKey)
         DopamineKit.DebugLog("Encoded TrackSyncer with sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
@@ -70,10 +67,10 @@ class Track : NSObject, NSCoding {
     ///
     func decodeJSONForTriggers() -> [String: AnyObject]{
         return [
-            "size" : SQLTrackedActionDataHelper.count(),
-            defaultsSizeToSync : sizeToSync,
-            defaultsTimerStartsAt : Int(timerStartsAt),
-            defaultsTimerExpiresIn : Int(timerExpiresIn)
+            sizeKey : SQLTrackedActionDataHelper.count(),
+            sizeToSyncKey : sizeToSync,
+            timerStartsAtKey : NSNumber(longLong: timerStartsAt),
+            timerExpiresInKey : NSNumber(longLong: timerExpiresIn)
         ]
     }
     
@@ -165,7 +162,7 @@ class Track : NSObject, NSCoding {
     /// - parameters:
     ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if there were no actions to sync.
     ///
-    func sync(recorder: SyncOverview, completion: (statusCode: Int) -> () = { _ in }) {
+    func sync(completion: (statusCode: Int) -> () = { _ in }) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)){
             guard !self.syncInProgress else {
                 DopamineKit.DebugLog("Track sync already happening")

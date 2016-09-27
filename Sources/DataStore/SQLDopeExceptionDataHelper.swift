@@ -1,40 +1,41 @@
 //
-//  SQLReportedActionDataHelper.swift
+//  SQLDopeExceptionDataHelper.swift
 //  Pods
 //
-//  Created by Akash Desai on 7/18/16.
+//  Created by Akash Desai on 9/26/16.
 //
 //
 
 import Foundation
 import SQLite
 
-typealias SQLReportedAction = (
+typealias SQLDopeException = (
     index: Int64,
-    actionID: String,
-    reinforcementDecision: String,
-    metaData: [String:AnyObject]?,
     utc: Int64,
-    timezoneOffset: Int64
+    timezoneOffset: Int64,
+    exceptionClassName: String,
+    message: String,
+    stackTrace: String
 )
 
-class SQLReportedActionDataHelper : SQLDataHelperProtocol {
+class SQLDopeExceptionDataHelper : SQLDataHelperProtocol {
     
-    typealias T = SQLReportedAction
+    typealias T = SQLDopeException
     
-    static let TABLE_NAME = "Reported_Actions"
+    
+    static let TABLE_NAME = "Dope_Exceptions"
     static let table = Table(TABLE_NAME)
     
     static let index = Expression<Int64>("index")
     static let utc = Expression<Int64>("utc")
     static let timezoneOffset = Expression<Int64>("timezoneOffset")
-    static let actionID = Expression<String>("actionID")
-    static let reinforcementDecision = Expression<String>("reinforcementDecision")
-    static let metaData = Expression<Blob?>("metaData")
+    static let exceptionClassName = Expression<String>("exceptionClassName")
+    static let message = Expression<String>("message")
+    static let stackTrace = Expression<String>("stackTrace")
     
-    static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.ReportedActionsQueue", nil)
+    static let tableQueue = dispatch_queue_create("com.usedopamine.dopaminekit.datastore.DopeExceptionsQueue", nil)
     
-    /// Creates a SQLite table for reported actions
+    /// Creates a SQLite table for dopamine exceptions
     ///
     /// Called in SQLiteDataStore.sharedInstance.createTables()
     ///
@@ -51,9 +52,9 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
                     t.column(index, primaryKey: true)
                     t.column(utc)
                     t.column(timezoneOffset)
-                    t.column(actionID)
-                    t.column(reinforcementDecision)
-                    t.column(metaData)
+                    t.column(exceptionClassName)
+                    t.column(message)
+                    t.column(stackTrace)
                     }
                 )
                 DopamineKit.DebugLog("Table \(TABLE_NAME) created!")
@@ -63,7 +64,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
-    /// Drops the table for reported actions
+    /// Drops the table for dopamine exceptions
     ///
     /// Called in SQLiteDataStore.sharedInstance.dropTables()
     ///
@@ -84,7 +85,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
-    /// Inserts a reported action into the SQLite table
+    /// Inserts a dopamine exceptions into the SQLite table
     ///
     /// - parameters:
     ///     - item: A sql row with meaningful values for all columns except index.
@@ -104,22 +105,22 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
             let insert = table.insert(
                 utc <- item.utc,
                 timezoneOffset <- item.timezoneOffset,
-                actionID <- item.actionID,
-                reinforcementDecision <- item.reinforcementDecision,
-                metaData <- (item.metaData==nil ? nil : NSKeyedArchiver.archivedDataWithRootObject(item.metaData!).datatypeValue)
+                exceptionClassName <- item.exceptionClassName,
+                message <- item.message,
+                stackTrace <- item.stackTrace
             )
             do {
                 rowId = try DB.run(insert)
-                DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) actionID:\(item.actionID) reinforcementDecision:\(item.reinforcementDecision)")
+                DopamineKit.DebugLog("Inserted into Table:\(TABLE_NAME) row:\(rowId) exception with className:\(item.exceptionClassName) message:\(item.message) stackTrace:\(item.stackTrace)")
             } catch {
-                DopamineKit.DebugLog("Insert error for reported action with values actionID:(\(item.actionID)) metaData:(\(item.metaData)) utc:(\(item.utc))")
+                DopamineKit.DebugLog("Insert error for exception with className:\(item.exceptionClassName) message:\(item.message) stackTrace:\(item.stackTrace)")
                 return
             }
         }
         return rowId
     }
     
-    /// Deletes a reported action from the SQLite table
+    /// Deletes a dopamine exception from the SQLite table
     ///
     /// - parameters:
     ///     - item: A sql row with the index to delete.
@@ -144,10 +145,10 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         }
     }
     
-    /// Finds a reported action by id from the SQLite table
+    /// Finds a dopamine exception by id from the SQLite table
     ///
     /// - parameters:
-    ///     - id: The index to find the reported action.
+    ///     - id: The index to find the dopamine exception action.
     ///
     static func find(id: Int64) -> T? {
         var result:T?
@@ -162,13 +163,13 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
             do {
                 let items = try DB.prepare(query)
                 for item in  items {
-                    result = SQLReportedAction(
+                    result = SQLDopeException(
                         index: item[index],
                         utc: item[utc],
                         timezoneOffset: item[timezoneOffset],
-                        actionID: item[actionID],
-                        reinforcementDecision: item[reinforcementDecision],
-                        metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject]
+                        exceptionClassName: item[exceptionClassName],
+                        message: item[message],
+                        stackTrace: item[stackTrace]
                     )
                     break
                 }
@@ -179,9 +180,9 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         return result
     }
     
-    /// Finds all reported actions from the SQLite table
+    /// Finds all dopamine exceptions from the SQLite table
     ///
-    /// - returns: All rows from the reported actions table.
+    /// - returns: All rows from the dopamine exception table.
     ///
     static func findAll() -> [T] {
         var results:[T] = []
@@ -195,13 +196,13 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
             do {
                 let items = try DB.prepare(table)
                 for item in items {
-                    results.append( SQLReportedAction(
+                    results.append( SQLDopeException(
                         index: item[index],
                         utc: item[utc],
                         timezoneOffset: item[timezoneOffset],
-                        actionID: item[actionID],
-                        reinforcementDecision: item[reinforcementDecision],
-                        metaData: item[metaData]==nil ? nil : NSKeyedUnarchiver.unarchiveObjectWithData(NSData.fromDatatypeValue(item[metaData]!)) as? [String:AnyObject]
+                        exceptionClassName: item[exceptionClassName],
+                        message: item[message],
+                        stackTrace: item[stackTrace]
                         )
                     )
                 }
@@ -212,7 +213,7 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
         return results
     }
     
-    /// How many rows total are in the reported actions table
+    /// How many rows total are in the dopamine exceptions table
     ///
     static func count() -> Int {
         var result = 0
@@ -233,16 +234,13 @@ class SQLReportedActionDataHelper : SQLDataHelperProtocol {
     static func decodeJSONForItem(item: T) -> [String: AnyObject] {
         var jsonObject: [String:AnyObject] = [:]
         
-        jsonObject["actionID"] = item.actionID
-        jsonObject["reinforcementDecision"] = item.reinforcementDecision
-        jsonObject["metaData"] = item.metaData
-        jsonObject["time"] = [
-            ["timeType":"utc", "value": NSNumber( longLong:item.utc )],
-            ["timeType":"deviceTimezoneOffset", "value": NSNumber( longLong:item.timezoneOffset )]
-        ]
+        jsonObject["utc"] = NSNumber(longLong: item.utc)
+        jsonObject["timezoneOffset"] = NSNumber(longLong: item.timezoneOffset)
+        jsonObject["exceptionClassName"] = item.exceptionClassName
+        jsonObject["message"] = item.message
+        jsonObject["stackTrace"] = item.stackTrace
         
         return jsonObject
     }
     
 }
-

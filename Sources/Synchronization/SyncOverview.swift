@@ -8,45 +8,83 @@
 
 import Foundation
 
-struct SyncOverview {
+class SyncOverview {
     
-    private var utc: Int64
-    private var timezoneOffset: Int64
-    private var totalSyncTime: Int64
-    private var cause: String
-    private var trackTriggers: [String: AnyObject]
-    private var reportTriggers: [String: AnyObject]
-    private var cartridgesTriggers: [[String: AnyObject]]
+    var utc: Int64
+    var timezoneOffset: Int64
+    var totalSyncTime: Int64
+    var cause: String
+    var track: [String: AnyObject]
+    var report: [String: AnyObject]
+    var cartridges: [String: [String: AnyObject]]
+    
+    static let syncResponseKey = "syncResponse"
+    /// Added to a SyncOverview sync object
+    struct SyncResponse {
+        let utc: Int64
+        let roundTripTime: Int64
+        let status: Int
+        let error: String?
+        
+        private static let utcKey = "utc"
+        private static let roundTripTimeKey = "roundTripTime"
+        private static let statusKey = "status"
+        private static let errorKey = "error"
+        
+        init(startTime:Int64, endTime:Int64 = Int64(1000*NSDate().timeIntervalSince1970), status: Int, error: String?) {
+            self.utc = startTime
+            self.roundTripTime = endTime - startTime
+            self.status = status
+            self.error = error
+        }
+        
+        /// Returns a JSON compatible object
+        ///
+        func toJSONType() -> [String: AnyObject] {
+            var jsonObject:[String: AnyObject] = [:]
+            jsonObject[SyncResponse.utcKey] = NSNumber(longLong:roundTripTime)
+            jsonObject[SyncResponse.roundTripTimeKey] = NSNumber(longLong:roundTripTime)
+            jsonObject[SyncResponse.statusKey] = status
+            jsonObject[SyncResponse.errorKey] = error
+            
+            return jsonObject
+        }
+    }
     
     init(utc: Int64=Int64(1000*NSDate().timeIntervalSince1970),
          timezoneOffset: Int64=Int64(1000*NSTimeZone.defaultTimeZone().secondsFromGMT),
-         totalSyncTime: Int64,
+         totalSyncTime: Int64 = -1,
          cause: String,
-         trackTriggers: [String: AnyObject],
-         reportTriggers: [String: AnyObject],
-         cartridgeTriggers: [[String: AnyObject]]
+         trackTriggers: [String: AnyObject] = [:],
+         reportTriggers: [String: AnyObject] = [:],
+         cartridgeTriggers: [String: [String: AnyObject]] = [:]
         ) {
         self.utc = utc
         self.timezoneOffset = timezoneOffset
         self.totalSyncTime = totalSyncTime
         self.cause = cause
-        self.trackTriggers = trackTriggers
-        self.reportTriggers = reportTriggers
-        self.cartridgesTriggers = cartridgeTriggers
+        self.track = trackTriggers
+        self.report = reportTriggers
+        self.cartridges = cartridgeTriggers
     }
     
-    static func startRecordingSync(cause: String, track: Track, report: Report, cartridges: [String: Cartridge]) -> SyncOverview {
-        var recording = SyncOverview(totalSyncTime: 0,
-                                     cause: cause,
-                                     trackTriggers: track.decodeJSONForTriggers(),
-                                     reportTriggers: report.decodeJSONForTriggers(),
-                                     cartridgeTriggers: [])
-        
-        for (_, cartridge) in cartridges {
-            recording.cartridgesTriggers.append(cartridge.decodeJSONForTriggers())
+    /// Stores the sync overview into the local database
+    ///
+    func store() {
+        let recordedSync = SQLSyncOverview(
+            index:0,
+            utc: utc,
+            timezoneOffset: timezoneOffset,
+            totalSyncTime: totalSyncTime,
+            cause: cause,
+            track: track,
+            report: report,
+            cartridges: Array(cartridges.values)
+        )
+        guard let _ = SQLSyncOverviewDataHelper.insert(recordedSync) else {
+            DopamineKit.DebugLog("SQLiteDataStore error, couldnt store sync overview.")
+            return
         }
-        
-        return recording
     }
     
 }
