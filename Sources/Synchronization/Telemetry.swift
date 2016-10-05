@@ -90,9 +90,9 @@ internal class Telemetry {
         queue.async {
             var cartridgeTriggers: [String: [String: AnyObject]] = [:]
             for (actionID, cartridge) in cartridges {
-                cartridgeTriggers[actionID] = cartridge.toJSONType() as? [String : AnyObject]
+                cartridgeTriggers[actionID] = cartridge.toJSONType()
             }
-            currentSyncOverview = SyncOverview.init(cause: cause, trackTriggers: track.toJSONType() as! [String : AnyObject], reportTriggers: report.toJSONType() as! [String : AnyObject], cartridgeTriggers: cartridgeTriggers)
+            currentSyncOverview = SyncOverview.init(cause: cause, trackTriggers: track.toJSONType(), reportTriggers: report.toJSONType(), cartridgeTriggers: cartridgeTriggers)
         }
     }
     
@@ -102,18 +102,18 @@ internal class Telemetry {
     ///     - status: The HTTP status code received from the DopamineAPI.
     ///     - startedAt: The time the API call started at.
     ///
-    static func setResponseForTrackSync(_ status: Int?, error: String?=nil, whichStartedAt startedAt: Int64) {
+    static func setResponseForTrackSync(_ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
         queue.async {
             if let syncOverview = Telemetry.currentSyncOverview {
                 var syncResponse: [String: AnyObject] = [:]
                 syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt) as AnyObject
                 syncResponse[SyncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt) as AnyObject
-                syncResponse[SyncOverview.statusKey] = status as AnyObject?
+                syncResponse[SyncOverview.statusKey] = status as AnyObject
                 syncResponse[SyncOverview.errorKey] = error as AnyObject?
                 
                 syncOverview.trackTriggers[SyncOverview.syncResponseKey] = syncResponse as AnyObject
             } else {
-                DopamineKit.DebugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
+                DopamineKit.debugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
             }
         }
     }
@@ -124,18 +124,18 @@ internal class Telemetry {
     ///     - status: The HTTP status code received from the DopamineAPI.
     ///     - startedAt: The time the API call started at.
     ///
-    static func setResponseForReportSync(_ status: Int?, error: String?=nil, whichStartedAt startedAt: Int64) {
+    static func setResponseForReportSync(_ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
         queue.async{
             if let syncOverview = Telemetry.currentSyncOverview {
                 var syncResponse: [String: AnyObject] = [:]
                 syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt) as AnyObject
                 syncResponse[SyncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt) as AnyObject
-                syncResponse[SyncOverview.statusKey] = status as AnyObject?
+                syncResponse[SyncOverview.statusKey] = status as AnyObject
                 syncResponse[SyncOverview.errorKey] = error as AnyObject?
                 
                 syncOverview.reportTriggers[SyncOverview.syncResponseKey] = syncResponse as AnyObject
             } else {
-                DopamineKit.DebugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
+                DopamineKit.debugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
             }
         }
     }
@@ -147,19 +147,21 @@ internal class Telemetry {
     ///     - status: The HTTP status code received from the DopamineAPI.
     ///     - startedAt: The time the API call started at.
     ///
-    static func setResponseForCartridgeSync(forAction actionID: String, _ status: Int?, error: String?=nil, whichStartedAt startedAt: Int64) {
+    static func setResponseForCartridgeSync(forAction actionID: String, _ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
         queue.async{
             if let syncOverview = Telemetry.currentSyncOverview {
                 var syncResponse: [String: AnyObject] = [:]
                 syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt) as AnyObject
                 syncResponse[SyncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt) as AnyObject
-                syncResponse[SyncOverview.statusKey] = status as AnyObject?
+                syncResponse[SyncOverview.statusKey] = status as AnyObject
                 syncResponse[SyncOverview.errorKey] = error as AnyObject?
                 
-                
-                syncOverview.cartridgesTriggers[actionID] = [SyncOverview.syncResponseKey: syncResponse as AnyObject]
+                if var cartridge = syncOverview.cartridgesTriggers[actionID] {
+                    cartridge[SyncOverview.syncResponseKey] = syncResponse as AnyObject
+                    syncOverview.cartridgesTriggers[actionID] = cartridge
+                }
             } else {
-                DopamineKit.DebugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
+                DopamineKit.debugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
             }
         }
     }
@@ -169,25 +171,25 @@ internal class Telemetry {
     /// - returns:
     ///     An array of the all syncOverviews which have not been sent to the DopamineAPI.
     ///
-    static func stopRecordingSync( successfullySynced: Bool) {
+    static func stopRecordingSync(successfulSync: Bool) {
         queue.async {
             var syncOverviewArray: [SyncOverview] = syncOverviews
             if let syncOverview = Telemetry.currentSyncOverview {
                 syncOverview.totalSyncTime = Int64(1000*NSDate().timeIntervalSince1970) - syncOverview.utc
                 syncOverviewArray.append(syncOverview)
                 currentSyncOverview = nil
-                DopamineKit.DebugLog("Saved a sync overview, totaling \(syncOverviewArray.count) overviews - \n\(syncOverview.toJSONType())")
+                DopamineKit.debugLog("Saved a sync overview, totaling \(syncOverviewArray.count) overviews - \n\(syncOverview.toJSONType())")
             } else {
-                DopamineKit.DebugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
+                DopamineKit.debugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
             }
             
-            if(successfullySynced) {
+            if(successfulSync) {
                 DopamineAPI.sync(syncOverviews: syncOverviewArray, dopeExceptions: dopeExceptions, completion: { response in
                     queue.async {
                         if response["status"] as? Int == 200 {
                             syncOverviews = []
                             dopeExceptions = []
-                            DopamineKit.DebugLog("Cleared sync overview array and dope exceptions array.")
+                            DopamineKit.debugLog("Cleared sync overview array and dope exceptions array.")
                         } else {
                             syncOverviews = syncOverviewArray
                         }

@@ -58,7 +58,7 @@ internal class DopeException : NSObject, NSCoding {
     
     /// This function converts a DopeAction to a JSON compatible Object
     ///
-    func toJSONType() -> AnyObject {
+    func toJSONType() -> [String : AnyObject] {
         var jsonObject: [String:AnyObject] = [:]
         
         jsonObject[DopeException.utcKey] = NSNumber(value: utc) as AnyObject
@@ -66,8 +66,8 @@ internal class DopeException : NSObject, NSCoding {
         jsonObject[DopeException.exceptionClassNameKey] = exceptionClassName as AnyObject
         jsonObject[DopeException.messageKey] = message as AnyObject
         jsonObject[DopeException.stackTraceKey] = stackTrace as AnyObject
-        DopamineKit.DebugLog(jsonObject.description)
-        return jsonObject as AnyObject
+        DopamineKit.debugLog(jsonObject.description)
+        return jsonObject
     }
     
 }

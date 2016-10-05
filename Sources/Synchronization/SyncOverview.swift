@@ -72,7 +72,7 @@ internal class SyncOverview : NSObject, NSCoding {
     
     /// This function converts a DopeAction to a JSON compatible Object
     ///
-    func toJSONType() -> AnyObject {
+    func toJSONType() -> [String : AnyObject] {
         var jsonObject: [String:AnyObject] = [:]
         
         jsonObject[SyncOverview.utcKey] = NSNumber(value: utc) as AnyObject
@@ -82,8 +82,8 @@ internal class SyncOverview : NSObject, NSCoding {
         jsonObject[SyncOverview.trackKey] = trackTriggers as AnyObject
         jsonObject[SyncOverview.reportKey] = reportTriggers as AnyObject
         jsonObject[SyncOverview.cartridgesKey] = cartridgesTriggers as AnyObject
-        DopamineKit.DebugLog(jsonObject.description)
-        return jsonObject as AnyObject
+        DopamineKit.debugLog(jsonObject.description)
+        return jsonObject
     }
     
 }

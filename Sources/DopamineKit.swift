@@ -18,7 +18,7 @@ open class DopamineKit : NSObject {
         super.init()
     }
     
-    /// This function sends an asynchronous tracking call for the specified actionID
+    /// This function sends an asynchronous tracking call for the specified action
     ///
     /// - parameters:
     ///     - actionID: Descriptive name for the action.
@@ -32,7 +32,7 @@ open class DopamineKit : NSObject {
         syncCoordinator.store(trackedAction: action)
     }
 
-    /// This function sends an asynchronous reinforcement call for the specified actionID
+    /// This function sends an asynchronous reinforcement call for the specified action
     ///
     /// - parameters:
     ///     - actionID: Action name configured on the Dopamine Dashboard
@@ -62,7 +62,7 @@ open class DopamineKit : NSObject {
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    internal static func DebugLog(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
+    internal static func debugLog(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
         #if DEBUG
             var functionSignature:String = function
             if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {

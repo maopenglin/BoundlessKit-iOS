@@ -67,17 +67,17 @@ internal class DopeAction : NSObject, NSCoding {
     
     /// This function converts a DopeAction to a JSON compatible Object
     ///
-    func toJSONType() -> AnyObject {
+    func toJSONType() -> [String : AnyObject] {
         var jsonObject: [String:AnyObject] = [:]
         
-        jsonObject["actionID"] = actionID as AnyObject
-        jsonObject["reinforcementDecision"] = reinforcementDecision as AnyObject?
-        jsonObject["metaData"] = metaData as AnyObject?
+        jsonObject[actionIDKey] = actionID as AnyObject
+        jsonObject[reinforcementDecisionKey] = reinforcementDecision as AnyObject?
+        jsonObject[metaDataKey] = metaData as AnyObject?
         jsonObject["time"] = [
-            ["timeType":"utc", "value": NSNumber(value: utc)],
+            ["timeType":utcKey, "value": NSNumber(value: utc)],
             ["timeType":"deviceTimezoneOffset", "value": NSNumber(value: timezoneOffset)]
         ] as AnyObject
         
-        return jsonObject as AnyObject
+        return jsonObject
     }
 }
