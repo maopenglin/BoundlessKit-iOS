@@ -16,16 +16,16 @@ Pod::Spec.new do |s|
 #
 
 s.name             = "DopamineKit"
-s.version          = "4.1.1"
+s.version          = "4.1.2"
 s.summary          = "A framework to use DopamineLabs machine learning API written in Swift 3"
+s.homepage         = "https://github.com/DopamineLabs/DopamineKit-iOS"
+s.social_media_url = 'https://twitter.com/usedopamine'
 
 s.description      = <<-DESC
 Make your iOS app habit-forming using the DopamineAPI.
 
 This packages provides a framework for interacting with the DopamineAPI from a Cocoa based iOS application. After you have received your API key and configured the actions and reinforcements relevant to your app on the Dopamine Developer Dashboard, you may use this framework to place 'tracking', and 'reinforcement' calls from inside your app that will communicate directly with the DopamineAPI.
 DESC
-
-s.homepage         = "https://github.com/DopamineLabs/DopamineKit-iOS"
 
 
 # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -71,7 +71,6 @@ s.source           = { :git => "https://github.com/DopamineLabs/DopamineKit-iOS.
 #
 
 s.source_files = "Sources/**/*"
-# s.exclude_files = "Classes/Exclude"
 
 s.public_header_files = "Sources/**/*.h"
 
