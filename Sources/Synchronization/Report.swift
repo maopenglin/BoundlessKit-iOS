@@ -168,8 +168,8 @@ internal class Report : NSObject, NSCoding {
                         if responseStatusCode == 200 {
                             self.reportedActions.removeAll()
                             self.updateTriggers()
-                            completion(responseStatusCode)
                         }
+                        completion(responseStatusCode)
                     } else {
                         completion(404)
                     }
