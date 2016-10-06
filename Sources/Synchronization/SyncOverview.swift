@@ -81,7 +81,11 @@ internal class SyncOverview : NSObject, NSCoding {
         jsonObject[SyncOverview.causeKey] = cause as AnyObject
         jsonObject[SyncOverview.trackKey] = trackTriggers as AnyObject
         jsonObject[SyncOverview.reportKey] = reportTriggers as AnyObject
-        jsonObject[SyncOverview.cartridgesKey] = cartridgesTriggers as AnyObject
+        var cartridges: [[String: AnyObject]] = []
+        for (_, value) in cartridgesTriggers {
+            cartridges.append(value)
+        }
+        jsonObject[SyncOverview.cartridgesKey] = cartridges as AnyObject
         DopamineKit.debugLog(jsonObject.description)
         return jsonObject
     }
