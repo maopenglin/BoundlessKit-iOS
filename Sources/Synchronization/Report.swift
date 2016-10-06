@@ -34,7 +34,7 @@ internal class Report : NSObject, NSCoding {
     ///     - timerStartsAt: The start time for a sync timer. Defaults to 0.
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
-    private init(sizeToSync: Int = 15, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 172800000) {
+    private init(sizeToSync: Int = 15, timerStartsAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
         if let savedReportData = defaults.object(forKey: defaultsKey) as? NSData,
             let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData as Data) as? Report {
             self.reportedActions = savedReport.reportedActions
@@ -58,7 +58,7 @@ internal class Report : NSObject, NSCoding {
         self.sizeToSync = aDecoder.decodeInteger(forKey: sizeToSyncKey)
         self.timerStartsAt = aDecoder.decodeInt64(forKey: timerStartsAtKey)
         self.timerExpiresIn = aDecoder.decodeInt64(forKey: timerExpiresInKey)
-        DopamineKit.DebugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+        DopamineKit.debugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Encodes a report and saves it to NSUserDefaults
@@ -68,7 +68,7 @@ internal class Report : NSObject, NSCoding {
         aCoder.encode(sizeToSync, forKey: sizeToSyncKey)
         aCoder.encode(timerStartsAt, forKey: timerStartsAtKey)
         aCoder.encode(timerExpiresIn, forKey: timerExpiresInKey)
-        DopamineKit.DebugLog("Encoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+        DopamineKit.debugLog("Encoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
 
     /// Updates the sync triggers
@@ -96,8 +96,8 @@ internal class Report : NSObject, NSCoding {
     func erase() {
         self.reportedActions.removeAll()
         self.sizeToSync = 15
-        self.timerStartsAt = 0
-        self.timerExpiresIn = 0
+        self.timerStartsAt = Int64( 1000*NSDate().timeIntervalSince1970 )
+        self.timerExpiresIn = 172800000
         defaults.removeObject(forKey: defaultsKey)
     }
     
@@ -116,7 +116,7 @@ internal class Report : NSObject, NSCoding {
     private func timerDidExpire() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartsAt + timerExpiresIn)
-        DopamineKit.DebugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
+        DopamineKit.debugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
         return isExpired
     }
     
@@ -127,7 +127,7 @@ internal class Report : NSObject, NSCoding {
     private func isSizeToSync() -> Bool {
         let count = reportedActions.count
         let isSize = count >= sizeToSync
-        DopamineKit.DebugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
+        DopamineKit.debugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isSize
     }
     
@@ -149,7 +149,7 @@ internal class Report : NSObject, NSCoding {
     func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
-                DopamineKit.DebugLog("Report sync already happening")
+                DopamineKit.debugLog("Report sync already happening")
                 completion(0)
                 return
             }
@@ -157,19 +157,19 @@ internal class Report : NSObject, NSCoding {
             
             if self.reportedActions.count == 0 {
                 defer { self.syncInProgress = false }
-                DopamineKit.DebugLog("No reported actions to sync.")
+                DopamineKit.debugLog("No reported actions to sync.")
                 completion(0)
                 self.updateTriggers()
             } else {
-                DopamineKit.DebugLog("Sending \(self.reportedActions.count) reported actions...")
+                DopamineKit.debugLog("Sending \(self.reportedActions.count) reported actions...")
                 DopamineAPI.report(self.reportedActions, completion: { response in
                     defer { self.syncInProgress = false }
                     if let responseStatusCode = response["status"] as? Int {
-                        completion(responseStatusCode)
                         if responseStatusCode == 200 {
                             self.reportedActions.removeAll()
                             self.updateTriggers()
                         }
+                        completion(responseStatusCode)
                     } else {
                         completion(404)
                     }
@@ -181,7 +181,7 @@ internal class Report : NSObject, NSCoding {
     
     /// This function returns a snapshot of this instance as a JSON compatible Object
     ///
-    func toJSONType() -> AnyObject {
+    func toJSONType() -> [String : AnyObject] {
         var jsonObject: [String:AnyObject] = [:]
         
         jsonObject["size"] = NSNumber(value: reportedActions.count) as AnyObject
@@ -189,6 +189,6 @@ internal class Report : NSObject, NSCoding {
         jsonObject[timerStartsAtKey] = NSNumber(value: timerStartsAt) as AnyObject
         jsonObject[timerExpiresInKey] = NSNumber(value: timerExpiresIn) as AnyObject
         
-        return jsonObject as AnyObject
+        return jsonObject
     }
 }
