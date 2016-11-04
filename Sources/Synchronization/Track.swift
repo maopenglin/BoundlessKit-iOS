@@ -14,7 +14,7 @@ internal class Track : NSObject, NSCoding {
     static let sharedInstance = Track()
     
     private let defaults = UserDefaults.standard
-    private let defaultsKey = "DopamineTrack"
+    private let defaultsKey = "DopamineTrack_v4.1.3"
     private let trackedActionsKey = "trackedActions"
     private let sizeToSyncKey = "sizeToSync"
     private let timerStartsAtKey = "timerStartsAt"

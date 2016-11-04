@@ -14,8 +14,8 @@ internal class Telemetry {
     private static let queue = DispatchQueue(label: "com.usedopamine.dopaminekit.Telemetry")
     
     private static let defaults: UserDefaults = UserDefaults.standard
-    private static let syncOverviewsKey = "DopamineSyncOverviews"
-    private static let dopeExceptionsKey = "DopamineDopeExceptions"
+    private static let syncOverviewsKey = "DopamineSyncOverviews_v4.1.3"
+    private static let dopeExceptionsKey = "DopamineDopeExceptions_v4.1.3"
     
     private static var currentSyncOverview: SyncOverview?
     private static var syncOverviews: [SyncOverview] {
@@ -96,10 +96,11 @@ internal class Telemetry {
         }
     }
     
-    /// Sets the `syncResponsne` for `Track` in the current sync overview
+    /// Sets the `syncResponse` for `Track` in the current sync overview
     ///
     /// - parameters:
     ///     - status: The HTTP status code received from the DopamineAPI.
+    ///     - error: An error if one was received.
     ///     - startedAt: The time the API call started at.
     ///
     static func setResponseForTrackSync(_ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
@@ -118,10 +119,11 @@ internal class Telemetry {
         }
     }
     
-    /// Sets the `syncResponsne` for `Report` in the current sync overview
+    /// Sets the `syncResponse` for `Report` in the current sync overview
     ///
     /// - parameters:
     ///     - status: The HTTP status code received from the DopamineAPI.
+    ///     - error: An error if one was received.
     ///     - startedAt: The time the API call started at.
     ///
     static func setResponseForReportSync(_ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
@@ -140,11 +142,12 @@ internal class Telemetry {
         }
     }
     
-    /// Sets the `syncResponsne` for the cartridge in the current sync overview
+    /// Sets the `syncResponse` for the cartridge in the current sync overview
     ///
     /// - parameters:
     ///     - actionID: The name of the cartridge's action.
     ///     - status: The HTTP status code received from the DopamineAPI.
+    ///     - error: An error if one was received.
     ///     - startedAt: The time the API call started at.
     ///
     static func setResponseForCartridgeSync(forAction actionID: String, _ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
@@ -168,8 +171,8 @@ internal class Telemetry {
     
     /// Finalizes the current syncOverview object
     ///
-    /// - returns:
-    ///     An array of the all syncOverviews which have not been sent to the DopamineAPI.
+    /// - parameters:
+    ///     - successfulSync: Whether a successful sync was made with the DopamineAPI.
     ///
     static func stopRecordingSync(successfulSync: Bool) {
         queue.async {

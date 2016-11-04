@@ -12,7 +12,7 @@ import Foundation
 internal class Cartridge : NSObject, NSCoding {
     
     private let defaults = UserDefaults.standard
-    private func defaultsKey() -> String { return "DopamineCartridgeSyncerFor" + self.actionID }
+    private func defaultsKey() -> String { return "DopamineCartridgeSyncer_v4.1.3_For" + self.actionID }
     private let actionIDKey = "actionID"
     private let reinforcementDecisionsKey = "reinforcementDecisions"
     private let initialSizeKey = "initialSize"
