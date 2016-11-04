@@ -8,26 +8,26 @@
 
 /* Begin PBXBuildFile section */
 		0043D0660E37C4C5DA97391AB582C768 /* DopamineKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B43A91974800D3A52D7C87ED717E786 /* DopamineKit.swift */; };
+		1BF258B3CE9E3DFF0DE01B0E09848C85 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85E5A74BF2C5F729F6419654402FBC /* Foundation.framework */; };
 		23A1277363E4151799874DA518E80FD5 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6994B21A2445B7966A600DD83145885 /* Telemetry.swift */; };
 		2654FC2D684285EB7D6AB12F7312D23E /* Cartridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80FC393F496160BAECF25414EB2A7C14 /* Cartridge.swift */; };
 		2A60404D3646CB52D250C2786BAB3524 /* DopamineKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AEEA467B356923135B55508B249986D /* DopamineKit-dummy.m */; };
 		3A9B80E5CE3B4FFAD887919269441419 /* Pods-DopamineKit_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = BCB50A43A300BE12D82B869B121CF3A8 /* Pods-DopamineKit_Example-dummy.m */; };
+		40514FB7F26C9E982023D623FDCD2A38 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85E5A74BF2C5F729F6419654402FBC /* Foundation.framework */; };
 		418289B102A69A6D340D21DBD52B2060 /* DopamineAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D788B7B604A0642AEFEB4B09916044 /* DopamineAPI.swift */; };
 		6152F7AF612844CC123ECB611E5D55A5 /* DopamineKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8CDAD2329BD9ADCF3670B6EE37E916BE /* DopamineKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		63878D9EAEEA28DD91DE19477B569E30 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07389E2A49322AA4B20E3817DD9B326 /* Foundation.framework */; };
-		6BE52CD2D42B962423CE72A4CCD6918C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07389E2A49322AA4B20E3817DD9B326 /* Foundation.framework */; };
 		6D05ED37EE1E44A8FE6CCD2C229466C1 /* DopamineKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 49DEE856B59D3CE2657F387996127C41 /* DopamineKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		77DDEF96C19D3648450FDF1030575B7F /* Pods-DopamineKit_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C52B24D3596967BD4F17CA99753F541 /* Pods-DopamineKit_Tests-dummy.m */; };
 		81DAA49380CE0447D7601CEBAA247D80 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425FEFA5840150BD42881689730A9D0D /* SyncCoordinator.swift */; };
 		89452633DF6A2A07C2284BA614CE8CAE /* Pods-DopamineKit_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 613E0AB4F58AD2A5F39FF738DC2E8E37 /* Pods-DopamineKit_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9FAC4EAA3C962A9FBC312A8023563CDF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85E5A74BF2C5F729F6419654402FBC /* Foundation.framework */; };
 		AAFD4F3879CB2C5520AB5008E251FF00 /* DopeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CC75A8A0EEA8A52D8EED9DAE215D4 /* DopeAction.swift */; };
-		AB551732AAA6E3FA02B7F47767A9ECF7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07389E2A49322AA4B20E3817DD9B326 /* Foundation.framework */; };
 		B2220E797869AC9708D314C647EB542F /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4BE140FC9E0F8EA521BCF78EB96B9D /* Track.swift */; };
 		B46070C79DA80EFBB26F01C3644213AE /* Pods-DopamineKit_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C0432E7482FF606EF28ED29A9AD71C6 /* Pods-DopamineKit_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B80D8C4F2446268D5DB3D27CF0B683C6 /* SyncOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CD9CD1203C693721116F9D4CA706F4A /* SyncOverview.swift */; };
 		D291B9A000426FA5963AA0BE3F8DE309 /* DopeException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C8D8833A8464186B5253F749B089DE1 /* DopeException.swift */; };
 		D94EF0F1AC629A7552D9CFC07B9B5244 /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A54ED565E6F42B22CE92A21C41163B /* Report.swift */; };
-		DE02D23402FFA4D976283243D77E3E07 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F62877F6F8B2EC922EE9414A5FFAFFC1 /* CoreData.framework */; };
+		DBBB5A1FD88684776D4DA1BFCC64D282 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7E84538505F21AD441B87E2C82C53E5 /* CoreData.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,14 +76,14 @@
 		BCB50A43A300BE12D82B869B121CF3A8 /* Pods-DopamineKit_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-DopamineKit_Example-dummy.m"; sourceTree = "<group>"; };
 		BECCE1E52494B9C4A4A133D8E7FFD8C4 /* Pods_DopamineKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB4BE140FC9E0F8EA521BCF78EB96B9D /* Track.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
-		D07389E2A49322AA4B20E3817DD9B326 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		E0318C8FA7B6AE30863D47A061606E3A /* Pods-DopamineKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DopamineKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		E7A048CC22CBE3CC03D3C7CDAE9FED77 /* DopamineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DopamineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E7E84538505F21AD441B87E2C82C53E5 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/CoreData.framework; sourceTree = DEVELOPER_DIR; };
 		E844B40E16277A1E364E80531E8D71C1 /* Pods-DopamineKit_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-DopamineKit_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
 		E8C82F218024BED642819A5BF926D73C /* Pods-DopamineKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DopamineKit_Example.release.xcconfig"; sourceTree = "<group>"; };
 		E9CB3DAE67CF3AF0771D90DBEE80413F /* Pods-DopamineKit_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Example-frameworks.sh"; sourceTree = "<group>"; };
-		F62877F6F8B2EC922EE9414A5FFAFFC1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreData.framework; sourceTree = DEVELOPER_DIR; };
 		F6994B21A2445B7966A600DD83145885 /* Telemetry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
+		FF85E5A74BF2C5F729F6419654402FBC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,7 +91,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				63878D9EAEEA28DD91DE19477B569E30 /* Foundation.framework in Frameworks */,
+				1BF258B3CE9E3DFF0DE01B0E09848C85 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,7 +99,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6BE52CD2D42B962423CE72A4CCD6918C /* Foundation.framework in Frameworks */,
+				40514FB7F26C9E982023D623FDCD2A38 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,14 +107,23 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DE02D23402FFA4D976283243D77E3E07 /* CoreData.framework in Frameworks */,
-				AB551732AAA6E3FA02B7F47767A9ECF7 /* Foundation.framework in Frameworks */,
+				DBBB5A1FD88684776D4DA1BFCC64D282 /* CoreData.framework in Frameworks */,
+				9FAC4EAA3C962A9FBC312A8023563CDF /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		18C31505F53BCD0CB0F85AB659963013 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				E7E84538505F21AD441B87E2C82C53E5 /* CoreData.framework */,
+				FF85E5A74BF2C5F729F6419654402FBC /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
 		328654D6615DEEEC51B7DE6BA814EDF4 /* RESTfulAPI */ = {
 			isa = PBXGroup;
 			children = (
@@ -141,18 +150,9 @@
 		433CD3331B6C3787F473C941B61FC68F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				456545A12F33492FB25F7F125EF7F5C0 /* iOS */,
+				18C31505F53BCD0CB0F85AB659963013 /* iOS */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		456545A12F33492FB25F7F125EF7F5C0 /* iOS */ = {
-			isa = PBXGroup;
-			children = (
-				F62877F6F8B2EC922EE9414A5FFAFFC1 /* CoreData.framework */,
-				D07389E2A49322AA4B20E3817DD9B326 /* Foundation.framework */,
-			);
-			name = iOS;
 			sourceTree = "<group>";
 		};
 		53D314FFCE49DE34362222D1DCB23F98 /* Support Files */ = {
