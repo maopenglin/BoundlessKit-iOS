@@ -14,7 +14,7 @@ internal class Report : NSObject, NSCoding {
     static let sharedInstance = Report()
     
     private let defaults = UserDefaults.standard
-    private let defaultsKey = "DopamineReport"
+    private let defaultsKey = "DopamineReport_v4.1.3"
     private let reportedActionsKey = "reportedActions"
     private let sizeToSyncKey = "sizeToSync"
     private let timerStartsAtKey = "timerStartsAt"

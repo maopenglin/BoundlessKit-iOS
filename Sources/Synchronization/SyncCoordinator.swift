@@ -15,7 +15,7 @@ public class SyncCoordinator {
     /// Used to store actionIDs so cartridges can be loaded on init()
     ///
     private let defaults = UserDefaults.standard
-    private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet"
+    private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet_v4.1.3"
     
     private let trackSyncer = Track.sharedInstance
     private let reportSyncer = Report.sharedInstance
@@ -72,7 +72,7 @@ public class SyncCoordinator {
         }
     }
     
-    /// Checks which syners have been triggered, and syncs them in an order 
+    /// Checks which syncers have been triggered, and syncs them in an order
     /// that allows time for the DopamineAPI to generate cartridges
     ///
     public func performSync() {
