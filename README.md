@@ -78,7 +78,7 @@ https://github.com/DopamineLabs/DopamineKit-iOS-binary/) the framework.
 
   ```objective-c
   // Objective-C
-  [DopamineKit reinforce:@"some_action" metaData:nil timeoutSeconds:2.0 completion:^(NSString* reinforcement){
+  [DopamineKit reinforce:@"some_action" metaData:nil completion:^(NSString* reinforcement){
         
         if([reinforcement isEqualToString:@"quote"]){
             // show some positive reinforcement View
