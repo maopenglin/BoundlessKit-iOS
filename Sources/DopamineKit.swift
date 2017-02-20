@@ -32,13 +32,14 @@ open class DopamineKit : NSObject {
         syncCoordinator.store(trackedAction: action)
     }
 
-    /// This function sends an asynchronous reinforcement call for the specified action
+    /// This function intelligently chooses whether to reinforce a user action. The reinforcement function, passed as the completion, is run asynchronously on the queue.
     ///
     /// - parameters:
     ///     - actionID: Action name configured on the Dopamine Dashboard
     ///     - metaData: Action details i.e. calories or streak_count.
     ///                  Must be JSON formattable (Number, String, Bool, Array, Object).
     ///                  Defaults to `nil`.
+    ///     - queue: The queue to run the completion closure. Defaults to `DispatchQueue.main`.
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
     open static func reinforce(_ actionID: String, metaData: [String: AnyObject]? = nil, queue: DispatchQueue = DispatchQueue.main, completion: @escaping (String) -> ()) {
