@@ -41,11 +41,11 @@ open class DopamineKit : NSObject {
     ///                  Defaults to `nil`.
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
-    open static func reinforce(_ actionID: String, metaData: [String: AnyObject]? = nil, completion: @escaping (String) -> ()) {
+    open static func reinforce(_ actionID: String, metaData: [String: AnyObject]? = nil, queue: DispatchQueue = DispatchQueue.main, completion: @escaping (String) -> ()) {
         let action = DopeAction(actionID: actionID, metaData: metaData)
         action.reinforcementDecision = syncCoordinator.retrieveReinforcementDecisionFor(actionID: action.actionID)
         
-        DispatchQueue.main.async(execute: {
+        queue.async(execute: {
             completion(action.reinforcementDecision!)
         })
         
