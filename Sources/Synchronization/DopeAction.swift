@@ -23,6 +23,9 @@ internal class DopeAction : NSObject, NSCoding {
     var utc:Int64
     var timezoneOffset:Int64
     
+    private static let versionNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+    private static let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+    
     /// This function initializes a DopeAction
     ///
     /// - parameters:
@@ -53,6 +56,14 @@ internal class DopeAction : NSObject, NSCoding {
         self.metaData = aDecoder.decodeObject(forKey: metaDataKey) as? [String:AnyObject]
         self.utc = aDecoder.decodeInt64(forKey: utcKey)
         self.timezoneOffset = aDecoder.decodeInt64(forKey: timezoneOffsetKey)
+        
+        if (self.metaData == nil) { self.metaData = [:] }
+        if let v = DopeAction.versionNumber {
+            self.metaData?["CFBundleShortVersionString"] = v as AnyObject
+        }
+        if let b = DopeAction.buildNumber {
+            self.metaData?["CFBundleVersion"] = b as AnyObject
+        }
     }
     
     /// Encodes an action and saves it to NSUserDefaults
