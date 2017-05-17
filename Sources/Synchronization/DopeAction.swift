@@ -19,7 +19,7 @@ internal class DopeAction : NSObject, NSCoding {
     
     var actionID:String
     var reinforcementDecision:String?
-    var metaData:[String: AnyObject]?
+    var metaData:[String: Any]?
     var utc:Int64
     var timezoneOffset:Int64
     
@@ -37,7 +37,7 @@ internal class DopeAction : NSObject, NSCoding {
     ///
     init(actionID:String,
                 reinforcementDecision:String? = nil,
-                metaData:[String:AnyObject]? = nil,
+                metaData:[String:Any]? = nil,
                 utc:Int64 = Int64( 1000*Date().timeIntervalSince1970 ),
                 timezoneOffset:Int64 = Int64( 1000*NSTimeZone.default.secondsFromGMT() ))
     {
@@ -53,16 +53,16 @@ internal class DopeAction : NSObject, NSCoding {
     required init(coder aDecoder: NSCoder) {
         self.actionID = aDecoder.decodeObject(forKey: actionIDKey) as! String
         self.reinforcementDecision = aDecoder.decodeObject(forKey: reinforcementDecisionKey) as? String
-        self.metaData = aDecoder.decodeObject(forKey: metaDataKey) as? [String:AnyObject]
+        self.metaData = aDecoder.decodeObject(forKey: metaDataKey) as? [String:Any]
         self.utc = aDecoder.decodeInt64(forKey: utcKey)
         self.timezoneOffset = aDecoder.decodeInt64(forKey: timezoneOffsetKey)
         
         if (self.metaData == nil) { self.metaData = [:] }
         if let v = DopeAction.versionNumber {
-            self.metaData?["CFBundleShortVersionString"] = v as AnyObject
+            self.metaData?["CFBundleShortVersionString"] = v
         }
         if let b = DopeAction.buildNumber {
-            self.metaData?["CFBundleVersion"] = b as AnyObject
+            self.metaData?["CFBundleVersion"] = b
         }
     }
     
@@ -78,16 +78,16 @@ internal class DopeAction : NSObject, NSCoding {
     
     /// This function converts a DopeAction to a JSON compatible Object
     ///
-    func toJSONType() -> [String : AnyObject] {
-        var jsonObject: [String:AnyObject] = [:]
+    func toJSONType() -> [String : Any] {
+        var jsonObject: [String:Any] = [:]
         
-        jsonObject[actionIDKey] = actionID as AnyObject
-        jsonObject[reinforcementDecisionKey] = reinforcementDecision as AnyObject?
-        jsonObject[metaDataKey] = metaData as AnyObject?
+        jsonObject[actionIDKey] = actionID
+        jsonObject[reinforcementDecisionKey] = reinforcementDecision
+        jsonObject[metaDataKey] = metaData
         jsonObject["time"] = [
             ["timeType":utcKey, "value": NSNumber(value: utc)],
             ["timeType":"deviceTimezoneOffset", "value": NSNumber(value: timezoneOffset)]
-        ] as AnyObject
+        ]
         
         return jsonObject
     }
