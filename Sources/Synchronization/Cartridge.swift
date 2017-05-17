@@ -190,14 +190,14 @@ internal class Cartridge : NSObject, NSCoding {
     
     /// This function returns a snapshot of this instance as a JSON compatible Object
     ///
-    func toJSONType() -> [String: AnyObject] {
+    func toJSONType() -> [String: Any] {
         return [
-            actionIDKey : actionID as AnyObject,
-            "size" : reinforcementDecisions.count as AnyObject,
-            initialSizeKey : initialSize as AnyObject,
-            "capacityToSync" : Cartridge.capacityToSync as AnyObject,
-            timerStartsAtKey : NSNumber(value: timerStartsAt) as AnyObject,
-            timerExpiresInKey : NSNumber(value: timerExpiresIn) as AnyObject
+            actionIDKey : actionID,
+            "size" : reinforcementDecisions.count,
+            initialSizeKey : initialSize,
+            "capacityToSync" : Cartridge.capacityToSync,
+            timerStartsAtKey : NSNumber(value: timerStartsAt),
+            timerExpiresInKey : NSNumber(value: timerExpiresIn)
         ]
     }
     

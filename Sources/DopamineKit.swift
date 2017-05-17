@@ -26,7 +26,7 @@ open class DopamineKit : NSObject {
     ///                  Must be JSON formattable (Number, String, Bool, Array, Object).
     ///                  Defaults to `nil`.
     ///
-    open static func track(_ actionID: String, metaData: [String: AnyObject]? = nil) {
+    open static func track(_ actionID: String, metaData: [String: Any]? = nil) {
         // store the action to be synced
         let action = DopeAction(actionID: actionID, metaData:metaData)
         syncCoordinator.store(trackedAction: action)
@@ -42,7 +42,7 @@ open class DopamineKit : NSObject {
     ///     - queue: The queue to run the completion closure. Defaults to `DispatchQueue.main`.
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
-    open static func reinforce(_ actionID: String, metaData: [String: AnyObject]? = nil, queue: DispatchQueue = DispatchQueue.main, completion: @escaping (String) -> ()) {
+    open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, queue: DispatchQueue = DispatchQueue.main, completion: @escaping (String) -> ()) {
         let action = DopeAction(actionID: actionID, metaData: metaData)
         action.reinforcementDecision = syncCoordinator.retrieveReinforcementDecisionFor(actionID: action.actionID)
         

@@ -88,7 +88,7 @@ internal class Telemetry {
     ///
     static func startRecordingSync(cause: String, track: Track, report: Report, cartridges: [String: Cartridge]) {
         queue.async {
-            var cartridgeTriggers: [String: [String: AnyObject]] = [:]
+            var cartridgeTriggers: [String: [String: Any]] = [:]
             for (actionID, cartridge) in cartridges {
                 cartridgeTriggers[actionID] = cartridge.toJSONType()
             }
@@ -106,13 +106,13 @@ internal class Telemetry {
     static func setResponseForTrackSync(_ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
         queue.async {
             if let syncOverview = Telemetry.currentSyncOverview {
-                var syncResponse: [String: AnyObject] = [:]
-                syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt) as AnyObject
-                syncResponse[SyncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt) as AnyObject
-                syncResponse[SyncOverview.statusKey] = status as AnyObject
-                syncResponse[SyncOverview.errorKey] = error as AnyObject?
+                var syncResponse: [String: Any] = [:]
+                syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt)
+                syncResponse[SyncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt)
+                syncResponse[SyncOverview.statusKey] = status
+                syncResponse[SyncOverview.errorKey] = error
                 
-                syncOverview.trackTriggers[SyncOverview.syncResponseKey] = syncResponse as AnyObject
+                syncOverview.trackTriggers[SyncOverview.syncResponseKey] = syncResponse
             } else {
                 DopamineKit.debugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
             }
@@ -129,13 +129,13 @@ internal class Telemetry {
     static func setResponseForReportSync(_ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
         queue.async{
             if let syncOverview = Telemetry.currentSyncOverview {
-                var syncResponse: [String: AnyObject] = [:]
-                syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt) as AnyObject
-                syncResponse[SyncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt) as AnyObject
-                syncResponse[SyncOverview.statusKey] = status as AnyObject
-                syncResponse[SyncOverview.errorKey] = error as AnyObject?
+                var syncResponse: [String: Any] = [:]
+                syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt)
+                syncResponse[SyncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt)
+                syncResponse[SyncOverview.statusKey] = status
+                syncResponse[SyncOverview.errorKey] = error
                 
-                syncOverview.reportTriggers[SyncOverview.syncResponseKey] = syncResponse as AnyObject
+                syncOverview.reportTriggers[SyncOverview.syncResponseKey] = syncResponse
             } else {
                 DopamineKit.debugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
             }
@@ -153,14 +153,14 @@ internal class Telemetry {
     static func setResponseForCartridgeSync(forAction actionID: String, _ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
         queue.async{
             if let syncOverview = Telemetry.currentSyncOverview {
-                var syncResponse: [String: AnyObject] = [:]
-                syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt) as AnyObject
-                syncResponse[SyncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt) as AnyObject
-                syncResponse[SyncOverview.statusKey] = status as AnyObject
-                syncResponse[SyncOverview.errorKey] = error as AnyObject?
+                var syncResponse: [String: Any] = [:]
+                syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt)
+                syncResponse[SyncOverview.roundTripTimeKey] = NSNumber(value: Int64(1000*NSDate().timeIntervalSince1970) - startedAt)
+                syncResponse[SyncOverview.statusKey] = status
+                syncResponse[SyncOverview.errorKey] = error
                 
                 if var cartridge = syncOverview.cartridgesTriggers[actionID] {
-                    cartridge[SyncOverview.syncResponseKey] = syncResponse as AnyObject
+                    cartridge[SyncOverview.syncResponseKey] = syncResponse
                     syncOverview.cartridgesTriggers[actionID] = cartridge
                 }
             } else {

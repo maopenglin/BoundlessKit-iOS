@@ -297,7 +297,7 @@ open class CandyBar: UIView {
         }
         setNeedsLayout()
         setNeedsUpdateConstraints()
-        layoutIfNeeded()
+        superview.layoutIfNeeded()
         updateConstraintsIfNeeded()
     }
     

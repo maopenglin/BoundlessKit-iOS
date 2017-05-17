@@ -13,7 +13,7 @@ class ViewController: UIViewController {
     
     func action1Performed(){
         // Reinforce the action to make it sticky!!
-        DopamineKit.reinforce("action1", metaData: ["key":"value" as AnyObject], completion: {
+        DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {
             reinforcement in
                 // Update UI to display reinforcement decision on screen for learning purposes
                 self.responseLabel.text = reinforcement
@@ -64,7 +64,7 @@ class ViewController: UIViewController {
     
     func action2Performed(){
         // Tracking call is sent asynchronously
-        DopamineKit.track("action2", metaData: ["key":"value" as AnyObject, "calories":9000 as AnyObject])
+        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
     }
     
     
