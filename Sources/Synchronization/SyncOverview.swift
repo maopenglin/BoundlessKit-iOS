@@ -25,9 +25,9 @@ internal class SyncOverview : NSObject, NSCoding {
     var timezoneOffset: Int64
     var totalSyncTime: Int64
     var cause: String
-    var trackTriggers: [String: AnyObject]
-    var reportTriggers: [String: AnyObject]
-    var cartridgesTriggers: [String: [String: AnyObject]]
+    var trackTriggers: [String: Any]
+    var reportTriggers: [String: Any]
+    var cartridgesTriggers: [String: [String: Any]]
     
     /// Use this object to record the performance of a synchronization
     ///
@@ -36,7 +36,7 @@ internal class SyncOverview : NSObject, NSCoding {
     ///     - timerStartsAt: The start time for a sync timer. Defaults to 0.
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
-    init(cause: String, trackTriggers: [String: AnyObject], reportTriggers: [String: AnyObject], cartridgeTriggers: [String: [String: AnyObject]]) {
+    init(cause: String, trackTriggers: [String: Any], reportTriggers: [String: Any], cartridgeTriggers: [String: [String: Any]]) {
         self.utc = Int64( 1000*Date().timeIntervalSince1970 )
         self.timezoneOffset = Int64( 1000*NSTimeZone.default.secondsFromGMT() )
         self.totalSyncTime = -1
@@ -53,9 +53,9 @@ internal class SyncOverview : NSObject, NSCoding {
         self.timezoneOffset = aDecoder.decodeInt64(forKey: SyncOverview.timezoneOffsetKey)
         self.totalSyncTime = aDecoder.decodeInt64(forKey: SyncOverview.totalSyncTimeKey)
         self.cause = aDecoder.decodeObject(forKey: SyncOverview.causeKey) as! String
-        self.trackTriggers = aDecoder.decodeObject(forKey: SyncOverview.trackKey) as! [String: AnyObject]
-        self.reportTriggers = aDecoder.decodeObject(forKey: SyncOverview.reportKey) as! [String: AnyObject]
-        self.cartridgesTriggers = aDecoder.decodeObject(forKey: SyncOverview.cartridgesKey) as! [String: [String: AnyObject]]
+        self.trackTriggers = aDecoder.decodeObject(forKey: SyncOverview.trackKey) as! [String: Any]
+        self.reportTriggers = aDecoder.decodeObject(forKey: SyncOverview.reportKey) as! [String: Any]
+        self.cartridgesTriggers = aDecoder.decodeObject(forKey: SyncOverview.cartridgesKey) as! [String: [String: Any]]
     }
     
     /// Encodes an overview and saves it to NSUserDefaults
@@ -72,21 +72,20 @@ internal class SyncOverview : NSObject, NSCoding {
     
     /// This function converts a DopeAction to a JSON compatible Object
     ///
-    func toJSONType() -> [String : AnyObject] {
-        var jsonObject: [String:AnyObject] = [:]
+    func toJSONType() -> [String : Any] {
+        var jsonObject: [String:Any] = [:]
         
-        jsonObject[SyncOverview.utcKey] = NSNumber(value: utc) as AnyObject
-        jsonObject[SyncOverview.timezoneOffsetKey] = NSNumber(value: timezoneOffset) as AnyObject
-        jsonObject[SyncOverview.totalSyncTimeKey] = NSNumber(value: totalSyncTime) as AnyObject
-        jsonObject[SyncOverview.causeKey] = cause as AnyObject
-        jsonObject[SyncOverview.trackKey] = trackTriggers as AnyObject
-        jsonObject[SyncOverview.reportKey] = reportTriggers as AnyObject
-        var cartridges: [[String: AnyObject]] = []
+        jsonObject[SyncOverview.utcKey] = NSNumber(value: utc)
+        jsonObject[SyncOverview.timezoneOffsetKey] = NSNumber(value: timezoneOffset)
+        jsonObject[SyncOverview.totalSyncTimeKey] = NSNumber(value: totalSyncTime)
+        jsonObject[SyncOverview.causeKey] = cause
+        jsonObject[SyncOverview.trackKey] = trackTriggers
+        jsonObject[SyncOverview.reportKey] = reportTriggers
+        var cartridges: [[String: Any]] = []
         for (_, value) in cartridgesTriggers {
             cartridges.append(value)
         }
-        jsonObject[SyncOverview.cartridgesKey] = cartridges as AnyObject
-        DopamineKit.debugLog(jsonObject.description)
+        jsonObject[SyncOverview.cartridgesKey] = cartridges
         return jsonObject
     }
     

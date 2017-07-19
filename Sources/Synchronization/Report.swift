@@ -181,13 +181,13 @@ internal class Report : NSObject, NSCoding {
     
     /// This function returns a snapshot of this instance as a JSON compatible Object
     ///
-    func toJSONType() -> [String : AnyObject] {
-        var jsonObject: [String:AnyObject] = [:]
+    func toJSONType() -> [String : Any] {
+        var jsonObject: [String:Any] = [:]
         
-        jsonObject["size"] = NSNumber(value: reportedActions.count) as AnyObject
-        jsonObject[sizeToSyncKey] = NSNumber(value: sizeToSync) as AnyObject
-        jsonObject[timerStartsAtKey] = NSNumber(value: timerStartsAt) as AnyObject
-        jsonObject[timerExpiresInKey] = NSNumber(value: timerExpiresIn) as AnyObject
+        jsonObject["size"] = NSNumber(value: reportedActions.count)
+        jsonObject[sizeToSyncKey] = NSNumber(value: sizeToSync)
+        jsonObject[timerStartsAtKey] = NSNumber(value: timerStartsAt)
+        jsonObject[timerExpiresInKey] = NSNumber(value: timerExpiresIn)
         
         return jsonObject
     }
