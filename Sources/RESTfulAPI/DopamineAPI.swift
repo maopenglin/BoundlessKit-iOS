@@ -177,7 +177,16 @@ public class DopamineAPI : NSObject{
                 
                 do {
                     // turn the response into a json object
-                    responseDict = try JSONSerialization.jsonObject(with: responseData!, options: JSONSerialization.ReadingOptions()) as! [String: Any]
+                    guard let data = responseData,
+                          let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
+                    else {
+                        let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
+                        let message = "❌ Error reading \(type.pathExtenstion) response data, not a dictionary: \(json)"
+                        DopamineKit.debugLog(message)
+                        Telemetry.storeException(className: "JSONSerialization", message: message)
+                        return
+                    }
+                    responseDict = dict
                     DopamineKit.debugLog("✅\(type.pathExtenstion) call got response:\(responseDict.debugDescription)")
                     var statusCode: Int = -2
                     if let responseStatusCode = responseDict["status"] as? Int {
