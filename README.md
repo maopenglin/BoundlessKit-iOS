@@ -26,7 +26,7 @@ A simple "To Do List" iOS App is included in the [DopamineKit-iOS-HelloWorld rep
   3. Import the DopamineKit framework by using [CocoaPods](https://cocoapods.org/) (the Pod name is `DopamineKit`), or by [directly downloading](
 https://github.com/DopamineLabs/DopamineKit-iOS-binary/) the framework.
 
-  ![Workspace snapshot](readme/TestApp with DopamineKit and DopamineProperties.png)
+  ![Workspace snapshot](readme/TestApp_with_DopamineKit_and_DopamineProperties.png)
     *Shown is a Swift project using the CocoaPods dependency manager*
     
   4. Import the DopamineKit framework
