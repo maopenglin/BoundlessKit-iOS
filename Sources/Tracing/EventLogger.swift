@@ -14,16 +14,25 @@ public class EventLogger : NSObject {
     public static let EVENT_TYPE_APPEARED: NSString = "appeared"
     public static let EVENT_TYPE_TOUCHED: NSString = "touched"
     
-    public static func logEvent(withType type: String, withTag tag: String) {
-        DopamineKit.debugLog("Got event:\(type) with tag:\(tag)")
+    public static func logEvent(withType event: String, withTag tag: String) {
+        DopamineKit.debugLog("Got event:\(event) with tag:\(tag)")
+        
+        DopamineKit.track(event, metaData: ["tag":tag,
+        ])
     }
     
     public static func logEvent(withUIViewController viewController: UIViewController) {
-        DopamineKit.debugLog("Got event:\(EVENT_TYPE_APPEARED) for UIViewController with class :\(type(of:viewController))")
+        DopamineKit.debugLog("Got event:\(EVENT_TYPE_APPEARED) for UIViewController with class :\(NSStringFromClass(type(of:viewController)))")
+        
+        DopamineKit.track(EVENT_TYPE_APPEARED as String, metaData:
+            ["UIViewController":
+                ["classname": NSStringFromClass(type(of:viewController))]
+            ])
+        
     }
     
-    public static func logEvent(withTouch touch: UITouch, completion: @escaping () -> ()) {
-        var message = "Got event:\(EVENT_TYPE_TOUCHED)"
+    public static func logEvent(withTouch touch: UITouch, gestureName: String) {
+        var message = "Got event:\(EVENT_TYPE_TOUCHED)(\(gestureName))"
         if let control = touch.view as? UIControl {
             message += " for UIControl with class:\(type(of: control))"
             if let control = control as? UIButton,
@@ -44,4 +53,27 @@ public class EventLogger : NSObject {
     }
     
 }
+
+
+fileprivate extension UITouch {
+    
+//    enum GestureType : String {
+//        case unknown, tap, longPress, swipe
+//    }
+//    
+//    struct TouchRecord {
+//        let view: UIView
+//        let location: CGPoint
+//    }
+//    
+//    static var touch1: TouchRecord?
+//    static var touch2: TouchRecord?
+//    
+//    func analyze(event: UIEvent) {
+//        event.allTouches.anyO
+//    }
+    
+    
+}
+
 

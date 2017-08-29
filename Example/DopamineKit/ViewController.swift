@@ -91,8 +91,8 @@ class ViewController: UIViewController {
         DopamineKit.syncCoordinator.performSync()
     }
     
-    func temp() {
-        NSLog("Did touch up outside")
+    func touchUpOutsideFromButton1() {
+        NSLog("Did touch up outside from Reinforce Button")
     }
     
     func loadBasicUI(){
@@ -121,7 +121,7 @@ class ViewController: UIViewController {
         action1Button.titleLabel?.textAlignment = NSTextAlignment.center
         action1Button.backgroundColor = UIColor.init(red: 51/255.0, green: 153/255.0, blue: 51/255.0, alpha: 1.0)
         action1Button.addTarget(self, action: #selector(ViewController.action1Performed), for: UIControlEvents.touchUpInside)
-        action1Button.addTarget(self, action: #selector(ViewController.temp), for: UIControlEvents.touchUpOutside)
+        action1Button.addTarget(self, action: #selector(ViewController.touchUpOutsideFromButton1), for: UIControlEvents.touchUpOutside)
         self.view.addSubview(action1Button)
         
         // Button to represent some user action to Track

@@ -19,6 +19,8 @@
 		660D83CC8140E41709E83FE03558C802 /* DopamineKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AEEA467B356923135B55508B249986D /* DopamineKit-dummy.m */; };
 		688DBBF4A8D6E29D93AACFA8D3DDB048 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4BE140FC9E0F8EA521BCF78EB96B9D /* Track.swift */; };
 		6D67460B0D27CE6BA3F13677B427E3C1 /* Cartridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80FC393F496160BAECF25414EB2A7C14 /* Cartridge.swift */; };
+		84175C721F555F7E00439C8A /* UIWindow+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = 84175C701F555F7E00439C8A /* UIWindow+Dopamine.h */; };
+		84175C731F555F7E00439C8A /* UIWindow+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = 84175C711F555F7E00439C8A /* UIWindow+Dopamine.m */; };
 		843B60FE1F548A4F00F0F87E /* UIApplication+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = 843B60ED1F548A4F00F0F87E /* UIApplication+Dopamine.h */; };
 		843B60FF1F548A4F00F0F87E /* UIApplication+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = 843B60EE1F548A4F00F0F87E /* UIApplication+Dopamine.m */; };
 		843B61001F548A4F00F0F87E /* UIApplicationDelegate+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = 843B60EF1F548A4F00F0F87E /* UIApplicationDelegate+Dopamine.h */; };
@@ -78,6 +80,8 @@
 		7555C005FD3F95381466C1E2DE4D4F46 /* Pods-DopamineKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Example-resources.sh"; sourceTree = "<group>"; };
 		76D788B7B604A0642AEFEB4B09916044 /* DopamineAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineAPI.swift; sourceTree = "<group>"; };
 		80FC393F496160BAECF25414EB2A7C14 /* Cartridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Cartridge.swift; sourceTree = "<group>"; };
+		84175C701F555F7E00439C8A /* UIWindow+Dopamine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+Dopamine.h"; sourceTree = "<group>"; };
+		84175C711F555F7E00439C8A /* UIWindow+Dopamine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow+Dopamine.m"; sourceTree = "<group>"; };
 		843B60ED1F548A4F00F0F87E /* UIApplication+Dopamine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication+Dopamine.h"; sourceTree = "<group>"; };
 		843B60EE1F548A4F00F0F87E /* UIApplication+Dopamine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+Dopamine.m"; sourceTree = "<group>"; };
 		843B60EF1F548A4F00F0F87E /* UIApplicationDelegate+Dopamine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+Dopamine.h"; sourceTree = "<group>"; };
@@ -210,6 +214,8 @@
 				843B60F01F548A4F00F0F87E /* UIApplicationDelegate+Dopamine.m */,
 				843B60F11F548A4F00F0F87E /* UIViewController+Dopamine.h */,
 				843B60F21F548A4F00F0F87E /* UIViewController+Dopamine.m */,
+				84175C701F555F7E00439C8A /* UIWindow+Dopamine.h */,
+				84175C711F555F7E00439C8A /* UIWindow+Dopamine.m */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -336,6 +342,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84175C721F555F7E00439C8A /* UIWindow+Dopamine.h in Headers */,
 				B99883630F012D2794BA3F1BF6694048 /* DopamineKit.h in Headers */,
 				5841DB56142D6A733615A7B65A4D6A69 /* DopamineKit-umbrella.h in Headers */,
 				843B61021F548A4F00F0F87E /* UIViewController+Dopamine.h in Headers */,
@@ -443,6 +450,7 @@
 			files = (
 				6D67460B0D27CE6BA3F13677B427E3C1 /* Cartridge.swift in Sources */,
 				843B610A1F548A4F00F0F87E /* EventLogger.swift in Sources */,
+				84175C731F555F7E00439C8A /* UIWindow+Dopamine.m in Sources */,
 				843B61011F548A4F00F0F87E /* UIApplicationDelegate+Dopamine.m in Sources */,
 				4735365CCB973B5987EA7EC545BA95C4 /* DopamineAPI.swift in Sources */,
 				660D83CC8140E41709E83FE03558C802 /* DopamineKit-dummy.m in Sources */,
@@ -540,7 +548,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/DopamineKit/DopamineKit-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/DopamineKit/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/DopamineKit/DopamineKit.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -620,7 +628,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/DopamineKit/DopamineKit-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/DopamineKit/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/DopamineKit/DopamineKit.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;

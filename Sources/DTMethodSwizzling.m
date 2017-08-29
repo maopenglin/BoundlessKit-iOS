@@ -14,6 +14,7 @@
 #import <SwizzleHelper.h>
 #import <UIApplicationDelegate+Dopamine.h>
 #import <UIApplication+Dopamine.h>
+#import <UIWindow+Dopamine.h>
 #import <UIViewController+Dopamine.h>
 
 @implementation UIApplication (Dopamine)
@@ -22,11 +23,14 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
-        // Swizzle - UIApplication
-        [DopamineApp swizzleSelectors];
+//        // Swizzle - UIApplication
+//        [DopamineApp swizzleSelectors];
         
         // Swizzle - UIApplicationDelegate
         [DopamineAppDelegate swizzleSelectors];
+        
+        // Swizzle - UIWindow
+        [DopamineWindow swizzleSelectors];
         
         // Swizzle - UIViewController
         [DopamineViewController swizzleSelectors];

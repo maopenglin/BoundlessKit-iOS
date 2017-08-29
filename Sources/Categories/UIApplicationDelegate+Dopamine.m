@@ -26,11 +26,11 @@ static Class delegateClass = nil;
 // But rather in one of the subclasses
 static NSArray* delegateSubclasses = nil;
 
-+(Class)delegateClass {
++ (Class) delegateClass {
     return delegateClass;
 }
 
--(void) swizzled_setDelegate:(id<UIApplicationDelegate>)delegate {
+- (void) swizzled_setDelegate:(id<UIApplicationDelegate>)delegate {
     if (delegateClass) {
         [self swizzled_setDelegate:delegate];
         return;
@@ -50,14 +50,14 @@ static NSArray* delegateSubclasses = nil;
 
 // Application State Swizzles
 
-- (void)swizzled_applicationDidBecomeActive:(UIApplication*)application {
+- (void) swizzled_applicationDidBecomeActive:(UIApplication*)application {
     [EventLogger logEventWithType:[EventLogger EVENT_TYPE_APP_FOCUS] withTag:@"becomeActive"];
     
     if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
         [self swizzled_applicationDidBecomeActive:application];
 }
 
-- (void)swizzled_applicationWillResignActive:(UIApplication*)application {
+- (void) swizzled_applicationWillResignActive:(UIApplication*)application {
     [EventLogger logEventWithType:[EventLogger EVENT_TYPE_APP_FOCUS] withTag:@"resignActive"];
     
     if ([self respondsToSelector:@selector(swizzled_applicationWillResignActive:)])
