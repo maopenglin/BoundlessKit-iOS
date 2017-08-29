@@ -154,12 +154,12 @@ fileprivate extension UIWindow {
 //    }
 }
 
-fileprivate extension UIControlEvents {
+public extension UIControlEvents {
     
     static let allTouchEventsForReal: [UIControlEvents] = [.touchDown, .touchDownRepeat, .touchDragInside, .touchDragOutside, .touchDragEnter, .touchDragExit, .touchUpInside, .touchUpOutside, .touchCancel, .valueChanged, .primaryActionTriggered,  .editingDidBegin, .editingChanged, .editingDidEnd, .editingDidEndOnExit ]
     
     
-    var description: String { get { return UIControlEvents.nameForRawTouchEvents[self.rawValue] ?? "<No description set for \(self)>" } }
+    public var description: String { get { return UIControlEvents.nameForRawTouchEvents[self.rawValue] ?? "<No description set for \(self)>" } }
     
     private static let nameForRawTouchEvents: [UInt: String] = [UIControlEvents.touchDown.rawValue: "touchDown",
                                                                 UIControlEvents.touchDownRepeat.rawValue: "touchDownRepeat",

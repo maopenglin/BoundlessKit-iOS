@@ -35,7 +35,6 @@
         // Swizzle - UIViewController
         [DopamineViewController swizzleSelectors];
         
-        
     });
 }
 

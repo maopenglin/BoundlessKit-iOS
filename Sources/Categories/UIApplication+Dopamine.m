@@ -1,5 +1,5 @@
 ////
-////  UIApplicationDelegate+Dopamine.m
+////  UIApplication+Dopamine.m
 ////  Pods
 ////
 ////  Created by Akash Desai on 8/15/17.
