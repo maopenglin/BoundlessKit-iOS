@@ -212,7 +212,7 @@ extension String {
 }
 
 extension Dictionary where Key==String, Value==Set<String> {
-    static func += (lhs: inout [Key: Value], rhs: [Key: Value]) {
+    static func += (lhs: inout [String: Set<String>], rhs: [String: Set<String>]) {
         rhs.forEach{ key, values in
             if let prevousValues = lhs[key] {
                 lhs[key] = prevousValues.union(values)
