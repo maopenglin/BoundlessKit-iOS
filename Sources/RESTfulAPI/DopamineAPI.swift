@@ -158,7 +158,7 @@ public class DopamineAPI : NSObject{
                 defer { completion(responseDict) }
                 
                 if responseURL == nil {
-                    DopamineKit.debugLog("❌ invalid response:\(error?.localizedDescription)")
+                    DopamineKit.debugLog("❌ invalid response:\(String(describing: error?.localizedDescription))")
                     responseDict["error"] = error?.localizedDescription
                     switch type {
                     case .track:

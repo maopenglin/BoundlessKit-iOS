@@ -12,7 +12,7 @@ import Foundation
 open class DopamineKit : NSObject {
     
     public static let sharedInstance: DopamineKit = DopamineKit()
-    public static let syncCoordinator = SyncCoordinator.sharedInstance
+    public static let syncCoordinator = SyncCoordinator.shared
     
     private override init() {
         super.init()
@@ -63,7 +63,7 @@ open class DopamineKit : NSObject {
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    internal static func debugLog(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
+    public static func debugLog(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
         #if DEBUG
             var functionSignature:String = function
             if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {

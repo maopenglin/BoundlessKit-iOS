@@ -10,7 +10,7 @@ import Foundation
 
 public class SyncCoordinator {
     
-    internal static let sharedInstance = SyncCoordinator()
+    internal static let shared = SyncCoordinator()
     
     /// Used to store actionIDs so cartridges can be loaded on init()
     ///
