@@ -8,7 +8,6 @@
 
 import Foundation
 
-@objc
 public class Helper: NSObject {
     
 //    public static var liveRecording = false
@@ -64,9 +63,36 @@ public class Helper: NSObject {
 //            Helper.liveRecording = recordingEnabled
 //            DopamineKit.debugLog("Recording set to:\(recordingEnabled)")
 //        }
-//    }
+    //    }
+    
+    public static func sendTouch(touch: UITouch) {
+        
+    }
+    
+    public static func sendEvent(event: UIEvent) {
+        print(event.description)
+    }
 }
 
+fileprivate extension UIControlEvents {
+    
+    static let allTouchEventsForReal: [UIControlEvents] = [.touchDown, .touchDownRepeat, .touchDragInside, .touchDragOutside, .touchDragEnter, .touchDragExit, .touchUpInside, .touchUpOutside, .touchCancel]
+    
+    
+    var description: String { get { return UIControlEvents.nameForRawTouchEvents[self.rawValue] ?? "<No description set for \(self)>" } }
+    
+    private static let nameForRawTouchEvents: [UInt: String] = [UIControlEvents.touchDown.rawValue: "touchDown",
+                                                                UIControlEvents.touchDownRepeat.rawValue: "touchDownRepeat",
+                                                                UIControlEvents.touchDragInside.rawValue: "touchDragInside",
+                                                                UIControlEvents.touchDragOutside.rawValue: "touchDragOutside",
+                                                                UIControlEvents.touchDragEnter.rawValue: "touchDragEnter",
+                                                                UIControlEvents.touchDragExit.rawValue: "touchDragExit",
+                                                                UIControlEvents.touchUpInside.rawValue: "touchUpInside",
+                                                                UIControlEvents.touchUpOutside.rawValue: "touchUpOutside",
+                                                                UIControlEvents.touchCancel.rawValue: "touchCancel",
+                                                                ]
+    
+}
 
 extension UIControl {
     
@@ -75,10 +101,11 @@ extension UIControl {
         
         for target in self.allTargets {
             var actionNames: Set<String> = Set([])
-            
-            if let targetActions = self.actions(forTarget: target, forControlEvent: self.allControlEvents) {
-                for action in targetActions {
-                    actionNames.insert(action)
+            for touchEvent in UIControlEvents.allTouchEventsForReal {
+                if let targetActions = self.actions(forTarget: target, forControlEvent: touchEvent) {
+                    for action in targetActions {
+                        actionNames.insert("\(touchEvent.description):\(action)")
+                    }
                 }
             }
             

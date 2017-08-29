@@ -28,6 +28,9 @@
         } else if (touch.phase == UITouchPhaseEnded){
 //            [EventLogger logEventWithType:[EventLogger EVENT_TYPE_TOUCHED] forObject:touch.view];
 //            [Helper setLastTouch:touch];
+            [Helper sendTouchWithTouch:touch];
+            [Helper sendEventWithEvent:event];
+            
         }
     }
     [self swizzled_sendEvent:event];
