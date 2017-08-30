@@ -101,8 +101,13 @@ static CGFloat PINCH_MIN = 20;
                 }
                 
                 if (touch2.phase == UITouchPhaseEnded) {
+                    firstTouchHash = touch1.hash;
                     startTouchTime = [touch1 timestamp];
                     startTouchPosition1 = [touch1 locationInView:self];
+                } else {
+                    firstTouchHash = touch2.hash;
+                    startTouchTime = [touch2 timestamp];
+                    startTouchPosition1 = [touch2 locationInView:self];
                 }
             }
         } else {
