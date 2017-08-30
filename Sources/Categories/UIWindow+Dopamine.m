@@ -32,15 +32,13 @@ static CGFloat PINCH_MIN = 20;
         UITouch *touch = event.allTouches.anyObject;
         
         if (touch.phase == UITouchPhaseBegan) {
-            // could be swipe or tap or hold
+            // could be pinch or swipe or drag or tap or hold
             firstTouchHash = touch.hash;
             
             startTouchTime = [touch timestamp];
             startTouchPosition1 = [touch locationInView:self];
-        } else if (touch.phase == UITouchPhaseMoved) {
-            // swipe or drag. determine at phaseEnded
         } else if (touch.phase == UITouchPhaseEnded && touch.hash == firstTouchHash) {
-            // tap or hold or swipe or drag
+            // swipe or drag or tap or hold
             
             CGPoint currentTouchPosition = [touch locationInView:self];
             double xDistance = fabs(startTouchPosition1.x - currentTouchPosition.x);
@@ -65,12 +63,9 @@ static CGFloat PINCH_MIN = 20;
                 
             } else if (touch.tapCount > 0) {
                 NSLog(@"tapCount:(%lu)", (unsigned long)touch.tapCount);
-            } else {
-                NSLog(@"Holding touch for %fs", touch.timestamp - startTouchTime);
             }
             firstTouchHash = false;
-        }
-        else if (touch.phase == UITouchPhaseCancelled) {
+        } else if (touch.phase == UITouchPhaseCancelled) {
             firstTouchHash = false;
         }
         
@@ -87,7 +82,7 @@ static CGFloat PINCH_MIN = 20;
         }
         
         if (touch2.view == NULL) {
-            // touch2 in same view as touch1
+            // touch2 in same view as touch1 --> pinch
             if (touch2.phase == UITouchPhaseBegan) {
                 startTouchPosition2 = [touch2 locationInView:self];
             } else if (touch1.phase == UITouchPhaseEnded || touch2.phase == UITouchPhaseEnded) {
