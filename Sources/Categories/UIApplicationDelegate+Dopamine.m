@@ -53,6 +53,7 @@ static NSArray* delegateSubclasses = nil;
 - (void) swizzled_applicationDidBecomeActive:(UIApplication*)application {
     [EventLogger logEventWithType:[EventLogger EVENT_TYPE_APP_FOCUS] withTag:@"becomeActive"];
     
+    
     if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
         [self swizzled_applicationDidBecomeActive:application];
 }
