@@ -58,7 +58,7 @@ internal class Track : NSObject, NSCoding {
         self.sizeToSync = aDecoder.decodeInteger(forKey: sizeToSyncKey)
         self.timerStartsAt = aDecoder.decodeInt64(forKey: timerStartsAtKey)
         self.timerExpiresIn = aDecoder.decodeInt64(forKey: timerExpiresInKey)
-        DopamineKit.debugLog("Decoded TrackSyncer with trackedActions:\(trackedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+//        DopamineKit.debugLog("Decoded TrackSyncer with trackedActions:\(trackedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Encodes a track and saves it to NSUserDefaults
@@ -68,7 +68,7 @@ internal class Track : NSObject, NSCoding {
         aCoder.encode(sizeToSync, forKey: sizeToSyncKey)
         aCoder.encode(timerStartsAt, forKey: timerStartsAtKey)
         aCoder.encode(timerExpiresIn, forKey: timerExpiresInKey)
-        DopamineKit.debugLog("Encoded TrackSyncer with trackedActions:\(trackedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+//        DopamineKit.debugLog("Encoded TrackSyncer with trackedActions:\(trackedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Updates the sync triggers
@@ -116,7 +116,7 @@ internal class Track : NSObject, NSCoding {
     private func timerDidExpire() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartsAt + timerExpiresIn)
-        DopamineKit.debugLog("Track timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
+//        DopamineKit.debugLog("Track timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
         return isExpired
     }
     
@@ -127,7 +127,7 @@ internal class Track : NSObject, NSCoding {
     private func isSizeToSync() -> Bool {
         let count = trackedActions.count
         let isSize = count >= sizeToSync
-        DopamineKit.debugLog("Track has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
+//        DopamineKit.debugLog("Track has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isSize
     }
     

@@ -10,7 +10,12 @@
 #endif
 #endif
 
+#import "UIApplication+Dopamine.h"
+#import "UIApplicationDelegate+Dopamine.h"
+#import "UIViewController+Dopamine.h"
+#import "UIWindow+Dopamine.h"
 #import "DopamineKit.h"
+#import "SwizzleHelper.h"
 
 FOUNDATION_EXPORT double DopamineKitVersionNumber;
 FOUNDATION_EXPORT const unsigned char DopamineKitVersionString[];
