@@ -49,7 +49,8 @@ static CGFloat PINCH_MIN = 20;
                 NSString* swipeOrDrag = (touch.timestamp - startTouchTime < 1.0) ? @"Swipe" : @"Drag";
                 if (xDistance > yDistance) {
                     if (currentTouchPosition.x > startTouchPosition1.x) {
-                        NSLog(@"%@ right", swipeOrDrag);
+//                        NSLog(@"%@ right", swipeOrDrag);
+                        
                     } else {
                         NSLog(@"%@ left", swipeOrDrag);
                     }

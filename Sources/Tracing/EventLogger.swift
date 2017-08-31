@@ -12,7 +12,7 @@ public class EventLogger : NSObject {
     
     public static let EVENT_TYPE_APP_FOCUS: NSString = "appFocus"
     public static let EVENT_TYPE_APPEARED: NSString = "appeared"
-    public static let EVENT_TYPE_TOUCHED: NSString = "touched"
+    public static let EVENT_TYPE_TOUCH: NSString = "touch"
     
     public static func logEvent(withType event: String, withTag tag: String) {
         DopamineKit.debugLog("Got event:\(event) with tag:\(tag)")
@@ -32,7 +32,7 @@ public class EventLogger : NSObject {
     }
     
     public static func logEvent(withTouch touch: UITouch, gestureName: String) {
-        var message = "Got event:\(EVENT_TYPE_TOUCHED)(\(gestureName))"
+        var message = "Got event:\(EVENT_TYPE_TOUCH)(\(gestureName))"
         if let control = touch.view as? UIControl {
             message += " for UIControl with class:\(type(of: control))"
             if let control = control as? UIButton,
@@ -53,27 +53,3 @@ public class EventLogger : NSObject {
     }
     
 }
-
-
-fileprivate extension UITouch {
-    
-//    enum GestureType : String {
-//        case unknown, tap, longPress, swipe
-//    }
-//    
-//    struct TouchRecord {
-//        let view: UIView
-//        let location: CGPoint
-//    }
-//    
-//    static var touch1: TouchRecord?
-//    static var touch2: TouchRecord?
-//    
-//    func analyze(event: UIEvent) {
-//        event.allTouches.anyO
-//    }
-    
-    
-}
-
-
