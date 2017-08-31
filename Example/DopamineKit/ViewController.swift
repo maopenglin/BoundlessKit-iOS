@@ -11,6 +11,11 @@ import DopamineKit
 
 class ViewController: UIViewController {
     
+    var someCounter: Float = 0
+    
+//    func action1Performed() {
+//        NSLog("action1Performed")
+//    }
     func action1Performed(){
         // Reinforce the action to make it sticky!!
         DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {
@@ -76,9 +81,9 @@ class ViewController: UIViewController {
     //
     ///////////////////////////////////////
     
-    var responseLabel:UILabel = UILabel()
-    var action1Button:UIButton = UIButton()
-    var trackedActionButton:UIButton = UIButton()
+    var responseLabel:UILabel!
+    var action1Button:UIButton!
+    var trackedActionButton:UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()

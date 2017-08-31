@@ -58,7 +58,7 @@ internal class Report : NSObject, NSCoding {
         self.sizeToSync = aDecoder.decodeInteger(forKey: sizeToSyncKey)
         self.timerStartsAt = aDecoder.decodeInt64(forKey: timerStartsAtKey)
         self.timerExpiresIn = aDecoder.decodeInt64(forKey: timerExpiresInKey)
-        DopamineKit.debugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+//        DopamineKit.debugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Encodes a report and saves it to NSUserDefaults
@@ -68,7 +68,7 @@ internal class Report : NSObject, NSCoding {
         aCoder.encode(sizeToSync, forKey: sizeToSyncKey)
         aCoder.encode(timerStartsAt, forKey: timerStartsAtKey)
         aCoder.encode(timerExpiresIn, forKey: timerExpiresInKey)
-        DopamineKit.debugLog("Encoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+//        DopamineKit.debugLog("Encoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
 
     /// Updates the sync triggers
@@ -116,7 +116,7 @@ internal class Report : NSObject, NSCoding {
     private func timerDidExpire() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartsAt + timerExpiresIn)
-        DopamineKit.debugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
+//        DopamineKit.debugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
         return isExpired
     }
     
@@ -127,7 +127,7 @@ internal class Report : NSObject, NSCoding {
     private func isSizeToSync() -> Bool {
         let count = reportedActions.count
         let isSize = count >= sizeToSync
-        DopamineKit.debugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
+//        DopamineKit.debugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isSize
     }
     

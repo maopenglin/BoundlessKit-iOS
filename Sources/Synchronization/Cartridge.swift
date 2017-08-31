@@ -66,7 +66,7 @@ internal class Cartridge : NSObject, NSCoding {
         self.initialSize = aDecoder.decodeInteger(forKey: initialSizeKey)
         self.timerStartsAt = aDecoder.decodeInt64(forKey: timerStartsAtKey)
         self.timerExpiresIn = aDecoder.decodeInt64(forKey: timerExpiresInKey)
-        DopamineKit.debugLog("Decoded cartridge with actionID:\(actionID) reinforcementDecisions:\(reinforcementDecisions.count) initialSize:\(initialSize) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+//        DopamineKit.debugLog("Decoded cartridge with actionID:\(actionID) reinforcementDecisions:\(reinforcementDecisions.count) initialSize:\(initialSize) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Encodes a cartridge and saves it to NSUserDefaults
@@ -77,7 +77,7 @@ internal class Cartridge : NSObject, NSCoding {
         aCoder.encode(initialSize, forKey: initialSizeKey)
         aCoder.encode(timerStartsAt, forKey: timerStartsAtKey)
         aCoder.encode(timerExpiresIn, forKey: timerExpiresInKey)
-        DopamineKit.debugLog("Encoded cartridge with actionID:\(actionID) reinforcementDecisions:\(reinforcementDecisions.count) initialSize:\(initialSize) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+//        DopamineKit.debugLog("Encoded cartridge with actionID:\(actionID) reinforcementDecisions:\(reinforcementDecisions.count) initialSize:\(initialSize) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Updates the sync triggers
@@ -121,7 +121,7 @@ internal class Cartridge : NSObject, NSCoding {
     private func timerDidExpire() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartsAt + timerExpiresIn)
-        DopamineKit.debugLog("Cartridge \(actionID) expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so \(isExpired ? "does" : "doesn't") need to sync...")
+//        DopamineKit.debugLog("Cartridge \(actionID) expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so \(isExpired ? "does" : "doesn't") need to sync...")
         return isExpired
     }
     
@@ -130,7 +130,7 @@ internal class Cartridge : NSObject, NSCoding {
     private func isCapacityToSync() -> Bool {
         let count = reinforcementDecisions.count
         let result = count < Cartridge.minimumSize || Double(count) / Double(initialSize) <= Cartridge.capacityToSync;
-        DopamineKit.debugLog("Cartridge for \(actionID) has \(count)/\(initialSize) decisions so \(result ? "does" : "doesn't") need to sync since a cartridge requires at least \(Cartridge.minimumSize) decisions or \(Cartridge.capacityToSync*100)%% capacity.")
+//        DopamineKit.debugLog("Cartridge for \(actionID) has \(count)/\(initialSize) decisions so \(result ? "does" : "doesn't") need to sync since a cartridge requires at least \(Cartridge.minimumSize) decisions or \(Cartridge.capacityToSync*100)%% capacity.")
         return result
     }
     

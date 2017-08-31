@@ -11,7 +11,7 @@ class Tests: XCTestCase {
         // Set the plist so DopamineKit can read the appID, versionID, production and development secrets, and the inProduction flag
         let path = Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")
         DopamineAPI.testCredentialPath = path as String!
-        Tests.log(message: "Modified dopamine credentials path to:'\(path)'")
+        Tests.log(message: "Modified dopamine credentials path to:'\(String(describing: path))'")
     }
     
     override func tearDown() {
