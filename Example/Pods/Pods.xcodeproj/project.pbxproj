@@ -24,7 +24,6 @@
 		843B61021F548A4F00F0F87E /* UIViewController+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = 843B60F11F548A4F00F0F87E /* UIViewController+Dopamine.h */; };
 		843B61031F548A4F00F0F87E /* UIViewController+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = 843B60F21F548A4F00F0F87E /* UIViewController+Dopamine.m */; };
 		843B61041F548A4F00F0F87E /* DTMethodSwizzling.m in Sources */ = {isa = PBXBuildFile; fileRef = 843B60F31F548A4F00F0F87E /* DTMethodSwizzling.m */; };
-		843B61051F548A4F00F0F87E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843B60F41F548A4F00F0F87E /* Helper.swift */; };
 		843B61081F548A4F00F0F87E /* SwizzleHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 843B60F81F548A4F00F0F87E /* SwizzleHelper.h */; };
 		843B61091F548A4F00F0F87E /* SwizzleHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 843B60F91F548A4F00F0F87E /* SwizzleHelper.m */; };
 		843B610A1F548A4F00F0F87E /* EventLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843B60FB1F548A4F00F0F87E /* EventLogger.swift */; };
@@ -81,7 +80,6 @@
 		843B60F11F548A4F00F0F87E /* UIViewController+Dopamine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Dopamine.h"; sourceTree = "<group>"; };
 		843B60F21F548A4F00F0F87E /* UIViewController+Dopamine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Dopamine.m"; sourceTree = "<group>"; };
 		843B60F31F548A4F00F0F87E /* DTMethodSwizzling.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTMethodSwizzling.m; sourceTree = "<group>"; };
-		843B60F41F548A4F00F0F87E /* Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		843B60F81F548A4F00F0F87E /* SwizzleHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwizzleHelper.h; sourceTree = "<group>"; };
 		843B60F91F548A4F00F0F87E /* SwizzleHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwizzleHelper.m; sourceTree = "<group>"; };
 		843B60FB1F548A4F00F0F87E /* EventLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventLogger.swift; sourceTree = "<group>"; };
@@ -259,7 +257,6 @@
 				8CDAD2329BD9ADCF3670B6EE37E916BE /* DopamineKit.h */,
 				5B43A91974800D3A52D7C87ED717E786 /* DopamineKit.swift */,
 				843B60F31F548A4F00F0F87E /* DTMethodSwizzling.m */,
-				843B60F41F548A4F00F0F87E /* Helper.swift */,
 				843B60F81F548A4F00F0F87E /* SwizzleHelper.h */,
 				843B60F91F548A4F00F0F87E /* SwizzleHelper.m */,
 				843B60EC1F548A4F00F0F87E /* Categories */,
@@ -442,7 +439,6 @@
 				3F326964D9F22602BDAA2329BF0F844F /* DopamineKit.swift in Sources */,
 				A7A8D56289EC46CA88AF201A9B5B0CBF /* DopeAction.swift in Sources */,
 				365ECDE974A1D0040E0ACC515287493F /* DopeException.swift in Sources */,
-				843B61051F548A4F00F0F87E /* Helper.swift in Sources */,
 				D571D575B03A9D035F7008E80877443E /* Report.swift in Sources */,
 				4B729A6D68D6595C9391C70C9D5843F7 /* SyncCoordinator.swift in Sources */,
 				2123A6A1293D10E4EF90E4F42ED4D396 /* SyncOverview.swift in Sources */,
