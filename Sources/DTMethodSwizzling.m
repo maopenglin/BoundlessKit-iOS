@@ -23,14 +23,14 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
-//        // Swizzle - UIApplication
-//        [DopamineApp swizzleSelectors];
+        // Swizzle - UIApplication
+        [DopamineApp swizzleSelectors];
         
         // Swizzle - UIApplicationDelegate
         [DopamineAppDelegate swizzleSelectors];
         
-        // Swizzle - UIWindow
-        [DopamineWindow swizzleSelectors];
+//        // Swizzle - UIWindow
+//        [DopamineWindow swizzleSelectors];
         
         // Swizzle - UIViewController
         [DopamineViewController swizzleSelectors];

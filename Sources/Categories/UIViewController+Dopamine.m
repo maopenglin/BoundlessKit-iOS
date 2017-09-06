@@ -19,13 +19,13 @@
 }
 
 - (void) swizzled_viewDidAppear:(BOOL)animated {
-    [EventLogger logEventWithUIViewController:self withTag:@"appeared"];
+    [DopamineKit track:@"viewController" metaData:@{@"tag":@"appeared"}];
     if ([self respondsToSelector:@selector(swizzled_viewDidAppear:)])
         [self swizzled_viewDidAppear:animated];
 }
 
 - (void) swizzled_viewDidDisappear:(BOOL)animated {
-    [EventLogger logEventWithUIViewController:self withTag:@"dissappeared"];
+    [DopamineKit track:@"viewController" metaData:@{@"tag":@"dissappeared"}];
     if ([self respondsToSelector:@selector(swizzled_viewDidDisappear:)])
         [self swizzled_viewDidDisappear:animated];
 }
