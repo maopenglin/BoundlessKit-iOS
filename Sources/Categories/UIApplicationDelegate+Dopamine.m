@@ -50,15 +50,27 @@ static NSArray* delegateSubclasses = nil;
 
 // Application State Swizzles
 
+static NSDate *lastActive;
+
 - (void) swizzled_applicationDidBecomeActive:(UIApplication*)application {
-    [EventLogger logEventWithType:[EventLogger EVENT_TYPE_APP_FOCUS] withTag:@"becomeActive"];
+    lastActive = [[NSDate alloc] init];
+    double recordedUTC = [lastActive timeIntervalSince1970] * 1000;
+    
+    [DopamineKit track:@"appFocus" metaData:@{@"tag":@"becomeActive",
+                                              @"id": [NSNumber numberWithDouble:recordedUTC]}];
     
     if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
         [self swizzled_applicationDidBecomeActive:application];
 }
 
 - (void) swizzled_applicationWillResignActive:(UIApplication*)application {
-    [EventLogger logEventWithType:[EventLogger EVENT_TYPE_APP_FOCUS] withTag:@"resignActive"];
+    NSDate *now = [[NSDate alloc] init];
+    double recordedUTC = [now timeIntervalSince1970] * 1000;
+    double millisActive = (lastActive) ? [now timeIntervalSinceDate:lastActive] : 0;
+    [DopamineKit track:@"appFocus" metaData:@{@"tag":@"resignActive",
+                                              @"id": [NSNumber numberWithDouble:recordedUTC],
+                                              @"millisActive": [NSNumber numberWithDouble:millisActive]
+                                              }];
     
     if ([self respondsToSelector:@selector(swizzled_applicationWillResignActive:)])
         [self swizzled_applicationWillResignActive:application];
