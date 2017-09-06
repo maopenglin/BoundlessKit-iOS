@@ -76,7 +76,7 @@ public class SyncCoordinator {
     /// that allows time for the DopamineAPI to generate cartridges
     ///
     public func performSync() {
-        DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
+        DispatchQueue.global(qos: .background).async {
             guard !self.syncInProgress else {
                 DopamineKit.debugLog("Sync already happening")
                 return
