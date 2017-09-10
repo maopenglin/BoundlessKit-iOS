@@ -20,6 +20,7 @@
 
 - (void) swizzled_viewDidAppear:(BOOL)animated {
     [DopamineKit track:@"viewController" metaData:@{@"tag":@"appeared"}];
+    [Helper logControlActionsWithView:[self view]];
     if ([self respondsToSelector:@selector(swizzled_viewDidAppear:)])
         [self swizzled_viewDidAppear:animated];
 }

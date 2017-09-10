@@ -58,6 +58,10 @@ static NSDate *lastActive;
     
     [DopamineKit track:@"appFocus" metaData:@{@"tag":@"becomeActive",
                                               @"id": [NSNumber numberWithDouble:recordedUTC]}];
+
+#ifdef DEBUG
+    [VisualizerAPI promptPairing];
+#endif
     
     if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
         [self swizzled_applicationDidBecomeActive:application];
