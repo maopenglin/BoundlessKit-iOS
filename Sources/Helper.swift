@@ -10,6 +10,8 @@ import Foundation
 
 public class Helper: NSObject {
     
+    public static var lastTouchLocationInUIWindow: CGPoint = CGPoint.zero
+    
 //    public static var liveRecording = false
 //    
 //    @objc public static var recordedTouches: [String:Set<String>] {

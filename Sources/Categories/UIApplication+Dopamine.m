@@ -16,7 +16,7 @@
 
 + (void) swizzleSelectors {
     [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendAction:to:from:forEvent:) :[UIApplication class] :@selector(sendAction:to:from:forEvent:)];
-//    [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendEvent:) :[UIApplication class] :@selector(sendEvent:)];
+    [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendEvent:) :[UIApplication class] :@selector(sendEvent:)];
 }
 
 //static NSUInteger firstTouchHash;
@@ -26,8 +26,14 @@
 //static CGFloat SWIPE_DRAG_MIN = 80;
 //static CGFloat PINCH_MIN = 20;
 //
-//-(void) swizzled_sendEvent: (UIEvent *) event {
-//    
+-(void) swizzled_sendEvent: (UIEvent *) event {
+    UITouch* touch = event.allTouches.anyObject;
+    if (touch != nil) {
+        CGPoint local = [touch locationInView:[touch view]];
+        Helper.lastTouchLocationInUIWindow = [[touch view] convertPoint:local toView:nil];
+    }
+    
+    
 //    if (event.allTouches.count == 1) {
 //        UITouch *touch = event.allTouches.anyObject;
 //        
@@ -126,9 +132,9 @@
 //    } else {
 //        // Will support multi-touch later
 //    }
-//    
-//    [self swizzled_sendEvent:event];
-//}
+    
+    [self swizzled_sendEvent:event];
+}
 
 - (BOOL)swizzled_sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event {
     NSString *selectorName = NSStringFromSelector(action);
@@ -138,6 +144,8 @@
                                                 @"target": NSStringFromClass([target class]),
                                                 @"selector": selectorName}
          ];
+        [VisualizerAPI recordEventWithSender:NSStringFromClass([sender class]) target:NSStringFromClass([target class]) selector:selectorName event:event];
+        
     }
     
     return [self swizzled_sendAction:action to:target from:sender forEvent:event];

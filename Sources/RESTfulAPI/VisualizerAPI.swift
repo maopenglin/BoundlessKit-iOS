@@ -13,21 +13,71 @@ public class VisualizerAPI : NSObject {
     /// Valid API actions appeneded to the VisualizerAPI URL
     ///
     internal enum CallType{
-        case websessions, record, activeEvents
+        case websessions, record, eventrewards
         var pathExtenstion:String{ switch self{
         case .websessions: return "websessions/"
         case .record: return "event/record/"
-        case .activeEvents: return "event/active/"
+        case .eventrewards: return "event/rewards/"
             }
         }
     }
     
-    internal static let shared = VisualizerAPI()
-    static var webSessionID: String?
+    public static let shared = VisualizerAPI()
     private static let baseURL = "http://127.0.0.1:5000/visualizer/"
+    
+    static var webSessionID: String? //= "test"
+    var eventRewards: [String:String] = [:]
+    public func setReward(sender: String, target: String, selector: String, rewardType: String){
+        eventRewards[[sender, target, selector].joined(separator: "-")] = rewardType
+    }
+    public func getReward(sender: String, target: String, selector: String) -> String? {
+        return eventRewards[[sender, target, selector].joined(separator: "-")]
+    }
     
     private override init() {
         super.init()
+        retrieveRewards()
+    }
+    
+    public func retrieveRewards() {
+        send(call: .eventrewards, with: configurationData){ response in
+            if let rewards = response["rewards"] as? [[String:String]] {
+                for reward in rewards {
+                    if let sender = reward["sender"],
+                        let target = reward["target"],
+                        let selector = reward["selector"],
+                        let rewardType = reward["rewardType"] {
+                        self.setReward(sender: sender, target: target, selector: selector, rewardType: rewardType)
+                    }
+                }
+            }
+            DopamineKit.debugLog("Rewards:\(self.eventRewards)")
+        }
+    }
+    
+    public static func recordEvent(sender: String, target: String, selector: String, event: UIEvent) {
+        // display reward if reward is set for this event
+        if let reward = shared.getReward(sender: sender, target: target, selector: selector) {
+            if reward == "starburst" {
+                DopamineKit.debugLog("here")
+                UIApplication.shared.keyWindow!.showStarburst(at: Helper.lastTouchLocationInUIWindow)
+            }
+        }
+        
+        guard let _ = webSessionID else {
+            return
+        }
+        
+        // send event
+        var payload = shared.configurationData
+        
+        payload["sender"] = sender
+        payload["target"] = target
+        payload["selector"] = selector
+        
+        shared.send(call: .record, with: payload){ response in
+            
+        }
     }
     
     public static func promptPairing() {
@@ -150,7 +200,7 @@ public class VisualizerAPI : NSObject {
     ///
     private lazy var configurationData: [String: Any] = {
         
-        var dict: [String: Any] = [ "primaryIdentity" : self.primaryIdentity ]
+        var dict: [String: Any] = [ "userID" : self.primaryIdentity ]
         
         // create a credentials dict from .plist
         let credentialsFilename = "DopamineProperties"
