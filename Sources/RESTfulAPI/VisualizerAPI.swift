@@ -28,9 +28,7 @@ public class VisualizerAPI : NSObject {
     
     static var portalOfficerID: String? //= "test"
     var eventRewards: [String:String] = [:]
-    public func setReward(sender: String, target: String, selector: String, rewardType: String){
-        eventRewards[[sender, target, selector].joined(separator: "-")] = rewardType
-    }
+    
     public func getReward(sender: String, target: String, selector: String) -> String? {
         return eventRewards[[sender, target, selector].joined(separator: "-")]
     }
@@ -42,17 +40,13 @@ public class VisualizerAPI : NSObject {
     
     public func retrieveRewards() {
         send(call: .eventrewards, with: configurationData){ response in
-            if let rewards = response["rewards"] as? [[String:String]] {
-                for reward in rewards {
-                    if let sender = reward["sender"],
-                        let target = reward["target"],
-                        let selector = reward["selector"],
-                        let rewardType = reward["rewardType"] {
-                        self.setReward(sender: sender, target: target, selector: selector, rewardType: rewardType)
-                    }
+            if let rewards = response["rewards"] as? [String:String] {
+                guard !NSDictionary(dictionary: self.eventRewards).isEqual(to: rewards) else {
+                    return
                 }
+                self.eventRewards = rewards
+                DopamineKit.debugLog("Rewards:\(self.eventRewards)")
             }
-            DopamineKit.debugLog("Rewards:\(self.eventRewards)")
         }
     }
     
@@ -69,6 +63,7 @@ public class VisualizerAPI : NSObject {
         }
         
         if let officerID = portalOfficerID {
+            // Visualizer is connected
             DispatchQueue.global().async {
                 
                 // send event
@@ -84,6 +79,9 @@ public class VisualizerAPI : NSObject {
                         portalOfficerID = nil
                     }
                 }
+                
+                // update rewards
+                shared.retrieveRewards()
             }
         }
     }
