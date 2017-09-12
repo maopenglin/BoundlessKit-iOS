@@ -13,11 +13,12 @@ public class VisualizerAPI : NSObject {
     /// Valid API actions appeneded to the VisualizerAPI URL
     ///
     internal enum CallType{
-        case websessions, record, eventrewards
+        case eventrewards, officerrequest, devicematch, eventrecord
         var pathExtenstion:String{ switch self{
-        case .websessions: return "websessions/"
-        case .record: return "event/record/"
         case .eventrewards: return "event/rewards/"
+        case .officerrequest: return "portal/pairs/officerrequest"
+        case .devicematch: return "portal/pairs/devicematch"
+        case .eventrecord: return "event/record/"
             }
         }
     }
@@ -25,7 +26,7 @@ public class VisualizerAPI : NSObject {
     public static let shared = VisualizerAPI()
     private static let baseURL = "http://127.0.0.1:5000/visualizer/"
     
-    static var webSessionID: String? //= "test"
+    static var portalOfficerID: String? //= "test"
     var eventRewards: [String:String] = [:]
     public func setReward(sender: String, target: String, selector: String, rewardType: String){
         eventRewards[[sender, target, selector].joined(separator: "-")] = rewardType
@@ -57,26 +58,33 @@ public class VisualizerAPI : NSObject {
     
     public static func recordEvent(sender: String, target: String, selector: String, event: UIEvent) {
         // display reward if reward is set for this event
+        
         if let reward = shared.getReward(sender: sender, target: target, selector: selector) {
-            if reward == "starburst" {
-                DopamineKit.debugLog("here")
-                UIApplication.shared.keyWindow!.showStarburst(at: Helper.lastTouchLocationInUIWindow)
+            DispatchQueue.main.async {
+                if reward == "starburst" {
+                    DopamineKit.debugLog("here")
+                    UIApplication.shared.keyWindow!.showStarburst(at: Helper.lastTouchLocationInUIWindow)
+                }
             }
         }
         
-        guard let _ = webSessionID else {
-            return
-        }
-        
-        // send event
-        var payload = shared.configurationData
-        
-        payload["sender"] = sender
-        payload["target"] = target
-        payload["selector"] = selector
-        
-        shared.send(call: .record, with: payload){ response in
-            
+        if let officerID = portalOfficerID {
+            DispatchQueue.global().async {
+                
+                // send event
+                var payload = shared.configurationData
+                
+                payload["officerID"] = officerID
+                payload["sender"] = sender
+                payload["target"] = target
+                payload["selector"] = selector
+                
+                shared.send(call: .eventrecord, with: payload){ response in
+                    if  response["officerID"] as? String != portalOfficerID {
+                        portalOfficerID = nil
+                    }
+                }
+            }
         }
     }
     
@@ -84,35 +92,47 @@ public class VisualizerAPI : NSObject {
         var payload = shared.configurationData
         payload["deviceName"] = UIDevice.current.name
         
-        shared.send(call: .websessions, with: payload){ response in
-            if let webSessionIDs = response["webSessionIDs"] as? [String] {
-                presentPairingAlert(webSessionIDs: webSessionIDs)
+        shared.send(call: .officerrequest, with: payload){ response in
+            if let waitingOfficerIDs = response["officerIDs"] as? [String] {
+                presentPairingAlert(waitingOfficerIDs: waitingOfficerIDs)
+            } else if let connectedOfficerID = response["officerID"] as? String {
+                VisualizerAPI.portalOfficerID = connectedOfficerID
             }
         }
     }
     
-    private static func presentPairingAlert(webSessionIDs: Array<String>) {
-        var webSessionIDs = webSessionIDs
-        guard let webSessionID = webSessionIDs.popLast() else {
-            return
+    private static func presentPairingAlert(waitingOfficerIDs: Array<String>) {
+        DispatchQueue.main.async {
+            var waitingOfficerIDs = waitingOfficerIDs
+            guard let waitingOfficerID = waitingOfficerIDs.popLast() else {
+                return
+            }
+            
+            let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Pair with \(waitingOfficerID)?", preferredStyle: UIAlertControllerStyle.alert)
+            
+            pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
+                
+                var payload = shared.configurationData
+                payload["deviceName"] = UIDevice.current.name
+                payload["officerID"] = waitingOfficerID
+                
+                shared.send(call: .devicematch, with: payload) { response in
+                    if let officerID = response["officerID"] as? String {
+                        VisualizerAPI.portalOfficerID = officerID
+                    }
+                }
+            }))
+            
+            pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
+                presentPairingAlert(waitingOfficerIDs: waitingOfficerIDs)
+            }))
+            
+            let alertWindow = UIWindow(frame: UIScreen.main.bounds)
+            alertWindow.rootViewController = UIViewController()
+            alertWindow.windowLevel = UIWindowLevelAlert + 1;
+            alertWindow.makeKeyAndVisible()
+            alertWindow.rootViewController?.present(pairingAlert, animated: true, completion: nil)
         }
-        
-        let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Pair with \(webSessionID)", preferredStyle: UIAlertControllerStyle.alert)
-        
-        pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
-            VisualizerAPI.webSessionID = webSessionID
-        }))
-        
-        pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
-            presentPairingAlert(webSessionIDs: webSessionIDs)
-        }))
-        
-        let alertWindow = UIWindow(frame: UIScreen.main.bounds)
-        alertWindow.rootViewController = UIViewController()
-        alertWindow.windowLevel = UIWindowLevelAlert + 1;
-        alertWindow.makeKeyAndVisible()
-        alertWindow.rootViewController?.present(pairingAlert, animated: true, completion: nil)
-
     }
     
     
