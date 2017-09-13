@@ -24,7 +24,7 @@ public class VisualizerAPI : NSObject {
     }
     
     public static let shared = VisualizerAPI()
-    private static let baseURL = "http://127.0.0.1:5000/visualizer/"
+    private static let baseURL = "http://10.0.1.159:5000/visualizer/"
     
     static var portalOfficerID: String? //= "test"
     var eventRewards: [String:String] = [:]
@@ -106,7 +106,7 @@ public class VisualizerAPI : NSObject {
                 return
             }
             
-            let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Pair with \(waitingOfficerID)?", preferredStyle: UIAlertControllerStyle.alert)
+            let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Pair with Officer \(waitingOfficerID)?", preferredStyle: UIAlertControllerStyle.alert)
             
             pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
                 
