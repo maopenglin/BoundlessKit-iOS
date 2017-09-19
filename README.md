@@ -9,8 +9,6 @@
 
 DopamineKit provides wrappers for accessing the DopamineAPI and expressive UI reinforcements for your app.
 
-Get your free API key at [http://dashboard.usedopamine.com/](http://dashboard.usedopamine.com/)
-
 Learn more at [http://usedopamine.com](http://usedopamine.com)
 
 ### Looking for an iOS Example App?
@@ -19,7 +17,7 @@ A simple "To Do List" iOS App is included in the [DopamineKit-iOS-HelloWorld rep
 
 ## Set up DopamineKit
 
-  1. First, make sure you have received your API key and other credentials, which are in the configuration file __DopamineProperties.plist__ automatically generated from the [Dopamine Developer Dashboard](http://dashboard.usedopamine.com). 
+  1. First, make sure you have received your API key and other credentials, which are in the configuration file __DopamineProperties.plist__.
 
   2. Drag __DopamineProperties.plist__ into your project group. Ensure that the .plist was added to app target > Build Phases > Copy Bundle Resources as shown in the image below.  
 
@@ -145,7 +143,7 @@ Dopamine.track(actionID, metaData)
 
 ####Reinforcement Calls
 
-A reinforcement call should be used when the user has performed a particular action that you wish to become a 'habit', the reinforcement call will return the name of the feedback function that should be called to inform, delight or congratulate the user. The names of the reinforcement functions, the feedback functions and their respective pairings may be found and configured on the developer dashboard.
+A reinforcement call should be used when the user has performed a particular action that you wish to become a 'habit', the reinforcement call will return the name of the feedback function that should be called to inform, delight or congratulate the user. The names of the reinforcement functions, the feedback functions and their respective pairings must be configured by contacting us.
 
 ######General syntax
 
@@ -169,9 +167,9 @@ For more information on using closures, see Apple's [documentation](https://deve
 ========
 
 ####DopamineProperties.plist
-`DopamineProperties.plist` _must_ be contained within your app's _main bundle_. This property list contains configuration variables needed to make valid calls to the API, all of which can be found on your developer dashboard:
+`DopamineProperties.plist` _must_ be contained within your app's _main bundle_ by default, or the location can be configured by setting `DopamineAPI.testCredentialPath`. This property list contains configuration variables needed to make valid calls to the API:
 
- - `appID: String` - uniquely identifies your app, get this from your [developer dashboard](http://dev.usedopamine.com).
+ - `appID: String` - uniquely identifies your app
 
  - `versionID: String` -  this is a unique identifier that you choose that marks this implementation as unique in our system. This could be something like 'summer2015Implementation' or 'ClinicalTrial4'. Your `versionID` is what we use to keep track of what users are exposed to what reinforcement and how to best optimize that.
 
