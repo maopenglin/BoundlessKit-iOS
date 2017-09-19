@@ -52,19 +52,15 @@ https://github.com/DopamineLabs/DopamineKit-iOS-binary/) the framework.
   reinforcement in
 		
 		switch(reinforcement){
-			// Use any rewarding UI components you made like, 
-			// self.showInspirationalQuote() or self.showFunnyMeme().
-			// For now, we'll try out Dopamine's CandyBar for a simple reward.
+			// Use any rewarding UI components that fit your app's theme,
+			// for example showInspirationalQuote() or showFunnyMeme().
 
 		case "thumbsUp" :
-			CandyBar(title: "Great job!", icon: Candy.ThumbsUp).show(duration: 1.2)
+			// Show a thumbs up sticker!
                                 
 		case "stars" :
-			CandyBar(title: "Great job!", icon: Candy.Stars).show(duration: 1.2)
-                                
-		case "medalStar" :
-			CandyBar(title: "Great job!", icon: Candy.MedalStar).show(duration: 1.2)
-                            
+			// Show stars falling in the background!
+			
 		default:
 			// Show nothing! This is called a neutral response, 
 			// and builds up the good feelings for the next surprise!
@@ -79,12 +75,10 @@ https://github.com/DopamineLabs/DopamineKit-iOS-binary/) the framework.
   [DopamineKit reinforce:@"some_action" metaData:nil completion:^(NSString* reinforcement){
         
         if([reinforcement isEqualToString:@"quote"]){
-            // show some positive reinforcement View
-            [self showInspirationalQuote]
+            // show a famous, positive quote
             
         } else if([reinforcement isEqualToString:@"meme"]){
-            // some other feel good reinforcement View
-            [self showFunnyMeme]
+            // show a dank meme
             
         } else{
             // Show nothing! This is called a neutral response, 
