@@ -18,7 +18,7 @@
     [SwizzleHelper injectSelector:[DopamineAppDelegate class] :@selector(swizzled_setDelegate:) :[UIApplication class] :@selector(setDelegate:)];
 }
 
-+ (void) dopamineLoadedTagSelector {}
+//+ (void) dopamineLoadedTagSelector {}
 
 static Class delegateClass = nil;
 

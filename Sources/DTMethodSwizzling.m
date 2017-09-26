@@ -16,6 +16,8 @@
 #import <UIApplication+Dopamine.h>
 #import <UIWindow+Dopamine.h>
 #import <UIViewController+Dopamine.h>
+#import <SKProductsRequest+Dopamine.h>
+#import <SKPaymentTransactionObserver+Dopamine.h>
 
 @implementation UIApplication (Dopamine)
 
@@ -34,6 +36,12 @@
         
         // Swizzle - UIViewController
         [DopamineViewController swizzleSelectors];
+        
+//        // Swizzle - SKProductsRequest
+//        [DopamineProductsRequest swizzleSelectors];
+        
+        // Swizzle - DopaminePaymentTransactionObserver
+        [DopaminePaymentTransactionObserver swizzleSelectors];
         
     });
 }
