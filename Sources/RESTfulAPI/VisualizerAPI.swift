@@ -35,7 +35,7 @@ public class VisualizerAPI : NSObject {
     
     private override init() {
         super.init()
-        retrieveRewards()
+//        retrieveRewards()
     }
     
     public func retrieveRewards() {
@@ -52,7 +52,7 @@ public class VisualizerAPI : NSObject {
     
     public static func recordEvent(sender: String, target: String, selector: String, event: UIEvent) {
         // display reward if reward is set for this event
-        
+        return
         if let reward = shared.getReward(sender: sender, target: target, selector: selector) {
             DispatchQueue.main.async {
                 if reward == "starburst" {
@@ -87,6 +87,7 @@ public class VisualizerAPI : NSObject {
     }
     
     public static func promptPairing() {
+        return
         var payload = shared.configurationData
         payload["deviceName"] = UIDevice.current.name
         
