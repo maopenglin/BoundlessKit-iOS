@@ -14,7 +14,6 @@
 #import <SwizzleHelper.h>
 #import <UIApplicationDelegate+Dopamine.h>
 #import <UIApplication+Dopamine.h>
-#import <UIWindow+Dopamine.h>
 #import <UIViewController+Dopamine.h>
 #import <SKPaymentTransactionObserver+Dopamine.h>
 
@@ -30,13 +29,10 @@
         // Swizzle - UIApplicationDelegate
         [DopamineAppDelegate swizzleSelectors];
         
-//        // Swizzle - UIWindow
-//        [DopamineWindow swizzleSelectors];
-        
         // Swizzle - UIViewController
         [DopamineViewController swizzleSelectors];
         
-        // Swizzle - DopaminePaymentTransactionObserver
+        // Swizzle - SKPaymentTransactionObserver
         [DopaminePaymentTransactionObserver swizzleSelectors];
         
     });
