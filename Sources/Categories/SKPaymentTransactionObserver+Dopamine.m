@@ -41,7 +41,6 @@ static NSArray* observerSubclasses = nil;
 }
 
 - (void)swizzled_paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray<SKPaymentTransaction *> *)transactions {
-    NSLog(@"Inside swizzled_paymentQueue:updatedtransactions with following transactions:");
     for (SKPaymentTransaction* transaction in transactions) {
         NSString* stateName;
         switch (transaction.transactionState) {
@@ -69,7 +68,10 @@ static NSArray* observerSubclasses = nil;
                 stateName = @"unknown";
                 break;
         }
-        NSLog(@"\tTransaction <%@> has state <%@>", transaction.payment.productIdentifier, stateName);
+        [DopamineKit track:@"SKPaymentTransactionObserver" metaData:@{@"tag": @"updatedTransactions",
+                                                                      @"productID": transaction.payment.productIdentifier,
+                                                                      @"quantity": [NSNumber numberWithInteger:transaction.payment.quantity],
+                                                                      @"transactionState": stateName}];
     }
     
     if ([self respondsToSelector:@selector(swizzled_paymentQueue:updatedTransactions:)]) {

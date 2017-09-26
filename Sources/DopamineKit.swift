@@ -29,6 +29,7 @@ open class DopamineKit : NSObject {
     open static func track(_ actionID: String, metaData: [String: Any]? = nil) {
         // store the action to be synced
         if true {
+            debugLog("actionID:\(actionID) metaData:\(String(describing: metaData))")
             return
         }
         DispatchQueue.global(qos: .background).async {

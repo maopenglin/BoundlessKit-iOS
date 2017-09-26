@@ -56,8 +56,8 @@ static NSDate *lastActive;
     lastActive = [[NSDate alloc] init];
     double recordedUTC = [lastActive timeIntervalSince1970] * 1000;
     
-    [DopamineKit track:@"appFocus" metaData:@{@"tag":@"becomeActive",
-                                              @"id": [NSNumber numberWithDouble:recordedUTC]}];
+    [DopamineKit track:@"UIApplicationDelegate" metaData:@{@"tag":@"didBecomeActive",
+                                                           @"startTime": [NSNumber numberWithDouble:recordedUTC]}];
 
 #ifdef DEBUG
     [VisualizerAPI promptPairing];
@@ -70,10 +70,11 @@ static NSDate *lastActive;
 - (void) swizzled_applicationWillResignActive:(UIApplication*)application {
     NSDate *now = [[NSDate alloc] init];
     double recordedUTC = [now timeIntervalSince1970] * 1000;
-    double millisActive = (lastActive) ? [now timeIntervalSinceDate:lastActive] : 0;
-    [DopamineKit track:@"appFocus" metaData:@{@"tag":@"resignActive",
-                                              @"id": [NSNumber numberWithDouble:recordedUTC],
-                                              @"millisActive": [NSNumber numberWithDouble:millisActive]
+    double millisActive = (lastActive) ? 1000*[now timeIntervalSinceDate:lastActive] : 0;
+    [DopamineKit track:@"UIApplicationDelegate" metaData:@{@"tag":@"willResignActive",
+                                                           @"startTime": [NSNumber numberWithDouble:recordedUTC],
+                                                           @"endTime": [NSNumber numberWithDouble:recordedUTC],
+                                                           @"millisActive": [NSNumber numberWithDouble:millisActive]
                                               }];
     
     if ([self respondsToSelector:@selector(swizzled_applicationWillResignActive:)])
