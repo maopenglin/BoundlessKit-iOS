@@ -13,8 +13,9 @@ public class VisualizerAPI : NSObject {
     /// Valid API actions appeneded to the VisualizerAPI URL
     ///
     internal enum CallType{
-        case eventrewards, officerrequest, devicematch, eventrecord
+        case identify, eventrewards, officerrequest, devicematch, eventrecord
         var pathExtenstion:String{ switch self{
+        case .identify: return "codeless/pair/customer/identity/"
         case .eventrewards: return "event/rewards/"
         case .officerrequest: return "portal/pairs/officerrequest"
         case .devicematch: return "portal/pairs/devicematch"
@@ -24,7 +25,7 @@ public class VisualizerAPI : NSObject {
     }
     
     public static let shared = VisualizerAPI()
-    private static let baseURL = "http://10.0.1.159:5000/visualizer/"
+    private static let baseURL = "https://dashboard-api.usedopamine.com/"
     
     static var portalOfficerID: String? //= "test"
     var eventRewards: [String:String] = [:]
@@ -87,43 +88,43 @@ public class VisualizerAPI : NSObject {
     }
     
     public static func promptPairing() {
-        return
         var payload = shared.configurationData
         payload["deviceName"] = UIDevice.current.name
         
-        shared.send(call: .officerrequest, with: payload){ response in
-            if let waitingOfficerIDs = response["officerIDs"] as? [String] {
-                presentPairingAlert(waitingOfficerIDs: waitingOfficerIDs)
-            } else if let connectedOfficerID = response["officerID"] as? String {
-                VisualizerAPI.portalOfficerID = connectedOfficerID
+        shared.send(call: .identify, with: payload){ response in
+            if let status = response["status"] as? Int {
+                switch status {
+                case 202:
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+                        promptPairing()
+                    }
+                    break
+                    
+                case 200:
+                    if let adminName = response["adminName"] as? String {
+                        presentPairingAlert(from: adminName)
+                    }
+                    
+                case 500, 204, 201:
+                    break
+                    
+                default:
+                    break
+                }
             }
         }
     }
     
-    private static func presentPairingAlert(waitingOfficerIDs: Array<String>) {
+    private static func presentPairingAlert(from adminName: String) {
         DispatchQueue.main.async {
-            var waitingOfficerIDs = waitingOfficerIDs
-            guard let waitingOfficerID = waitingOfficerIDs.popLast() else {
-                return
-            }
-            
-            let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Pair with Officer \(waitingOfficerID)?", preferredStyle: UIAlertControllerStyle.alert)
+            let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
             
             pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
-                
-                var payload = shared.configurationData
-                payload["deviceName"] = UIDevice.current.name
-                payload["officerID"] = waitingOfficerID
-                
-                shared.send(call: .devicematch, with: payload) { response in
-                    if let officerID = response["officerID"] as? String {
-                        VisualizerAPI.portalOfficerID = officerID
-                    }
-                }
+                VisualizerAPI.portalOfficerID = adminName
             }))
             
             pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
-                presentPairingAlert(waitingOfficerIDs: waitingOfficerIDs)
+                
             }))
             
             let alertWindow = UIWindow(frame: UIScreen.main.bounds)
@@ -219,7 +220,7 @@ public class VisualizerAPI : NSObject {
     ///
     private lazy var configurationData: [String: Any] = {
         
-        var dict: [String: Any] = [ "userID" : self.primaryIdentity ]
+        var dict: [String: Any] = [ "primaryIdentity" : self.primaryIdentity ]
         
         // create a credentials dict from .plist
         let credentialsFilename = "DopamineProperties"
