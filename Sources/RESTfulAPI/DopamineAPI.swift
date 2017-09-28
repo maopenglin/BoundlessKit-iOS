@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import AdSupport
 
 
 public class DopamineAPI : NSObject{
@@ -299,6 +299,10 @@ public class DopamineAPI : NSObject{
     /// This variable computes an identity for the user and saves it to NSUserDefaults for future use.
     ///
     private lazy var primaryIdentity:String = {
+        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled,
+            let advertisingIdentifier = ASIdentifierManager.shared().advertisingIdentifier {
+            return advertisingIdentifier.uuidString
+        }
         let key = "DopaminePrimaryIdentity"
         let defaults = UserDefaults.standard
         if let identity = defaults.value(forKey: key) as? String {
