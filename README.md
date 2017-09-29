@@ -17,17 +17,20 @@ A simple "To Do List" iOS App is included in the [DopamineKit-iOS-HelloWorld rep
 
 ## Set up DopamineKit
 
-  1. First, make sure you have received your API key and other credentials, which are in the configuration file __DopamineProperties.plist__.
+  1. First make sure you have a __DopamineProperties.plist__ file, which includes your API key and other credentials.
 
-  2. Drag __DopamineProperties.plist__ into your project group. Ensure that the .plist was added to app target > Build Phases > Copy Bundle Resources as shown in the image below.  
+  2. Go to your project's `App Target` > `Build Phases` > `Copy Bundle Resources`, and then drag and drop in __DopamineProperties.plist__ with the "Copy items if needed" box checked.  
 
-  3. Import the DopamineKit framework by using [CocoaPods](https://cocoapods.org/) (the Pod name is `DopamineKit`), or by [directly downloading](
-https://github.com/DopamineLabs/DopamineKit-iOS-binary/) the framework.
+  3. Add the following line to your [CocoaPod Podfile](https://cocoapods.org/)
+
+	```
+	pod 'DopamineKit'
+	```
 
   ![Workspace snapshot](readme/TestApp_with_DopamineKit_and_DopamineProperties.png)
-    *Shown is a Swift project using the CocoaPods dependency manager*
+    *By step 3 your project should have the highlighted items shown in the image above*
     
-  4. Import the DopamineKit framework
+  4. Import DopamineKit into your code
 
   ```swift
   // Swift
@@ -39,7 +42,7 @@ https://github.com/DopamineLabs/DopamineKit-iOS-binary/) the framework.
   #import <DopamineKit/DopamineKit-Swift.h>
   ```
   
-  5. Start using Dopamine! The main features of DopamineAPI are the `reinforce()` and `track()` functions. These should be added as a response to any of the _actions_ to be reinforced or tracked.
+  5. Start using Dopamine! The main features of DopamineKit are the `reinforce()` and `track()` functions. These should be added as a response to any of the _actions_ to be reinforced or tracked.
   
 
 ###### DopamineKit.reinforce()
