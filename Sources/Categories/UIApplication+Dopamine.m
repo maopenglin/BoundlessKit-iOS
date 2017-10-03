@@ -145,7 +145,7 @@
                                                        @"target": NSStringFromClass([target class]),
                                                        @"selector": selectorName}
          ];
-        [VisualizerAPI recordEventWithSender:NSStringFromClass([sender class]) target:NSStringFromClass([target class]) selector:selectorName event:event];
+        [VisualizerAPI recordEventWithSenderInstance: sender sender: NSStringFromClass([sender class]) target:NSStringFromClass([target class]) selector:selectorName event:event];
         
     }
     

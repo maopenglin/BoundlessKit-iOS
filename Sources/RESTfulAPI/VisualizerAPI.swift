@@ -13,13 +13,11 @@ public class VisualizerAPI : NSObject {
     /// Valid API actions appeneded to the VisualizerAPI URL
     ///
     internal enum CallType{
-        case identify, eventrewards, officerrequest, devicematch, eventrecord
+        case identify, accept, submit
         var pathExtenstion:String{ switch self{
         case .identify: return "codeless/pair/customer/identity/"
-        case .eventrewards: return "event/rewards/"
-        case .officerrequest: return "portal/pairs/officerrequest"
-        case .devicematch: return "portal/pairs/devicematch"
-        case .eventrecord: return "event/record/"
+        case .accept: return "codeless/pair/customer/accept/"
+        case .submit: return "codeless/visualizer/customer/submit/"
             }
         }
     }
@@ -27,8 +25,9 @@ public class VisualizerAPI : NSObject {
     public static let shared = VisualizerAPI()
     private static let baseURL = "https://dashboard-api.usedopamine.com/"
     
-    static var portalOfficerID: String? //= "test"
+    static var connectionID: String? //= "test"
     var eventRewards: [String:String] = [:]
+    let visualizerEventQueue = DispatchQueue(label: "DopamineKit.VisualizerAPI.visualizerEvents", qos: .background)
     
     public func getReward(sender: String, target: String, selector: String) -> String? {
         return eventRewards[[sender, target, selector].joined(separator: "-")]
@@ -40,20 +39,23 @@ public class VisualizerAPI : NSObject {
     }
     
     public func retrieveRewards() {
-        send(call: .eventrewards, with: configurationData){ response in
-            if let rewards = response["rewards"] as? [String:String] {
-                guard !NSDictionary(dictionary: self.eventRewards).isEqual(to: rewards) else {
-                    return
-                }
-                self.eventRewards = rewards
-                DopamineKit.debugLog("Rewards:\(self.eventRewards)")
-            }
-        }
+        return
+//        send(call: .eventrewards, with: configurationData){ response in
+//            if let rewards = response["rewards"] as? [String:String] {
+//                guard !NSDictionary(dictionary: self.eventRewards).isEqual(to: rewards) else {
+//                    return
+//                }
+//                self.eventRewards = rewards
+//                DopamineKit.debugLog("Rewards:\(self.eventRewards)")
+//            }
+//        }
     }
     
-    public static func recordEvent(sender: String, target: String, selector: String, event: UIEvent) {
+    public static func recordEvent(senderInstance: AnyObject, sender: String, target: String, selector: String, event: UIEvent) {
+        
+        //        shared.visualizerEventQueue.async {
         // display reward if reward is set for this event
-        return
+        
         if let reward = shared.getReward(sender: sender, target: target, selector: selector) {
             DispatchQueue.main.async {
                 if reward == "starburst" {
@@ -63,31 +65,47 @@ public class VisualizerAPI : NSObject {
             }
         }
         
-        if let officerID = portalOfficerID {
+        if let connectionID = connectionID {
             // Visualizer is connected
-            DispatchQueue.global().async {
+            //                DispatchQueue.global().async {
+            if true {
                 
                 // send event
                 var payload = shared.configurationData
                 
-                payload["officerID"] = officerID
+                
+                //        payload["officerID"] = officerID
+                payload["connectionUUID"] = connectionID
                 payload["sender"] = sender
                 payload["target"] = target
                 payload["selector"] = selector
-                
-                shared.send(call: .eventrecord, with: payload){ response in
-                    if  response["officerID"] as? String != portalOfficerID {
-                        portalOfficerID = nil
+                if let view = senderInstance as? UIView,
+                    let imageString = view.imageAsBase64EncodedString() {
+                    payload["senderImage"] = imageString
+                } else if let barItem = senderInstance as? UIBarItem,
+                    let image = barItem.image,
+                    let imageString = image.base64EncodedPNGString() {
+                    payload["senderImage"] = imageString
+                } else {
+                    NSLog("Cannot create image, please message team@usedopamine.com to add support for visualizer snapshots of class type:<\(type(of: senderInstance))>!")
+                }
+                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
+                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+                shared.send(call: .submit, with: payload){ response in
+                    if response["status"] as? Int != 200 {
+                        VisualizerAPI.connectionID = nil
                     }
                 }
                 
                 // update rewards
                 shared.retrieveRewards()
             }
+            //            }
         }
     }
     
     public static func promptPairing() {
+//        return
         var payload = shared.configurationData
         payload["deviceName"] = UIDevice.current.name
         
@@ -101,8 +119,9 @@ public class VisualizerAPI : NSObject {
                     break
                     
                 case 200:
-                    if let adminName = response["adminName"] as? String {
-                        presentPairingAlert(from: adminName)
+                    if let adminName = response["adminName"] as? String,
+                        let connectionID = response["connectionUUID"] as? String {
+                        presentPairingAlert(from: adminName, connectionID: connectionID)
                     }
                     
                 case 500, 204, 201:
@@ -115,12 +134,19 @@ public class VisualizerAPI : NSObject {
         }
     }
     
-    private static func presentPairingAlert(from adminName: String) {
+    private static func presentPairingAlert(from adminName: String, connectionID: String) {
         DispatchQueue.main.async {
             let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
             
             pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
-                VisualizerAPI.portalOfficerID = adminName
+                var payload = shared.configurationData
+                payload["deviceName"] = UIDevice.current.name
+                payload["connectionUUID"] = connectionID
+                shared.send(call: .accept, with: payload) {response in
+                    if response["status"] as? Int == 200 {
+                        VisualizerAPI.connectionID = connectionID
+                    }
+                }
             }))
             
             pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
@@ -287,4 +313,49 @@ public class VisualizerAPI : NSObject {
         }
     }()
 
+}
+
+//fileprivate func snapshotAsBase64EncodedString(object: AnyObject) -> String? {
+//    if let object = object as? NSObject {
+//        if let view = object.value(forKey: "view") as? UIView,
+//            let imageString = view.imageAsBase64EncodedString() {
+//            return imageString
+//        } else if let image = object.value(forKey: "image") as? UIImage,
+//            let imageString = image.base64EncodedPNGString() {
+//            return imageString
+//        }
+//        
+//        NSLog("Cannot create image, please message team@usedopamine.com to add support for visualizer snapshots of class type:<\(type(of: object))>!")
+//    }
+//    
+//    return nil
+//}
+
+fileprivate extension UIView {
+    func imageAsBase64EncodedString() -> String? {
+        UIGraphicsBeginImageContextWithOptions(bounds.size, false, 0)
+        drawHierarchy(in: self.bounds, afterScreenUpdates: true)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        if let image = image,
+            let imageString = image.base64EncodedPNGString() {
+            return imageString
+        } else {
+            NSLog("Could not create snapshot of UIView...")
+            return nil
+        }
+    }
+}
+
+fileprivate extension UIImage {
+    func base64EncodedPNGString() -> String? {
+        if let imageData = UIImagePNGRepresentation(self) {
+            print(imageData.base64EncodedString())
+            return imageData.base64EncodedString()
+        } else {
+            NSLog("Could not create PNG representation of UIImage...")
+            return nil
+        }
+    }
 }
