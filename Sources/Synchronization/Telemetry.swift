@@ -11,7 +11,8 @@ internal class Telemetry {
     
     static let sharedInstance = Telemetry()
     
-    private static let queue = DispatchQueue(label: "com.usedopamine.dopaminekit.Telemetry")
+//    private static let queue = DispatchQueue(label: "com.usedopamine.dopaminekit.Telemetry")
+    private static let queue = DispatchQueue.global()
     
     private static let defaults: UserDefaults = UserDefaults.standard
     private static let syncOverviewsKey = "DopamineSyncOverviews_v4.1.3"
