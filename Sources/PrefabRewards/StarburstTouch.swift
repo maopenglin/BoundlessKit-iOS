@@ -10,8 +10,8 @@ import Foundation
 import UIKit
 import AVFoundation
 
-extension UIView {
-    func showStarburst(at location:CGPoint) {
+public extension UIView {
+    public func showStarburst(at location:CGPoint) {
         let stars = CAEmitterLayer(starburstLayerAt: location)
         layer.addSublayer(stars)
 //        Helper.playStarSound()
@@ -25,9 +25,11 @@ extension UIView {
     }
 }
 
-class UIButtonWithStarburstOnClick : UIButton {
+public class UIButtonWithStarburstOnClick : UIButton {
+    
     var enableStarburst = true
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    
+    override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if enableStarburst, isTouchInside,
             let touch = touches.first {
             showStarburst(at: touch.location(in: self))
@@ -36,7 +38,7 @@ class UIButtonWithStarburstOnClick : UIButton {
     }
 }
 
-extension CAEmitterLayer {
+fileprivate extension CAEmitterLayer {
     convenience init(starburstLayerAt location:CGPoint) {
         self.init()
         emitterPosition = location

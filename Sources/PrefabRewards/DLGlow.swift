@@ -15,7 +15,7 @@ public extension UIView {
         startGlowingWithColor(color: UIColor(red: 153/256.0, green: 101/256.0, blue: 21/256.0, alpha: 0.8), fromIntensity: 0.0, toIntensity: 1.0, repeat: false)
     }
     
-    func startGlowingWithColor(color:UIColor, fromIntensity:CGFloat, toIntensity:CGFloat, repeat shouldRepeat:Bool) {
+    public func startGlowingWithColor(color:UIColor, fromIntensity:CGFloat, toIntensity:CGFloat, repeat shouldRepeat:Bool) {
         
         UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
         

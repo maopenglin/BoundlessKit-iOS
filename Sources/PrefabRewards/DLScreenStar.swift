@@ -9,8 +9,9 @@
 import Foundation
 import UIKit
 
-extension UIView {
-    func showSolidStar() {
+public extension UIView {
+    
+    public func showSolidStar() {
         var singleStarColors = ["blue", "green", "orange", "purple", "red", "yellow"]
         let starImage = UIImage(named: "star-single-\(singleStarColors.removeRandom())")!
         let starView = UIImageView(image: starImage)
@@ -30,9 +31,10 @@ extension UIView {
             }
         }
     }
+    
 }
 
-extension Array {
+fileprivate extension Array {
     mutating func removeRandom() -> Element {
         let randomIndex = Int(arc4random_uniform(UInt32(self.count)))
         return remove(at: randomIndex)

@@ -10,12 +10,8 @@ import Foundation
 import UIKit
 import AudioToolbox
 
-class DLCoins {
-    
-}
-
-extension UIView {
-    func showCoins(at location:CGPoint, vibration:Bool = true) {
+public extension UIView {
+    public func showCoins(at location:CGPoint, vibration:Bool = true) {
         let coins = CAEmitterLayer(coinLayerAt: location)
         layer.addSublayer(coins)
         if vibration { AudioServicesPlaySystemSound(kSystemSoundID_Vibrate) }
@@ -29,9 +25,11 @@ extension UIView {
     }
 }
 
- class UIButtonWithCoinsOnClick : UIButton {
-    var enableCoins = true
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+public class UIButtonWithCoinsOnClick : UIButton {
+    
+    public var enableCoins = true
+    
+    override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if enableCoins, isTouchInside,
             let touch = touches.first {
             showCoins(at: touch.location(in: self))
@@ -40,7 +38,7 @@ extension UIView {
     }
 }
 
-extension CAEmitterLayer {
+fileprivate extension CAEmitterLayer {
     convenience init(coinLayerAt location:CGPoint) {
         self.init()
         emitterPosition = location

@@ -9,57 +9,7 @@
 import Foundation
 import UIKit
 
-fileprivate class CoreAnimationDelegate : NSObject, CAAnimationDelegate {
-    
-    let willStart: (()->Void)->Void
-    let didStart: ()->Void
-    let didStop: ()->Void
-    
-    init(willStart: @escaping (()->Void)->Void = {startAnimation in startAnimation()}, didStart: @escaping ()->Void = {}, didStop: @escaping ()->Void = {}) {
-        self.willStart = willStart
-        self.didStart = didStart
-        self.didStop = didStop
-    }
-    
-    func start(view: UIView, animation:CAAnimation) {
-        willStart() {
-            animation.delegate = self
-            view.layer.add(animation, forKey: nil)
-        }
-    }
-    
-    func animationDidStart(_ anim: CAAnimation) {
-        didStart()
-    }
-    
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        if flag {
-            didStop()
-        }
-    }
-}
-
 public extension UIView {
-    
-    func testAnimation() {
-        testRotate()
-    }
-    
-    
-    func testHeartbeat() {
-        pulse()
-    }
-    
-    func testRotate() {
-        rotate360Degrees()
-    }
-    
-    func testShake() {
-        shake()
-    }
-}
-
-extension UIView {
     
     func shake(count:Float = 2, duration:TimeInterval = 0.5, translation:Float = -10, speed:Float = 3, completion: @escaping ()->Void = {}) {
         let animation : CABasicAnimation = CABasicAnimation(keyPath: "transform.translation.x")
@@ -94,5 +44,35 @@ extension UIView {
         pulse.damping = damping
         
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: pulse)
+    }
+}
+
+fileprivate class CoreAnimationDelegate : NSObject, CAAnimationDelegate {
+    
+    let willStart: (()->Void)->Void
+    let didStart: ()->Void
+    let didStop: ()->Void
+    
+    init(willStart: @escaping (()->Void)->Void = {startAnimation in startAnimation()}, didStart: @escaping ()->Void = {}, didStop: @escaping ()->Void = {}) {
+        self.willStart = willStart
+        self.didStart = didStart
+        self.didStop = didStop
+    }
+    
+    func start(view: UIView, animation:CAAnimation) {
+        willStart() {
+            animation.delegate = self
+            view.layer.add(animation, forKey: nil)
+        }
+    }
+    
+    func animationDidStart(_ anim: CAAnimation) {
+        didStart()
+    }
+    
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        if flag {
+            didStop()
+        }
     }
 }

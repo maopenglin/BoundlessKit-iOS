@@ -9,6 +9,32 @@
 import Foundation
 import UIKit
 
+public extension UIView {
+    public func showSheen() {
+        let imageView = UIImageView(image: UIImage(named: "sheen")!)
+        
+        let height = self.frame.height
+        let width: CGFloat = height * 1.667
+        imageView.frame = CGRect(x: -width, y: 0, width: width, height: height)
+        
+        let animation = CABasicAnimation(keyPath: "transform.translation.x")
+        animation.duration = 2.0
+//        animation.speed = 2.0
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        animation.byValue = self.frame.width + width
+        
+        SheenAnimationDelegate(
+            willStart: { start in
+                self.addSubview(imageView)
+                start()
+        },
+            didStop: {
+                imageView.removeFromSuperview()
+        }
+            ).start(view: imageView, animation: animation)
+    }
+}
+
 fileprivate class SheenAnimationDelegate : NSObject, CAAnimationDelegate {
     
     let willStart: (()->Void)->Void
@@ -39,28 +65,3 @@ fileprivate class SheenAnimationDelegate : NSObject, CAAnimationDelegate {
     }
 }
 
-extension UIView {
-    func showSheen() {
-        let imageView = UIImageView(image: UIImage(named: "sheen")!)
-        
-        let height = self.frame.height
-        let width: CGFloat = height * 1.667
-        imageView.frame = CGRect(x: -width, y: 0, width: width, height: height)
-        
-        let animation = CABasicAnimation(keyPath: "transform.translation.x")
-        animation.duration = 2.0
-//        animation.speed = 2.0
-        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-        animation.byValue = self.frame.width + width
-        
-        SheenAnimationDelegate(
-            willStart: { start in
-                self.addSubview(imageView)
-                start()
-        },
-            didStop: {
-                imageView.removeFromSuperview()
-        }
-            ).start(view: imageView, animation: animation)
-    }
-}

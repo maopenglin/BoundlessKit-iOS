@@ -9,20 +9,16 @@
 import Foundation
 import UIKit
 
-class BalloonAnimationDelegate : NSObject, CAAnimationDelegate {
-
-    let balloonView: UIView
+public extension UIView {
     
-    init(balloonView: UIView) {
-        self.balloonView = balloonView
+    public func showBalloons() {
+        let largestSize = min(frame.width, frame.height) / 3
+        let balloonSizes = [largestSize/2, largestSize/2, largestSize/3, largestSize]
+        for size in balloonSizes {
+            showBalloon(width: size, height: size)
+        }
     }
     
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        balloonView.removeFromSuperview()
-    }
-}
-
-extension UIView {
     fileprivate func showBalloon(width: CGFloat, height: CGFloat) {
         let animation = CAKeyframeAnimation(keyPath: "position")
         let path = UIBezierPath()
@@ -51,13 +47,18 @@ extension UIView {
         animation.delegate = balloonDelegate
         balloonView.layer.add(animation, forKey: "random upward path")
     }
+}
+
+class BalloonAnimationDelegate : NSObject, CAAnimationDelegate {
     
-    func showBalloons() {
-        let largestSize = min(frame.width, frame.height) / 3
-        let balloonSizes = [largestSize/2, largestSize/2, largestSize/3, largestSize]
-        for size in balloonSizes {
-            showBalloon(width: size, height: size)
-        }
+    let balloonView: UIView
+    
+    init(balloonView: UIView) {
+        self.balloonView = balloonView
+    }
+    
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        balloonView.removeFromSuperview()
     }
 }
 
