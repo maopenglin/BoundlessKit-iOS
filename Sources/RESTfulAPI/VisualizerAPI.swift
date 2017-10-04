@@ -53,23 +53,19 @@ public class VisualizerAPI : NSObject {
     
     public static func recordEvent(senderInstance: AnyObject, sender: String, target: String, selector: String, event: UIEvent) {
         
-        //        shared.visualizerEventQueue.async {
-        // display reward if reward is set for this event
-        
-        if let reward = shared.getReward(sender: sender, target: target, selector: selector) {
-            DispatchQueue.main.async {
-                if reward == "starburst" {
-                    DopamineKit.debugLog("here")
-                    UIApplication.shared.keyWindow!.showStarburst(at: Helper.lastTouchLocationInUIWindow)
+        shared.visualizerEventQueue.async {
+            // display reward if reward is set for this event
+            
+            if let reward = shared.getReward(sender: sender, target: target, selector: selector) {
+                DispatchQueue.main.async {
+                    if reward == "starburst" {
+                        DopamineKit.debugLog("here")
+                        UIApplication.shared.keyWindow!.showStarburst(at: Helper.lastTouchLocationInUIWindow)
+                    }
                 }
             }
-        }
-        
-        if let connectionID = connectionID {
-            // Visualizer is connected
-            //                DispatchQueue.global().async {
-            if true {
-                
+            
+            if let connectionID = connectionID {
                 // send event
                 var payload = shared.configurationData
                 
@@ -79,15 +75,17 @@ public class VisualizerAPI : NSObject {
                 payload["sender"] = sender
                 payload["target"] = target
                 payload["selector"] = selector
-                if let view = senderInstance as? UIView,
-                    let imageString = view.imageAsBase64EncodedString() {
-                    payload["senderImage"] = imageString
-                } else if let barItem = senderInstance as? UIBarItem,
-                    let image = barItem.image,
-                    let imageString = image.base64EncodedPNGString() {
-                    payload["senderImage"] = imageString
-                } else {
-                    NSLog("Cannot create image, please message team@usedopamine.com to add support for visualizer snapshots of class type:<\(type(of: senderInstance))>!")
+                DispatchQueue.main.sync {
+                    if let view = senderInstance as? UIView,
+                        let imageString = view.imageAsBase64EncodedString() {
+                        payload["senderImage"] = imageString
+                    } else if let barItem = senderInstance as? UIBarItem,
+                        let image = barItem.image,
+                        let imageString = image.base64EncodedPNGString() {
+                        payload["senderImage"] = imageString
+                    } else {
+                        NSLog("Cannot create image, please message team@usedopamine.com to add support for visualizer snapshots of class type:<\(type(of: senderInstance))>!")
+                    }
                 }
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
@@ -100,7 +98,6 @@ public class VisualizerAPI : NSObject {
                 // update rewards
                 shared.retrieveRewards()
             }
-            //            }
         }
     }
     
@@ -228,6 +225,7 @@ public class VisualizerAPI : NSObject {
             
             // send request
             DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
+            //test
             task.resume()
             
         } catch {
