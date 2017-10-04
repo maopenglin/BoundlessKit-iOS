@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     
     func action1Performed() {
         NSLog("action1Performed")
+        action1Button.showConfetti()
     }
 //    func action1Performed(){
 //        // Reinforce the action to make it sticky!!
