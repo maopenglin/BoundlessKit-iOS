@@ -11,14 +11,22 @@ import UIKit
 
 public extension UIView {
     
-    func shake(count:Float = 2, duration:TimeInterval = 0.5, translation:Float = -10, speed:Float = 3, completion: @escaping ()->Void = {}) {
-        let animation : CABasicAnimation = CABasicAnimation(keyPath: "transform.translation.x")
-        animation.repeatCount = count
+    func shake(count:Int = 2, duration:TimeInterval = 2.0, translation:Int = 10, speed:Float = 3, completion: @escaping ()->Void = {}) {
+        
+        let path = UIBezierPath()
+        path.move(to: .zero)
+        for _ in 1...count {
+            path.addLine(to: CGPoint(x: translation, y: 0))
+            path.addLine(to: CGPoint(x: -translation, y: 0))
+        }
+        path.close()
+        
+        let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        animation.repeatCount = 1
         animation.duration = duration/TimeInterval(animation.repeatCount)
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-        animation.byValue = translation
+        animation.path = path.cgPath
         animation.speed = speed
-        animation.autoreverses = true
         
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: animation)
     }
