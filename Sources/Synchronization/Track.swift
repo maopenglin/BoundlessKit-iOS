@@ -11,7 +11,7 @@ import Foundation
 @objc
 internal class Track : NSObject, NSCoding {
     
-    static let sharedInstance = Track()
+    @objc static let sharedInstance = Track()
     
     private let defaults = UserDefaults.standard
     private let defaultsKey = "DopamineTrack_v4.1.3"
@@ -93,7 +93,7 @@ internal class Track : NSObject, NSCoding {
     
     /// Clears the saved track sync triggers from NSUserDefaults
     ///
-    func erase() {
+    @objc func erase() {
         self.trackedActions.removeAll()
         self.sizeToSync = 15
         self.timerStartsAt = Int64( 1000*NSDate().timeIntervalSince1970 )
@@ -105,7 +105,7 @@ internal class Track : NSObject, NSCoding {
     ///
     /// - returns: Whether a sync has been triggered.
     ///
-    func isTriggered() -> Bool {
+    @objc func isTriggered() -> Bool {
         return timerDidExpire() || isSizeToSync()
     }
     
@@ -136,7 +136,7 @@ internal class Track : NSObject, NSCoding {
     /// - parameters:
     ///     - action: The action to be stored.
     ///
-    func add(action: DopeAction) {
+    @objc func add(action: DopeAction) {
         trackedActions.append(action)
         defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
@@ -146,7 +146,7 @@ internal class Track : NSObject, NSCoding {
     /// - parameters:
     ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if there were no actions to sync.
     ///
-    func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
+    @objc func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
                 DopamineKit.debugLog("Track sync already happening")
@@ -181,7 +181,7 @@ internal class Track : NSObject, NSCoding {
     
     /// This function returns a snapshot of this instance as a JSON compatible Object
     ///
-    func toJSONType() -> [String : Any] {
+    @objc func toJSONType() -> [String : Any] {
         var jsonObject: [String:Any] = [:]
         
         jsonObject["size"] = NSNumber(value: trackedActions.count)

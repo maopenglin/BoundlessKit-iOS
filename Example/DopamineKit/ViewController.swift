@@ -11,12 +11,12 @@ import DopamineKit
 
 class ViewController: UIViewController {
     
-    var someCounter: Float = 0
+    @objc var someCounter: Float = 0
     
 //    func action1Performed() {
 //        NSLog("action1Performed")
 //    }
-    func action1Performed(){
+    @objc func action1Performed(){
         // Reinforce the action to make it sticky!!
         DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {
             reinforcement in
@@ -67,7 +67,7 @@ class ViewController: UIViewController {
         })
     }
     
-    func action2Performed(){
+    @objc func action2Performed(){
         // Tracking call is sent asynchronously
         DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
     }
@@ -81,9 +81,9 @@ class ViewController: UIViewController {
     //
     ///////////////////////////////////////
     
-    var responseLabel:UILabel!
-    var action1Button:UIButton!
-    var trackedActionButton:UIButton!
+    @objc var responseLabel:UILabel!
+    @objc var action1Button:UIButton!
+    @objc var trackedActionButton:UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,7 +91,7 @@ class ViewController: UIViewController {
         DopamineKit.syncCoordinator.performSync()
     }
     
-    func loadBasicUI(){
+    @objc func loadBasicUI(){
         let viewSize = self.view.frame.size
         let viewCenter = self.view.center
         
@@ -131,7 +131,7 @@ class ViewController: UIViewController {
         self.view.addSubview(trackedActionButton)
     }
     
-    func flash(_ elm:UIView){
+    @objc func flash(_ elm:UIView){
         elm.alpha = 0.0
         UIView.animate(withDuration: 0.75, delay: 0.0, options: .allowUserInteraction, animations: {() -> Void in
             elm.alpha = 1.0

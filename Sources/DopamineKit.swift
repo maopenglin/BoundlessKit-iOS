@@ -11,7 +11,7 @@ import Foundation
 @objc
 open class DopamineKit : NSObject {
     
-    public static let sharedInstance: DopamineKit = DopamineKit()
+    @objc public static let sharedInstance: DopamineKit = DopamineKit()
     public static let syncCoordinator = SyncCoordinator.shared
     
     private override init() {
@@ -26,7 +26,7 @@ open class DopamineKit : NSObject {
     ///                  Must be JSON formattable (Number, String, Bool, Array, Object).
     ///                  Defaults to `nil`.
     ///
-    open static func track(_ actionID: String, metaData: [String: Any]? = nil) {
+    @objc open static func track(_ actionID: String, metaData: [String: Any]? = nil) {
         // store the action to be synced
         let action = DopeAction(actionID: actionID, metaData:metaData)
         syncCoordinator.store(trackedAction: action)
@@ -42,7 +42,7 @@ open class DopamineKit : NSObject {
     ///     - queue: The queue to run the completion closure. Defaults to `DispatchQueue.main`.
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
-    open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, queue: DispatchQueue = DispatchQueue.main, completion: @escaping (String) -> ()) {
+    @objc open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, queue: DispatchQueue = DispatchQueue.main, completion: @escaping (String) -> ()) {
         let action = DopeAction(actionID: actionID, metaData: metaData)
         action.reinforcementDecision = syncCoordinator.retrieveReinforcementDecisionFor(actionID: action.actionID)
         
@@ -63,7 +63,7 @@ open class DopamineKit : NSObject {
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    public static func debugLog(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
+    @objc public static func debugLog(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
         #if DEBUG
             var functionSignature:String = function
             if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
