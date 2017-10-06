@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     
     func action1Performed() {
         NSLog("action1Performed")
-        action1Button.showConfetti()
+        view.showCoins(at: action1Button.center, width: action1Button.bounds.width)
     }
 //    func action1Performed(){
 //        // Reinforce the action to make it sticky!!

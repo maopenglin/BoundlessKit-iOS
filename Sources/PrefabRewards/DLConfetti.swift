@@ -71,7 +71,7 @@ fileprivate extension CAEmitterLayer {
                 cell.velocityRange = 50
                 cell.emissionLongitude = CGFloat.pi
                 cell.emissionRange = CGFloat.pi / 4
-                cell.spin = 2
+                cell.spin = 1
                 cell.spinRange = 3
                 cell.scaleRange = 0.5
                 cell.scaleSpeed = -0.05
@@ -80,6 +80,10 @@ fileprivate extension CAEmitterLayer {
                 cells.append(cell)
             }
         }
+        
+        self.shadowOffset = CGSize(width: 5, height: 7)
+        self.shadowOpacity = 0.4
+        self.shadowRadius = 5
         
         self.emitterCells = cells
     }

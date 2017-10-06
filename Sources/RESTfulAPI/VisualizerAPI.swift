@@ -121,6 +121,15 @@ public class VisualizerAPI : NSObject {
                         presentPairingAlert(from: adminName, connectionID: connectionID)
                     }
                     
+                case 208:
+                    if let connectionID = response["connectionUUID"] as? String {
+                        let connectedRestoredAlert = UIAlertController(title: "Visualizer Pairing", message: "Connection restored", preferredStyle: .alert)
+                        connectedRestoredAlert.addAction( UIAlertAction(title: "Ok", style: .default, handler: { _ in
+                            VisualizerAPI.connectionID = connectionID
+                        }))
+                        UIWindow.presentTopLevelAlert(alertController: connectedRestoredAlert)
+                    }
+                    
                 case 500, 204, 201:
                     break
                     
@@ -150,11 +159,7 @@ public class VisualizerAPI : NSObject {
                 
             }))
             
-            let alertWindow = UIWindow(frame: UIScreen.main.bounds)
-            alertWindow.rootViewController = UIViewController()
-            alertWindow.windowLevel = UIWindowLevelAlert + 1;
-            alertWindow.makeKeyAndVisible()
-            alertWindow.rootViewController?.present(pairingAlert, animated: true, completion: nil)
+            UIWindow.presentTopLevelAlert(alertController: pairingAlert)
         }
     }
     
@@ -328,6 +333,16 @@ public class VisualizerAPI : NSObject {
 //    
 //    return nil
 //}
+
+fileprivate extension UIWindow {
+    static func presentTopLevelAlert(alertController:UIAlertController, completion:(() -> Void)? = nil) {
+        let alertWindow = UIWindow(frame: UIScreen.main.bounds)
+        alertWindow.rootViewController = UIViewController()
+        alertWindow.windowLevel = UIWindowLevelAlert + 1;
+        alertWindow.makeKeyAndVisible()
+        alertWindow.rootViewController?.present(alertController, animated: true, completion: completion)
+    }
+}
 
 fileprivate extension UIView {
     func imageAsBase64EncodedString() -> String? {

@@ -11,7 +11,7 @@ import UIKit
 
 
 public extension UIView {
-    public func showGoldenFrame(saveScreenshot:Bool) {
+    public func showGoldenFrame(saveScreenshot:Bool = false) {
         let frameImage = UIImage(named: "frame-gold")!
         let frameView = UIImageView(image: frameImage)
         frameView.frame = CGRect(origin: CGPoint.zero, size: self.frame.size)
