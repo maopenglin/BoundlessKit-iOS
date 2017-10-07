@@ -10,18 +10,6 @@ import Foundation
 import UIKit
 import AVFoundation
 
-public enum EmojiSplosionIntensity : Int {
-    case one, some, many
-    
-    fileprivate var explosionValues: (birthRate: Float, velocity: CGFloat) {
-        switch self {
-        case .one: return (birthRate: 1, velocity: 100)
-        case .some: return (birthRate: 3, velocity: 500)
-        case .many: return (birthRate: 10, velocity: 750)
-        }
-    }
-}
-
 public enum SpinIntensity : CGFloat {
     case none=0, slight=120, heavy=360
 }
@@ -33,24 +21,29 @@ public extension UIView {
                                   scaleSpeed: CGFloat = 0.1,
                                   scaleRange: CGFloat = 0.1,
                                   lifetime: Float = 2.0,
-                                  intensity: EmojiSplosionIntensity = .one,
+                                  quantity: Float = 1.0,
+                                  bursts: Double = 1.0,
+                                  velocity: CGFloat = 200,
                                   xAcceleration: CGFloat = 0,
                                   yAcceleration: CGFloat = 0,
                                   angle: CGFloat = -90,
                                   range: CGFloat = 1,
                                   spinIntensity: SpinIntensity = .none
         ) {
-        showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, birthRate:intensity.explosionValues.birthRate, velocity:intensity.explosionValues.velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spinIntensity.rawValue)
+        showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spinIntensity.rawValue)
     }
     
-    public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, birthRate: Float, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat) {
+    public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, birthRate: Float, birthCycles: Double, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat) {
         guard let content = content else {
             DopamineKit.debugLog("❌ received nil image content!")
             return
         }
         
+        let presentingLayer: CALayer = (UIApplication.shared.delegate?.window??.layer)!
+        let position = convert(location, to: nil)
+        
         let emitter = CAEmitterLayer()
-        emitter.emitterPosition = convert(location, to: nil)
+        emitter.emitterPosition = position
         
         let cell = CAEmitterCell()
         cell.name = "emojiCell"
@@ -75,13 +68,12 @@ public extension UIView {
         emitter.emitterCells = [cell]
         DopamineKit.debugLog("Emoji'Splosion'!")
         DispatchQueue.main.async {
-            let windowLayer = UIApplication.shared.delegate?.window??.layer
             emitter.beginTime = CACurrentMediaTime()
-            windowLayer?.addSublayer(emitter)
+            presentingLayer.addSublayer(emitter)
             //        Helper.playStarSound()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + birthCycles) {
                 emitter.birthRate = 0
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double(lifetime + 0.3)) {
                     emitter.removeFromSuperlayer()
                 }
             }
