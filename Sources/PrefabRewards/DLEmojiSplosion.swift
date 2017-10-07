@@ -40,10 +40,10 @@ public extension UIView {
                                   range: CGFloat = 1,
                                   spinIntensity: SpinIntensity = .none
         ) {
-        showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, birthRate:intensity.explosionValues.birthRate, velocity:intensity.explosionValues.velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spinIntensity:spinIntensity)
+        showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, birthRate:intensity.explosionValues.birthRate, velocity:intensity.explosionValues.velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spinIntensity.rawValue)
     }
     
-    public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, birthRate: Float, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spinIntensity: SpinIntensity) {
+    public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, birthRate: Float, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat) {
         guard let content = content else {
             DopamineKit.debugLog("❌ received nil image content!")
             return
@@ -57,10 +57,10 @@ public extension UIView {
         cell.contents = content
         cell.birthRate = birthRate
         cell.lifetime = lifetime
-        cell.spin = spinIntensity.rawValue.degreesToRadians()
-        cell.spinRange = spinIntensity.rawValue.degreesToRadians() / 8
+        cell.spin = spin.degreesToRadians()
+        cell.spinRange = cell.spin / 8
         cell.velocity = velocity
-        cell.velocityRange = velocity / 3
+        cell.velocityRange = cell.velocity / 3
         cell.xAcceleration = xAcceleration
         cell.yAcceleration = yAcceleration
         cell.scale = scale
@@ -73,15 +73,17 @@ public extension UIView {
         cell.color = cell.color?.copy(alpha: CGFloat(lifetime / fadeOutDuration))
         
         emitter.emitterCells = [cell]
-        
-        
-        let windowLayer = UIApplication.shared.delegate?.window??.layer
-        windowLayer?.addSublayer(emitter)
-//        Helper.playStarSound()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            emitter.birthRate = 0
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                emitter.removeFromSuperlayer()
+        DopamineKit.debugLog("Emoji'Splosion'!")
+        DispatchQueue.main.async {
+            let windowLayer = UIApplication.shared.delegate?.window??.layer
+            emitter.beginTime = CACurrentMediaTime()
+            windowLayer?.addSublayer(emitter)
+            //        Helper.playStarSound()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                emitter.birthRate = 0
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                    emitter.removeFromSuperlayer()
+                }
             }
         }
     }
