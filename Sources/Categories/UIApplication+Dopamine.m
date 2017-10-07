@@ -15,8 +15,8 @@
 @implementation DopamineApp
 
 + (void) swizzleSelectors {
-    [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendAction:to:from:forEvent:) :[UIApplication class] :@selector(sendAction:to:from:forEvent:)];
     [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendEvent:) :[UIApplication class] :@selector(sendEvent:)];
+    [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendAction:to:from:forEvent:) :[UIApplication class] :@selector(sendAction:to:from:forEvent:)];
 }
 
 //static NSUInteger firstTouchHash;
@@ -133,7 +133,9 @@
 //        // Will support multi-touch later
 //    }
     
-    [self swizzled_sendEvent:event];
+    
+    if ([self respondsToSelector:@selector(swizzled_sendEvent:)])
+        [self swizzled_sendEvent:event];
 }
 
 - (BOOL)swizzled_sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event {

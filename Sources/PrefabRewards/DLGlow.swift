@@ -37,11 +37,11 @@ public extension UIView {
         let animation = CABasicAnimation(keyPath: "opacity")
         animation.fromValue = fromIntensity
         animation.toValue = toIntensity
-        animation.repeatCount = 1
-//        animation.duration = 5.0
-        animation.speed = 0.35
+        animation.repeatCount = 2
+        animation.duration = 0.2
+//        animation.speed = 0.35
         animation.autoreverses = true
-        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         
         GlowAnimationDelegate(
             willStart: { start in

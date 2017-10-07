@@ -60,7 +60,7 @@ public class VisualizerAPI : NSObject {
                 DispatchQueue.main.async {
                     if reward == "starburst" {
                         DopamineKit.debugLog("here")
-                        UIApplication.shared.keyWindow!.showStarburst(at: Helper.lastTouchLocationInUIWindow)
+                        UIApplication.shared.keyWindow!.showEmojiSplosion(at: Helper.lastTouchLocationInUIWindow)
                     }
                 }
             }
