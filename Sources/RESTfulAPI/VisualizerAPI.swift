@@ -26,11 +26,30 @@ public class VisualizerAPI : NSObject {
     private static let baseURL = "https://dashboard-api.usedopamine.com/"
     
     static var connectionID: String? //= "test"
-    var eventRewards: [String:String] = [:]
-    let visualizerEventQueue = DispatchQueue(label: "DopamineKit.VisualizerAPI.visualizerEvents", qos: .background)
+//    var eventRewards: [String:[String:Any]] = [:]
+    var eventRewards: [String:[String:Any]] = PlaceHolder.rewardPairing
+    var miniMapping: [String:[String:Any]]?
     
-    public func getReward(sender: String, target: String, selector: String) -> String? {
-        return eventRewards[[sender, target, selector].joined(separator: "-")]
+    public func showRewardFor(sender: String, target: String, selector: String, rewardFunction: @escaping ([String:Any]) -> Void) {
+        let pairingKey = [sender, target, selector].joined(separator: "-")
+        if miniMapping != nil,
+            let rewardParameters = miniMapping![pairingKey] {
+            DopamineKit.debugLog("Found real time rewarded event <\(pairingKey)> with parameters:<\(rewardParameters)>")
+            DispatchQueue.main.async {
+                rewardFunction(rewardParameters)
+            }
+            return
+        }
+        if let rewardParameters = eventRewards[pairingKey] {
+            DopamineKit.debugLog("Found rewarded event <\(pairingKey)> with parameters:<\(rewardParameters)>")
+            
+            // TODO: enclose in DopamineKit.reinfoce(). temporary inside main dispatch
+            DispatchQueue.main.async {
+                rewardFunction(rewardParameters)
+            }
+        } else {
+            DopamineKit.debugLog("No reward pairing found for <\(pairingKey)>")
+        }
     }
     
     private override init() {
@@ -52,19 +71,46 @@ public class VisualizerAPI : NSObject {
     }
     
     public static func recordEvent(senderInstance: AnyObject, sender: String, target: String, selector: String, event: UIEvent) {
-        
-        shared.visualizerEventQueue.async {
-            // display reward if reward is set for this event
+        DispatchQueue.global().async {
             
-            if let reward = shared.getReward(sender: sender, target: target, selector: selector) {
-                DispatchQueue.main.async {
-                    if reward == "starburst" {
-                        DopamineKit.debugLog("here")
-                        UIApplication.shared.keyWindow!.showEmojiSplosion(at: Helper.lastTouchLocationInUIWindow)
+            // display reward if reward is set for this event
+            shared.showRewardFor(sender: sender, target: target, selector: selector) { rewardParams in
+                switch rewardParams["type"] as? String {
+                    
+                case "burst"?:
+                    let content = (rewardParams["content"] as? String)?.image().cgImage
+                    
+                    switch rewardParams["view"] as? String {
+                    case "touch"?:
+                        UIApplication.shared.keyWindow!.showEmojiSplosion(at: Helper.lastTouchLocationInUIWindow, content:content)
+                        break
+                        
+                    case "sender"?:
+                        if let senderInstance = senderInstance as? UIView {
+                            senderInstance.showEmojiSplosion(at:CGPoint(x: senderInstance.bounds.width/2, y: senderInstance.bounds.height/2), content:content)
+                        }
+                        
+                    case "target"?:
+                        break
+                        
+                    case "fixed"?:
+                        break
+                        
+                    default:
+                        break
                     }
+                    
+                case "confetti"?:
+                    break
+                    
+                default:
+                    DopamineKit.debugLog("Unknown reward type:\(String(describing: rewardParams["type"]))")
+                    // TODO: implement delegate callback for dev defined rewards
                 }
             }
             
+            
+            // send event to visualizer if connected
             if let connectionID = connectionID {
                 // send event
                 var payload = shared.configurationData
@@ -90,7 +136,20 @@ public class VisualizerAPI : NSObject {
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                 shared.send(call: .submit, with: payload){ response in
-                    if response["status"] as? Int != 200 {
+                    if response["status"] as? Int == 200 {
+                        if let temporaryMappings = response["mappings"] as? [[String:Any]] {
+                            var miniMapping = [String : [String : Any]]()
+                            for mapping in temporaryMappings {
+                                if let sender = mapping["sender"],
+                                    let target = mapping["target"],
+                                    let selector = mapping["selector"]
+                                {
+                                    miniMapping["\(sender)-\(target)-\(selector)"] = mapping
+                                }
+                            }
+                            shared.miniMapping = miniMapping
+                        }
+                    } else {
                         VisualizerAPI.connectionID = nil
                     }
                 }
@@ -141,26 +200,26 @@ public class VisualizerAPI : NSObject {
     }
     
     private static func presentPairingAlert(from adminName: String, connectionID: String) {
-        DispatchQueue.main.async {
-            let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
-            
-            pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
-                var payload = shared.configurationData
-                payload["deviceName"] = UIDevice.current.name
-                payload["connectionUUID"] = connectionID
-                shared.send(call: .accept, with: payload) {response in
-                    if response["status"] as? Int == 200 {
-                        VisualizerAPI.connectionID = connectionID
-                    }
+        
+        let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
+        
+        pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
+            var payload = shared.configurationData
+            payload["deviceName"] = UIDevice.current.name
+            payload["connectionUUID"] = connectionID
+            shared.send(call: .accept, with: payload) {response in
+                if response["status"] as? Int == 200 {
+                    VisualizerAPI.connectionID = connectionID
                 }
-            }))
+            }
+        }))
+        
+        pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
             
-            pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
-                
-            }))
-            
-            UIWindow.presentTopLevelAlert(alertController: pairingAlert)
-        }
+        }))
+        
+        UIWindow.presentTopLevelAlert(alertController: pairingAlert)
+        
     }
     
     
@@ -336,11 +395,13 @@ public class VisualizerAPI : NSObject {
 
 fileprivate extension UIWindow {
     static func presentTopLevelAlert(alertController:UIAlertController, completion:(() -> Void)? = nil) {
-        let alertWindow = UIWindow(frame: UIScreen.main.bounds)
-        alertWindow.rootViewController = UIViewController()
-        alertWindow.windowLevel = UIWindowLevelAlert + 1;
-        alertWindow.makeKeyAndVisible()
-        alertWindow.rootViewController?.present(alertController, animated: true, completion: completion)
+        DispatchQueue.main.async {
+            let alertWindow = UIWindow(frame: UIScreen.main.bounds)
+            alertWindow.rootViewController = UIViewController()
+            alertWindow.windowLevel = UIWindowLevelAlert + 1;
+            alertWindow.makeKeyAndVisible()
+            alertWindow.rootViewController?.present(alertController, animated: true, completion: completion)
+        }
     }
 }
 
