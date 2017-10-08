@@ -18,29 +18,30 @@ public extension UIView {
     public func showEmojiSplosion(at location:CGPoint,
                                   content: CGImage? = "❤️".image().cgImage,
                                   scale: CGFloat = 1.0,
-                                  scaleSpeed: CGFloat = 0.1,
-                                  scaleRange: CGFloat = 0.1,
+                                  scaleSpeed: CGFloat = 0,
+                                  scaleRange: CGFloat = 0,
                                   lifetime: Float = 2.0,
+                                  fadeout: Float = 0.2,
                                   quantity: Float = 1.0,
                                   bursts: Double = 1.0,
-                                  velocity: CGFloat = 200,
+                                  velocity: CGFloat = 0,
                                   xAcceleration: CGFloat = 0,
                                   yAcceleration: CGFloat = 0,
                                   angle: CGFloat = -90,
-                                  range: CGFloat = 1,
+                                  range: CGFloat = 0,
                                   spinIntensity: SpinIntensity = .none
         ) {
-        showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spinIntensity.rawValue)
+        showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spinIntensity.rawValue)
     }
     
-    public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, birthRate: Float, birthCycles: Double, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat) {
+    public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, fadeout: Float, birthRate: Float, birthCycles: Double, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat) {
         guard let content = content else {
             DopamineKit.debugLog("❌ received nil image content!")
             return
         }
         
-        let presentingLayer: CALayer = (UIApplication.shared.delegate?.window??.layer)!
-        let position = convert(location, to: nil)
+        let presentingLayer: CALayer = self.superview!.layer // (UIApplication.shared.delegate?.window??.layer)!
+        let position = convert(location, to: self.superview!)
         
         let emitter = CAEmitterLayer()
         emitter.emitterPosition = position
@@ -61,9 +62,8 @@ public extension UIView {
         cell.scaleRange = scaleRange
         cell.emissionLongitude = angle.degreesToRadians()
         cell.emissionRange = range.degreesToRadians()
-        let fadeOutDuration: Float = 0.2
-        cell.alphaSpeed = -1.0 / fadeOutDuration
-        cell.color = cell.color?.copy(alpha: CGFloat(lifetime / fadeOutDuration))
+        cell.alphaSpeed = -1.0 / fadeout
+        cell.color = cell.color?.copy(alpha: CGFloat(lifetime / fadeout))
         
         emitter.emitterCells = [cell]
         DopamineKit.debugLog("Emoji'Splosion'!")
@@ -85,8 +85,7 @@ public extension String {
     func image(font:UIFont = .systemFont(ofSize: 24)) -> UIImage {
         let size = (self as NSString).size(attributes: [NSFontAttributeName: font])
         UIGraphicsBeginImageContextWithOptions(size, false, 0);
-        let rect = CGRect(origin: .zero, size: size)
-        (self as NSString).draw(in: rect, withAttributes: [NSFontAttributeName: font])
+        (self as NSString).draw(at: .zero, withAttributes: [NSFontAttributeName: font])
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image!
