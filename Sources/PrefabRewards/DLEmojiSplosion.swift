@@ -10,10 +10,6 @@ import Foundation
 import UIKit
 import AVFoundation
 
-public enum SpinIntensity : CGFloat {
-    case none=0, slight=120, heavy=360
-}
-
 public extension UIView {
     public func showEmojiSplosion(at location:CGPoint,
                                   content: CGImage? = "❤️".image().cgImage,
@@ -21,6 +17,7 @@ public extension UIView {
                                   scaleSpeed: CGFloat = 0,
                                   scaleRange: CGFloat = 0,
                                   lifetime: Float = 2.0,
+                                  lifetimeRange: Float = 0.5,
                                   fadeout: Float = 0.2,
                                   quantity: Float = 1.0,
                                   bursts: Double = 1.0,
@@ -29,28 +26,29 @@ public extension UIView {
                                   yAcceleration: CGFloat = 0,
                                   angle: CGFloat = -90,
                                   range: CGFloat = 0,
-                                  spinIntensity: SpinIntensity = .none
+                                  spin: CGFloat = 0
         ) {
-        showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spinIntensity.rawValue)
+        showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin)
     }
     
-    public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, fadeout: Float, birthRate: Float, birthCycles: Double, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat) {
+    public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, lifetimeRange: Float, fadeout: Float, birthRate: Float, birthCycles: Double, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat) {
         guard let content = content else {
             DopamineKit.debugLog("❌ received nil image content!")
             return
         }
         
-        let presentingLayer: CALayer = self.superview!.layer // (UIApplication.shared.delegate?.window??.layer)!
-        let position = convert(location, to: self.superview!)
+//        let presentingLayer: CALayer = self.superview!.layer // (UIApplication.shared.delegate?.window??.layer)!
+//        let position = convert(location, to: self.superview!)
         
         let emitter = CAEmitterLayer()
-        emitter.emitterPosition = position
+        emitter.emitterPosition = location
         
         let cell = CAEmitterCell()
         cell.name = "emojiCell"
         cell.contents = content
         cell.birthRate = birthRate
         cell.lifetime = lifetime
+        cell.lifetimeRange = lifetimeRange
         cell.spin = spin.degreesToRadians()
         cell.spinRange = cell.spin / 8
         cell.velocity = velocity
@@ -66,14 +64,18 @@ public extension UIView {
         cell.color = cell.color?.copy(alpha: CGFloat(lifetime / fadeout))
         
         emitter.emitterCells = [cell]
+        emitter.shouldRasterize = true
+        emitter.rasterizationScale = UIScreen.main.scale
+        emitter.contentsScale = UIScreen.main.scale
+        
         DopamineKit.debugLog("Emoji'Splosion'!")
         DispatchQueue.main.async {
             emitter.beginTime = CACurrentMediaTime()
-            presentingLayer.addSublayer(emitter)
+            self.layer.addSublayer(emitter)
             //        Helper.playStarSound()
             DispatchQueue.main.asyncAfter(deadline: .now() + birthCycles) {
                 emitter.birthRate = 0
-                DispatchQueue.main.asyncAfter(deadline: .now() + Double(lifetime + 0.3)) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double(lifetime + lifetimeRange + 17.0)) {
                     emitter.removeFromSuperlayer()
                 }
             }
@@ -85,6 +87,8 @@ public extension String {
     func image(font:UIFont = .systemFont(ofSize: 24)) -> UIImage {
         let size = (self as NSString).size(attributes: [NSFontAttributeName: font])
         UIGraphicsBeginImageContextWithOptions(size, false, 0);
+//        let context = UIGraphicsGetCurrentContext()!
+//        CGContextSetShouldAntialias(context, true)
         (self as NSString).draw(at: .zero, withAttributes: [NSFontAttributeName: font])
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
