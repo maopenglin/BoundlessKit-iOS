@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 public extension UIView {
-    public func showSheen() {
+    public func showSheen(duration: Double) {
         let imageView = UIImageView(image: UIImage(named: "sheen")!)
         
         let height = self.frame.height
@@ -18,7 +18,7 @@ public extension UIView {
         imageView.frame = CGRect(x: -width, y: 0, width: width, height: height)
         
         let animation = CABasicAnimation(keyPath: "transform.translation.x")
-        animation.duration = 2.0
+        animation.duration = duration
 //        animation.speed = 2.0
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         animation.byValue = self.frame.width + width
