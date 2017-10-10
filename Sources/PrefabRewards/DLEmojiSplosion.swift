@@ -57,8 +57,10 @@ public extension UIView {
             cell.scaleRange = scaleRange
             cell.emissionLongitude = angle.degreesToRadians()
             cell.emissionRange = range.degreesToRadians()
-            cell.alphaSpeed = -1.0 / fadeout
-            cell.color = cell.color?.copy(alpha: CGFloat(lifetime / fadeout))
+            if fadeout != 0 {
+                cell.alphaSpeed = -1.0 / fadeout
+                cell.color = cell.color?.copy(alpha: CGFloat(lifetime / fadeout))
+            }
             
             emitter.emitterCells = [cell]
             
