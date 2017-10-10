@@ -9,25 +9,25 @@
 import Foundation
 internal class SyncOverview : NSObject, NSCoding {
     
-    @objc static let utcKey = "utc"
-    @objc static let timezoneOffsetKey = "timezoneOffset"
-    @objc static let totalSyncTimeKey = "totalSyncTime"
-    @objc static let causeKey = "cause"
-    @objc static let trackKey = "track"
-    @objc static let reportKey = "report"
-    @objc static let cartridgesKey = "cartridges"
-    @objc static let syncResponseKey = "syncResponse"
-    @objc static let roundTripTimeKey = "roundTripTime"
-    @objc static let statusKey = "status"
-    @objc static let errorKey = "error"
+    static let utcKey = "utc"
+    static let timezoneOffsetKey = "timezoneOffset"
+    static let totalSyncTimeKey = "totalSyncTime"
+    static let causeKey = "cause"
+    static let trackKey = "track"
+    static let reportKey = "report"
+    static let cartridgesKey = "cartridges"
+    static let syncResponseKey = "syncResponse"
+    static let roundTripTimeKey = "roundTripTime"
+    static let statusKey = "status"
+    static let errorKey = "error"
     
-    @objc var utc: Int64
-    @objc var timezoneOffset: Int64
-    @objc var totalSyncTime: Int64
-    @objc var cause: String
-    @objc var trackTriggers: [String: Any]
-    @objc var reportTriggers: [String: Any]
-    @objc var cartridgesTriggers: [String: [String: Any]]
+    var utc: Int64
+    var timezoneOffset: Int64
+    var totalSyncTime: Int64
+    var cause: String
+    var trackTriggers: [String: Any]
+    var reportTriggers: [String: Any]
+    var cartridgesTriggers: [String: [String: Any]]
     
     /// Use this object to record the performance of a synchronization
     ///
@@ -36,7 +36,7 @@ internal class SyncOverview : NSObject, NSCoding {
     ///     - timerStartsAt: The start time for a sync timer. Defaults to 0.
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
-    @objc init(cause: String, trackTriggers: [String: Any], reportTriggers: [String: Any], cartridgeTriggers: [String: [String: Any]]) {
+    init(cause: String, trackTriggers: [String: Any], reportTriggers: [String: Any], cartridgeTriggers: [String: [String: Any]]) {
         self.utc = Int64( 1000*Date().timeIntervalSince1970 )
         self.timezoneOffset = Int64( 1000*NSTimeZone.default.secondsFromGMT() )
         self.totalSyncTime = -1
@@ -72,7 +72,7 @@ internal class SyncOverview : NSObject, NSCoding {
     
     /// This function converts a DopeAction to a JSON compatible Object
     ///
-    @objc func toJSONType() -> [String : Any] {
+    func toJSONType() -> [String : Any] {
         var jsonObject: [String:Any] = [:]
         
         jsonObject[SyncOverview.utcKey] = NSNumber(value: utc)

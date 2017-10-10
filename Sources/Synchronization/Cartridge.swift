@@ -19,7 +19,7 @@ internal class Cartridge : NSObject, NSCoding {
     private let timerStartsAtKey = "timerStartsAt"
     private let timerExpiresInKey = "timerExpiresIn"
     
-    @objc let actionID: String
+    let actionID: String
     private var reinforcementDecisions: [String] = []
     private var initialSize: Int = 0
     private var timerStartsAt: Int64 = 0
@@ -41,7 +41,7 @@ internal class Cartridge : NSObject, NSCoding {
     ///     - timerStartsAt: The start time for a sync timer.
     ///     - timerExpiresIn: The timer length for a sync timer.
     ///
-    @objc init(actionID: String, initialSize: Int=0, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 0) {
+    init(actionID: String, initialSize: Int=0, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 0) {
         self.actionID = actionID
         super.init()
         if let savedCartridgeData = defaults.object(forKey: defaultsKey()) as? NSData,
@@ -96,7 +96,7 @@ internal class Cartridge : NSObject, NSCoding {
     
     /// Clears the saved reinforcement decisions and sync triggers from NSUserDefaults
     ///
-    @objc func erase() {
+    func erase() {
         self.reinforcementDecisions.removeAll()
         self.initialSize = 0
         self.timerStartsAt = 0
@@ -106,7 +106,7 @@ internal class Cartridge : NSObject, NSCoding {
     
     /// Returns whether the cartridge has been triggered for a sync
     ///
-    @objc func isTriggered() -> Bool {
+    func isTriggered() -> Bool {
         return timerDidExpire() || isCapacityToSync()
     }
     
@@ -136,7 +136,7 @@ internal class Cartridge : NSObject, NSCoding {
     
     /// Adds a reinforcement decision to the cartridge
     ///
-    @objc func add(reinforcementDecision: String) {
+    func add(reinforcementDecision: String) {
         reinforcementDecisions.append(reinforcementDecision)
     }
     
@@ -144,7 +144,7 @@ internal class Cartridge : NSObject, NSCoding {
     ///
     /// - returns: A fresh reinforcement decision if any are stored, else `neutralResponse`
     ///
-    @objc func remove() -> String {
+    func remove() -> String {
         if isFresh() {
             let reinforcementDecision = reinforcementDecisions.removeFirst()
             defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey())
@@ -159,7 +159,7 @@ internal class Cartridge : NSObject, NSCoding {
     /// - parameters:
     ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if the cartridge is already being synced by another thread.
     ///
-    @objc func sync(completion: @escaping (Int) -> () = { _ in }) {
+    func sync(completion: @escaping (Int) -> () = { _ in }) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
                 completion(0)
@@ -191,7 +191,7 @@ internal class Cartridge : NSObject, NSCoding {
     
     /// This function returns a snapshot of this instance as a JSON compatible Object
     ///
-    @objc func toJSONType() -> [String: Any] {
+    func toJSONType() -> [String: Any] {
         return [
             actionIDKey : actionID,
             "size" : reinforcementDecisions.count,

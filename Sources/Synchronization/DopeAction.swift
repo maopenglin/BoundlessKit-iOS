@@ -17,11 +17,11 @@ internal class DopeAction : NSObject, NSCoding {
     private let utcKey = "utc"
     private let timezoneOffsetKey = "timezoneOffset"
     
-    @objc var actionID:String
-    @objc var reinforcementDecision:String?
-    @objc var metaData:[String: Any]?
-    @objc var utc:Int64
-    @objc var timezoneOffset:Int64
+    var actionID:String
+    var reinforcementDecision:String?
+    var metaData:[String: Any]?
+    var utc:Int64
+    var timezoneOffset:Int64
     
     private static let versionNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
     private static let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
@@ -35,7 +35,7 @@ internal class DopeAction : NSObject, NSCoding {
     ///     - utc: Time the action occured in utc milliseconds. Defaults to the current time.
     ///     - timezoneOffset: Local timezone offset for the time the action occured in milliseconds. Defaults to the current device timezone.
     ///
-    @objc init(actionID:String,
+    init(actionID:String,
                 reinforcementDecision:String? = nil,
                 metaData:[String:Any]? = nil,
                 utc:Int64 = Int64( 1000*Date().timeIntervalSince1970 ),
@@ -78,7 +78,7 @@ internal class DopeAction : NSObject, NSCoding {
     
     /// This function converts a DopeAction to a JSON compatible Object
     ///
-    @objc func toJSONType() -> [String : Any] {
+    func toJSONType() -> [String : Any] {
         var jsonObject: [String:Any] = [:]
         
         jsonObject[actionIDKey] = actionID

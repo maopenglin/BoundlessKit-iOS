@@ -9,7 +9,7 @@
 import Foundation
 import AdSupport
 
-
+@objc
 public class DopamineAPI : NSObject{
     
     /// Valid API actions appeneded to the DopamineAPI URL
@@ -25,7 +25,7 @@ public class DopamineAPI : NSObject{
         }
     }
     
-    @objc internal static let sharedInstance: DopamineAPI = DopamineAPI()
+    internal static let sharedInstance: DopamineAPI = DopamineAPI()
     
     private static let dopamineAPIURL = "https://api.usedopamine.com/v4/"
     private static let clientSDKVersion = Bundle(for: DopamineAPI.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
@@ -42,7 +42,7 @@ public class DopamineAPI : NSObject{
     ///     - actions: An array of actions to send.
     ///     - completion: A closure to handle the JSON formatted response.
     ///
-    @objc internal static func track(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
+    internal static func track(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
         // create dict with credentials
         var payload = sharedInstance.configurationData
         
@@ -65,7 +65,7 @@ public class DopamineAPI : NSObject{
     ///     - actions: An array of actions to send.
     ///     - completion: A closure to handle the JSON formatted response.
     ///
-    @objc internal static func report(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
+    internal static func report(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
         var payload = sharedInstance.configurationData
         
         var reinforcedActionsArray = Array<Any>()
@@ -86,7 +86,7 @@ public class DopamineAPI : NSObject{
     ///     - actionID: The actionID that needs reinforcement decisions.
     ///     - completion: A closure to handle the JSON formatted response.
     ///
-    @objc internal static func refresh(_ actionID: String, completion: @escaping ([String:Any]) -> ()){
+    internal static func refresh(_ actionID: String, completion: @escaping ([String:Any]) -> ()){
         var payload = sharedInstance.configurationData
         
         payload["actionID"] = actionID
@@ -104,7 +104,7 @@ public class DopamineAPI : NSObject{
     ///     - exceptions: The array of DopeExceptions to send
     ///     - completion: A closure to handle the JSON formatted response.
     ///
-    @objc internal static func sync( syncOverviews: [SyncOverview], dopeExceptions: [DopeException], completion: @escaping ([String:Any]) -> ()){
+    internal static func sync( syncOverviews: [SyncOverview], dopeExceptions: [DopeException], completion: @escaping ([String:Any]) -> ()){
         var payload = sharedInstance.configurationData
         
         var syncOverviewJSONArray: [Any] = []
@@ -236,13 +236,12 @@ public class DopamineAPI : NSObject{
     private lazy var configurationData: [String: Any] = {
         
         var dict: [String: Any] = [ "clientOS": "iOS",
-                                    "clientOSVersion": clientOSVersion,
-                                    "clientSDKVersion": clientSDKVersion,
+                                    "clientOSVersion": DopamineAPI.clientOSVersion,
+                                    "clientSDKVersion": DopamineAPI.clientSDKVersion,
                                     "primaryIdentity": self.primaryIdentity ]
         
-        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled,
-            let advertisingIdentifier = ASIdentifierManager.shared().advertisingIdentifier {
-            dict["advertisingID"] = advertisingIdentifier
+        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
+            dict["advertisingID"] = ASIdentifierManager.shared().advertisingIdentifier
         }
         
         // create a credentials dict from .plist

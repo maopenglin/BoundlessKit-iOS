@@ -9,17 +9,17 @@
 import Foundation
 internal class DopeException : NSObject, NSCoding {
     
-    @objc static let utcKey = "utc"
-    @objc static let timezoneOffsetKey = "timezoneOffset"
-    @objc static let exceptionClassNameKey = "class"
-    @objc static let messageKey = "message"
-    @objc static let stackTraceKey = "stackTrace"
+    static let utcKey = "utc"
+    static let timezoneOffsetKey = "timezoneOffset"
+    static let exceptionClassNameKey = "class"
+    static let messageKey = "message"
+    static let stackTraceKey = "stackTrace"
     
-    @objc var utc: Int64
-    @objc var timezoneOffset: Int64
-    @objc var exceptionClassName: String
-    @objc var message: String
-    @objc var stackTrace: String
+    var utc: Int64
+    var timezoneOffset: Int64
+    var exceptionClassName: String
+    var message: String
+    var stackTrace: String
     
     /// Use this object to record the performance of a synchronization
     ///
@@ -28,7 +28,7 @@ internal class DopeException : NSObject, NSCoding {
     ///     - timerStartsAt: The start time for a sync timer. Defaults to 0.
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
-    @objc init(exceptionClassName: String, message: String, stackTrace: String) {
+    init(exceptionClassName: String, message: String, stackTrace: String) {
         self.utc = Int64( 1000*Date().timeIntervalSince1970 )
         self.timezoneOffset = Int64( 1000*NSTimeZone.default.secondsFromGMT() )
         self.exceptionClassName = exceptionClassName
@@ -58,7 +58,7 @@ internal class DopeException : NSObject, NSCoding {
     
     /// This function converts a DopeAction to a JSON compatible Object
     ///
-    @objc func toJSONType() -> [String : Any] {
+    func toJSONType() -> [String : Any] {
         var jsonObject: [String:Any] = [:]
         
         jsonObject[DopeException.utcKey] = NSNumber(value: utc)

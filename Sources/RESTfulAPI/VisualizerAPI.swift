@@ -8,6 +8,7 @@
 
 import Foundation
 
+@objc
 public class VisualizerAPI : NSObject {
     
     /// Valid API actions appeneded to the VisualizerAPI URL
@@ -23,6 +24,7 @@ public class VisualizerAPI : NSObject {
         }
     }
     
+    @objc
     public static let shared = VisualizerAPI()
     private static let baseURL = "https://dashboard-api.usedopamine.com/"
     
@@ -87,6 +89,7 @@ public class VisualizerAPI : NSObject {
         tracesQueue.maxConcurrentOperationCount = 1
     }
     
+    @objc
     public func retrieveRewards() {
         var payload = configurationData
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
@@ -94,6 +97,7 @@ public class VisualizerAPI : NSObject {
         send(call: .boot, with: payload){ _ in }
     }
     
+    @objc
     public static func recordEvent(touch: UITouch) {
         DispatchQueue.global().async {
             if let touchView = touch.view {
@@ -212,6 +216,7 @@ public class VisualizerAPI : NSObject {
         }
     }
     
+    @objc
     public static func recordAction(senderInstance: AnyObject, targetInstance: AnyObject, selectorObj: Selector, event: UIEvent) {
         DispatchQueue.global().async {
             let senderClassname = NSStringFromClass(type(of: senderInstance))
@@ -599,8 +604,8 @@ public class VisualizerAPI : NSObject {
     private lazy var configurationData: [String: Any] = {
         
         var dict: [String: Any] = [ "clientOS": "iOS",
-                                    "clientOSVersion": clientOSVersion,
-                                    "clientSDKVersion": clientSDKVersion,
+                                    "clientOSVersion": VisualizerAPI.clientOSVersion,
+                                    "clientSDKVersion": VisualizerAPI.clientSDKVersion,
                                     "primaryIdentity" : self.primaryIdentity ]
         
         // create a credentials dict from .plist
