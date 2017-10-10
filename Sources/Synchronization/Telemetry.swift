@@ -182,7 +182,7 @@ internal class Telemetry {
                 syncOverview.totalSyncTime = Int64(1000*NSDate().timeIntervalSince1970) - syncOverview.utc
                 syncOverviewArray.append(syncOverview)
                 currentSyncOverview = nil
-                DopamineKit.debugLog("Saved a sync overview, totaling \(syncOverviewArray.count) overviews - \n\(syncOverview.toJSONType())")
+//                DopamineKit.debugLog("Saved a sync overview, totaling \(syncOverviewArray.count) overviews - \n\(syncOverview.toJSONType())")
             } else {
                 DopamineKit.debugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
             }

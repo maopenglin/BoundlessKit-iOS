@@ -28,14 +28,10 @@ open class DopamineKit : NSObject {
     ///
     open static func track(_ actionID: String, metaData: [String: Any]? = nil) {
         // store the action to be synced
-//        if true {
-//            debugLog("actionID:\(actionID) metaData:\(String(describing: metaData))")
-//            return
-//        }
         DispatchQueue.global(qos: .background).async {
             let action = DopeAction(actionID: actionID, metaData:metaData)
             syncCoordinator.store(trackedAction: action)
-            debugLog("tracked:\(actionID) with metadata:\(String(describing: metaData))")
+//            debugLog("tracked:\(actionID) with metadata:\(String(describing: metaData))")
         }
     }
     
@@ -49,9 +45,6 @@ open class DopamineKit : NSObject {
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
     open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, completion: @escaping (String) -> ()) {
-//        if true {
-//            return
-//        }
         let action = DopeAction(actionID: actionID, metaData: metaData)
         action.reinforcementDecision = syncCoordinator.retrieveReinforcementDecisionFor(actionID: action.actionID)
         
@@ -78,7 +71,7 @@ open class DopamineKit : NSObject {
                 functionSignature.replaceSubrange(parameterNames, with: "()")
             }
             let fileName = NSString(string: filePath).lastPathComponent
-            NSLog("[\(fileName):\(line):\(functionSignature)] - \(message)")
+            print("[\(fileName):\(line):\(functionSignature)] - \(message)")
         #endif
     }
 

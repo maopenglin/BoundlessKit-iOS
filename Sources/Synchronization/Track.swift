@@ -157,11 +157,11 @@ internal class Track : NSObject, NSCoding {
     func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
-                DopamineKit.debugLog("Track sync already happening")
                 completion(0)
                 return
             }
             self.syncInProgress = true
+            DopamineKit.debugLog("Track sync in progress...")
             self.trackedActionsQueue.waitUntilAllOperationsAreFinished()
             self.trackedActionsQueue.isSuspended = true
             let syncFinished = {

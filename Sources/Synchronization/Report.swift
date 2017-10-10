@@ -149,11 +149,11 @@ internal class Report : NSObject, NSCoding {
     func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
-                DopamineKit.debugLog("Report sync already happening")
                 completion(0)
                 return
             }
             self.syncInProgress = true
+            DopamineKit.debugLog("Report sync in progress...")
             
             if self.reportedActions.count == 0 {
                 defer { self.syncInProgress = false }

@@ -30,7 +30,7 @@ public class VisualizerAPI : NSObject {
     private static let clientOS = "iOS"
     private static let clientOSVersion = UIDevice.current.systemVersion
     
-    static var connectionID: String? //= "dev"
+    static var connectionID: String?
     private let tracesQueue = OperationQueue()
     private var visualizerMappings: [String:[String:Any]]? = nil
     private var rewardMappings: [String:[String:Any]] = {
@@ -48,6 +48,7 @@ public class VisualizerAPI : NSObject {
             for actionID in mappings.keys {
                 Cartridge(actionID: actionID).sync()
             }
+            DopamineKit.debugLog("🆕 Updated reward mapping version!")
         }
     }
     
@@ -55,13 +56,13 @@ public class VisualizerAPI : NSObject {
         let pairingKey = [sender, target, selector].joined(separator: "-")
         if visualizerMappings != nil,
             let rewardParameters = visualizerMappings![pairingKey] {
-            DopamineKit.debugLog("Found real time rewarded event <\(pairingKey)> with parameters:<\(rewardParameters)>")
+            DopamineKit.debugLog("Found real time visualizer reward for <\(pairingKey)>")
             if let reinforcements = rewardParameters["reinforcements"] as? [[String:Any]] {
                 let reinforcement = reinforcements.randomElement()
                 completion(reinforcement)
             }
         } else if let rewardParameters = rewardMappings[pairingKey] {
-            DopamineKit.debugLog("Found rewarded event <\(pairingKey)> with parameters:<\(rewardParameters)>")
+            DopamineKit.debugLog("Found reward for <\(pairingKey)>")
             if let actionID = rewardParameters["actionID"] as? String,
                 let reinforcements = rewardParameters["reinforcements"] as? [[String:Any]] {
                 DopamineKit.reinforce(actionID) { reinforcementType in
@@ -76,7 +77,7 @@ public class VisualizerAPI : NSObject {
                 DopamineKit.debugLog("Bad reward parameters")
             }
         } else {
-            DopamineKit.debugLog("No reward pairing found for <\(pairingKey)>")
+//            DopamineKit.debugLog("No reward pairing found for <\(pairingKey)>")
         }
     }
     
@@ -146,7 +147,7 @@ public class VisualizerAPI : NSObject {
                                         view = superview
                                         location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                     } else {
-                                        DopamineKit.debugLog("Oh no. Sender is not a UIView or has no superview. No reward for you.")
+                                        DopamineKit.debugLog("Oh no. TouchView has no superview. No reward for you.")
                                         break showReward
                                     }
                                     
@@ -157,7 +158,6 @@ public class VisualizerAPI : NSObject {
                                 case "custom":
                                     if viewCustom != "" {
                                         let viewCustomParams = viewCustom.components(separatedBy: "$")
-                                        DopamineKit.debugLog("ViewCustomParams:\(viewCustomParams)")
                                         if viewCustomParams.count == 2,
                                             let index = Int(viewCustomParams[1]) {
                                             let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: viewCustomParams[0])
@@ -219,23 +219,11 @@ public class VisualizerAPI : NSObject {
                 
                 // send event to visualizer if connected
                 if let connectionID = connectionID {
-                    // send event
                     var payload = shared.configurationData
-                    
-                    
-                    //        payload["officerID"] = officerID
                     payload["connectionUUID"] = connectionID
                     payload["sender"] = senderClassname
                     payload["target"] = targetName
                     payload["selector"] = selectorName
-//                    DispatchQueue.main.sync {
-//                        //test
-//                        if let imageString = touchView.imageAsBase64EncodedString() {
-//                            payload["senderImage"] = imageString
-//                        } else {
-//                            NSLog("Cannot create image for class type:<\(type(of: touchView))>!")
-//                        }
-//                    }
                     payload["senderImage"] = ""
                     payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                     payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
@@ -287,7 +275,7 @@ public class VisualizerAPI : NSObject {
                                     view = sv
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
-                                    DopamineKit.debugLog("Oh no. Sender is not a UIView or has no view property.")
+                                    DopamineKit.debugLog("Oh no. Sender is not a UIView or has no view property. No reward for you.")
                                     break showReward
                                 }
                                 
@@ -296,10 +284,14 @@ public class VisualizerAPI : NSObject {
                                     let superview = senderInstance.superview {
                                     view = superview
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                } else if senderInstance.responds(to: Selector("view")),
+                                    let sv = senderInstance.value(forKey: "view") as? UIView,
+                                    let ssv = sv.superview {
+                                    view = ssv
+                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
-                                    DopamineKit.debugLog("Oh no. Sender is not a UIView or has no superview. Doing touch")
-                                    view = UIApplication.shared.keyWindow!
-                                    location = Helper.lastTouchLocationInUIWindow
+                                    DopamineKit.debugLog("Oh no. Sender is not a UIView or has no superview. No reward for you.")
+                                    break showReward
                                 }
                                 
                             case "target":
@@ -341,7 +333,7 @@ public class VisualizerAPI : NSObject {
                                 
                                 
                             default:
-                                DopamineKit.debugLog("Oh no. Unknown reward type primitive. No reward for you.")
+                                DopamineKit.debugLog("Oh no. Unknown view type. No reward for you.")
                                 break showReward
                             }
                             
@@ -364,7 +356,6 @@ public class VisualizerAPI : NSObject {
                                     let spin = reinforcement["Spin"] as? CGFloat,
                                     let velocity = reinforcement["Velocity"] as? CGFloat
                                 {
-                                    // Touch
                                     view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
                                 }
                                 
@@ -381,17 +372,14 @@ public class VisualizerAPI : NSObject {
             
             // send event to visualizer if connected
             if let connectionID = connectionID {
-                // send event
                 var payload = shared.configurationData
-                
-                
-                //        payload["officerID"] = officerID
+                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
+                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                 payload["connectionUUID"] = connectionID
                 payload["sender"] = senderClassname
                 payload["target"] = targetClassname
                 payload["selector"] = selectorName
                 DispatchQueue.main.sync {
-                    //test
                     if let view = senderInstance as? UIView,
                         let imageString = view.imageAsBase64EncodedString() {
                         payload["senderImage"] = imageString
@@ -399,13 +387,15 @@ public class VisualizerAPI : NSObject {
                         let image = barItem.image,
                         let imageString = image.base64EncodedPNGString() {
                         payload["senderImage"] = imageString
+                    } else if senderInstance.responds(to: Selector("view")),
+                        let sv = senderInstance.value(forKey: "view") as? UIView,
+                        let imageString = sv.imageAsBase64EncodedString() {
+                        payload["senderImage"] = imageString
                     } else {
                         NSLog("Cannot create image, please message team@usedopamine.com to add support for visualizer snapshots of class type:<\(type(of: senderInstance))>!")
                     }
                 }
 //                payload["senderImage"] = ""
-                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                 shared.send(call: .submit, with: payload){ response in
                     if response["status"] as? Int != 200 {
                         VisualizerAPI.connectionID = nil
@@ -416,7 +406,6 @@ public class VisualizerAPI : NSObject {
     }
     
     public static func promptPairing() {
-//        return
         var payload = shared.configurationData
         payload["deviceName"] = UIDevice.current.name
         
@@ -498,99 +487,95 @@ public class VisualizerAPI : NSObject {
             DopamineKit.debugLog("Could not construct for \(type.pathExtenstion)")
             return
         }
-        
-        DopamineKit.debugLog("Preparing \(type.pathExtenstion) api call to \(url.absoluteString)...")
-        do {
-            var request = URLRequest(url: url)
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpMethod = "POST"
-            request.timeoutInterval = timeout
-            let jsonPayload = try JSONSerialization.data(withJSONObject: payload, options: JSONSerialization.WritingOptions())
-            //            DopamineKit.debugLog("sending raw payload:\(jsonPayload.debugDescription)")   // hex 16 chars
-            request.httpBody = jsonPayload
-            
-            let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
-            let task = URLSession.shared.dataTask(with: request, completionHandler: { responseData, responseURL, error in
-                var responseDict: [String : Any] = [:]
-                defer { completion(responseDict) }
+        tracesQueue.addOperation {
+//            DopamineKit.debugLog("Preparing \(type.pathExtenstion) api call to \(url.absoluteString)...")
+            do {
+                var request = URLRequest(url: url)
+                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                request.httpMethod = "POST"
+                request.timeoutInterval = timeout
+                let jsonPayload = try JSONSerialization.data(withJSONObject: payload, options: JSONSerialization.WritingOptions())
+                request.httpBody = jsonPayload
                 
-                if responseURL == nil {
-                    DopamineKit.debugLog("❌ invalid response:\(String(describing: error?.localizedDescription))")
-                    responseDict["error"] = error?.localizedDescription
-                    return
-                }
-                
-                if let responseData = responseData,
-                    responseData.isEmpty {
-                    DopamineKit.debugLog("✅\(type.pathExtenstion) call got empty response.")
-                    return
-                }
-                
-                do {
-                    // turn the response into a json object
-                    guard let data = responseData,
-                        let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
-                        else {
-                            let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
-                            let message = "❌ Error reading \(type.pathExtenstion) response data, not a dictionary: \(json)"
-                            DopamineKit.debugLog(message)
-                            Telemetry.storeException(className: "JSONSerialization", message: message)
-                            return
-                    }
-                    responseDict = dict
-                    DopamineKit.debugLog("✅\(type.pathExtenstion) call got response:\(responseDict.debugDescription)")
+                let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
+                let task = URLSession.shared.dataTask(with: request, completionHandler: { responseData, responseURL, error in
+                    var responseDict: [String : Any] = [:]
+                    defer { completion(responseDict) }
                     
-                    if (type == .boot) || (type == .submit  && self.tracesQueue.operationCount <= 1) {
-                        if (type == .boot && responseDict["status"] as? Int == 205) || (type == .submit && responseDict["status"] as? Int == 200) {
-                            if let apiMappings = responseDict["mappings"] as? [[String:Any]] {
-                                var tempDict = [String : [String : Any]]()
-                                for mappings in apiMappings {
-                                    if let sender = mappings["sender"],
-                                        let target = mappings["target"],
-                                        let selector = mappings["selector"]
-                                    {
-                                        tempDict["\(sender)-\(target)-\(selector)"] = mappings
-                                    } else if let actionID = mappings["actionID"] as? String,
-                                        let reinforcements = mappings["reinforcement"] as? [[String: Any]] {
-                                        tempDict[actionID] = ["actionID":actionID, "reinforcements":reinforcements]
-                                    } else {
-                                        DopamineKit.debugLog("Invalid mapping")
+                    if responseURL == nil {
+                        DopamineKit.debugLog("❌ invalid response:\(String(describing: error?.localizedDescription))")
+                        responseDict["error"] = error?.localizedDescription
+                        return
+                    }
+                    
+                    if let responseData = responseData,
+                        responseData.isEmpty {
+                        DopamineKit.debugLog("✅\(type.pathExtenstion) call got empty response.")
+                        return
+                    }
+                    
+                    do {
+                        // turn the response into a json object
+                        guard let data = responseData,
+                            let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
+                            else {
+                                let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
+                                let message = "❌ Error reading \(type.pathExtenstion) response data, not a dictionary: \(json)"
+                                DopamineKit.debugLog(message)
+                                Telemetry.storeException(className: "JSONSerialization", message: message)
+                                return
+                        }
+                        responseDict = dict
+                        //                    DopamineKit.debugLog("✅\(type.pathExtenstion) call got response:\(responseDict.debugDescription)")
+                        DopamineKit.debugLog("✅\(type.pathExtenstion) call got response with status:\(responseDict["status"] ?? "unknown")")
+                        
+                        if (type == .boot) || (type == .submit  && self.tracesQueue.operationCount <= 1) {
+                            if (type == .boot && responseDict["status"] as? Int == 205) || (type == .submit && responseDict["status"] as? Int == 200) {
+                                if let apiMappings = responseDict["mappings"] as? [[String:Any]] {
+                                    var tempDict = [String : [String : Any]]()
+                                    for mappings in apiMappings {
+                                        if let sender = mappings["sender"],
+                                            let target = mappings["target"],
+                                            let selector = mappings["selector"]
+                                        {
+                                            tempDict["\(sender)-\(target)-\(selector)"] = mappings
+                                        } else if let actionID = mappings["actionID"] as? String,
+                                            let reinforcements = mappings["reinforcement"] as? [[String: Any]] {
+                                            tempDict[actionID] = ["actionID":actionID, "reinforcements":reinforcements]
+                                        } else {
+                                            DopamineKit.debugLog("Invalid mapping")
+                                        }
                                     }
-                                }
-                                print("New mapping:\(tempDict)")
-                                if type == .submit {
-                                    VisualizerAPI.shared.visualizerMappings = tempDict
-                                } else { // .boot
-                                    if let newVersionID = responseDict["newVersionID"] as? String {
-                                        VisualizerAPI.shared.setNewRewardMappings(mappings: tempDict, newVersionID: newVersionID)
-                                    } else {
-                                        DopamineKit.debugLog("Missing 'newVersionID'")
+                                    if type == .submit {
+                                        VisualizerAPI.shared.visualizerMappings = tempDict
+                                    } else { // .boot
+                                        if let newVersionID = responseDict["newVersionID"] as? String {
+                                            VisualizerAPI.shared.setNewRewardMappings(mappings: tempDict, newVersionID: newVersionID)
+                                        } else {
+                                            DopamineKit.debugLog("Missing 'newVersionID'")
+                                        }
                                     }
                                 }
                             }
                         }
+                        
+                    } catch {
+                        let message = "❌ Error reading \(type.pathExtenstion) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))
+                        DopamineKit.debugLog(message)
+                        return
                     }
                     
-                } catch {
-                    let message = "❌ Error reading \(type.pathExtenstion) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))
-                    DopamineKit.debugLog(message)
-                    return
-                }
+                })
                 
-            })
-            
-            // send request
-//            DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
-            //test
-            tracesQueue.addOperation {
+                // send request
+                //            DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
                 task.resume()
+                
+            } catch {
+                let message = "Error sending \(type.pathExtenstion) api call with payload:(\(payload.description))"
+                DopamineKit.debugLog(message)
+                Telemetry.storeException(className: "JSONSerialization", message: message)
             }
-            DopamineKit.debugLog("Traces queued:\(tracesQueue.operationCount)")
-            
-        } catch {
-            let message = "Error sending \(type.pathExtenstion) api call with payload:(\(payload.description))"
-            DopamineKit.debugLog(message)
-            Telemetry.storeException(className: "JSONSerialization", message: message)
         }
     }
     
@@ -671,7 +656,6 @@ public class VisualizerAPI : NSObject {
             defaults.setValue(defaultIdentity, forKey: key)
             return defaultIdentity
         }
-//        return "Akash"
     }()
 
 }
