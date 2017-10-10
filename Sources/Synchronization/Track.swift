@@ -11,7 +11,7 @@ import Foundation
 @objc
 internal class Track : NSObject, NSCoding {
     
-    @objc static let sharedInstance = Track()
+    static let sharedInstance = Track()
     
     private let defaults = UserDefaults.standard
     private let defaultsKey = "DopamineTrack_v4.1.3"
@@ -108,7 +108,7 @@ internal class Track : NSObject, NSCoding {
     ///
     /// - returns: Whether a sync has been triggered.
     ///
-    @objc func isTriggered() -> Bool {
+    func isTriggered() -> Bool {
         return timerDidExpire() || isSizeToSync()
     }
     
@@ -154,7 +154,7 @@ internal class Track : NSObject, NSCoding {
     /// - parameters:
     ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if there were no actions to sync.
     ///
-    @objc func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
+    func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
                 completion(0)
@@ -195,7 +195,7 @@ internal class Track : NSObject, NSCoding {
     
     /// This function returns a snapshot of this instance as a JSON compatible Object
     ///
-    @objc func toJSONType() -> [String : Any] {
+    func toJSONType() -> [String : Any] {
         var jsonObject: [String:Any] = [:]
         
         jsonObject["size"] = NSNumber(value: trackedActions.count)

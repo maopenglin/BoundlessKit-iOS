@@ -8,6 +8,7 @@
 
 import Foundation
 
+@objc
 public class VisualizerAPI : NSObject {
     
     /// Valid API actions appeneded to the VisualizerAPI URL
@@ -23,6 +24,7 @@ public class VisualizerAPI : NSObject {
         }
     }
     
+    @objc
     public static let shared = VisualizerAPI()
     private static let baseURL = "https://dashboard-api.usedopamine.com/"
     
@@ -87,6 +89,7 @@ public class VisualizerAPI : NSObject {
         retrieveRewards()
     }
     
+    @objc
     public func retrieveRewards() {
         var payload = configurationData
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
@@ -94,6 +97,7 @@ public class VisualizerAPI : NSObject {
         send(call: .boot, with: payload){ _ in }
     }
     
+    @objc
     public static func recordEvent(touch: UITouch) {
         DispatchQueue.global().async {
             if let touchView = touch.view {
@@ -238,6 +242,7 @@ public class VisualizerAPI : NSObject {
         }
     }
     
+    @objc
     public static func recordAction(senderInstance: AnyObject, targetInstance: AnyObject, selectorObj: Selector, event: UIEvent) {
         DispatchQueue.global().async {
             let senderClassname = NSStringFromClass(type(of: senderInstance))
@@ -270,7 +275,7 @@ public class VisualizerAPI : NSObject {
                                 if let senderInstance = senderInstance as? UIView {
                                     view = senderInstance
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else if senderInstance.responds(to: Selector("view")),
+                                } else if senderInstance.responds(to: NSSelectorFromString("view")),
                                     let sv = senderInstance.value(forKey: "view") as? UIView {
                                     view = sv
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
@@ -284,7 +289,7 @@ public class VisualizerAPI : NSObject {
                                     let superview = senderInstance.superview {
                                     view = superview
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else if senderInstance.responds(to: Selector("view")),
+                                } else if senderInstance.responds(to: NSSelectorFromString("view")),
                                     let sv = senderInstance.value(forKey: "view") as? UIView,
                                     let ssv = sv.superview {
                                     view = ssv
@@ -298,7 +303,7 @@ public class VisualizerAPI : NSObject {
                                 if let targetInstance = targetInstance as? UIView {
                                     view = targetInstance
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else if targetInstance.responds(to: Selector("view")),
+                                } else if targetInstance.responds(to: NSSelectorFromString("view")),
                                     let tv = targetInstance.value(forKey: "view") as? UIView {
                                     view = tv
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
@@ -387,7 +392,7 @@ public class VisualizerAPI : NSObject {
                         let image = barItem.image,
                         let imageString = image.base64EncodedPNGString() {
                         payload["senderImage"] = imageString
-                    } else if senderInstance.responds(to: Selector("view")),
+                    } else if senderInstance.responds(to: NSSelectorFromString("view")),
                         let sv = senderInstance.value(forKey: "view") as? UIView,
                         let imageString = sv.imageAsBase64EncodedString() {
                         payload["senderImage"] = imageString
@@ -405,6 +410,7 @@ public class VisualizerAPI : NSObject {
         }
     }
     
+    @objc
     public static func promptPairing() {
         var payload = shared.configurationData
         payload["deviceName"] = UIDevice.current.name
@@ -589,8 +595,8 @@ public class VisualizerAPI : NSObject {
     private lazy var configurationData: [String: Any] = {
         
         var dict: [String: Any] = [ "clientOS": "iOS",
-                                    "clientOSVersion": clientOSVersion,
-                                    "clientSDKVersion": clientSDKVersion,
+                                    "clientOSVersion": VisualizerAPI.clientOSVersion,
+                                    "clientSDKVersion": VisualizerAPI.clientSDKVersion,
                                     "primaryIdentity" : self.primaryIdentity ]
         
         // create a credentials dict from .plist

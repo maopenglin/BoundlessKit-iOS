@@ -100,9 +100,6 @@ open class CandyBar: UIView {
         CandyBar.topWindow()!.addSubview(self)
         forceUpdates()
         let (damping, velocity) = self.springiness.springValues
-        if adjustsStatusBarStyle {
-            UIApplication.shared.setStatusBarStyle(preferredStatusBarStyle, animated: true)
-        }
         UIView.animate(withDuration: animationDuration, delay: 0.0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: .allowUserInteraction, animations: {
             self.candybarState = .showing
             }, completion: { finished in
@@ -121,10 +118,6 @@ open class CandyBar: UIView {
     ///
     @objc open static func hexStringToUIColor (_ hex:String) -> UIColor {
         var cString:String = hex.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines as CharacterSet).uppercased()
-        
-        if (cString.hasPrefix("#")) {
-            cString = cString.substring(from: cString.characters.index(cString.startIndex, offsetBy: 1))
-        }
         
         if ((cString.characters.count) != 6) {
             return UIColor.gray
@@ -186,9 +179,6 @@ open class CandyBar: UIView {
     ///
     /// If the candybar's `adjustsStatusBarStyle` is false, this property does nothing.
     @objc open var preferredStatusBarStyle = UIStatusBarStyle.lightContent
-    
-    /// Whether or not this candybar should adjust the status bar style during its presentation. Defaults to `false`.
-    @objc open var adjustsStatusBarStyle = false
     
     /// Whether the candybar should appear at the top or the bottom of the screen. Defaults to `.Top`.
     @objc open var position = CandyBarPosition.bottom
