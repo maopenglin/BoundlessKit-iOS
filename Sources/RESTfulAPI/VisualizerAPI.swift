@@ -42,25 +42,18 @@ public class VisualizerAPI : NSObject {
         UserDefaults.standard.set(mappings, forKey: "Visualizer.rewardMappings")
     }
     
-    public func showRewardFor(sender: String, target: String, selector: String, rewardFunction: @escaping ([String:Any]) -> Void) {
+    public func getMappingFor(sender: String, target: String, selector: String) -> [String:Any]? {
         let pairingKey = [sender, target, selector].joined(separator: "-")
         if visualizerMappings != nil,
             let rewardParameters = visualizerMappings![pairingKey] {
             DopamineKit.debugLog("Found real time rewarded event <\(pairingKey)> with parameters:<\(rewardParameters)>")
-            DispatchQueue.main.async {
-                rewardFunction(rewardParameters)
-            }
-            return
-        }
-        if let rewardParameters = rewardMappings[pairingKey] {
+            return rewardParameters
+        } else if let rewardParameters = rewardMappings[pairingKey] {
             DopamineKit.debugLog("Found rewarded event <\(pairingKey)> with parameters:<\(rewardParameters)>")
-            
-            // TODO: enclose in DopamineKit.reinfoce(). temporary inside main dispatch
-            DispatchQueue.main.async {
-                rewardFunction(rewardParameters)
-            }
+            return rewardParameters
         } else {
             DopamineKit.debugLog("No reward pairing found for <\(pairingKey)>")
+            return nil
         }
     }
     
@@ -99,99 +92,103 @@ public class VisualizerAPI : NSObject {
                 
                 
                 // display reward if reward is set for this event
-                shared.showRewardFor(sender: senderClassname, target: targetName, selector: selectorName) { rewardParams in
-                    showReward: do {
-                        if let reinforcements = rewardParams["reinforcements"] as? [[String:Any]] {
-                            let reinforcement = reinforcements.randomElement()
-                            if let viewOption = reinforcement["ViewOption"] as? String,
-                                let viewCustom = reinforcement["ViewCustom"] as? String,
-                                let viewMarginX = reinforcement["ViewMarginX"] as? CGFloat,
-                                let viewMarginY = reinforcement["ViewMarginY"] as? CGFloat,
-                                let reinforcementType = reinforcement["primitive"] as? String
-                            {
-                                let view: UIView
-                                var location: CGPoint
-                                switch viewOption {
-                                case "fixed":
-                                    view = UIApplication.shared.keyWindow!
-                                    location = CGPoint(x: viewMarginX, y: viewMarginY)
-                                    
-                                case "touch":
-                                    view = UIApplication.shared.keyWindow!
-                                    location = Helper.lastTouchLocationInUIWindow
-                                
-                                case "sender":
-                                    view = UIApplication.shared.keyWindow!
-                                    location = Helper.lastTouchLocationInUIWindow
-                                    
-                                case "superview":
-                                    if let superview = touchView.superview {
-                                        view = superview
+                if let rewardParams = shared.getMappingFor(sender: senderClassname, target: targetName, selector: selectorName) {
+                    
+                    if let reinforcements = rewardParams["reinforcements"] as? [[String:Any]] {
+                        let reinforcement = reinforcements.randomElement()
+                        if let delay = reinforcement["Delay"] as? Double,
+                            let viewOption = reinforcement["ViewOption"] as? String,
+                            let viewCustom = reinforcement["ViewCustom"] as? String,
+                            let viewMarginX = reinforcement["ViewMarginX"] as? CGFloat,
+                            let viewMarginY = reinforcement["ViewMarginY"] as? CGFloat,
+                            let reinforcementType = reinforcement["primitive"] as? String
+                        {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                                showReward: do {
+                                    let view: UIView
+                                    var location: CGPoint
+                                    switch viewOption {
+                                    case "fixed":
+                                        view = UIApplication.shared.keyWindow!
+                                        location = CGPoint(x: viewMarginX, y: viewMarginY)
+                                        
+                                    case "touch":
+                                        view = UIApplication.shared.keyWindow!
+                                        location = Helper.lastTouchLocationInUIWindow
+                                        
+                                    case "sender":
+                                        view = UIApplication.shared.keyWindow!
+                                        location = Helper.lastTouchLocationInUIWindow
+                                        
+                                    case "superview":
+                                        if let superview = touchView.superview {
+                                            view = superview
+                                            location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                        } else {
+                                            DopamineKit.debugLog("Oh no. Sender is not a UIView or has no superview. No reward for you.")
+                                            break showReward
+                                        }
+                                        
+                                    case "target":
+                                        view = touchView
                                         location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                    } else {
-                                        DopamineKit.debugLog("Oh no. Sender is not a UIView or has no superview. No reward for you.")
-                                        break showReward
-                                    }
-                                    
-                                case "target":
-                                    view = touchView
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                    
-                                case "custom":
-                                    if viewCustom != "" {
-                                        let viewCustomParams = viewCustom.components(separatedBy: "$")
-                                        DopamineKit.debugLog("ViewCustomParams:\(viewCustomParams)")
-                                        if viewCustomParams.count == 2,
-                                            let index = Int(viewCustomParams[1]) {
-                                            let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: viewCustomParams[0])
-                                            if index <= possibleViews.count-1 {
-                                                view = possibleViews[index]
-                                                location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                        
+                                    case "custom":
+                                        if viewCustom != "" {
+                                            let viewCustomParams = viewCustom.components(separatedBy: "$")
+                                            DopamineKit.debugLog("ViewCustomParams:\(viewCustomParams)")
+                                            if viewCustomParams.count == 2,
+                                                let index = Int(viewCustomParams[1]) {
+                                                let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: viewCustomParams[0])
+                                                if index <= possibleViews.count-1 {
+                                                    view = possibleViews[index]
+                                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                                } else {
+                                                    DopamineKit.debugLog("Oh no. Must select which CustomView with a VALID index. No reward for you.")
+                                                    break showReward
+                                                }
                                             } else {
-                                                DopamineKit.debugLog("Oh no. Must select which CustomView with a VALID index. No reward for you.")
+                                                DopamineKit.debugLog("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
                                                 break showReward
                                             }
                                         } else {
-                                            DopamineKit.debugLog("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
+                                            DopamineKit.debugLog("Oh no. No CustomView classname set. No reward for you.")
                                             break showReward
                                         }
-                                    } else {
-                                        DopamineKit.debugLog("Oh no. No CustomView classname set. No reward for you.")
+                                        
+                                        
+                                    default:
+                                        DopamineKit.debugLog("Oh no. Unknown reward type primitive. No reward for you.")
                                         break showReward
                                     }
                                     
-                                    
-                                default:
-                                    DopamineKit.debugLog("Oh no. Unknown reward type primitive. No reward for you.")
-                                    break showReward
-                                }
-                                
-                                switch reinforcementType {
-                                    
-                                case "Emojisplosion":
-                                    if let content = reinforcement["Content"] as? String,
-                                        let xAcceleration = reinforcement["AccelX"] as? CGFloat,
-                                        let yAcceleration = reinforcement["AccelY"] as? CGFloat,
-                                        let bursts = reinforcement["Bursts"] as? Double,
-                                        let angle = reinforcement["EmissionAngle"] as? CGFloat,
-                                        let range = reinforcement["EmissionRange"] as? CGFloat,
-                                        let fadeout = reinforcement["FadeOut"] as? Float,
-                                        let lifetime = reinforcement["Lifetime"] as? Float,
-                                        let lifetimeRange = reinforcement["LifetimeRange"] as? Float,
-                                        let quantity = reinforcement["Quantity"] as? Float,
-                                        let scale = reinforcement["Scale"] as? CGFloat,
-                                        let scaleRange = reinforcement["ScaleRange"] as? CGFloat,
-                                        let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat,
-                                        let spin = reinforcement["Spin"] as? CGFloat,
-                                        let velocity = reinforcement["Velocity"] as? CGFloat
-                                    {
-                                        // Touch
-                                        view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
+                                    switch reinforcementType {
+                                        
+                                    case "Emojisplosion":
+                                        if let content = reinforcement["Content"] as? String,
+                                            let xAcceleration = reinforcement["AccelX"] as? CGFloat,
+                                            let yAcceleration = reinforcement["AccelY"] as? CGFloat,
+                                            let bursts = reinforcement["Bursts"] as? Double,
+                                            let angle = reinforcement["EmissionAngle"] as? CGFloat,
+                                            let range = reinforcement["EmissionRange"] as? CGFloat,
+                                            let fadeout = reinforcement["FadeOut"] as? Float,
+                                            let lifetime = reinforcement["Lifetime"] as? Float,
+                                            let lifetimeRange = reinforcement["LifetimeRange"] as? Float,
+                                            let quantity = reinforcement["Quantity"] as? Float,
+                                            let scale = reinforcement["Scale"] as? CGFloat,
+                                            let scaleRange = reinforcement["ScaleRange"] as? CGFloat,
+                                            let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat,
+                                            let spin = reinforcement["Spin"] as? CGFloat,
+                                            let velocity = reinforcement["Velocity"] as? CGFloat
+                                        {
+                                            // Touch
+                                            view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
+                                        }
+                                        
+                                    default:
+                                        DopamineKit.debugLog("Unknown reward type:\(String(describing: rewardParams["type"]))")
+                                        // TODO: implement delegate callback for dev defined rewards
                                     }
-                                
-                                default:
-                                    DopamineKit.debugLog("Unknown reward type:\(String(describing: rewardParams["type"]))")
-                                    // TODO: implement delegate callback for dev defined rewards
                                 }
                             }
                         } else {
@@ -241,125 +238,129 @@ public class VisualizerAPI : NSObject {
             let selectorName = NSStringFromSelector(selectorObj)
             
             // display reward if reward is set for this event
-            shared.showRewardFor(sender: senderClassname, target: targetClassname, selector: selectorName) { rewardParams in
-                showReward: do {
+            if let rewardParams = shared.getMappingFor(sender: senderClassname, target: targetClassname, selector: selectorName) {
+                
                     if let reinforcements = rewardParams["reinforcements"] as? [[String:Any]] {
                         let reinforcement = reinforcements.randomElement()
-                        if let viewOption = reinforcement["ViewOption"] as? String,
+                        if let delay = reinforcement["Delay"] as? Double,
+                            let viewOption = reinforcement["ViewOption"] as? String,
                             let viewCustom = reinforcement["ViewCustom"] as? String,
                             let viewMarginX = reinforcement["ViewMarginX"] as? CGFloat,
                             let viewMarginY = reinforcement["ViewMarginY"] as? CGFloat,
                             let reinforcementType = reinforcement["primitive"] as? String
                         {
-                            let view: UIView
-                            var location: CGPoint
-                            switch viewOption {
-                            case "fixed":
-                                view = UIApplication.shared.keyWindow!
-                                location = CGPoint(x: viewMarginX, y: viewMarginY)
-                                
-                            case "touch":
-                                view = UIApplication.shared.keyWindow!
-                                location = Helper.lastTouchLocationInUIWindow
-                                
-                            case "sender":
-                                if let senderInstance = senderInstance as? UIView {
-                                    view = senderInstance
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else if senderInstance.responds(to: Selector("view")),
-                                    let sv = senderInstance.value(forKey: "view") as? UIView {
-                                    view = sv
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else {
-                                    DopamineKit.debugLog("Oh no. Sender is not a UIView or has no view property.")
-                                    break showReward
-                                }
-                                
-                            case "superview":
-                                if let senderInstance = senderInstance as? UIView,
-                                    let superview = senderInstance.superview {
-                                    view = superview
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else {
-                                    DopamineKit.debugLog("Oh no. Sender is not a UIView or has no superview. Doing touch")
-                                    view = UIApplication.shared.keyWindow!
-                                    location = Helper.lastTouchLocationInUIWindow
-                                }
-                                
-                            case "target":
-                                if let targetInstance = targetInstance as? UIView {
-                                    view = targetInstance
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else if targetInstance.responds(to: Selector("view")),
-                                    let tv = targetInstance.value(forKey: "view") as? UIView {
-                                    view = tv
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else {
-                                    DopamineKit.debugLog("Oh no. Target is not a UIView and has no view property. Doing touch")
-                                    view = UIApplication.shared.keyWindow!
-                                    location = Helper.lastTouchLocationInUIWindow
-                                }
-                                
-                            case "custom":
-                                if viewCustom != "" {
-                                    let viewCustomParams = viewCustom.components(separatedBy: "$")
-                                    DopamineKit.debugLog("ViewCustomParams:\(viewCustomParams)")
-                                    if viewCustomParams.count == 2,
-                                        let index = Int(viewCustomParams[1]) {
-                                        let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: viewCustomParams[0])
-                                        if index <= possibleViews.count-1 {
-                                            view = possibleViews[index]
+                            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                                showReward: do {
+                                    let view: UIView
+                                    var location: CGPoint
+                                    switch viewOption {
+                                    case "fixed":
+                                        view = UIApplication.shared.keyWindow!
+                                        location = CGPoint(x: viewMarginX, y: viewMarginY)
+                                        
+                                    case "touch":
+                                        view = UIApplication.shared.keyWindow!
+                                        location = Helper.lastTouchLocationInUIWindow
+                                        
+                                    case "sender":
+                                        if let senderInstance = senderInstance as? UIView {
+                                            view = senderInstance
+                                            location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                        } else if senderInstance.responds(to: Selector("view")),
+                                            let sv = senderInstance.value(forKey: "view") as? UIView {
+                                            view = sv
                                             location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                         } else {
-                                            DopamineKit.debugLog("Oh no. Must select which CustomView with a VALID index. No reward for you.")
+                                            DopamineKit.debugLog("Oh no. Sender is not a UIView or has no view property.")
                                             break showReward
                                         }
-                                    } else {
-                                        DopamineKit.debugLog("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
+                                        
+                                    case "superview":
+                                        if let senderInstance = senderInstance as? UIView,
+                                            let superview = senderInstance.superview {
+                                            view = superview
+                                            location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                        } else {
+                                            DopamineKit.debugLog("Oh no. Sender is not a UIView or has no superview. Doing touch")
+                                            view = UIApplication.shared.keyWindow!
+                                            location = Helper.lastTouchLocationInUIWindow
+                                        }
+                                        
+                                    case "target":
+                                        if let targetInstance = targetInstance as? UIView {
+                                            view = targetInstance
+                                            location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                        } else if targetInstance.responds(to: Selector("view")),
+                                            let tv = targetInstance.value(forKey: "view") as? UIView {
+                                            view = tv
+                                            location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                        } else {
+                                            DopamineKit.debugLog("Oh no. Target is not a UIView and has no view property. Doing touch")
+                                            view = UIApplication.shared.keyWindow!
+                                            location = Helper.lastTouchLocationInUIWindow
+                                        }
+                                        
+                                    case "custom":
+                                        if viewCustom != "" {
+                                            let viewCustomParams = viewCustom.components(separatedBy: "$")
+                                            DopamineKit.debugLog("ViewCustomParams:\(viewCustomParams)")
+                                            if viewCustomParams.count == 2,
+                                                let index = Int(viewCustomParams[1]) {
+                                                let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: viewCustomParams[0])
+                                                if index <= possibleViews.count-1 {
+                                                    view = possibleViews[index]
+                                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                                } else {
+                                                    DopamineKit.debugLog("Oh no. Must select which CustomView with a VALID index. No reward for you.")
+                                                    break showReward
+                                                }
+                                            } else {
+                                                DopamineKit.debugLog("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
+                                                break showReward
+                                            }
+                                        } else {
+                                            DopamineKit.debugLog("Oh no. No CustomView classname set. No reward for you.")
+                                            break showReward
+                                        }
+                                        
+                                        
+                                    default:
+                                        DopamineKit.debugLog("Oh no. Unknown reward type primitive. No reward for you.")
                                         break showReward
                                     }
-                                } else {
-                                    DopamineKit.debugLog("Oh no. No CustomView classname set. No reward for you.")
-                                    break showReward
+                                    
+                                    switch reinforcementType {
+                                        
+                                    case "Emojisplosion":
+                                        if let content = reinforcement["Content"] as? String,
+                                            let xAcceleration = reinforcement["AccelX"] as? CGFloat,
+                                            let yAcceleration = reinforcement["AccelY"] as? CGFloat,
+                                            let bursts = reinforcement["Bursts"] as? Double,
+                                            let angle = reinforcement["EmissionAngle"] as? CGFloat,
+                                            let range = reinforcement["EmissionRange"] as? CGFloat,
+                                            let fadeout = reinforcement["FadeOut"] as? Float,
+                                            let lifetime = reinforcement["Lifetime"] as? Float,
+                                            let lifetimeRange = reinforcement["LifetimeRange"] as? Float,
+                                            let quantity = reinforcement["Quantity"] as? Float,
+                                            let scale = reinforcement["Scale"] as? CGFloat,
+                                            let scaleRange = reinforcement["ScaleRange"] as? CGFloat,
+                                            let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat,
+                                            let spin = reinforcement["Spin"] as? CGFloat,
+                                            let velocity = reinforcement["Velocity"] as? CGFloat
+                                        {
+                                            // Touch
+                                            view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
+                                        }
+                                        
+                                    default:
+                                        DopamineKit.debugLog("Unknown reward type:\(String(describing: rewardParams["type"]))")
+                                        // TODO: implement delegate callback for dev defined rewards
+                                    }
                                 }
-                                
-                                
-                            default:
-                                DopamineKit.debugLog("Oh no. Unknown reward type primitive. No reward for you.")
-                                break showReward
-                            }
-                            
-                            switch reinforcementType {
-                                
-                            case "Emojisplosion":
-                                if let content = reinforcement["Content"] as? String,
-                                    let xAcceleration = reinforcement["AccelX"] as? CGFloat,
-                                    let yAcceleration = reinforcement["AccelY"] as? CGFloat,
-                                    let bursts = reinforcement["Bursts"] as? Double,
-                                    let angle = reinforcement["EmissionAngle"] as? CGFloat,
-                                    let range = reinforcement["EmissionRange"] as? CGFloat,
-                                    let fadeout = reinforcement["FadeOut"] as? Float,
-                                    let lifetime = reinforcement["Lifetime"] as? Float,
-                                    let lifetimeRange = reinforcement["LifetimeRange"] as? Float,
-                                    let quantity = reinforcement["Quantity"] as? Float,
-                                    let scale = reinforcement["Scale"] as? CGFloat,
-                                    let scaleRange = reinforcement["ScaleRange"] as? CGFloat,
-                                    let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat,
-                                    let spin = reinforcement["Spin"] as? CGFloat,
-                                    let velocity = reinforcement["Velocity"] as? CGFloat
-                                {
-                                    // Touch
-                                    view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
-                                }
-                            
-                            default:
-                                DopamineKit.debugLog("Unknown reward type:\(String(describing: rewardParams["type"]))")
-                                // TODO: implement delegate callback for dev defined rewards
                             }
                         }
                     } else {
                         DopamineKit.debugLog("Invalid visualizer reward parameters.")
-                    }
                 }
             }
             
