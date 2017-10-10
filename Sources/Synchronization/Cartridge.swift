@@ -170,6 +170,7 @@ internal class Cartridge : NSObject, NSCoding {
             
             DopamineAPI.refresh(self.actionID) { response in
                 defer { self.syncInProgress = false }
+                print(response)
                 if let responseStatusCode = response["status"] as? Int,
                     let cartridgeDecisions = response["reinforcementCartridge"] as? [String],
                     let expiresIn = response["expiresIn"] as? Int

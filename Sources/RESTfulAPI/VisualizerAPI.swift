@@ -37,23 +37,44 @@ public class VisualizerAPI : NSObject {
         if let rm = UserDefaults.standard.dictionary(forKey: "Visualizer.rewardMappings") as? [String: [String:Any]] { return rm }
         else { return [:] }
     }()
-    private func setNewRewardMappings(mappings: [String:[String:Any]]) {
-        rewardMappings = mappings
-        UserDefaults.standard.set(mappings, forKey: "Visualizer.rewardMappings")
+    private func setNewRewardMappings(mappings: [String:[String:Any]], newVersionID: String) {
+        let currentVersionID = UserDefaults.standard.string(forKey: "Visualizer.versionID")
+        if currentVersionID != nil && newVersionID == currentVersionID {
+            return
+        } else {
+            rewardMappings = mappings
+            UserDefaults.standard.set(newVersionID, forKey: "Visualizer.versionID")
+            UserDefaults.standard.set(mappings, forKey: "Visualizer.rewardMappings")
+            for actionID in mappings.keys {
+                Cartridge(actionID: actionID).sync()
+            }
+        }
     }
     
-    public func getMappingFor(sender: String, target: String, selector: String) -> [String:Any]? {
+    public func getMappingFor(sender: String, target: String, selector: String, completion: @escaping ([String:Any]) -> ()) {
         let pairingKey = [sender, target, selector].joined(separator: "-")
         if visualizerMappings != nil,
             let rewardParameters = visualizerMappings![pairingKey] {
             DopamineKit.debugLog("Found real time rewarded event <\(pairingKey)> with parameters:<\(rewardParameters)>")
-            return rewardParameters
+            completion(rewardParameters)
         } else if let rewardParameters = rewardMappings[pairingKey] {
+            if let actionID = rewardParameters["actionID"] as? String,
+                let reinforcements = rewardParameters["reinforcements"] as? [[String:Any]] {
+                DopamineKit.reinforce(actionID) { reinforcementType in
+                    for reinforcement in reinforcements {
+                        if reinforcement["primitive"] as? String == reinforcementType {
+                            completion(reinforcement)
+                            return
+                        }
+                    }
+                }
+            } else {
+                DopamineKit.debugLog("Bad reward parameters")
+            }
             DopamineKit.debugLog("Found rewarded event <\(pairingKey)> with parameters:<\(rewardParameters)>")
-            return rewardParameters
+            completion(rewardParameters)
         } else {
             DopamineKit.debugLog("No reward pairing found for <\(pairingKey)>")
-            return nil
         }
     }
     
@@ -92,7 +113,7 @@ public class VisualizerAPI : NSObject {
                 
                 
                 // display reward if reward is set for this event
-                if let rewardParams = shared.getMappingFor(sender: senderClassname, target: targetName, selector: selectorName) {
+                shared.getMappingFor(sender: senderClassname, target: targetName, selector: selectorName) { rewardParams in
                     
                     if let reinforcements = rewardParams["reinforcements"] as? [[String:Any]] {
                         let reinforcement = reinforcements.randomElement()
@@ -238,7 +259,7 @@ public class VisualizerAPI : NSObject {
             let selectorName = NSStringFromSelector(selectorObj)
             
             // display reward if reward is set for this event
-            if let rewardParams = shared.getMappingFor(sender: senderClassname, target: targetClassname, selector: selectorName) {
+            shared.getMappingFor(sender: senderClassname, target: targetClassname, selector: selectorName) { rewardParams in
                 
                     if let reinforcements = rewardParams["reinforcements"] as? [[String:Any]] {
                         let reinforcement = reinforcements.randomElement()
@@ -544,7 +565,15 @@ public class VisualizerAPI : NSObject {
                                     }
                                 }
                                 print("New mapping:\(tempDict)")
-                                (type == .boot) ? (VisualizerAPI.shared.setNewRewardMappings(mappings: tempDict)) : (VisualizerAPI.shared.visualizerMappings = tempDict)
+                                if type == .submit {
+                                    VisualizerAPI.shared.visualizerMappings = tempDict
+                                } else { // .boot
+                                    if let newVersionID = responseDict["newVersionID"] as? String {
+                                        VisualizerAPI.shared.setNewRewardMappings(mappings: tempDict, newVersionID: newVersionID)
+                                    } else {
+                                        DopamineKit.debugLog("Missing 'newVersionID'")
+                                    }
+                                }
                             }
                         }
                     }

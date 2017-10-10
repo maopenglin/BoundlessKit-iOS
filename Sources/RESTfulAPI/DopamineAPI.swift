@@ -273,7 +273,11 @@ public class DopamineAPI : NSObject{
             DopamineKit.debugLog("[DopamineKit]: Error no versionID - (\(credentialsFilename)) is in the wrong format")
             return dict
         }
-        dict["versionID"] = versionID
+        if let newVersionID = UserDefaults.standard.string(forKey: "Visualizer.versionID") {
+            dict["versionID"] = newVersionID
+        } else {
+            dict["versionID"] = versionID
+        }
         
         if let inProduction = credentialsPlist["inProduction"] as? Bool{
             if(inProduction){
