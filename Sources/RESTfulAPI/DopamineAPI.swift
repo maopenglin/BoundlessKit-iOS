@@ -238,9 +238,12 @@ public class DopamineAPI : NSObject{
         var dict: [String: Any] = [ "clientOS": "iOS",
                                     "clientOSVersion": clientOSVersion,
                                     "clientSDKVersion": clientSDKVersion,
-                                    ]
-        // add an identity key
-        dict["primaryIdentity"] = self.primaryIdentity
+                                    "primaryIdentity": self.primaryIdentity ]
+        
+        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled,
+            let advertisingIdentifier = ASIdentifierManager.shared().advertisingIdentifier {
+            dict["advertisingID"] = advertisingIdentifier
+        }
         
         // create a credentials dict from .plist
         let credentialsFilename = "DopamineProperties"
@@ -299,10 +302,6 @@ public class DopamineAPI : NSObject{
     /// This variable computes an identity for the user and saves it to NSUserDefaults for future use.
     ///
     private lazy var primaryIdentity:String = {
-        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled,
-            let advertisingIdentifier = ASIdentifierManager.shared().advertisingIdentifier {
-            return advertisingIdentifier.uuidString
-        }
         let key = "DopaminePrimaryIdentity"
         let defaults = UserDefaults.standard
         if let identity = defaults.value(forKey: key) as? String {
