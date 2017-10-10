@@ -28,7 +28,7 @@ public class VisualizerAPI : NSObject {
     static var connectionID: String? //= "test"
 //    var eventRewards: [String:[String:Any]] = [:]
     var eventRewards: [String:[String:Any]] = PlaceHolder.rewardPairing
-    var miniMapping: [String:[String:Any]]?
+    var miniMapping: [String:[String:Any]]? = nil
     var traces: [Any] = []
     let tracesQueue = OperationQueue()
     
@@ -636,21 +636,20 @@ public class VisualizerAPI : NSObject {
 
 }
 
-//fileprivate func snapshotAsBase64EncodedString(object: AnyObject) -> String? {
-//    if let object = object as? NSObject {
-//        if let view = object.value(forKey: "view") as? UIView,
-//            let imageString = view.imageAsBase64EncodedString() {
-//            return imageString
-//        } else if let image = object.value(forKey: "image") as? UIImage,
-//            let imageString = image.base64EncodedPNGString() {
-//            return imageString
-//        }
-//        
-//        NSLog("Cannot create image, please message team@usedopamine.com to add support for visualizer snapshots of class type:<\(type(of: object))>!")
-//    }
-//    
-//    return nil
-//}
+fileprivate extension UIResponder {
+    func getParentResponders() -> [String]{
+        var parentResponders: [String] = []
+        getParentResponders(responders: &parentResponders)
+        return parentResponders
+    }
+    
+    func getParentResponders(responders: inout [String]) {
+        responders.append(NSStringFromClass(type(of:self)))
+        if let next = self.next {
+            next.getParentResponders(responders: &responders)
+        }
+    }
+}
 
 fileprivate extension UIWindow {
     static func presentTopLevelAlert(alertController:UIAlertController, completion:(() -> Void)? = nil) {
