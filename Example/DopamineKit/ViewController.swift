@@ -13,61 +13,6 @@ class ViewController: UIViewController {
     
     @objc var someCounter: Float = 0
     
-    func action1Performed() {
-        NSLog("action1Performed")
-//        view.showCoins(at: action1Button.center, width: action1Button.bounds.width)
-        action1Button.showConfetti()
-    }
-//    func action1Performed(){
-//        // Reinforce the action to make it sticky!!
-//        DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {
-//            reinforcement in
-//                // Update UI to display reinforcement decision on screen for learning purposes
-//                self.responseLabel.text = reinforcement
-//                self.flash(self.responseLabel)
-//            
-//                // Now you should use `response` to call a reward function paired on the Dopamine Developer Dashboard
-//            
-//            
-//                // Try out CandyBar as a form of reinforcement!
-//                // The functions paired here are medaltStar, stars, and thumbsUp
-//                var reinforcerType:CandyIcon
-//                var title:String?
-//                var subtitle:String?
-//                var backgroundColor:UIColor = UIColor.blue
-//                var visibilityDuration:TimeInterval = 1.75
-//                
-//                // Set up a couple of different responses to keep your users surprised
-//                switch(reinforcement){
-//                case "medalStar":
-//                    reinforcerType = CandyIcon.medalStar
-//                    title = "You should drop an album soon"
-//                    subtitle = "Cuz you're on 🔥"
-//                    break
-//                case "stars":
-//                    reinforcerType = CandyIcon.stars
-//                    title = "Great workout 💯"
-//                    subtitle = "It's not called sweating, it's called glisenting"
-//                    backgroundColor = UIColor.orange
-//                    break
-//                case "thumbsUp":
-//                    reinforcerType = CandyIcon.thumbsUp
-//                    title = "Awesome run!"
-//                    subtitle = "Either you run the day,\nOr the day runs you."
-//                    backgroundColor = CandyBar.hexStringToUIColor("#ff0000")
-//                    visibilityDuration = 2.5
-//                    break
-//                default:
-//                    return
-//                }
-//                
-//                // Woo hoo! Treat yoself
-//                let candybar = CandyBar(title: title, subtitle: subtitle, icon: reinforcerType, backgroundColor: backgroundColor)
-//                // if `nil` or no duration is provided, the CandyBar will go away when the user taps it or `candybar.dismiss()` is used
-//                candybar.show(visibilityDuration)
-//            
-//        })
-//    }
     @objc func action1Performed(){
         // Reinforce the action to make it sticky!!
         DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {
