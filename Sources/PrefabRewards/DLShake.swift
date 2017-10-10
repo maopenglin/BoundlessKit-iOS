@@ -11,7 +11,7 @@ import UIKit
 
 public extension UIView {
     
-    func shake(count:Int = 2, duration:TimeInterval = 5.0, translation:Int = 10, speed:Float = 3, completion: @escaping ()->Void = {}) {
+    func showShimmy(count:Int = 2, duration:TimeInterval = 5.0, translation:Int = 10, speed:Float = 3, completion: @escaping ()->Void = {}) {
         
         let path = UIBezierPath()
         path.move(to: .zero)
@@ -41,7 +41,7 @@ public extension UIView {
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: rotateAnimation)
     }
     
-    func pulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, completion: @escaping ()->Void = {}) {
+    func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, completion: @escaping ()->Void = {}) {
         
         let pulse = CASpringAnimation(keyPath: "transform.scale")
         pulse.repeatCount = count

@@ -45,6 +45,7 @@ public class VisualizerAPI : NSObject {
             rewardMappings = mappings
             UserDefaults.standard.set(newVersionID, forKey: "Visualizer.versionID")
             UserDefaults.standard.set(mappings, forKey: "Visualizer.rewardMappings")
+            SyncCoordinator.shared.flushVersionedSyncers()
             for actionID in mappings.keys {
                 Cartridge(actionID: actionID).sync()
             }
@@ -84,7 +85,6 @@ public class VisualizerAPI : NSObject {
     private override init() {
         super.init()
         tracesQueue.maxConcurrentOperationCount = 1
-        retrieveRewards()
     }
     
     public func retrieveRewards() {
@@ -126,7 +126,7 @@ public class VisualizerAPI : NSObject {
                         let reinforcementType = reinforcement["primitive"] as? String
                     {
                         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                            showReward: do {
+                            prepareShowReward: do {
                                 let view: UIView
                                 var location: CGPoint
                                 switch viewOption {
@@ -148,7 +148,7 @@ public class VisualizerAPI : NSObject {
                                         location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                     } else {
                                         DopamineKit.debugLog("Oh no. TouchView has no superview. No reward for you.")
-                                        break showReward
+                                        break prepareShowReward
                                     }
                                     
                                 case "target":
@@ -166,50 +166,24 @@ public class VisualizerAPI : NSObject {
                                                 location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                             } else {
                                                 DopamineKit.debugLog("Oh no. Must select which CustomView with a VALID index. No reward for you.")
-                                                break showReward
+                                                break prepareShowReward
                                             }
                                         } else {
                                             DopamineKit.debugLog("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
-                                            break showReward
+                                            break prepareShowReward
                                         }
                                     } else {
                                         DopamineKit.debugLog("Oh no. No CustomView classname set. No reward for you.")
-                                        break showReward
+                                        break prepareShowReward
                                     }
                                     
                                     
                                 default:
                                     DopamineKit.debugLog("Oh no. Unknown reward type primitive. No reward for you.")
-                                    break showReward
+                                    break prepareShowReward
                                 }
                                 
-                                switch reinforcementType {
-                                    
-                                case "Emojisplosion":
-                                    if let content = reinforcement["Content"] as? String,
-                                        let xAcceleration = reinforcement["AccelX"] as? CGFloat,
-                                        let yAcceleration = reinforcement["AccelY"] as? CGFloat,
-                                        let bursts = reinforcement["Bursts"] as? Double,
-                                        let angle = reinforcement["EmissionAngle"] as? CGFloat,
-                                        let range = reinforcement["EmissionRange"] as? CGFloat,
-                                        let fadeout = reinforcement["FadeOut"] as? Float,
-                                        let lifetime = reinforcement["Lifetime"] as? Float,
-                                        let lifetimeRange = reinforcement["LifetimeRange"] as? Float,
-                                        let quantity = reinforcement["Quantity"] as? Float,
-                                        let scale = reinforcement["Scale"] as? CGFloat,
-                                        let scaleRange = reinforcement["ScaleRange"] as? CGFloat,
-                                        let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat,
-                                        let spin = reinforcement["Spin"] as? CGFloat,
-                                        let velocity = reinforcement["Velocity"] as? CGFloat
-                                    {
-                                        // Touch
-                                        view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
-                                    }
-                                    
-                                default:
-                                    DopamineKit.debugLog("Unknown reinforcement reward type:\(String(describing: reinforcement))")
-                                    // TODO: implement delegate callback for dev defined rewards
-                                }
+                                showReward(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
                             }
                         }
                         
@@ -254,7 +228,7 @@ public class VisualizerAPI : NSObject {
                     let reinforcementType = reinforcement["primitive"] as? String
                 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        showReward: do {
+                        prepareShowReward: do {
                             let view: UIView
                             var location: CGPoint
                             switch viewOption {
@@ -270,13 +244,13 @@ public class VisualizerAPI : NSObject {
                                 if let senderInstance = senderInstance as? UIView {
                                     view = senderInstance
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else if senderInstance.responds(to: Selector("view")),
+                                } else if senderInstance.responds(to: NSSelectorFromString("view")),
                                     let sv = senderInstance.value(forKey: "view") as? UIView {
                                     view = sv
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
                                     DopamineKit.debugLog("Oh no. Sender is not a UIView or has no view property. No reward for you.")
-                                    break showReward
+                                    break prepareShowReward
                                 }
                                 
                             case "superview":
@@ -284,21 +258,21 @@ public class VisualizerAPI : NSObject {
                                     let superview = senderInstance.superview {
                                     view = superview
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else if senderInstance.responds(to: Selector("view")),
+                                } else if senderInstance.responds(to: NSSelectorFromString("view")),
                                     let sv = senderInstance.value(forKey: "view") as? UIView,
                                     let ssv = sv.superview {
                                     view = ssv
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
                                     DopamineKit.debugLog("Oh no. Sender is not a UIView or has no superview. No reward for you.")
-                                    break showReward
+                                    break prepareShowReward
                                 }
                                 
                             case "target":
                                 if let targetInstance = targetInstance as? UIView {
                                     view = targetInstance
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else if targetInstance.responds(to: Selector("view")),
+                                } else if targetInstance.responds(to: NSSelectorFromString("view")),
                                     let tv = targetInstance.value(forKey: "view") as? UIView {
                                     view = tv
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
@@ -320,49 +294,24 @@ public class VisualizerAPI : NSObject {
                                             location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                         } else {
                                             DopamineKit.debugLog("Oh no. Must select which CustomView with a VALID index. No reward for you.")
-                                            break showReward
+                                            break prepareShowReward
                                         }
                                     } else {
                                         DopamineKit.debugLog("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
-                                        break showReward
+                                        break prepareShowReward
                                     }
                                 } else {
                                     DopamineKit.debugLog("Oh no. No CustomView classname set. No reward for you.")
-                                    break showReward
+                                    break prepareShowReward
                                 }
                                 
                                 
                             default:
                                 DopamineKit.debugLog("Oh no. Unknown view type. No reward for you.")
-                                break showReward
+                                break prepareShowReward
                             }
                             
-                            switch reinforcementType {
-                                
-                            case "Emojisplosion":
-                                if let content = reinforcement["Content"] as? String,
-                                    let xAcceleration = reinforcement["AccelX"] as? CGFloat,
-                                    let yAcceleration = reinforcement["AccelY"] as? CGFloat,
-                                    let bursts = reinforcement["Bursts"] as? Double,
-                                    let angle = reinforcement["EmissionAngle"] as? CGFloat,
-                                    let range = reinforcement["EmissionRange"] as? CGFloat,
-                                    let fadeout = reinforcement["FadeOut"] as? Float,
-                                    let lifetime = reinforcement["Lifetime"] as? Float,
-                                    let lifetimeRange = reinforcement["LifetimeRange"] as? Float,
-                                    let quantity = reinforcement["Quantity"] as? Float,
-                                    let scale = reinforcement["Scale"] as? CGFloat,
-                                    let scaleRange = reinforcement["ScaleRange"] as? CGFloat,
-                                    let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat,
-                                    let spin = reinforcement["Spin"] as? CGFloat,
-                                    let velocity = reinforcement["Velocity"] as? CGFloat
-                                {
-                                    view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
-                                }
-                                
-                            default:
-                                DopamineKit.debugLog("Unknown reinforcement reward type:\(String(describing: reinforcement))")
-                                // TODO: implement delegate callback for dev defined rewards
-                            }
+                            showReward(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
                         }
                     }
                 }
@@ -387,7 +336,7 @@ public class VisualizerAPI : NSObject {
                         let image = barItem.image,
                         let imageString = image.base64EncodedPNGString() {
                         payload["senderImage"] = imageString
-                    } else if senderInstance.responds(to: Selector("view")),
+                    } else if senderInstance.responds(to: NSSelectorFromString("view")),
                         let sv = senderInstance.value(forKey: "view") as? UIView,
                         let imageString = sv.imageAsBase64EncodedString() {
                         payload["senderImage"] = imageString
@@ -402,6 +351,67 @@ public class VisualizerAPI : NSObject {
                     }
                 }
             }
+        }
+    }
+    
+    fileprivate static func showReward(on view: UIView, at location: CGPoint, of type: String, withParameters reinforcement: [String: Any]) {
+        switch type {
+            
+        case "Emojisplosion":
+            if let content = reinforcement["Content"] as? String,
+                let xAcceleration = reinforcement["AccelX"] as? CGFloat,
+                let yAcceleration = reinforcement["AccelY"] as? CGFloat,
+                let bursts = reinforcement["Bursts"] as? Double,
+                let angle = reinforcement["EmissionAngle"] as? CGFloat,
+                let range = reinforcement["EmissionRange"] as? CGFloat,
+                let fadeout = reinforcement["FadeOut"] as? Float,
+                let lifetime = reinforcement["Lifetime"] as? Float,
+                let lifetimeRange = reinforcement["LifetimeRange"] as? Float,
+                let quantity = reinforcement["Quantity"] as? Float,
+                let scale = reinforcement["Scale"] as? CGFloat,
+                let scaleRange = reinforcement["ScaleRange"] as? CGFloat,
+                let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat,
+                let spin = reinforcement["Spin"] as? CGFloat,
+                let velocity = reinforcement["Velocity"] as? CGFloat
+            {
+                view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
+            }
+            
+        case "Glow":
+            if let duration = reinforcement["Duration"] as? Double,
+                let color = reinforcement["Color"] as? String,
+                let alpha = reinforcement["Alpha"] as? CGFloat,
+                let count = reinforcement["Count"] as? Float,
+                let radius = reinforcement["Radius"] as? CGFloat
+            {
+                view.showGlow(duration: duration, color: UIColor.from(hex: color), alpha: alpha, radius: radius, count: count)
+            }
+            
+        case "Sheen":
+            if let duration = reinforcement["Duration"] as? Double {
+                view.showSheen(duration: duration)
+            }
+            
+        case "Pulse":
+            if let count = reinforcement["Count"] as? Float,
+                let duration = reinforcement["Duration"] as? Double,
+                let scale = reinforcement["Scale"] as? CGFloat,
+                let velocity = reinforcement["Velocity"] as? CGFloat,
+                let damping = reinforcement["Damping"] as? CGFloat {
+                print("Here!")
+                view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping)
+            }
+            
+        case "Shimmy":
+            if let count = reinforcement["Count"] as? Int,
+                let duration = reinforcement["Duration"] as? Double,
+                let translation = reinforcement["Translation"] as? Int {
+                view.showShimmy(count: count, duration: duration, translation: translation)
+            }
+            
+        default:
+            DopamineKit.debugLog("Unknown reinforcement reward type:\(String(describing: reinforcement))")
+            // TODO: implement delegate callback for dev defined rewards
         }
     }
     
@@ -540,7 +550,7 @@ public class VisualizerAPI : NSObject {
                                         {
                                             tempDict["\(sender)-\(target)-\(selector)"] = mappings
                                         } else if let actionID = mappings["actionID"] as? String,
-                                            let reinforcements = mappings["reinforcement"] as? [[String: Any]] {
+                                            let reinforcements = mappings["reinforcements"] as? [[String: Any]] {
                                             tempDict[actionID] = ["actionID":actionID, "reinforcements":reinforcements]
                                         } else {
                                             DopamineKit.debugLog("Invalid mapping")
@@ -568,7 +578,7 @@ public class VisualizerAPI : NSObject {
                 })
                 
                 // send request
-                //            DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
+                            DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
                 task.resume()
                 
             } catch {

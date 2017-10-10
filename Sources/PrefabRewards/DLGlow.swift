@@ -12,10 +12,10 @@ import UIKit
 public extension UIView {
     
     public func showGlow() {
-        startGlowingWithColor(color: UIColor(red: 153/256.0, green: 101/256.0, blue: 21/256.0, alpha: 0.8), fromIntensity: 0.0, toIntensity: 1.0, repeat: false)
+        showGlow(duration: 0.2, color: UIColor(red: 153/256.0, green: 101/256.0, blue: 21/256.0, alpha: 0.8), alpha: 0.8, radius: 50, count: 2)
     }
     
-    public func startGlowingWithColor(color:UIColor, fromIntensity:CGFloat, toIntensity:CGFloat, repeat shouldRepeat:Bool) {
+    public func showGlow(duration: Double, color: UIColor, alpha: CGFloat, radius: CGFloat, count: Float) {
         
         UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
         
@@ -31,14 +31,14 @@ public extension UIView {
         glowView.alpha = 0
         glowView.layer.shadowColor = color.cgColor
         glowView.layer.shadowOffset = .zero
-        glowView.layer.shadowRadius = 50
+        glowView.layer.shadowRadius = radius
         glowView.layer.shadowOpacity = 1.0
         
         let animation = CABasicAnimation(keyPath: "opacity")
-        animation.fromValue = fromIntensity
-        animation.toValue = toIntensity
-        animation.repeatCount = 2
-        animation.duration = 0.2
+        animation.fromValue = 0
+        animation.toValue = alpha
+        animation.repeatCount = count
+        animation.duration = duration
 //        animation.speed = 0.35
         animation.autoreverses = true
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
@@ -85,4 +85,27 @@ fileprivate class GlowAnimationDelegate : NSObject, CAAnimationDelegate {
     }
 }
 
+public extension UIColor {
+    static func from (hex: String) -> UIColor {
+        var cString:String = hex.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines).uppercased()
+        
+        if (cString.hasPrefix("#")) {
+            cString = cString.substring(from: cString.characters.index(cString.startIndex, offsetBy: 1))
+        }
+        
+        if cString.characters.count != 6 {
+            return UIColor.gray
+        }
+        
+        var rgbValue:UInt32 = 0
+        Scanner(string: cString).scanHexInt32(&rgbValue)
+        
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
+    }
+}
 
