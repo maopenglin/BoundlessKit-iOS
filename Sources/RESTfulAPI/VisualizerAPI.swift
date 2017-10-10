@@ -420,6 +420,7 @@ public class VisualizerAPI : NSObject {
         }
     }
     
+    @objc
     public static func promptPairing() {
         var payload = shared.configurationData
         payload["deviceName"] = UIDevice.current.name

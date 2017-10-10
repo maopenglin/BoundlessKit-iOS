@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
 #
 
 s.name             = "DopamineKit"
-s.version          = "5.0.1a"
+s.version          = "5.0.1b"
 s.summary          = "A framework to use DopamineLabs machine learning API written in Swift 3"
 s.homepage         = "https://github.com/DopamineLabs/DopamineKit-iOS"
 s.social_media_url = 'https://twitter.com/usedopamine'
