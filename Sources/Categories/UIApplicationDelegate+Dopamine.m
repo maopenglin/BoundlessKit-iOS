@@ -53,6 +53,9 @@ static NSArray* delegateSubclasses = nil;
 static NSDate *lastActive;
 
 - (void) swizzled_applicationDidBecomeActive:(UIApplication*)application {
+    if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
+        [self swizzled_applicationDidBecomeActive:application];
+    
     lastActive = [[NSDate alloc] init];
     double recordedUTC = [lastActive timeIntervalSince1970] * 1000;
     
@@ -63,8 +66,6 @@ static NSDate *lastActive;
     [VisualizerAPI promptPairing];
 #endif
     
-    if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
-        [self swizzled_applicationDidBecomeActive:application];
 }
 
 - (void) swizzled_applicationWillResignActive:(UIApplication*)application {
