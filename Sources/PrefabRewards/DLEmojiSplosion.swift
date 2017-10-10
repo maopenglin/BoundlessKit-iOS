@@ -79,9 +79,9 @@ public extension UIView {
 
 public extension String {
     func image(font:UIFont = .systemFont(ofSize: 24)) -> UIImage {
-        let size = (self as NSString).size(attributes: [NSFontAttributeName: font])
+        let size = (self as NSString).size(withAttributes: [NSAttributedStringKey.font: font])
         UIGraphicsBeginImageContextWithOptions(size, false, 0);
-        (self as NSString).draw(at: .zero, withAttributes: [NSFontAttributeName: font])
+        (self as NSString).draw(at: .zero, withAttributes: [NSAttributedStringKey.font: font])
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image!
