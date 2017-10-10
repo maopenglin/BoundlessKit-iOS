@@ -13,11 +13,12 @@ public class VisualizerAPI : NSObject {
     /// Valid API actions appeneded to the VisualizerAPI URL
     ///
     internal enum CallType{
-        case identify, accept, submit
+        case identify, accept, submit, boot
         var pathExtenstion:String{ switch self{
         case .identify: return "codeless/pair/customer/identity/"
         case .accept: return "codeless/pair/customer/accept/"
         case .submit: return "codeless/visualizer/customer/submit/"
+        case .boot: return "https://api.usedopamine.com/v5/app/boot"
             }
         }
     }
@@ -25,24 +26,33 @@ public class VisualizerAPI : NSObject {
     public static let shared = VisualizerAPI()
     private static let baseURL = "https://dashboard-api.usedopamine.com/"
     
-    static var connectionID: String? //= "test"
-//    var eventRewards: [String:[String:Any]] = [:]
-    var eventRewards: [String:[String:Any]] = PlaceHolder.rewardPairing
-    var miniMapping: [String:[String:Any]]? = nil
-    var traces: [Any] = []
-    let tracesQueue = OperationQueue()
+    private static let clientSDKVersion = Bundle(for: DopamineAPI.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+    private static let clientOS = "iOS"
+    private static let clientOSVersion = UIDevice.current.systemVersion
+    
+    static var connectionID: String? //= "dev"
+    private let tracesQueue = OperationQueue()
+    private var visualizerMappings: [String:[String:Any]]? = nil
+    private var rewardMappings: [String:[String:Any]] = {
+        if let rm = UserDefaults.standard.dictionary(forKey: "Visualizer.rewardMappings") as? [String: [String:Any]] { return rm }
+        else { return [:] }
+    }()
+    private func setNewRewardMappings(mappings: [String:[String:Any]]) {
+        rewardMappings = mappings
+        UserDefaults.standard.set(mappings, forKey: "Visualizer.rewardMappings")
+    }
     
     public func showRewardFor(sender: String, target: String, selector: String, rewardFunction: @escaping ([String:Any]) -> Void) {
         let pairingKey = [sender, target, selector].joined(separator: "-")
-        if miniMapping != nil,
-            let rewardParameters = miniMapping![pairingKey] {
+        if visualizerMappings != nil,
+            let rewardParameters = visualizerMappings![pairingKey] {
             DopamineKit.debugLog("Found real time rewarded event <\(pairingKey)> with parameters:<\(rewardParameters)>")
             DispatchQueue.main.async {
                 rewardFunction(rewardParameters)
             }
             return
         }
-        if let rewardParameters = eventRewards[pairingKey] {
+        if let rewardParameters = rewardMappings[pairingKey] {
             DopamineKit.debugLog("Found rewarded event <\(pairingKey)> with parameters:<\(rewardParameters)>")
             
             // TODO: enclose in DopamineKit.reinfoce(). temporary inside main dispatch
@@ -57,20 +67,14 @@ public class VisualizerAPI : NSObject {
     private override init() {
         super.init()
         tracesQueue.maxConcurrentOperationCount = 1
-//        retrieveRewards()
+        retrieveRewards()
     }
     
     public func retrieveRewards() {
-        return
-//        send(call: .eventrewards, with: configurationData){ response in
-//            if let rewards = response["rewards"] as? [String:String] {
-//                guard !NSDictionary(dictionary: self.eventRewards).isEqual(to: rewards) else {
-//                    return
-//                }
-//                self.eventRewards = rewards
-//                DopamineKit.debugLog("Rewards:\(self.eventRewards)")
-//            }
-//        }
+        var payload = configurationData
+        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
+        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+        send(call: .boot, with: payload){ _ in }
     }
     
     public static func recordEvent(touch: UITouch) {
@@ -117,8 +121,8 @@ public class VisualizerAPI : NSObject {
                                     location = Helper.lastTouchLocationInUIWindow
                                 
                                 case "sender":
-                                    DopamineKit.debugLog("Target not supported for this type of event! No reward for you.")
-                                    break showReward
+                                    view = UIApplication.shared.keyWindow!
+                                    location = Helper.lastTouchLocationInUIWindow
                                     
                                 case "superview":
                                     if let superview = touchView.superview {
@@ -220,10 +224,10 @@ public class VisualizerAPI : NSObject {
                     payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                     payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                     shared.send(call: .submit, with: payload){ response in
+                        if response["status"] as? Int != 200 {
+                            VisualizerAPI.connectionID = nil
+                        }
                     }
-                    
-                    // update rewards
-                    shared.retrieveRewards()
                 }
                 
             }
@@ -388,10 +392,10 @@ public class VisualizerAPI : NSObject {
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                 shared.send(call: .submit, with: payload){ response in
+                    if response["status"] as? Int != 200 {
+                        VisualizerAPI.connectionID = nil
+                    }
                 }
-                
-                // update rewards
-                shared.retrieveRewards()
             }
         }
     }
@@ -468,8 +472,14 @@ public class VisualizerAPI : NSObject {
     ///     - completion: A closure with a JSON formatted dictionary.
     ///
     private func send(call type: CallType, with payload: [String:Any], timeout:TimeInterval = 3.0, completion: @escaping ([String: Any]) -> Void) {
-        let baseURL = URL(string: VisualizerAPI.baseURL)!
-        guard let url = URL(string: type.pathExtenstion, relativeTo: baseURL) else {
+        let url: URL
+        if type == .boot,
+            let bootURL = URL(string: type.pathExtenstion) {
+            url = bootURL
+        } else if let baseURL = URL(string: VisualizerAPI.baseURL),
+            let visualizerUrl = URL(string: type.pathExtenstion, relativeTo: baseURL) {
+            url = visualizerUrl
+        } else {
             DopamineKit.debugLog("Could not construct for \(type.pathExtenstion)")
             return
         }
@@ -513,25 +523,28 @@ public class VisualizerAPI : NSObject {
                             return
                     }
                     responseDict = dict
-//                    DopamineKit.debugLog("✅\(type.pathExtenstion) call got response:\(responseDict.debugDescription)")
+                    DopamineKit.debugLog("✅\(type.pathExtenstion) call got response:\(responseDict.debugDescription)")
                     
-                    if type == .submit  && self.tracesQueue.operationCount <= 1 {
-                        if responseDict["status"] as? Int == 200 {
-                            if let temporaryMappings = responseDict["mappings"] as? [[String:Any]] {
-                                var miniMapping = [String : [String : Any]]()
-                                for mapping in temporaryMappings {
-                                    if let sender = mapping["sender"],
-                                        let target = mapping["target"],
-                                        let selector = mapping["selector"]
+                    if (type == .boot) || (type == .submit  && self.tracesQueue.operationCount <= 1) {
+                        if (type == .boot && responseDict["status"] as? Int == 205) || (type == .submit && responseDict["status"] as? Int == 200) {
+                            if let apiMappings = responseDict["mappings"] as? [[String:Any]] {
+                                var tempDict = [String : [String : Any]]()
+                                for mappings in apiMappings {
+                                    if let sender = mappings["sender"],
+                                        let target = mappings["target"],
+                                        let selector = mappings["selector"]
                                     {
-                                        miniMapping["\(sender)-\(target)-\(selector)"] = mapping
+                                        tempDict["\(sender)-\(target)-\(selector)"] = mappings
+                                    } else if let actionID = mappings["actionID"] as? String,
+                                        let reinforcements = mappings["reinforcement"] as? [[String: Any]] {
+                                        tempDict[actionID] = ["actionID":actionID, "reinforcements":reinforcements]
+                                    } else {
+                                        DopamineKit.debugLog("Invalid mapping")
                                     }
                                 }
-                                VisualizerAPI.shared.miniMapping = miniMapping
-                                print("Minimapping:\(VisualizerAPI.shared.miniMapping)")
+                                print("New mapping:\(tempDict)")
+                                (type == .boot) ? (VisualizerAPI.shared.setNewRewardMappings(mappings: tempDict)) : (VisualizerAPI.shared.visualizerMappings = tempDict)
                             }
-                        } else {
-                            VisualizerAPI.connectionID = nil
                         }
                     }
                     
@@ -567,7 +580,10 @@ public class VisualizerAPI : NSObject {
     ///
     private lazy var configurationData: [String: Any] = {
         
-        var dict: [String: Any] = [ "primaryIdentity" : self.primaryIdentity ]
+        var dict: [String: Any] = [ "clientOS": "iOS",
+                                    "clientOSVersion": clientOSVersion,
+                                    "clientSDKVersion": clientSDKVersion,
+                                    "primaryIdentity" : self.primaryIdentity ]
         
         // create a credentials dict from .plist
         let credentialsFilename = "DopamineProperties"
@@ -632,6 +648,7 @@ public class VisualizerAPI : NSObject {
             defaults.setValue(defaultIdentity, forKey: key)
             return defaultIdentity
         }
+//        return "Akash"
     }()
 
 }

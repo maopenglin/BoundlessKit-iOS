@@ -65,6 +65,7 @@ static NSDate *lastActive;
 #ifdef DEBUG
     [VisualizerAPI promptPairing];
 #endif
+    [[VisualizerAPI shared] retrieveRewards];
     
 }
 
