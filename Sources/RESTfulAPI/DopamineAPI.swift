@@ -25,7 +25,7 @@ public class DopamineAPI : NSObject{
         }
     }
     
-    internal static let sharedInstance: DopamineAPI = DopamineAPI()
+    @objc internal static let sharedInstance: DopamineAPI = DopamineAPI()
     
     private static let dopamineAPIURL = "https://api.usedopamine.com/v4/"
     private static let clientSDKVersion = Bundle(for: DopamineAPI.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
@@ -42,7 +42,7 @@ public class DopamineAPI : NSObject{
     ///     - actions: An array of actions to send.
     ///     - completion: A closure to handle the JSON formatted response.
     ///
-    internal static func track(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
+    @objc internal static func track(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
         // create dict with credentials
         var payload = sharedInstance.configurationData
         
@@ -65,7 +65,7 @@ public class DopamineAPI : NSObject{
     ///     - actions: An array of actions to send.
     ///     - completion: A closure to handle the JSON formatted response.
     ///
-    internal static func report(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
+    @objc internal static func report(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
         var payload = sharedInstance.configurationData
         
         var reinforcedActionsArray = Array<Any>()
@@ -86,7 +86,7 @@ public class DopamineAPI : NSObject{
     ///     - actionID: The actionID that needs reinforcement decisions.
     ///     - completion: A closure to handle the JSON formatted response.
     ///
-    internal static func refresh(_ actionID: String, completion: @escaping ([String:Any]) -> ()){
+    @objc internal static func refresh(_ actionID: String, completion: @escaping ([String:Any]) -> ()){
         var payload = sharedInstance.configurationData
         
         payload["actionID"] = actionID
@@ -104,7 +104,7 @@ public class DopamineAPI : NSObject{
     ///     - exceptions: The array of DopeExceptions to send
     ///     - completion: A closure to handle the JSON formatted response.
     ///
-    internal static func sync( syncOverviews: [SyncOverview], dopeExceptions: [DopeException], completion: @escaping ([String:Any]) -> ()){
+    @objc internal static func sync( syncOverviews: [SyncOverview], dopeExceptions: [DopeException], completion: @escaping ([String:Any]) -> ()){
         var payload = sharedInstance.configurationData
         
         var syncOverviewJSONArray: [Any] = []
@@ -227,7 +227,7 @@ public class DopamineAPI : NSObject{
     
     /// A modifiable credentials path used for running tests
     ///
-    public static var testCredentialPath:String?
+    @objc public static var testCredentialPath:String?
     
     /// Computes the basic fields for a request call
     ///
@@ -248,7 +248,7 @@ public class DopamineAPI : NSObject{
         // create a credentials dict from .plist
         let credentialsFilename = "DopamineProperties"
         var path:String
-        if let testPath = testCredentialPath {
+        if let testPath = DopamineAPI.testCredentialPath {
             path = testPath
         } else {
             guard let credentialsPath = Bundle.main.path(forResource: credentialsFilename, ofType: "plist") else{

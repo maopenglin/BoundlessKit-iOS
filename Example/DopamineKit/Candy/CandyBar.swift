@@ -49,7 +49,7 @@ open class CandyBar: UIView {
     ///     - backgroundColor?: The color of the candybar's background view. Defaults to `UIColor.blackColor()`.
     ///     - didTapBlock?: An action to be called when the user taps on the candybar. Defaults to `nil`.
     ///
-    public required init(title: String? = nil, subtitle: String? = nil, image: UIImage? = nil, backgroundColor: UIColor = UIColor.black, didTapBlock: (() -> ())? = nil) {
+    @objc public required init(title: String? = nil, subtitle: String? = nil, image: UIImage? = nil, backgroundColor: UIColor = UIColor.black, didTapBlock: (() -> ())? = nil) {
         self.didTapBlock = didTapBlock
         self.image = image
         super.init(frame: CGRect.zero)
@@ -73,7 +73,7 @@ open class CandyBar: UIView {
     ///     - backgroundColor?: The color of the candybar's background view. Defaults to `UIColor.blackColor()`.
     ///     - didTapBlock?: An action to be called when the user taps on the candybar. Defaults to `nil`.
     ///
-    public required init(title: String? = nil, subtitle: String? = nil, icon: CandyIcon = .stars, backgroundColor: UIColor = UIColor.black, didTapBlock: (() -> ())? = nil) {
+    @objc public required init(title: String? = nil, subtitle: String? = nil, icon: CandyIcon = .stars, backgroundColor: UIColor = UIColor.black, didTapBlock: (() -> ())? = nil) {
         self.didTapBlock = didTapBlock
         self.image = icon.image
         super.init(frame: CGRect.zero)
@@ -119,7 +119,7 @@ open class CandyBar: UIView {
     /// - returns:
     ///     The corresponding UIColor for valid hex strings, `UIColor.grayColor()` otherwise.
     ///
-    open static func hexStringToUIColor (_ hex:String) -> UIColor {
+    @objc open static func hexStringToUIColor (_ hex:String) -> UIColor {
         var cString:String = hex.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines as CharacterSet).uppercased()
         
         if (cString.hasPrefix("#")) {
@@ -168,7 +168,7 @@ open class CandyBar: UIView {
     
     
     
-    class func topWindow() -> UIWindow? {
+    @objc class func topWindow() -> UIWindow? {
         for window in UIApplication.shared.windows.reversed() {
             if window.windowLevel == UIWindowLevelNormal && !window.isHidden && window.frame != CGRect.zero { return window }
         }
@@ -180,31 +180,31 @@ open class CandyBar: UIView {
     fileprivate let backgroundView = UIView()
     
     /// How long the slide down animation should last.
-    open var animationDuration: TimeInterval = 0.4
+    @objc open var animationDuration: TimeInterval = 0.4
     
     /// The preferred style of the status bar during display of the candybar. Defaults to `.LightContent`.
     ///
     /// If the candybar's `adjustsStatusBarStyle` is false, this property does nothing.
-    open var preferredStatusBarStyle = UIStatusBarStyle.lightContent
+    @objc open var preferredStatusBarStyle = UIStatusBarStyle.lightContent
     
     /// Whether or not this candybar should adjust the status bar style during its presentation. Defaults to `false`.
-    open var adjustsStatusBarStyle = false
+    @objc open var adjustsStatusBarStyle = false
     
     /// Whether the candybar should appear at the top or the bottom of the screen. Defaults to `.Top`.
-    open var position = CandyBarPosition.bottom
+    @objc open var position = CandyBarPosition.bottom
     
     /// How 'springy' the candybar should display. Defaults to `.Slight`
-    open var springiness = CandyBarSpringiness.slight
+    @objc open var springiness = CandyBarSpringiness.slight
     
     /// The color of the text as well as the image tint color if `shouldTintImage` is `true`.
-    open var textColor = UIColor.white {
+    @objc open var textColor = UIColor.white {
         didSet {
             resetTintColor()
         }
     }
     
     /// Whether or not the candybar should show a shadow when presented.
-    open var hasShadows = true {
+    @objc open var hasShadows = true {
         didSet {
             resetShadows()
         }
@@ -223,26 +223,26 @@ open class CandyBar: UIView {
     }
     
     /// A block to call when the uer taps on the candybar.
-    open var didTapBlock: (() -> ())?
+    @objc open var didTapBlock: (() -> ())?
     
     /// A block to call after the candybar has finished dismissing and is off screen.
-    open var didDismissBlock: (() -> ())?
+    @objc open var didDismissBlock: (() -> ())?
     
     /// Whether or not the candybar should dismiss itself when the user taps. Defaults to `true`.
-    open var dismissesOnTap = true
+    @objc open var dismissesOnTap = true
     
     /// Whether or not the candybar should dismiss itself when the user swipes up. Defaults to `true`.
-    open var dismissesOnSwipe = true
+    @objc open var dismissesOnSwipe = true
     
     /// Whether or not the candybar should tint the associated image to the provided `textColor`. Defaults to `true`.
-    open var shouldTintImage = true {
+    @objc open var shouldTintImage = true {
         didSet {
             resetTintColor()
         }
     }
     
     /// The label that displays the candybar's title.
-    open let titleLabel: UILabel = {
+    @objc open let titleLabel: UILabel = {
         let label = UILabel()
         var titleFont = UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)
         
@@ -254,7 +254,7 @@ open class CandyBar: UIView {
     }()
     
     /// The label that displays the candybar's subtitle.
-    open let detailLabel: UILabel = {
+    @objc open let detailLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.subheadline)
         label.numberOfLines = 0
@@ -263,10 +263,10 @@ open class CandyBar: UIView {
     }()
     
     /// The image on the left of the candybar.
-    let image: UIImage?
+    @objc let image: UIImage?
     
     /// The image view that displays the `image`.
-    open let imageView: UIImageView = {
+    @objc open let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
@@ -301,14 +301,14 @@ open class CandyBar: UIView {
         updateConstraintsIfNeeded()
     }
     
-    internal func didTap(_ recognizer: UITapGestureRecognizer) {
+    @objc internal func didTap(_ recognizer: UITapGestureRecognizer) {
         if dismissesOnTap {
             dismiss()
         }
         didTapBlock?()
     }
     
-    internal func didSwipe(_ recognizer: UISwipeGestureRecognizer) {
+    @objc internal func didSwipe(_ recognizer: UISwipeGestureRecognizer) {
         if dismissesOnSwipe {
             dismiss()
         }
@@ -436,7 +436,7 @@ open class CandyBar: UIView {
     }
     
     /// Dismisses the candybar without a oldStatusBarStyle parameter.
-    open func dismiss() {
+    @objc open func dismiss() {
         let (damping, velocity) = self.springiness.springValues
         UIView.animate(withDuration: animationDuration, delay: 0.0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: .allowUserInteraction, animations: {
             self.candybarState = .hidden
@@ -450,13 +450,13 @@ open class CandyBar: UIView {
 }
 
 extension NSLayoutConstraint {
-    class func defaultConstraintsWithVisualFormat(_ format: String, options: NSLayoutFormatOptions = NSLayoutFormatOptions(), metrics: [String: AnyObject]? = nil, views: [String: AnyObject] = [:]) -> [NSLayoutConstraint] {
+    @objc class func defaultConstraintsWithVisualFormat(_ format: String, options: NSLayoutFormatOptions = NSLayoutFormatOptions(), metrics: [String: AnyObject]? = nil, views: [String: AnyObject] = [:]) -> [NSLayoutConstraint] {
         return NSLayoutConstraint.constraints(withVisualFormat: format, options: options, metrics: metrics, views: views)
     }
 }
 
 extension UIView {
-    func constraintsEqualToSuperview(_ edgeInsets: UIEdgeInsets = UIEdgeInsets.zero) -> [NSLayoutConstraint] {
+    @objc func constraintsEqualToSuperview(_ edgeInsets: UIEdgeInsets = UIEdgeInsets.zero) -> [NSLayoutConstraint] {
         self.translatesAutoresizingMaskIntoConstraints = false
         var constraints = [NSLayoutConstraint]()
         if let superview = self.superview {
@@ -468,17 +468,17 @@ extension UIView {
         return constraints
     }
     
-    func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to constant: CGFloat, multiplier: CGFloat = 1.0) -> NSLayoutConstraint {
+    @objc func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to constant: CGFloat, multiplier: CGFloat = 1.0) -> NSLayoutConstraint {
         self.translatesAutoresizingMaskIntoConstraints = false
         return NSLayoutConstraint(item: self, attribute: attribute, relatedBy: relation, toItem: nil, attribute: .notAnAttribute, multiplier: multiplier, constant: constant)
     }
     
-    func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to otherAttribute: NSLayoutAttribute, of item: AnyObject? = nil, multiplier: CGFloat = 1.0, constant: CGFloat = 0.0) -> NSLayoutConstraint {
+    @objc func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to otherAttribute: NSLayoutAttribute, of item: AnyObject? = nil, multiplier: CGFloat = 1.0, constant: CGFloat = 0.0) -> NSLayoutConstraint {
         self.translatesAutoresizingMaskIntoConstraints = false
         return NSLayoutConstraint(item: self, attribute: attribute, relatedBy: relation, toItem: item ?? self, attribute: otherAttribute, multiplier: multiplier, constant: constant)
     }
     
-    func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to item: AnyObject, multiplier: CGFloat = 1.0, constant: CGFloat = 0.0) -> NSLayoutConstraint {
+    @objc func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to item: AnyObject, multiplier: CGFloat = 1.0, constant: CGFloat = 0.0) -> NSLayoutConstraint {
         self.translatesAutoresizingMaskIntoConstraints = false
         return NSLayoutConstraint(item: self, attribute: attribute, relatedBy: relation, toItem: item, attribute: attribute, multiplier: multiplier, constant: constant)
     }

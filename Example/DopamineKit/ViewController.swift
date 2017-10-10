@@ -11,7 +11,7 @@ import DopamineKit
 
 class ViewController: UIViewController {
     
-    var someCounter: Float = 0
+    @objc var someCounter: Float = 0
     
     func action1Performed() {
         NSLog("action1Performed")
@@ -68,8 +68,58 @@ class ViewController: UIViewController {
 //            
 //        })
 //    }
+    @objc func action1Performed(){
+        // Reinforce the action to make it sticky!!
+        DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {
+            reinforcement in
+                // Update UI to display reinforcement decision on screen for learning purposes
+                self.responseLabel.text = reinforcement
+                self.flash(self.responseLabel)
+            
+                // Now you should use `response` to call a reward function paired on the Dopamine Developer Dashboard
+            
+            
+                // Try out CandyBar as a form of reinforcement!
+                // The functions paired here are medaltStar, stars, and thumbsUp
+                var reinforcerType:CandyIcon
+                var title:String?
+                var subtitle:String?
+                var backgroundColor:UIColor = UIColor.blue
+                var visibilityDuration:TimeInterval = 1.75
+                
+                // Set up a couple of different responses to keep your users surprised
+                switch(reinforcement){
+                case "medalStar":
+                    reinforcerType = CandyIcon.medalStar
+                    title = "You should drop an album soon"
+                    subtitle = "Cuz you're on 🔥"
+                    break
+                case "stars":
+                    reinforcerType = CandyIcon.stars
+                    title = "Great workout 💯"
+                    subtitle = "It's not called sweating, it's called glisenting"
+                    backgroundColor = UIColor.orange
+                    break
+                case "thumbsUp":
+                    reinforcerType = CandyIcon.thumbsUp
+                    title = "Awesome run!"
+                    subtitle = "Either you run the day,\nOr the day runs you."
+                    backgroundColor = CandyBar.hexStringToUIColor("#ff0000")
+                    visibilityDuration = 2.5
+                    break
+                default:
+                    return
+                }
+                
+                // Woo hoo! Treat yoself
+                let candybar = CandyBar(title: title, subtitle: subtitle, icon: reinforcerType, backgroundColor: backgroundColor)
+                // if `nil` or no duration is provided, the CandyBar will go away when the user taps it or `candybar.dismiss()` is used
+                candybar.show(visibilityDuration)
+            
+        })
+    }
     
-    func action2Performed(){
+    @objc func action2Performed(){
         // Tracking call is sent asynchronously
         DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
     }
@@ -83,9 +133,9 @@ class ViewController: UIViewController {
     //
     ///////////////////////////////////////
     
-    var responseLabel:UILabel!
-    var action1Button:UIButton!
-    var trackedActionButton:UIButton!
+    @objc var responseLabel:UILabel!
+    @objc var action1Button:UIButton!
+    @objc var trackedActionButton:UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -93,11 +143,7 @@ class ViewController: UIViewController {
         DopamineKit.syncCoordinator.performSync()
     }
     
-    func touchUpOutsideFromButton1() {
-        NSLog("Did touch up outside from Reinforce Button")
-    }
-    
-    func loadBasicUI(){
+    @objc func loadBasicUI(){
         let viewSize = self.view.frame.size
         let viewCenter = self.view.center
         
@@ -123,7 +169,6 @@ class ViewController: UIViewController {
         action1Button.titleLabel?.textAlignment = NSTextAlignment.center
         action1Button.backgroundColor = UIColor.init(red: 51/255.0, green: 153/255.0, blue: 51/255.0, alpha: 1.0)
         action1Button.addTarget(self, action: #selector(ViewController.action1Performed), for: UIControlEvents.touchUpInside)
-        action1Button.addTarget(self, action: #selector(ViewController.touchUpOutsideFromButton1), for: UIControlEvents.touchUpOutside)
         self.view.addSubview(action1Button)
         
         // Button to represent some user action to Track
@@ -138,7 +183,7 @@ class ViewController: UIViewController {
         self.view.addSubview(trackedActionButton)
     }
     
-    func flash(_ elm:UIView){
+    @objc func flash(_ elm:UIView){
         elm.alpha = 0.0
         UIView.animate(withDuration: 0.75, delay: 0.0, options: .allowUserInteraction, animations: {() -> Void in
             elm.alpha = 1.0

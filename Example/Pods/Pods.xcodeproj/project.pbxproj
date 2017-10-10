@@ -50,6 +50,7 @@
 		F5A84921756F3387B1F69FACF86B3CAF /* DLEmojiSplosion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0484019DAAAED5EEA13B38A4C7B62627 /* DLEmojiSplosion.swift */; };
 		FE85BF21D5ED70587A1594BC50E0E852 /* SKPaymentTransactionObserver+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = AA3502DC6CA3F87F57DE08E212E91D90 /* SKPaymentTransactionObserver+Dopamine.m */; };
 		FECE8FB32D1EEA5DC57F317C82CD674E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3792A683529B65B8837AD54D85BA6912 /* Foundation.framework */; };
+		FF37656C09F7996D1858A3C688462229 /* SyncOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FD2354FD4A181A380B35B7278EE091 /* SyncOverview.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -576,7 +577,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "Target Support Files/Pods-DopamineKit_Example/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
 				MODULEMAP_FILE = "Target Support Files/Pods-DopamineKit_Example/Pods-DopamineKit_Example.modulemap";
@@ -588,8 +589,9 @@
 				PRODUCT_NAME = Pods_DopamineKit_Example;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
