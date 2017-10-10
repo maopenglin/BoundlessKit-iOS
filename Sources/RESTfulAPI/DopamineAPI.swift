@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import AdSupport
 
 
 public class DopamineAPI : NSObject{
@@ -215,7 +215,7 @@ public class DopamineAPI : NSObject{
             })
             
             // send request
-            DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
+//            DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
             task.resume()
             
         } catch {
@@ -236,11 +236,14 @@ public class DopamineAPI : NSObject{
     private lazy var configurationData: [String: Any] = {
         
         var dict: [String: Any] = [ "clientOS": "iOS",
-                                    "clientOSVersion": DopamineAPI.clientOSVersion,
-                                    "clientSDKVersion": DopamineAPI.clientSDKVersion,
-                                    ]
-        // add an identity key
-        dict["primaryIdentity"] = self.primaryIdentity
+                                    "clientOSVersion": clientOSVersion,
+                                    "clientSDKVersion": clientSDKVersion,
+                                    "primaryIdentity": self.primaryIdentity ]
+        
+        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled,
+            let advertisingIdentifier = ASIdentifierManager.shared().advertisingIdentifier {
+            dict["advertisingID"] = advertisingIdentifier
+        }
         
         // create a credentials dict from .plist
         let credentialsFilename = "DopamineProperties"
@@ -270,7 +273,11 @@ public class DopamineAPI : NSObject{
             DopamineKit.debugLog("[DopamineKit]: Error no versionID - (\(credentialsFilename)) is in the wrong format")
             return dict
         }
-        dict["versionID"] = versionID
+        if let newVersionID = UserDefaults.standard.string(forKey: "Visualizer.versionID") {
+            dict["versionID"] = newVersionID
+        } else {
+            dict["versionID"] = versionID
+        }
         
         if let inProduction = credentialsPlist["inProduction"] as? Bool{
             if(inProduction){

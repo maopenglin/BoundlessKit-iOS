@@ -162,14 +162,15 @@ internal class Cartridge : NSObject, NSCoding {
     @objc func sync(completion: @escaping (Int) -> () = { _ in }) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
-                DopamineKit.debugLog("Cartridge sync for \(self.actionID) already happening")
                 completion(0)
                 return
             }
             self.syncInProgress = true
+            DopamineKit.debugLog("Cartridge sync for \(self.actionID) in progress...")
             
             DopamineAPI.refresh(self.actionID) { response in
                 defer { self.syncInProgress = false }
+                print(response)
                 if let responseStatusCode = response["status"] as? Int,
                     let cartridgeDecisions = response["reinforcementCartridge"] as? [String],
                     let expiresIn = response["expiresIn"] as? Int

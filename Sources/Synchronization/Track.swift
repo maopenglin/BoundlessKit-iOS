@@ -21,6 +21,7 @@ internal class Track : NSObject, NSCoding {
     private let timerExpiresInKey = "timerExpiresIn"
     
     private var trackedActions: [DopeAction] = []
+    private let trackedActionsQueue = OperationQueue()
     private var sizeToSync: Int
     private var timerStartsAt: Int64
     private var timerExpiresIn: Int64
@@ -93,12 +94,14 @@ internal class Track : NSObject, NSCoding {
     
     /// Clears the saved track sync triggers from NSUserDefaults
     ///
-    @objc func erase() {
-        self.trackedActions.removeAll()
-        self.sizeToSync = 15
-        self.timerStartsAt = Int64( 1000*NSDate().timeIntervalSince1970 )
-        self.timerExpiresIn = 172800000
-        defaults.removeObject(forKey: defaultsKey)
+    func erase() {
+        trackedActionsQueue.addOperation {
+            self.trackedActions.removeAll()
+            self.sizeToSync = 15
+            self.timerStartsAt = Int64( 1000*NSDate().timeIntervalSince1970 )
+            self.timerExpiresIn = 172800000
+            self.defaults.removeObject(forKey: self.defaultsKey)
+        }
     }
     
     /// Check whether the track has been triggered for a sync
@@ -136,9 +139,14 @@ internal class Track : NSObject, NSCoding {
     /// - parameters:
     ///     - action: The action to be stored.
     ///
-    @objc func add(action: DopeAction) {
-        trackedActions.append(action)
-        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
+    func add(action: DopeAction) {
+        trackedActionsQueue.addOperation {
+//            print("Track operations:\(self.trackedActionsQueue.operationCount)")
+            self.trackedActions.append(action)
+            if self.trackedActionsQueue.operationCount == 1 {
+                self.defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: self.defaultsKey)
+            }
+        }
     }
     
     /// Sends tracked actions over the DopamineAPI
@@ -149,14 +157,20 @@ internal class Track : NSObject, NSCoding {
     @objc func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
-                DopamineKit.debugLog("Track sync already happening")
                 completion(0)
                 return
             }
             self.syncInProgress = true
+            DopamineKit.debugLog("Track sync in progress...")
+            self.trackedActionsQueue.waitUntilAllOperationsAreFinished()
+            self.trackedActionsQueue.isSuspended = true
+            let syncFinished = {
+                self.syncInProgress = false
+                self.trackedActionsQueue.isSuspended = false
+            }
             
             if self.trackedActions.count == 0 {
-                defer { self.syncInProgress = false }
+                defer { syncFinished() }
                 DopamineKit.debugLog("No tracked actions to sync.")
                 completion(0)
                 self.updateTriggers()
@@ -164,7 +178,7 @@ internal class Track : NSObject, NSCoding {
             } else {
                 DopamineKit.debugLog("Sending \(self.trackedActions.count) tracked actions...")
                 DopamineAPI.track(self.trackedActions) { response in
-                    defer { self.syncInProgress = false }
+                    defer { syncFinished() }
                     if let responseStatusCode = response["status"] as? Int {
                         if responseStatusCode == 200 {
                             self.trackedActions.removeAll()

@@ -19,15 +19,19 @@
 }
 
 - (void) swizzled_viewDidAppear:(BOOL)animated {
-    [EventLogger logEventWithUIViewController:self withTag:@"appeared"];
     if ([self respondsToSelector:@selector(swizzled_viewDidAppear:)])
         [self swizzled_viewDidAppear:animated];
+    
+    [DopamineKit track:@"UIViewController" metaData:@{@"instanceClass": NSStringFromClass([self class]),
+                                                      @"tag": @"didAppear"}];
+    //    [Helper logControlActionsWithView:[self view]];
 }
 
 - (void) swizzled_viewDidDisappear:(BOOL)animated {
-    [EventLogger logEventWithUIViewController:self withTag:@"dissappeared"];
     if ([self respondsToSelector:@selector(swizzled_viewDidDisappear:)])
         [self swizzled_viewDidDisappear:animated];
+    
+    [DopamineKit track:@"UIViewController" metaData:@{@"instanceClass": NSStringFromClass([self class]),
+                                                      @"tag": @"didDisappear"}];
 }
-
 @end

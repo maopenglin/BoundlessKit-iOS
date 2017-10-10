@@ -13,9 +13,6 @@ class ViewController: UIViewController {
     
     @objc var someCounter: Float = 0
     
-//    func action1Performed() {
-//        NSLog("action1Performed")
-//    }
     @objc func action1Performed(){
         // Reinforce the action to make it sticky!!
         DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {

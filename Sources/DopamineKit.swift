@@ -28,10 +28,13 @@ open class DopamineKit : NSObject {
     ///
     @objc open static func track(_ actionID: String, metaData: [String: Any]? = nil) {
         // store the action to be synced
-        let action = DopeAction(actionID: actionID, metaData:metaData)
-        syncCoordinator.store(trackedAction: action)
+        DispatchQueue.global(qos: .background).async {
+            let action = DopeAction(actionID: actionID, metaData:metaData)
+            syncCoordinator.store(trackedAction: action)
+//            debugLog("tracked:\(actionID) with metadata:\(String(describing: metaData))")
+        }
     }
-
+    
     /// This function intelligently chooses whether to reinforce a user action. The reinforcement function, passed as the completion, is run asynchronously on the queue.
     ///
     /// - parameters:
@@ -39,21 +42,19 @@ open class DopamineKit : NSObject {
     ///     - metaData: Action details i.e. calories or streak_count.
     ///                  Must be JSON formattable (Number, String, Bool, Array, Object).
     ///                  Defaults to `nil`.
-    ///     - queue: The queue to run the completion closure. Defaults to `DispatchQueue.main`.
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
-    @objc open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, queue: DispatchQueue = DispatchQueue.main, completion: @escaping (String) -> ()) {
+    open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, completion: @escaping (String) -> ()) {
         let action = DopeAction(actionID: actionID, metaData: metaData)
         action.reinforcementDecision = syncCoordinator.retrieveReinforcementDecisionFor(actionID: action.actionID)
         
-        queue.async(execute: {
+        DispatchQueue.main.async(execute: {
             completion(action.reinforcementDecision!)
         })
         
         // store the action to be synced
         syncCoordinator.store(reportedAction: action)
     }
-    
     
     /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
     ///
@@ -70,7 +71,7 @@ open class DopamineKit : NSObject {
                 functionSignature.replaceSubrange(parameterNames, with: "()")
             }
             let fileName = NSString(string: filePath).lastPathComponent
-            NSLog("[\(fileName):\(line):\(functionSignature)] - \(message)")
+            print("[\(fileName):\(line):\(functionSignature)] - \(message)")
         #endif
     }
 
