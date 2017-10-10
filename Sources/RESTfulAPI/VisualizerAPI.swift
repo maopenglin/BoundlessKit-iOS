@@ -29,6 +29,8 @@ public class VisualizerAPI : NSObject {
 //    var eventRewards: [String:[String:Any]] = [:]
     var eventRewards: [String:[String:Any]] = PlaceHolder.rewardPairing
     var miniMapping: [String:[String:Any]]?
+    var traces: [Any] = []
+    let tracesQueue = OperationQueue()
     
     public func showRewardFor(sender: String, target: String, selector: String, rewardFunction: @escaping ([String:Any]) -> Void) {
         let pairingKey = [sender, target, selector].joined(separator: "-")
@@ -54,6 +56,7 @@ public class VisualizerAPI : NSObject {
     
     private override init() {
         super.init()
+        tracesQueue.maxConcurrentOperationCount = 1
 //        retrieveRewards()
     }
     
@@ -70,10 +73,9 @@ public class VisualizerAPI : NSObject {
 //        }
     }
     
-    public static func recordEvent(event: UIEvent) {
+    public static func recordEvent(touch: UITouch) {
         DispatchQueue.global().async {
-            if let touch = event.allTouches?.first,
-                let touchView = touch.view {
+            if let touchView = touch.view {
                 let senderClassname = NSStringFromClass(type(of: touch))
                 let targetName = touchView.getParentResponders().joined(separator: ",")
                 let selectorName: String
@@ -113,10 +115,10 @@ public class VisualizerAPI : NSObject {
                                 case "touch":
                                     view = UIApplication.shared.keyWindow!
                                     location = Helper.lastTouchLocationInUIWindow
-                                    
+                                
                                 case "sender":
-                                    view = touchView
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                    DopamineKit.debugLog("Target not supported for this type of event! No reward for you.")
+                                    break showReward
                                     
                                 case "superview":
                                     if let superview = touchView.superview {
@@ -128,8 +130,8 @@ public class VisualizerAPI : NSObject {
                                     }
                                     
                                 case "target":
-                                    DopamineKit.debugLog("Target not supported for this type of event! No reward for you.")
-                                    break showReward
+                                    view = touchView
+                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                     
                                 case "custom":
                                     if viewCustom != "" {
@@ -182,30 +184,7 @@ public class VisualizerAPI : NSObject {
                                         // Touch
                                         view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
                                     }
-                                    //                        let content = (reinforcement["Content"] as? String)?.image().cgImage
-                                    //                        switch rewardParams["view"] as? String {
-                                    //                        case "touch"?:
-                                    //                            UIApplication.shared.keyWindow!.showEmojiSplosion(at: Helper.lastTouchLocationInUIWindow, content:content)
-                                    //                            break
-                                    //
-                                    //                        case "sender"?:
-                                    //                            if let senderInstance = senderInstance as? UIView {
-                                    //                                senderInstance.showEmojiSplosion(at:CGPoint(x: senderInstance.bounds.width/2, y: senderInstance.bounds.height/2), content:content)
-                                    //                            }
-                                    //
-                                    //                        case "target"?:
-                                    //                            break
-                                    //
-                                    //                        case "fixed"?:
-                                    //                            break
-                                    //
-                                    //                        default:
-                                    //                            break
-                                    //                        }
-                                    //
-                                    //                    case "confetti"?:
-                                    //                        break
-                                //
+                                
                                 default:
                                     DopamineKit.debugLog("Unknown reward type:\(String(describing: rewardParams["type"]))")
                                     // TODO: implement delegate callback for dev defined rewards
@@ -229,35 +208,18 @@ public class VisualizerAPI : NSObject {
                     payload["sender"] = senderClassname
                     payload["target"] = targetName
                     payload["selector"] = selectorName
-                    DispatchQueue.main.sync {
-                        //test
-                        if let imageString = touchView.imageAsBase64EncodedString() {
-                            payload["senderImage"] = imageString
-                        } else {
-                            NSLog("Cannot create image for class type:<\(type(of: touchView))>!")
-                        }
-//                        payload["senderImage"] = ""
-                    }
+//                    DispatchQueue.main.sync {
+//                        //test
+//                        if let imageString = touchView.imageAsBase64EncodedString() {
+//                            payload["senderImage"] = imageString
+//                        } else {
+//                            NSLog("Cannot create image for class type:<\(type(of: touchView))>!")
+//                        }
+//                    }
+                    payload["senderImage"] = ""
                     payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                     payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                     shared.send(call: .submit, with: payload){ response in
-                        if response["status"] as? Int == 200 {
-                            if let temporaryMappings = response["mappings"] as? [[String:Any]] {
-                                var miniMapping = [String : [String : Any]]()
-                                for mapping in temporaryMappings {
-                                    if let sender = mapping["sender"],
-                                        let target = mapping["target"],
-                                        let selector = mapping["selector"]
-                                    {
-                                        miniMapping["\(sender)-\(target)-\(selector)"] = mapping
-                                    }
-                                }
-                                shared.miniMapping = miniMapping
-                                print("Minimapping:\(shared.miniMapping)")
-                            }
-                        } else {
-                            VisualizerAPI.connectionID = nil
-                        }
                     }
                     
                     // update rewards
@@ -385,30 +347,7 @@ public class VisualizerAPI : NSObject {
                                     // Touch
                                     view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
                                 }
-                                //                        let content = (reinforcement["Content"] as? String)?.image().cgImage
-                                //                        switch rewardParams["view"] as? String {
-                                //                        case "touch"?:
-                                //                            UIApplication.shared.keyWindow!.showEmojiSplosion(at: Helper.lastTouchLocationInUIWindow, content:content)
-                                //                            break
-                                //
-                                //                        case "sender"?:
-                                //                            if let senderInstance = senderInstance as? UIView {
-                                //                                senderInstance.showEmojiSplosion(at:CGPoint(x: senderInstance.bounds.width/2, y: senderInstance.bounds.height/2), content:content)
-                                //                            }
-                                //
-                                //                        case "target"?:
-                                //                            break
-                                //
-                                //                        case "fixed"?:
-                                //                            break
-                                //
-                                //                        default:
-                                //                            break
-                                //                        }
-                                //
-                                //                    case "confetti"?:
-                                //                        break
-                            //
+                            
                             default:
                                 DopamineKit.debugLog("Unknown reward type:\(String(describing: rewardParams["type"]))")
                                 // TODO: implement delegate callback for dev defined rewards
@@ -444,27 +383,11 @@ public class VisualizerAPI : NSObject {
                     } else {
                         NSLog("Cannot create image, please message team@usedopamine.com to add support for visualizer snapshots of class type:<\(type(of: senderInstance))>!")
                     }
-//                    payload["senderImage"] = ""
                 }
+//                payload["senderImage"] = ""
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                 shared.send(call: .submit, with: payload){ response in
-                    if response["status"] as? Int == 200 {
-                        if let temporaryMappings = response["mappings"] as? [[String:Any]] {
-                            var miniMapping = [String : [String : Any]]()
-                            for mapping in temporaryMappings {
-                                if let sender = mapping["sender"],
-                                    let target = mapping["target"],
-                                    let selector = mapping["selector"]
-                                {
-                                    miniMapping["\(sender)-\(target)-\(selector)"] = mapping
-                                }
-                            }
-                            shared.miniMapping = miniMapping
-                        }
-                    } else {
-                        VisualizerAPI.connectionID = nil
-                    }
                 }
                 
                 // update rewards
@@ -592,6 +515,26 @@ public class VisualizerAPI : NSObject {
                     responseDict = dict
 //                    DopamineKit.debugLog("✅\(type.pathExtenstion) call got response:\(responseDict.debugDescription)")
                     
+                    if type == .submit  && self.tracesQueue.operationCount <= 1 {
+                        if responseDict["status"] as? Int == 200 {
+                            if let temporaryMappings = responseDict["mappings"] as? [[String:Any]] {
+                                var miniMapping = [String : [String : Any]]()
+                                for mapping in temporaryMappings {
+                                    if let sender = mapping["sender"],
+                                        let target = mapping["target"],
+                                        let selector = mapping["selector"]
+                                    {
+                                        miniMapping["\(sender)-\(target)-\(selector)"] = mapping
+                                    }
+                                }
+                                VisualizerAPI.shared.miniMapping = miniMapping
+                                print("Minimapping:\(VisualizerAPI.shared.miniMapping)")
+                            }
+                        } else {
+                            VisualizerAPI.connectionID = nil
+                        }
+                    }
+                    
                 } catch {
                     let message = "❌ Error reading \(type.pathExtenstion) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))
                     DopamineKit.debugLog(message)
@@ -603,7 +546,10 @@ public class VisualizerAPI : NSObject {
             // send request
 //            DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
             //test
-            task.resume()
+            tracesQueue.addOperation {
+                task.resume()
+            }
+            DopamineKit.debugLog("Traces queued:\(tracesQueue.operationCount)")
             
         } catch {
             let message = "Error sending \(type.pathExtenstion) api call with payload:(\(payload.description))"

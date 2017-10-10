@@ -24,7 +24,7 @@
     if (touch != nil) {
         CGPoint local = [touch locationInView:[touch view]];
         Helper.lastTouchLocationInUIWindow = [[touch view] convertPoint:local toView:nil];
-//        [VisualizerAPI recordEventWithEvent:event];
+        [VisualizerAPI recordEventWithTouch:touch];
     }
 
     if ([self respondsToSelector:@selector(swizzled_sendEvent:)])
