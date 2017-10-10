@@ -141,7 +141,7 @@ internal class Track : NSObject, NSCoding {
     ///
     func add(action: DopeAction) {
         trackedActionsQueue.addOperation {
-            print("Track operations:\(self.trackedActionsQueue.operationCount)")
+//            print("Track operations:\(self.trackedActionsQueue.operationCount)")
             self.trackedActions.append(action)
             if self.trackedActionsQueue.operationCount == 1 {
                 self.defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: self.defaultsKey)

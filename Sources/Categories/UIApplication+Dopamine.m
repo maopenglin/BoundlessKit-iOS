@@ -31,8 +31,11 @@
     if (touch != nil) {
         CGPoint local = [touch locationInView:[touch view]];
         Helper.lastTouchLocationInUIWindow = [[touch view] convertPoint:local toView:nil];
+//        [VisualizerAPI recordEventWithEvent:event];
     }
-    
+
+    if ([self respondsToSelector:@selector(swizzled_sendEvent:)])
+        [self swizzled_sendEvent:event];
     
 //    if (event.allTouches.count == 1) {
 //        UITouch *touch = event.allTouches.anyObject;
@@ -134,8 +137,6 @@
 //    }
     
     
-    if ([self respondsToSelector:@selector(swizzled_sendEvent:)])
-        [self swizzled_sendEvent:event];
 }
 
 - (BOOL)swizzled_sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event {
@@ -147,7 +148,7 @@
                                                        @"target": NSStringFromClass([target class]),
                                                        @"selector": selectorName}
          ];
-        [VisualizerAPI recordEventWithSenderInstance: sender sender: NSStringFromClass([sender class]) target:NSStringFromClass([target class]) selector:selectorName event:event];
+        [VisualizerAPI recordActionWithSenderInstance:sender targetInstance:target selectorObj:action event:event];
         
     }
     
