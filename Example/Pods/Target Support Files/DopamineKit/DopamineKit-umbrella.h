@@ -15,6 +15,7 @@
 #import "UIApplicationDelegate+Dopamine.h"
 #import "UIViewController+Dopamine.h"
 #import "DopamineKit.h"
+#import "ASIdentifierManager+ASIdentifierManagerHelper.h"
 #import "SwizzleHelper.h"
 
 FOUNDATION_EXPORT double DopamineKitVersionNumber;

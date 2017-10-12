@@ -240,10 +240,6 @@ public class DopamineAPI : NSObject{
                                     "clientSDKVersion": DopamineAPI.clientSDKVersion,
                                     "primaryIdentity": self.primaryIdentity ]
         
-        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
-            dict["advertisingID"] = ASIdentifierManager.shared().advertisingIdentifier
-        }
-        
         // create a credentials dict from .plist
         let credentialsFilename = "DopamineProperties"
         var path:String
@@ -302,18 +298,17 @@ public class DopamineAPI : NSObject{
     
     /// Computes a primary identity for the user
     ///
-    /// This variable computes an identity for the user and saves it to NSUserDefaults for future use.
-    ///
     private lazy var primaryIdentity:String = {
-        let key = "DopaminePrimaryIdentity"
-        let defaults = UserDefaults.standard
-        if let identity = defaults.value(forKey: key) as? String {
-            DopamineKit.debugLog("primaryIdentity:(\(identity))")
-            return identity
+        if let aid = ASIdentifierManager.shared().adId()?.uuidString,
+            aid != "00000000-0000-0000-0000-000000000000" {
+            DopamineKit.debugLog("ASIdentifierManager primaryIdentity:(\(aid))")
+            return aid
+        } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
+            DopamineKit.debugLog("identifierForVendor primaryIdentity:(\(vid))")
+            return vid
         } else {
-            let defaultIdentity = UIDevice.current.identifierForVendor!.uuidString
-            defaults.setValue(defaultIdentity, forKey: key)
-            return defaultIdentity
+            DopamineKit.debugLog("IDUnavailable")
+            return "IDUnavailable"
         }
     }()
 }

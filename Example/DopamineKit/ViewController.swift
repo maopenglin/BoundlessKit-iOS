@@ -49,7 +49,7 @@ class ViewController: UIViewController {
                     reinforcerType = CandyIcon.thumbsUp
                     title = "Awesome run!"
                     subtitle = "Either you run the day,\nOr the day runs you."
-                    backgroundColor = CandyBar.hexStringToUIColor("#ff0000")
+                    backgroundColor = UIColor.from(hex:"#ff0000")
                     visibilityDuration = 2.5
                     break
                 default:
@@ -57,9 +57,9 @@ class ViewController: UIViewController {
                 }
                 
                 // Woo hoo! Treat yoself
-                let candybar = CandyBar(title: title, subtitle: subtitle, icon: reinforcerType, backgroundColor: backgroundColor)
+            let candybar = CandyBar(title: title, subtitle: subtitle, image: reinforcerType.image, backgroundColor: backgroundColor)
                 // if `nil` or no duration is provided, the CandyBar will go away when the user taps it or `candybar.dismiss()` is used
-                candybar.show(visibilityDuration)
+            candybar.show(duration: visibilityDuration)
             
         })
     }
@@ -82,10 +82,24 @@ class ViewController: UIViewController {
     @objc var action1Button:UIButton!
     @objc var trackedActionButton:UIButton!
     
+    let testQueue = OperationQueue()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
         DopamineKit.syncCoordinator.performSync()
+        
+        testQueue.isSuspended = true
+        for i in 1...100 {
+            testQueue.addOperation {
+                DopamineKit.track("test")
+            }
+        }
+        testQueue.isSuspended = false
+        
+        DispatchQueue.global().asyncAfter(deadline: .now()) {
+            CandyBar(title: "title", subtitle: "Subtitle").show()
+        }
     }
     
     @objc func loadBasicUI(){
