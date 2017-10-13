@@ -225,10 +225,6 @@ public class DopamineAPI : NSObject{
         }
     }
     
-    /// A modifiable credentials path used for running tests
-    ///
-    @objc public static var testCredentialPath:String?
-    
     /// Computes the basic fields for a request call
     ///
     /// Add this to your payload before calling `send()`
@@ -240,32 +236,28 @@ public class DopamineAPI : NSObject{
                                     "clientSDKVersion": DopamineAPI.clientSDKVersion,
                                     "primaryIdentity": self.primaryIdentity ]
         
-        // create a credentials dict from .plist
-        let credentialsFilename = "DopamineProperties"
-        var path:String
-        if let testPath = DopamineAPI.testCredentialPath {
-            path = testPath
+        let credentials: [String: Any]
+        if let testCredentials = DopamineKit.testCredentials {
+            credentials = testCredentials
+            DopamineKit.debugLog("Using test credentials")
         } else {
-            guard let credentialsPath = Bundle.main.path(forResource: credentialsFilename, ofType: "plist") else{
-                DopamineKit.debugLog("[DopamineKit]: Error - cannot find credentials in (\(credentialsFilename))")
-                return dict
+            guard let credentialsPath = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist"),
+                let credentialsPlist = NSDictionary(contentsOfFile: credentialsPath) as? [String: Any] else {
+                    DopamineKit.debugLog("[DopamineKit]: Error - cannot find credentials")
+                    return dict
             }
-            path = credentialsPath
+            credentials = credentialsPlist
         }
         
-        guard let credentialsPlist = NSDictionary(contentsOfFile: path) as? [String: Any] else{
-            DopamineKit.debugLog("[DopamineKit]: Error - (\(credentialsFilename)) is in the wrong format")
-            return dict
-        }
         
-        guard let appID = credentialsPlist["appID"] as? String else{
-            DopamineKit.debugLog("[DopamineKit]: Error no appID - (\(credentialsFilename)) is in the wrong format")
+        guard let appID = credentials["appID"] as? String else{
+            DopamineKit.debugLog("<DopamineProperties>: Error no appID")
             return dict
         }
         dict["appID"] = appID
         
-        guard let versionID = credentialsPlist["versionID"] as? String else{
-            DopamineKit.debugLog("[DopamineKit]: Error no versionID - (\(credentialsFilename)) is in the wrong format")
+        guard let versionID = credentials["versionID"] as? String else{
+            DopamineKit.debugLog("<DopamineProperties>: Error no versionID")
             return dict
         }
         if let newVersionID = UserDefaults.standard.string(forKey: "Visualizer.versionID") {
@@ -274,22 +266,22 @@ public class DopamineAPI : NSObject{
             dict["versionID"] = versionID
         }
         
-        if let inProduction = credentialsPlist["inProduction"] as? Bool{
+        if let inProduction = credentials["inProduction"] as? Bool{
             if(inProduction){
-                guard let productionSecret = credentialsPlist["productionSecret"] as? String else{
-                    DopamineKit.debugLog("[DopamineKit]: Error no productionSecret - (\(credentialsFilename)) is in the wrong format")
+                guard let productionSecret = credentials["productionSecret"] as? String else{
+                    DopamineKit.debugLog("<DopamineProperties>: Error no productionSecret")
                     return dict
                 }
                 dict["secret"] = productionSecret
             } else{
-                guard let developmentSecret = credentialsPlist["developmentSecret"] as? String else{
-                    DopamineKit.debugLog("[DopamineKit]: Error no developmentSecret - (\(credentialsFilename)) is in the wrong format")
+                guard let developmentSecret = credentials["developmentSecret"] as? String else{
+                    DopamineKit.debugLog("<DopamineProperties>: Error no developmentSecret")
                     return dict
                 }
                 dict["secret"] = developmentSecret
             }
         } else{
-            DopamineKit.debugLog("[DopamineKit]: Error no inProduction - (\(credentialsFilename)) is in the wrong format")
+            DopamineKit.debugLog("<DopamineProperties>: Error no inProduction")
             return dict
         }
         
@@ -299,6 +291,12 @@ public class DopamineAPI : NSObject{
     /// Computes a primary identity for the user
     ///
     private lazy var primaryIdentity:String = {
+        #if DEBUG
+            if let tid = DopamineKit.developmentIdentity {
+                DopamineKit.debugLog("Testing with primaryIdentity:(\(tid))")
+                return tid
+            }
+        #endif
         if let aid = ASIdentifierManager.shared().adId()?.uuidString,
             aid != "00000000-0000-0000-0000-000000000000" {
             DopamineKit.debugLog("ASIdentifierManager primaryIdentity:(\(aid))")
@@ -307,7 +305,7 @@ public class DopamineAPI : NSObject{
             DopamineKit.debugLog("identifierForVendor primaryIdentity:(\(vid))")
             return vid
         } else {
-            DopamineKit.debugLog("IDUnavailable")
+            DopamineKit.debugLog("IDUnavailable for primaryIdentity")
             return "IDUnavailable"
         }
     }()
