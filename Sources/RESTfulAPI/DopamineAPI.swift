@@ -251,13 +251,13 @@ public class DopamineAPI : NSObject{
         
         
         guard let appID = credentials["appID"] as? String else{
-            DopamineKit.debugLog("<DopamineProperties>: Error no appID")
+            DopamineKit.debugLog("<DopamineProperties>: Error no appID key")
             return dict
         }
         dict["appID"] = appID
         
         guard let versionID = credentials["versionID"] as? String else{
-            DopamineKit.debugLog("<DopamineProperties>: Error no versionID")
+            DopamineKit.debugLog("<DopamineProperties>: Error no versionID key")
             return dict
         }
         if let newVersionID = UserDefaults.standard.string(forKey: "Visualizer.versionID") {
@@ -267,21 +267,17 @@ public class DopamineAPI : NSObject{
         }
         
         if let inProduction = credentials["inProduction"] as? Bool{
-            if(inProduction){
-                guard let productionSecret = credentials["productionSecret"] as? String else{
-                    DopamineKit.debugLog("<DopamineProperties>: Error no productionSecret")
-                    return dict
-                }
-                dict["secret"] = productionSecret
-            } else{
-                guard let developmentSecret = credentials["developmentSecret"] as? String else{
-                    DopamineKit.debugLog("<DopamineProperties>: Error no developmentSecret")
-                    return dict
-                }
-                dict["secret"] = developmentSecret
+            guard let productionSecret = credentials["productionSecret"] as? String else{
+                DopamineKit.debugLog("<DopamineProperties>: Error no productionSecret key")
+                return dict
             }
+            guard let developmentSecret = credentials["developmentSecret"] as? String else{
+                DopamineKit.debugLog("<DopamineProperties>: Error no developmentSecret key")
+                return dict
+            }
+            dict["secret"] = inProduction ? productionSecret : developmentSecret
         } else{
-            DopamineKit.debugLog("<DopamineProperties>: Error no inProduction")
+            DopamineKit.debugLog("<DopamineProperties>: Error no inProduction key")
             return dict
         }
         
