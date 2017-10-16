@@ -40,8 +40,7 @@
                                                        @"target": NSStringFromClass([target class]),
                                                        @"selector": selectorName}
          ];
-        [VisualizerAPI recordActionWithSenderInstance:sender targetInstance:target selectorObj:action event:event];
-        
+        [VisualizerAPI recordActionWithSenderInstance:sender targetInstance:target selectorObj:action event:event];   
     }
     
     return [self swizzled_sendAction:action to:target from:sender forEvent:event];
