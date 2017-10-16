@@ -584,7 +584,7 @@ public class VisualizerAPI : NSObject {
                 })
                 
                 // send request
-                            DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
+//                DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
                 task.resume()
                 
             } catch {
