@@ -21,7 +21,7 @@ public extension UIView {
         - duration: How long celebration confetti should last
         - size: Size of individual confetti pieces
         - shapes: This directly affects the quantity of confetti. For example, [.circle] will show half as much confetti as [.circle, .circle]
-        - colors: Confetti colors are randomly selected from this array. Repeated colors increase that color's likelihood
+        - colors: This directly affects the quantity of confetti. For example, [.blue] will show half as much confetti as [.blue, .blue]
      */
     public func showConfetti(duration:Double = 0,
                       size:CGSize = CGSize(width: 9, height: 6),
@@ -56,7 +56,7 @@ public extension UIView {
                 }
                 for color in colors {
                     let cell = CAEmitterCell()
-                    cell.setValuesForBurst1()
+                    cell.setValuesForBurstPhase1()
                     cell.contents = confettiImage
                     cell.color = color.cgColor
                     cells.append(cell)
@@ -72,7 +72,7 @@ public extension UIView {
             /* Remove the burst effect */
             DispatchQueue.main.asyncAfter(deadline: .now() + duration / 4) {
                 for cell in confettiEmitter.emitterCells! {
-                    cell.setValuesForBurst2()
+                    cell.setValuesForBurstPhase2()
                 }
                 
                 /* Remove the confetti emitter */
@@ -141,8 +141,8 @@ public extension UIView {
     }
 }
 
-extension CAEmitterCell {
-    func setValuesForBurst1() {
+fileprivate extension CAEmitterCell {
+    fileprivate func setValuesForBurstPhase1() {
         self.birthRate = 12
         self.lifetime = 7
         self.velocity = 250
@@ -158,13 +158,13 @@ extension CAEmitterCell {
         self.greenRange = 0.2
     }
     
-    func setValuesForBurst2() {
+    fileprivate func setValuesForBurstPhase2() {
         self.birthRate = 0
         self.velocity = 300
         self.yAcceleration = 200
     }
     
-    func setValuesForShower() {
+    fileprivate func setValuesForShower() {
         self.birthRate = 10
         self.lifetime = 7
         self.velocity = 200
@@ -181,7 +181,7 @@ extension CAEmitterCell {
         self.greenRange = 0.2
     }
     
-    func setValuesForShowerBlurred(scale: Int) {
+    fileprivate func setValuesForShowerBlurred(scale: Int) {
         self.birthRate = 1
         self.lifetime = 7
         self.velocity = 300
@@ -199,7 +199,7 @@ extension CAEmitterCell {
 }
 
 
-extension ConfettiShape {
+fileprivate extension ConfettiShape {
     
     fileprivate static func rectangleConfetti(size: CGSize, color: UIColor = UIColor.white) -> CGImage {
         let offset = size.width / CGFloat((arc4random_uniform(7) + 1))
