@@ -23,10 +23,10 @@ public extension UIView {
         - shapes: This directly affects the quantity of confetti. For example, [.circle] will show half as much confetti as [.circle, .circle]
         - colors: Confetti colors are randomly selected from this array. Repeated colors increase that color's likelihood
      */
-    public func showConfetti(duration:Double = 2.0,
+    public func showConfetti(duration:Double = 0,
                       size:CGSize = CGSize(width: 9, height: 6),
                       shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle],
-                      colors:[UIColor] = [UIColor.from(hex: "4d81fb"), UIColor.from(hex: "9243f9"), UIColor.from(hex: "fdc33b"), UIColor.from(hex: "f7332f")],
+                      colors:[UIColor] = [UIColor.from(hex: "4d81fb", alpha: 0.8), UIColor.from(hex: "9243f9", alpha: 0.8), UIColor.from(hex: "fdc33b", alpha: 0.8), UIColor.from(hex: "f7332f", alpha: 0.8)],
                       completion: @escaping ()->Void = {}) {
         
         self.confettiBurst(duration: 0.8, size: size, shapes: shapes, colors: colors) {
@@ -66,16 +66,16 @@ public extension UIView {
             /* Start showing the confetti */
             confettiEmitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(confettiEmitter)
+            completion()
             
             /* Remove the burst effect */
-            DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2.0) {
-                completion()
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration / 4) {
                 for cell in confettiEmitter.emitterCells! {
                     cell.setValuesForBurst2()
                 }
                 
                 /* Remove the confetti emitter */
-                DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2.0) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + duration * 3/4) {
                     confettiEmitter.birthRate = 0
                     DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
                         confettiEmitter.removeFromSuperlayer()
@@ -110,14 +110,22 @@ public extension UIView {
                     cell.setValuesForShower()
                     cell.contents = confettiImage
                     cells.append(cell)
+                    /* Create some blurred confetti for depth perception */
+                    let rand = Int(arc4random_uniform(2))
+                    if rand != 0 {
+                        let blurredCell = CAEmitterCell()
+                        blurredCell.setValuesForShowerBlurred(scale: rand)
+                        blurredCell.contents = confettiImage.blurImage(radius: rand)
+                        cells.append(blurredCell)
+                    }
                 }
             }
             
-            /* Create some blurred confetti for depth perception */
-            let blurredCell = CAEmitterCell()
-            blurredCell.setValuesForShowerBlurred()
-            blurredCell.contents = ConfettiShape.blurImage(ConfettiShape.rectangleConfetti(size: size, color: colors[0]), radius: 2)
-            cells.append(blurredCell)
+//            /* Create some blurred confetti for depth perception */
+//            let blurredCell = CAEmitterCell()
+//            blurredCell.setValuesForShowerBlurred()
+//            blurredCell.contents = ConfettiShape.blurImage(ConfettiShape.rectangleConfetti(size: size, color: colors[0]), radius: 2)
+//            cells.append(blurredCell)
             
             confettiEmitter.emitterCells = cells
             
@@ -157,32 +165,36 @@ extension CAEmitterCell {
     func setValuesForBurst2() {
         self.birthRate = 0
         self.velocity = 200
-        self.yAcceleration = 5
+        self.yAcceleration = 150
     }
     
     func setValuesForShower() {
-        self.birthRate = 16
+        self.birthRate = 10
         self.lifetime = 7
         self.velocity = 200
         self.velocityRange = 50
+        self.yAcceleration = 150
         self.emissionLongitude = .pi
         self.emissionRange = .pi/4
         self.spin = 1
         self.spinRange = 3
+        self.scaleRange = 0.8
         self.redRange = 0.2
         self.blueRange = 0.2
         self.greenRange = 0.2
     }
     
-    func setValuesForShowerBlurred() {
+    func setValuesForShowerBlurred(scale: Int) {
         self.birthRate = 1
         self.lifetime = 7
         self.velocity = 300
-        self.velocityRange = 50
+        self.velocityRange = 150
+        self.yAcceleration = 150
         self.emissionLongitude = .pi
         self.spin = 1
         self.spinRange = 3
-        self.scale = 3
+        self.scale = CGFloat(1 + scale)
+        self.scaleRange = 2
         self.redRange = 0.2
         self.blueRange = 0.2
         self.greenRange = 0.2
@@ -246,12 +258,14 @@ extension ConfettiShape {
         
         return image!.cgImage!
     }
-    
-    fileprivate static func blurImage(_ image: CGImage, radius: Int) -> CGImage {
+}
+
+fileprivate extension CGImage {
+     fileprivate func blurImage(radius: Int) -> CGImage {
         guard radius != 0 else {
-            return image
+            return self
         }
-        let imageToBlur = CIImage(cgImage: image)
+        let imageToBlur = CIImage(cgImage: self)
         let blurfilter = CIFilter(name: "CIGaussianBlur")!
         blurfilter.setValue(radius, forKey: kCIInputRadiusKey)
         blurfilter.setValue(imageToBlur, forKey: kCIInputImageKey)
