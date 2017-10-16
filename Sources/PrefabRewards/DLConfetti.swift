@@ -26,7 +26,7 @@ public extension UIView {
     public func showConfetti(duration:Double = 0,
                       size:CGSize = CGSize(width: 9, height: 6),
                       shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle],
-                      colors:[UIColor] = [UIColor.from(hex: "4d81fb", alpha: 0.8), UIColor.from(hex: "9243f9", alpha: 0.8), UIColor.from(hex: "fdc33b", alpha: 0.8), UIColor.from(hex: "f7332f", alpha: 0.8)],
+                      colors:[UIColor] = [UIColor.from(hex: "4d81fb", alpha: 0.8), UIColor.from(hex: "4ac4fb", alpha: 0.8), UIColor.from(hex: "9243f9", alpha: 0.8), UIColor.from(hex: "fdc33b", alpha: 0.8), UIColor.from(hex: "f7332f", alpha: 0.8)],
                       completion: @escaping ()->Void = {}) {
         
         self.confettiBurst(duration: 0.8, size: size, shapes: shapes, colors: colors) {
@@ -44,20 +44,21 @@ public extension UIView {
             confettiEmitter.emitterSize = CGSize(width: self.frame.width / 4, height: 0)
             
             var cells:[CAEmitterCell] = []
-            for color in colors {
-                for shape in shapes {
-                    let confettiImage: CGImage
-                    switch shape {
-                    case .rectangle:
-                        confettiImage = ConfettiShape.rectangleConfetti(size: size, color: color)
-                    case .circle:
-                        confettiImage = ConfettiShape.circleConfetti(size: size, color: color)
-                    case .spiral:
-                        confettiImage = ConfettiShape.spiralConfetti(size: size, color: color)
-                    }
+            for shape in shapes {
+                let confettiImage: CGImage
+                switch shape {
+                case .rectangle:
+                    confettiImage = ConfettiShape.rectangleConfetti(size: size)
+                case .circle:
+                    confettiImage = ConfettiShape.circleConfetti(size: size)
+                case .spiral:
+                    confettiImage = ConfettiShape.spiralConfetti(size: size)
+                }
+                for color in colors {
                     let cell = CAEmitterCell()
                     cell.setValuesForBurst1()
                     cell.contents = confettiImage
+                    cell.color = color.cgColor
                     cells.append(cell)
                 }
             }
@@ -95,20 +96,21 @@ public extension UIView {
             confettiEmitter.emitterSize = CGSize(width: self.frame.width, height: 0)
             
             var cells:[CAEmitterCell] = []
-            for color in colors {
-                for shape in shapes {
-                    let confettiImage: CGImage
-                    switch shape {
-                    case .rectangle:
-                        confettiImage = ConfettiShape.rectangleConfetti(size: size, color: color)
-                    case .circle:
-                        confettiImage = ConfettiShape.circleConfetti(size: size, color: color)
-                    case .spiral:
-                        confettiImage = ConfettiShape.spiralConfetti(size: size, color: color)
-                    }
+            for shape in shapes {
+                let confettiImage: CGImage
+                switch shape {
+                case .rectangle:
+                    confettiImage = ConfettiShape.rectangleConfetti(size: size)
+                case .circle:
+                    confettiImage = ConfettiShape.circleConfetti(size: size)
+                case .spiral:
+                    confettiImage = ConfettiShape.spiralConfetti(size: size)
+                }
+                for color in colors {
                     let cell = CAEmitterCell()
                     cell.setValuesForShower()
                     cell.contents = confettiImage
+                    cell.color = color.cgColor
                     cells.append(cell)
                     /* Create some blurred confetti for depth perception */
                     let rand = Int(arc4random_uniform(2))
@@ -116,17 +118,11 @@ public extension UIView {
                         let blurredCell = CAEmitterCell()
                         blurredCell.setValuesForShowerBlurred(scale: rand)
                         blurredCell.contents = confettiImage.blurImage(radius: rand)
+                        blurredCell.color = color.cgColor
                         cells.append(blurredCell)
                     }
                 }
             }
-            
-//            /* Create some blurred confetti for depth perception */
-//            let blurredCell = CAEmitterCell()
-//            blurredCell.setValuesForShowerBlurred()
-//            blurredCell.contents = ConfettiShape.blurImage(ConfettiShape.rectangleConfetti(size: size, color: colors[0]), radius: 2)
-//            cells.append(blurredCell)
-            
             confettiEmitter.emitterCells = cells
             
             /* Start showing the confetti */
@@ -164,8 +160,8 @@ extension CAEmitterCell {
     
     func setValuesForBurst2() {
         self.birthRate = 0
-        self.velocity = 200
-        self.yAcceleration = 150
+        self.velocity = 300
+        self.yAcceleration = 200
     }
     
     func setValuesForShower() {
@@ -173,11 +169,12 @@ extension CAEmitterCell {
         self.lifetime = 7
         self.velocity = 200
         self.velocityRange = 50
-        self.yAcceleration = 150
+        self.yAcceleration = 200
         self.emissionLongitude = .pi
         self.emissionRange = .pi/4
         self.spin = 1
         self.spinRange = 3
+        self.scale = 0.6
         self.scaleRange = 0.8
         self.redRange = 0.2
         self.blueRange = 0.2
@@ -189,7 +186,7 @@ extension CAEmitterCell {
         self.lifetime = 7
         self.velocity = 300
         self.velocityRange = 150
-        self.yAcceleration = 150
+        self.yAcceleration = 200
         self.emissionLongitude = .pi
         self.spin = 1
         self.spinRange = 3
@@ -204,7 +201,7 @@ extension CAEmitterCell {
 
 extension ConfettiShape {
     
-    fileprivate static func rectangleConfetti(size: CGSize, color: UIColor) -> CGImage {
+    fileprivate static func rectangleConfetti(size: CGSize, color: UIColor = UIColor.white) -> CGImage {
         let offset = size.width / CGFloat((arc4random_uniform(7) + 1))
         
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
@@ -225,7 +222,7 @@ extension ConfettiShape {
         return image!.cgImage!
     }
     
-    fileprivate static func spiralConfetti(size: CGSize, color: UIColor) -> CGImage {
+    fileprivate static func spiralConfetti(size: CGSize, color: UIColor = UIColor.white) -> CGImage {
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         let context = UIGraphicsGetCurrentContext()!
         
@@ -244,7 +241,7 @@ extension ConfettiShape {
         return image!.cgImage!
     }
     
-    fileprivate static func circleConfetti(size: CGSize, color: UIColor) -> CGImage {
+    fileprivate static func circleConfetti(size: CGSize, color: UIColor = UIColor.white) -> CGImage {
         let diameter = min(size.width, size.height)
         
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
