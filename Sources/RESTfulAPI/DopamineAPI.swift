@@ -260,11 +260,11 @@ public class DopamineAPI : NSObject{
             DopamineKit.debugLog("<DopamineProperties>: Error no versionID key")
             return dict
         }
-        if let newVersionID = UserDefaults.standard.string(forKey: "Visualizer.versionID") {
-            dict["versionID"] = newVersionID
-        } else {
+//        if let newVersionID = UserDefaults.standard.string(forKey: "Visualizer.versionID") {
+//            dict["versionID"] = newVersionID
+//        } else {
             dict["versionID"] = versionID
-        }
+//        }
         
         if let inProduction = credentials["inProduction"] as? Bool{
             guard let productionSecret = credentials["productionSecret"] as? String else{

@@ -31,7 +31,7 @@ class ViewController: UIViewController {
                 var subtitle:String?
                 var backgroundColor:UIColor = UIColor.blue
                 var visibilityDuration:TimeInterval = 1.75
-                
+            
                 // Set up a couple of different responses to keep your users surprised
                 switch(reinforcement){
                 case "medalStar":
@@ -55,7 +55,7 @@ class ViewController: UIViewController {
                 default:
                     return
                 }
-                
+            
                 // Woo hoo! Treat yoself
             let candybar = CandyBar(title: title, subtitle: subtitle, image: reinforcerType.image, backgroundColor: backgroundColor)
                 // if `nil` or no duration is provided, the CandyBar will go away when the user taps it or `candybar.dismiss()` is used
@@ -89,17 +89,17 @@ class ViewController: UIViewController {
         loadBasicUI()
         DopamineKit.syncCoordinator.performSync()
         
-        testQueue.isSuspended = true
-        for i in 1...100 {
-            testQueue.addOperation {
-                DopamineKit.track("test")
-            }
-        }
-        testQueue.isSuspended = false
+//        testQueue.isSuspended = true
+//        for _ in 1...100 {
+//            testQueue.addOperation {
+//                DopamineKit.track("test") {_ in}
+//            }
+//        }
+//        testQueue.isSuspended = false
         
-        DispatchQueue.global().asyncAfter(deadline: .now()) {
-            CandyBar(title: "title", subtitle: "Subtitle").show()
-        }
+//        DispatchQueue.global().asyncAfter(deadline: .now()) {
+//            CandyBar(title: "title", subtitle: "Subtitle").show(duration: 3.0)
+//        }
     }
     
     @objc func loadBasicUI(){
