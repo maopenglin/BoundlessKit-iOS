@@ -678,15 +678,17 @@ public class VisualizerAPI : NSObject {
 
 fileprivate extension UIResponder {
     func getParentResponders() -> [String]{
-        var parentResponders: [String] = []
-        getParentResponders(responders: &parentResponders)
-        return parentResponders
+        var responders: [String] = []
+        DispatchQueue.main.sync {
+            parentResponders(responders: &responders)
+        }
+        return responders
     }
     
-    func getParentResponders(responders: inout [String]) {
+    private func parentResponders(responders: inout [String]) {
         responders.append(NSStringFromClass(type(of:self)))
         if let next = self.next {
-            next.getParentResponders(responders: &responders)
+            next.parentResponders(responders: &responders)
         }
     }
 }
