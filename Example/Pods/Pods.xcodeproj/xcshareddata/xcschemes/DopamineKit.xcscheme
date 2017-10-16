@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C10E7AEE8B9C4A622B8A8954FC0274BD"
+               BlueprintIdentifier = "DA3695B5C87661A2E59D69B04922DDD5"
                BuildableName = "DopamineKit.framework"
                BlueprintName = "DopamineKit"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -47,7 +47,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C10E7AEE8B9C4A622B8A8954FC0274BD"
+            BlueprintIdentifier = "DA3695B5C87661A2E59D69B04922DDD5"
             BuildableName = "DopamineKit.framework"
             BlueprintName = "DopamineKit"
             ReferencedContainer = "container:Pods.xcodeproj">

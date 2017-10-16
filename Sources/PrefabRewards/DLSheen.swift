@@ -10,8 +10,12 @@ import Foundation
 import UIKit
 
 public extension UIView {
+    
     public func showSheen(duration: Double) {
-        let imageView = UIImageView(image: UIImage(named: "sheen")!)
+        guard let bundle = DopamineKit.frameworkBundle else {
+            return
+        }
+        let imageView = UIImageView(image: UIImage.init(named: "sheen", in: bundle, compatibleWith: nil))
         
         let height = self.frame.height
         let width: CGFloat = height * 1.667
@@ -65,3 +69,14 @@ fileprivate class SheenAnimationDelegate : NSObject, CAAnimationDelegate {
     }
 }
 
+
+fileprivate extension DopamineKit {
+    fileprivate class var frameworkBundle: Bundle? {
+        if let bundleURL = Bundle(for: DopamineKit.classForCoder()).url(forResource: "DopamineKit", withExtension: "bundle") {
+            return Bundle(url: bundleURL)
+        } else {
+            DopamineKit.debugLog("The DopamineKit framework bundle cannot be found")
+            return nil
+        }
+    }
+}

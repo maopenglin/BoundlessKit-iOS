@@ -165,11 +165,11 @@ internal class Report : NSObject, NSCoding {
                 DopamineAPI.report(self.reportedActions, completion: { response in
                     defer { self.syncInProgress = false }
                     if let responseStatusCode = response["status"] as? Int {
-                        if responseStatusCode == 200 {
+                        if responseStatusCode == 200 || responseStatusCode == 406 {
                             self.reportedActions.removeAll()
                             self.updateTriggers()
                         }
-                        completion(responseStatusCode)
+                        completion(200)
                     } else {
                         completion(404)
                     }

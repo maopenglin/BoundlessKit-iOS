@@ -584,7 +584,7 @@ public class VisualizerAPI : NSObject {
                 })
                 
                 // send request
-                            DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
+//                DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
                 task.resume()
                 
             } catch {
@@ -662,15 +662,22 @@ public class VisualizerAPI : NSObject {
     /// This variable computes an identity for the user and saves it to NSUserDefaults for future use.
     ///
     private lazy var primaryIdentity:String = {
-        let key = "DopaminePrimaryIdentity"
-        let defaults = UserDefaults.standard
-        if let identity = defaults.value(forKey: key) as? String {
-            DopamineKit.debugLog("primaryIdentity:(\(identity))")
-            return identity
+        #if DEBUG
+            if let tid = DopamineKit.developmentIdentity {
+                DopamineKit.debugLog("Testing with primaryIdentity:(\(tid))")
+                return tid
+            }
+        #endif
+        if let aid = ASIdentifierManager.shared().adId()?.uuidString,
+            aid != "00000000-0000-0000-0000-000000000000" {
+            DopamineKit.debugLog("ASIdentifierManager primaryIdentity:(\(aid))")
+            return aid
+        } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
+            DopamineKit.debugLog("identifierForVendor primaryIdentity:(\(vid))")
+            return vid
         } else {
-            let defaultIdentity = UIDevice.current.identifierForVendor!.uuidString
-            defaults.setValue(defaultIdentity, forKey: key)
-            return defaultIdentity
+            DopamineKit.debugLog("IDUnavailable for primaryIdentity")
+            return "IDUnavailable"
         }
     }()
 
@@ -678,15 +685,17 @@ public class VisualizerAPI : NSObject {
 
 fileprivate extension UIResponder {
     func getParentResponders() -> [String]{
-        var parentResponders: [String] = []
-        getParentResponders(responders: &parentResponders)
-        return parentResponders
+        var responders: [String] = []
+        DispatchQueue.main.sync {
+            parentResponders(responders: &responders)
+        }
+        return responders
     }
     
-    func getParentResponders(responders: inout [String]) {
+    private func parentResponders(responders: inout [String]) {
         responders.append(NSStringFromClass(type(of:self)))
         if let next = self.next {
-            next.getParentResponders(responders: &responders)
+            next.parentResponders(responders: &responders)
         }
     }
 }

@@ -16,8 +16,8 @@ Pod::Spec.new do |s|
 #
 
 s.name             = "DopamineKit"
-s.version          = "5.0.3"
-s.summary          = "A framework to use DopamineLabs machine learning API written in Swift 3"
+s.version          = "5.1.0"
+s.summary          = "A framework to use DopamineLabs machine learning API written in Swift 4"
 s.homepage         = "https://github.com/DopamineLabs/DopamineKit-iOS"
 s.social_media_url = 'https://twitter.com/usedopamine'
 
@@ -71,10 +71,10 @@ s.source           = { :git => "https://github.com/DopamineLabs/DopamineKit-iOS.
 #
 
 s.source_files = "Sources/**/*"
+s.resource_bundles = {
+'DopamineKit' => ['Sources/Assets/*.png']
+}
 
 s.public_header_files = "Sources/**/*.h"
-
-#s.dependency 'SQLite.swift'
-s.frameworks = 'CoreData'
 
 end

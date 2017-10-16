@@ -1,12 +1,15 @@
 //
-//  CandyBar.swift
+//  DLCandyBar.swift
+//  DopamineKit
 //
+//  Created by Akash Desai on 10/11/17.
 //
 
 import Foundation
 import UIKit
 
-internal enum CandyBarState {
+@objc
+public enum CandyBarState : Int {
     case showing, hidden, gone
 }
 
@@ -16,7 +19,7 @@ internal enum CandyBarState {
 /// - Bottom: The candybar will appear at the bottom.
 @objc
 public enum CandyBarPosition : Int{
-    case top, bottom
+    case top = 0, bottom
 }
 
 /// A level of 'springiness' for CandyBars.
@@ -36,7 +39,7 @@ public enum CandyBarSpringiness : Int{
     }
 }
 
-/// CandyBar is a dropdown notification view.
+/// CandyBar is a dropdown notification view, like a banner.
 @objc
 open class CandyBar: UIView {
     
@@ -46,11 +49,12 @@ open class CandyBar: UIView {
     ///     - title?: The title of the candybar. Defaults to `nil`.
     ///     - subtitle?: The subtitle of the candybar. Defaults to `nil`.
     ///     - image?: The image on the left of the candybar. Defaults to `nil`.
+    ///     - position: Whether the candybar should be displayed on the top or bottom. Defaults to `.Top`.
     ///     - backgroundColor?: The color of the candybar's background view. Defaults to `UIColor.blackColor()`.
     ///     - didTapBlock?: An action to be called when the user taps on the candybar. Defaults to `nil`.
     ///
-    @objc public required init(title: String? = nil, subtitle: String? = nil, image: UIImage? = nil, backgroundColor: UIColor = UIColor.black, didTapBlock: (() -> ())? = nil) {
-        self.didTapBlock = didTapBlock
+    public required init(title: String? = nil, subtitle: String? = nil, image: UIImage? = nil, position: CandyBarPosition = .top, backgroundColor: UIColor = UIColor.from(hex: "#1689ce"), didDismissBlock: (() -> ())? = nil) {
+        self.didDismissBlock = didDismissBlock
         self.image = image
         super.init(frame: CGRect.zero)
         resetShadows()
@@ -59,30 +63,7 @@ open class CandyBar: UIView {
         resetTintColor()
         titleLabel.text = title
         detailLabel.text = subtitle
-        backgroundView.backgroundColor = backgroundColor
-        backgroundView.alpha = 0.95
-    }
-    
-    
-    /// A CandyBar with the provided `title`, `subtitle`, and an optional icon, ready to be presented with `show()`.
-    ///
-    /// - parameters:
-    ///     - title?: The title of the candybar. Defaults to `nil`.
-    ///     - subtitle?: The subtitle of the candybar. Defaults to `nil`.
-    ///     - icon?: An icon, from the `Candy` class, to be displayed on the left of a candybar. Defaults to `.Stars`
-    ///     - backgroundColor?: The color of the candybar's background view. Defaults to `UIColor.blackColor()`.
-    ///     - didTapBlock?: An action to be called when the user taps on the candybar. Defaults to `nil`.
-    ///
-    @objc public required init(title: String? = nil, subtitle: String? = nil, icon: CandyIcon = .stars, backgroundColor: UIColor = UIColor.black, didTapBlock: (() -> ())? = nil) {
-        self.didTapBlock = didTapBlock
-        self.image = icon.image
-        super.init(frame: CGRect.zero)
-        resetShadows()
-        addGestureRecognizers()
-        initializeSubviews()
-        resetTintColor()
-        titleLabel.text = title
-        detailLabel.text = subtitle
+        self.position = position
         backgroundView.backgroundColor = backgroundColor
         backgroundView.alpha = 0.95
     }
@@ -91,113 +72,74 @@ open class CandyBar: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    /// Shows the candybar. If a view is specified, the candybar will be displayed at the top of that view, otherwise at top of the top window. If a `duration` is specified, the candybar dismisses itself automatically after that duration elapses.
+    /// Displays the candybar notification
     ///
-    /// - parameter:
-    ///     - duration?: A time interval, after which the candybar will dismiss itself. Defaults to `nil`, which in turn means the user will have to tap-to-dismiss or the function `candybar.dismiss()` can be used.
+    /// - parameters:
+    ///     - duration?: How long to show the candybar. If `nil`, then the candybar will be dismissed when the user taps it or until `.dismiss()` is called.
+    ///                 Defaults to `nil`.
     ///
-    open func show(_ duration: TimeInterval? = nil) {
+    open func show(duration: TimeInterval = 0) {
+        DispatchQueue.main.async {
         CandyBar.topWindow()!.addSubview(self)
-        forceUpdates()
+            self.forceUpdates()
+        let (damping, velocity) = self.springiness.springValues
+            UIView.animate(withDuration: self.animationDuration, delay: 0.0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: .allowUserInteraction, animations: {
+            self.candybarState = .showing
+        }, completion: { finished in
+            if (duration == 0) { return }
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + duration) {
+                self.dismiss()
+            }
+        })
+        }
+    }
+    
+    /// Dismisses the candybar and executes the `didDismissBlock`
+    ///
+    open func dismiss() {
         let (damping, velocity) = self.springiness.springValues
         UIView.animate(withDuration: animationDuration, delay: 0.0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: .allowUserInteraction, animations: {
-            self.candybarState = .showing
-            }, completion: { finished in
-                guard let duration = duration else { return }
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + duration, execute: {self.dismiss()})
+            self.candybarState = .hidden
+        }, completion: { finished in
+            self.candybarState = .gone
+            self.removeFromSuperview()
+            self.didDismissBlock?()
         })
     }
     
-    /// This function takes a hex string and returns a UIColor
-    ///
-    /// - parameters:
-    ///     - hex: A hex string with either format `"#ffffff"` or `"ffffff"` or `"#FFFFFF"`.
-    ///
-    /// - returns:
-    ///     The corresponding UIColor for valid hex strings, `UIColor.grayColor()` otherwise.
-    ///
-    @objc open static func hexStringToUIColor (_ hex:String) -> UIColor {
-        var cString:String = hex.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines as CharacterSet).uppercased()
-        
-        if ((cString.characters.count) != 6) {
-            return UIColor.gray
-        }
-        
-        var rgbValue:UInt32 = 0
-        Scanner(string: cString).scanHexInt32(&rgbValue)
-        
-        return UIColor(
-            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-            alpha: CGFloat(1.0)
-        )
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    /** 
-     
-     
-     
-     Internal functions below
-     Created by Harlan Haskins and Akash Desai
-     
-     
-     
-     
-    */
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    @objc class func topWindow() -> UIWindow? {
-        for window in UIApplication.shared.windows.reversed() {
-            if window.windowLevel == UIWindowLevelNormal && !window.isHidden && window.frame != CGRect.zero { return window }
-        }
-        return nil
-    }
-    
-    fileprivate let contentView = UIView()
-    fileprivate let labelView = UIView()
-    fileprivate let backgroundView = UIView()
-    
     /// How long the slide down animation should last.
-    @objc open var animationDuration: TimeInterval = 0.4
-    
-    /// The preferred style of the status bar during display of the candybar. Defaults to `.LightContent`.
-    ///
-    /// If the candybar's `adjustsStatusBarStyle` is false, this property does nothing.
-    @objc open var preferredStatusBarStyle = UIStatusBarStyle.lightContent
+    open var animationDuration: TimeInterval = 0.4
     
     /// Whether the candybar should appear at the top or the bottom of the screen. Defaults to `.Top`.
-    @objc open var position = CandyBarPosition.bottom
+    open var position = CandyBarPosition.top
     
     /// How 'springy' the candybar should display. Defaults to `.Slight`
-    @objc open var springiness = CandyBarSpringiness.slight
+    open var springiness = CandyBarSpringiness.slight
     
     /// The color of the text as well as the image tint color if `shouldTintImage` is `true`.
-    @objc open var textColor = UIColor.white {
+    open var textColor = UIColor.white {
         didSet {
             resetTintColor()
         }
     }
     
     /// Whether or not the candybar should show a shadow when presented.
-    @objc open var hasShadows = true {
+    open var hasShadows = true {
         didSet {
             resetShadows()
         }
+    }
+    
+    /// The text to display at the top line
+    open var titleText: String? {
+        get { return titleLabel.text }
+        set(text) { titleLabel.text = text }
+    }
+    
+    /// The text to display at the bottom line and in smaller text
+    open var subtitleText: String? {
+        get { return detailLabel.text }
+        set(text) { detailLabel.text = text }
     }
     
     /// The color of the background view. Defaults to `nil`.
@@ -212,27 +154,54 @@ open class CandyBar: UIView {
         set { backgroundView.alpha = newValue }
     }
     
-    /// A block to call when the uer taps on the candybar.
-    @objc open var didTapBlock: (() -> ())?
+    /// A block to call when the user taps on the candybar.
+    open var didTapBlock: (() -> ())?
     
     /// A block to call after the candybar has finished dismissing and is off screen.
-    @objc open var didDismissBlock: (() -> ())?
+    open var didDismissBlock: (() -> ())?
     
     /// Whether or not the candybar should dismiss itself when the user taps. Defaults to `true`.
-    @objc open var dismissesOnTap = true
+    open var dismissesOnTap = true
     
     /// Whether or not the candybar should dismiss itself when the user swipes up. Defaults to `true`.
-    @objc open var dismissesOnSwipe = true
+    open var dismissesOnSwipe = true
     
     /// Whether or not the candybar should tint the associated image to the provided `textColor`. Defaults to `true`.
-    @objc open var shouldTintImage = true {
+    open var shouldTintImage = false {
         didSet {
             resetTintColor()
         }
     }
     
+    
+    
+    
+    /**
+     
+     
+     
+     Internal functions below
+     Created by Harlan Haskins and modified by Akash Desai
+     
+     
+     
+     
+     */
+    
+    
+    class func topWindow() -> UIWindow? {
+        for window in UIApplication.shared.windows.reversed() {
+            if window.windowLevel == UIWindowLevelNormal && !window.isHidden && window.frame != CGRect.zero { return window }
+        }
+        return nil
+    }
+    
+    fileprivate let contentView = UIView()
+    fileprivate let labelView = UIView()
+    fileprivate let backgroundView = UIView()
+    
     /// The label that displays the candybar's title.
-    @objc open let titleLabel: UILabel = {
+    open let titleLabel: UILabel = {
         let label = UILabel()
         var titleFont = UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)
         
@@ -244,7 +213,7 @@ open class CandyBar: UIView {
     }()
     
     /// The label that displays the candybar's subtitle.
-    @objc open let detailLabel: UILabel = {
+    open let detailLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.subheadline)
         label.numberOfLines = 0
@@ -253,10 +222,10 @@ open class CandyBar: UIView {
     }()
     
     /// The image on the left of the candybar.
-    @objc let image: UIImage?
+    var image: UIImage?
     
     /// The image view that displays the `image`.
-    @objc open let imageView: UIImageView = {
+    open let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
@@ -390,7 +359,7 @@ open class CandyBar: UIView {
     
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        guard let superview = superview , candybarState != .gone else { return }
+        guard let superview = superview, candybarState != .gone else { return }
         commonConstraints = self.constraintsWithAttributes([.leading, .trailing], .equal, to: superview)
         superview.addConstraints(commonConstraints)
         
@@ -425,28 +394,16 @@ open class CandyBar: UIView {
         }
     }
     
-    /// Dismisses the candybar without a oldStatusBarStyle parameter.
-    @objc open func dismiss() {
-        let (damping, velocity) = self.springiness.springValues
-        UIView.animate(withDuration: animationDuration, delay: 0.0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: .allowUserInteraction, animations: {
-            self.candybarState = .hidden
-            }, completion: { finished in
-                self.candybarState = .gone
-                self.removeFromSuperview()
-                self.didDismissBlock?()
-        })
-    }
-    
 }
 
 extension NSLayoutConstraint {
-    @objc class func defaultConstraintsWithVisualFormat(_ format: String, options: NSLayoutFormatOptions = NSLayoutFormatOptions(), metrics: [String: AnyObject]? = nil, views: [String: AnyObject] = [:]) -> [NSLayoutConstraint] {
+    class func defaultConstraintsWithVisualFormat(_ format: String, options: NSLayoutFormatOptions = NSLayoutFormatOptions(), metrics: [String: AnyObject]? = nil, views: [String: AnyObject] = [:]) -> [NSLayoutConstraint] {
         return NSLayoutConstraint.constraints(withVisualFormat: format, options: options, metrics: metrics, views: views)
     }
 }
 
 extension UIView {
-    @objc func constraintsEqualToSuperview(_ edgeInsets: UIEdgeInsets = UIEdgeInsets.zero) -> [NSLayoutConstraint] {
+    func constraintsEqualToSuperview(_ edgeInsets: UIEdgeInsets = UIEdgeInsets.zero) -> [NSLayoutConstraint] {
         self.translatesAutoresizingMaskIntoConstraints = false
         var constraints = [NSLayoutConstraint]()
         if let superview = self.superview {
@@ -458,17 +415,17 @@ extension UIView {
         return constraints
     }
     
-    @objc func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to constant: CGFloat, multiplier: CGFloat = 1.0) -> NSLayoutConstraint {
+    func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to constant: CGFloat, multiplier: CGFloat = 1.0) -> NSLayoutConstraint {
         self.translatesAutoresizingMaskIntoConstraints = false
         return NSLayoutConstraint(item: self, attribute: attribute, relatedBy: relation, toItem: nil, attribute: .notAnAttribute, multiplier: multiplier, constant: constant)
     }
     
-    @objc func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to otherAttribute: NSLayoutAttribute, of item: AnyObject? = nil, multiplier: CGFloat = 1.0, constant: CGFloat = 0.0) -> NSLayoutConstraint {
+    func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to otherAttribute: NSLayoutAttribute, of item: AnyObject? = nil, multiplier: CGFloat = 1.0, constant: CGFloat = 0.0) -> NSLayoutConstraint {
         self.translatesAutoresizingMaskIntoConstraints = false
         return NSLayoutConstraint(item: self, attribute: attribute, relatedBy: relation, toItem: item ?? self, attribute: otherAttribute, multiplier: multiplier, constant: constant)
     }
     
-    @objc func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to item: AnyObject, multiplier: CGFloat = 1.0, constant: CGFloat = 0.0) -> NSLayoutConstraint {
+    func constraintWithAttribute(_ attribute: NSLayoutAttribute, _ relation: NSLayoutRelation, to item: AnyObject, multiplier: CGFloat = 1.0, constant: CGFloat = 0.0) -> NSLayoutConstraint {
         self.translatesAutoresizingMaskIntoConstraints = false
         return NSLayoutConstraint(item: self, attribute: attribute, relatedBy: relation, toItem: item, attribute: attribute, multiplier: multiplier, constant: constant)
     }
@@ -477,3 +434,4 @@ extension UIView {
         return attributes.map { self.constraintWithAttribute($0, relation, to: item, multiplier: multiplier, constant: constant) }
     }
 }
+

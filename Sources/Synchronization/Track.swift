@@ -155,7 +155,7 @@ internal class Track : NSObject, NSCoding {
     ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if there were no actions to sync.
     ///
     func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
-        DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
+        DispatchQueue.global().async{
             guard !self.syncInProgress else {
                 completion(0)
                 return

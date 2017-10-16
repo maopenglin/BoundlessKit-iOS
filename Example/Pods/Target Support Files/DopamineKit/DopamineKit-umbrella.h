@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "ASIdentifierManager+ASIdentifierManagerHelper.h"
 #import "SKPaymentTransactionObserver+Dopamine.h"
 #import "UIApplication+Dopamine.h"
 #import "UIApplicationDelegate+Dopamine.h"
