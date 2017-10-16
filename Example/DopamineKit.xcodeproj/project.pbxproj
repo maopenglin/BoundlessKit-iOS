@@ -569,7 +569,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0498B184D9048B7F96411D2D /* Pods-DopamineKit_Example.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 367K5HG48M;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
@@ -588,7 +588,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 101F6BD0552D25826A486B97 /* Pods-DopamineKit_Example.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 367K5HG48M;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
