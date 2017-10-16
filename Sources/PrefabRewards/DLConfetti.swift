@@ -25,55 +25,93 @@ public extension UIView {
      */
     public func showConfetti(duration:Double = 2.0,
                       size:CGSize = CGSize(width: 15, height: 10),
-                      shapes:[ConfettiShape] = [.rectangle, .rectangle, .rectangle, .circle, .circle, .spiral, .spiral, .spiral],
-                      colors:[UIColor] = [UIColor.blue, UIColor.green, UIColor.yellow, UIColor.red] ) {
+                      shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle],
+                      colors:[UIColor] = [UIColor.blue, UIColor.purple, UIColor.yellow, UIColor.red],
+                      completion: @escaping ()->Void = {}) {
         
-        let confettiEmitter = CAEmitterLayer(emitterWidth: self.frame.width, confettiSize: size, confettiShapes: shapes, confettiColors: colors)
+        firstBurst(duration: 0.8, size: size, shapes: shapes, colors: colors) {
+            self.secondBurst(duration: duration, size: size, shapes: shapes, colors: colors, completion: completion)
+        }
+    }
+    
+    internal func firstBurst(duration:Double,
+                              size:CGSize,
+                              shapes:[ConfettiShape],
+                              colors:[UIColor],
+                              completion: @escaping ()->Void) {
+        let confettiEmitter = CAEmitterLayer(center: CGPoint(x: self.frame.width/2.0, y: 0), emitterWidth: self.frame.width / 4.0, emissionRange: CGFloat.pi/4.0, birthRate: 8, velocity: 250, yAcceleration: -80, confettiSize: size, confettiShapes: shapes, confettiColors: colors)
+        confettiEmitter.beginTime = CACurrentMediaTime()
+        self.layer.addSublayer(confettiEmitter)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2.0) {
+            confettiEmitter.birthRate = 0
+            completion()
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2.0) {
+                for cell in confettiEmitter.emitterCells! {
+                    cell.yAcceleration = 0
+                }
+                confettiEmitter.birthRate = 0
+                confettiEmitter.velocity = 200
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                    confettiEmitter.removeFromSuperlayer()
+                }
+            }
+        }
+    }
+    
+    internal func secondBurst(duration:Double,
+                              size:CGSize,
+                              shapes:[ConfettiShape],
+                              colors:[UIColor],
+                              completion: @escaping ()->Void) {
+        let confettiEmitter = CAEmitterLayer(center: CGPoint(x: self.frame.width/2.0, y: 0), emitterWidth: self.frame.width, emissionRange: CGFloat.pi/4.0, birthRate: 2, velocity: 200, yAcceleration: 0, confettiSize: size, confettiShapes: shapes, confettiColors: colors)
+        confettiEmitter.beginTime = CACurrentMediaTime()
         self.layer.addSublayer(confettiEmitter)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
             confettiEmitter.birthRate = 0
-            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 7.0) {
                 confettiEmitter.removeFromSuperlayer()
+                completion()
             }
         }
     }
 }
 
 fileprivate extension CAEmitterLayer {
-    convenience init(emitterWidth: CGFloat, confettiSize:CGSize, confettiShapes:[ConfettiShape], confettiColors:[UIColor]) {
+    convenience init(center: CGPoint, emitterWidth: CGFloat, emissionRange: CGFloat, birthRate: Float, velocity: CGFloat, yAcceleration: CGFloat, confettiSize:CGSize, confettiShapes:[ConfettiShape], confettiColors:[UIColor]) {
         self.init()
         
-        self.emitterPosition = CGPoint(x: emitterWidth / 2.0, y: 0)
+        self.emitterPosition = center
         self.emitterShape = kCAEmitterLayerLine
         self.emitterSize = CGSize(width: emitterWidth, height: 1)
         
         var cells:[CAEmitterCell] = []
         
-        if confettiColors.count > 0 {
+        for color in confettiColors {
             for shape in confettiShapes {
-                let selectedColor = confettiColors[Int(arc4random_uniform(UInt32(confettiColors.count)))]
                 let confettiImage: UIImage
                 switch shape {
                 case .rectangle:
-                    confettiImage = rectangleConfetti(size: confettiSize, color: selectedColor)
+                    confettiImage = rectangleConfetti(size: confettiSize, color: color)
                 case .circle:
-                    confettiImage = circleConfetti(size: confettiSize, color: selectedColor)
+                    confettiImage = circleConfetti(size: confettiSize, color: color)
                 case .spiral:
-                    confettiImage = spiralConfetti(size: confettiSize, color: selectedColor)
+                    confettiImage = spiralConfetti(size: confettiSize, color: color)
                 }
                 let cell = CAEmitterCell()
                 
-                cell.birthRate = 2
+                cell.birthRate = birthRate
                 cell.lifetime = 7.0
                 cell.lifetimeRange = 0
-                cell.velocity = 200
-                cell.velocityRange = 50
+                cell.velocity = velocity
+                cell.yAcceleration = yAcceleration
                 cell.emissionLongitude = CGFloat.pi
-                cell.emissionRange = CGFloat.pi / 4
+                cell.emissionRange = emissionRange
                 cell.spin = 1
                 cell.spinRange = 3
-                cell.scaleRange = 0.5
+                cell.scale = 1
+                cell.scaleRange = 1
                 cell.scaleSpeed = -0.05
                 cell.contents = confettiImage.cgImage!
                 
@@ -81,15 +119,11 @@ fileprivate extension CAEmitterLayer {
             }
         }
         
-        self.shadowOffset = CGSize(width: 5, height: 7)
-        self.shadowOpacity = 0.4
-        self.shadowRadius = 5
-        
         self.emitterCells = cells
     }
     
     fileprivate func rectangleConfetti(size: CGSize, color: UIColor) -> UIImage {
-        let offset = size.width / 8.0
+        let offset = size.width / CGFloat((arc4random_uniform(7) + 1))
         
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         let context = UIGraphicsGetCurrentContext()!
