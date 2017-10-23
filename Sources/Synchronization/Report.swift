@@ -14,7 +14,9 @@ internal class Report : NSObject, NSCoding {
     static let sharedInstance = Report()
     
     private let defaults = UserDefaults.standard
-    private let defaultsKey = "DopamineReport_v4.1.3"
+    private let defaultsKey = "DopamineReport"
+    private let customerVersion = DopamineAPI.customerVersionID ?? "undefinedVersion"
+    
     private let reportedActionsKey = "reportedActions"
     private let sizeToSyncKey = "sizeToSync"
     private let timerStartsAtKey = "timerStartsAt"
@@ -35,20 +37,26 @@ internal class Report : NSObject, NSCoding {
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
     private init(sizeToSync: Int = 15, timerStartsAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
-        if let savedReportData = defaults.object(forKey: defaultsKey) as? NSData,
-            let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData as Data) as? Report {
-            self.reportedActions = savedReport.reportedActions
-            self.sizeToSync = savedReport.sizeToSync
-            self.timerStartsAt = savedReport.timerStartsAt
-            self.timerExpiresIn = savedReport.timerExpiresIn
-            super.init()
-        } else {
-            self.sizeToSync = sizeToSync;
-            self.timerStartsAt = timerStartsAt;
-            self.timerExpiresIn = timerExpiresIn;
-            super.init()
-            defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
+        if let savedReportData = defaults.object(forKey: defaultsKey) as? NSData {
+            if let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData as Data) as? Report,
+                savedReport.customerVersion == self.customerVersion
+            {
+                self.reportedActions = savedReport.reportedActions
+                self.sizeToSync = savedReport.sizeToSync
+                self.timerStartsAt = savedReport.timerStartsAt
+                self.timerExpiresIn = savedReport.timerExpiresIn
+                super.init()
+                return
+            } else {
+                defaults.removeObject(forKey: defaultsKey)
+                DopamineKit.debugLog("Erased outdated report.")
+            }
         }
+        self.sizeToSync = sizeToSync;
+        self.timerStartsAt = timerStartsAt;
+        self.timerExpiresIn = timerExpiresIn;
+        super.init()
+        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
     
     /// Decodes a saved report from NSUserDefaults
@@ -149,7 +157,6 @@ internal class Report : NSObject, NSCoding {
     func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
-                DopamineKit.debugLog("Report sync already happening")
                 completion(0)
                 return
             }

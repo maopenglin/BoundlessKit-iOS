@@ -162,7 +162,6 @@ internal class Cartridge : NSObject, NSCoding {
     func sync(completion: @escaping (Int) -> () = { _ in }) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
-                DopamineKit.debugLog("Cartridge sync for \(self.actionID) already happening")
                 completion(0)
                 return
             }

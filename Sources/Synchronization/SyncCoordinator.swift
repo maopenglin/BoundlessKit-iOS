@@ -78,7 +78,6 @@ public class SyncCoordinator {
     public func performSync() {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
-                DopamineKit.debugLog("Sync already happening")
                 return
             }
             self.syncInProgress = true

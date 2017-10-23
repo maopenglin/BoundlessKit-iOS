@@ -31,6 +31,7 @@ public class DopamineAPI : NSObject{
     private static let clientSDKVersion = Bundle(for: DopamineAPI.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     private static let clientOS = "iOS"
     private static let clientOSVersion = UIDevice.current.systemVersion
+    internal static var customerVersionID: String? {return sharedInstance.configurationData["versionID"] as? String}
     
     private override init() {
         super.init()
