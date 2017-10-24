@@ -12,7 +12,8 @@ import Foundation
 internal class Cartridge : NSObject, NSCoding {
     
     private let defaults = UserDefaults.standard
-    private func defaultsKey() -> String { return "DopamineCartridgeSyncer_v4.1.3_For" + self.actionID }
+    private var defaultsKey: String { get { return "DopamineCartridgeSyncer_For_\(self.actionID)" } }
+    private let customerVersion = DopamineAPI.customerVersionID ?? "undefinedVersion"
     private let actionIDKey = "actionID"
     private let reinforcementDecisionsKey = "reinforcementDecisions"
     private let initialSizeKey = "initialSize"
@@ -44,18 +45,23 @@ internal class Cartridge : NSObject, NSCoding {
     init(actionID: String, initialSize: Int=0, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 0) {
         self.actionID = actionID
         super.init()
-        if let savedCartridgeData = defaults.object(forKey: defaultsKey()) as? NSData,
-            let savedCartridge = NSKeyedUnarchiver.unarchiveObject(with: savedCartridgeData as Data) as? Cartridge {
-            self.reinforcementDecisions = savedCartridge.reinforcementDecisions
-            self.initialSize = savedCartridge.initialSize
-            self.timerStartsAt = savedCartridge.timerStartsAt
-            self.timerExpiresIn = savedCartridge.timerExpiresIn
-        } else {
-            self.initialSize = initialSize;
-            self.timerStartsAt = timerStartsAt;
-            self.timerExpiresIn = timerExpiresIn;
-            defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey())
+        if let savedCartridgeData = defaults.object(forKey: defaultsKey) as? NSData {
+            if let savedCartridge = NSKeyedUnarchiver.unarchiveObject(with: savedCartridgeData as Data) as? Cartridge,
+                savedCartridge.customerVersion == self.customerVersion {
+                self.reinforcementDecisions = savedCartridge.reinforcementDecisions
+                self.initialSize = savedCartridge.initialSize
+                self.timerStartsAt = savedCartridge.timerStartsAt
+                self.timerExpiresIn = savedCartridge.timerExpiresIn
+                return
+            } else {
+                defaults.removeObject(forKey: defaultsKey)
+                DopamineKit.debugLog("Erased outdated cartridge.")
+            }
         }
+        self.initialSize = initialSize
+        self.timerStartsAt = timerStartsAt
+        self.timerExpiresIn = timerExpiresIn
+        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
     
     /// Decodes a saved cartridge from NSUserDefaults
@@ -91,7 +97,7 @@ internal class Cartridge : NSObject, NSCoding {
         self.initialSize = initialSize
         self.timerStartsAt = timerStartsAt
         self.timerExpiresIn = timerExpiresIn
-        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey())
+        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
     
     /// Clears the saved reinforcement decisions and sync triggers from NSUserDefaults
@@ -101,7 +107,7 @@ internal class Cartridge : NSObject, NSCoding {
         self.initialSize = 0
         self.timerStartsAt = 0
         self.timerExpiresIn = 0
-        defaults.removeObject(forKey: defaultsKey())
+        defaults.removeObject(forKey: defaultsKey)
     }
     
     /// Returns whether the cartridge has been triggered for a sync
@@ -147,7 +153,7 @@ internal class Cartridge : NSObject, NSCoding {
     func remove() -> String {
         if isFresh() {
             let reinforcementDecision = reinforcementDecisions.removeFirst()
-            defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey())
+            defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
             return reinforcementDecision
         } else {
             return "neutralResponse"

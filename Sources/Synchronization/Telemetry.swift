@@ -14,8 +14,8 @@ internal class Telemetry {
     private static let queue = DispatchQueue(label: "com.usedopamine.dopaminekit.Telemetry")
     
     private static let defaults: UserDefaults = UserDefaults.standard
-    private static let syncOverviewsKey = "DopamineSyncOverviews_v4.1.3"
-    private static let dopeExceptionsKey = "DopamineDopeExceptions_v4.1.3"
+    private static let syncOverviewsKey = "DopamineSyncOverviews"
+    private static let dopeExceptionsKey = "DopamineDopeExceptions"
     
     private static var currentSyncOverview: SyncOverview?
     private static var syncOverviews: [SyncOverview] {

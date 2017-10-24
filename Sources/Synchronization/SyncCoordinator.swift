@@ -15,7 +15,7 @@ public class SyncCoordinator {
     /// Used to store actionIDs so cartridges can be loaded on init()
     ///
     private let defaults = UserDefaults.standard
-    private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet_v4.1.3"
+    private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet"
     
     private let trackSyncer = Track.sharedInstance
     private let reportSyncer = Report.sharedInstance
