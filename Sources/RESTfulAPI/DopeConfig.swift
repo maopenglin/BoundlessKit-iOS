@@ -11,13 +11,15 @@ import Foundation
 @objc
 public class DopeConfig : NSObject, NSCoding {
     
+    fileprivate static var _shared: DopeConfig?
     @objc public static var shared: DopeConfig {
         if let savedConfigData = DopeConfig.defaults.object(forKey: DopeConfig.defaultsKey) as? NSData,
             let savedConfig = NSKeyedUnarchiver.unarchiveObject(with: savedConfigData as Data) as? DopeConfig {
-            return savedConfig
+            _shared = savedConfig
         } else {
-            return DopeConfig()
+            _shared = DopeConfig()
         }
+        return _shared!
     }
     
     private static let defaults = UserDefaults.standard

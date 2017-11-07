@@ -11,7 +11,7 @@ import Foundation
 @objc
 internal class Track : NSObject, NSCoding {
     
-    static let sharedInstance = Track()
+    static let shared = Track()
     
     private let defaults = UserDefaults.standard
     private let defaultsKey = "DopamineTrack"
@@ -118,9 +118,9 @@ internal class Track : NSObject, NSCoding {
     ///
     private func batchIsFull() -> Bool {
         let count = trackedActions.count
-        let batchSizeReached = count >= DopeConfig.shared.trackingBatchSize
+        let isBatchSizeReached = count >= DopeConfig.shared.trackingBatchSize
         //        DopamineKit.debugLog("Track has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
-        return batchSizeReached
+        return isBatchSizeReached
     }
     
     /// Stores a tracked action to be synced over the DopamineAPI at a later time

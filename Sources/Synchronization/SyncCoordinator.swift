@@ -17,8 +17,8 @@ public class SyncCoordinator {
     private let defaults = UserDefaults.standard
     private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet"
     
-    private let trackSyncer = Track.sharedInstance
-    private let reportSyncer = Report.sharedInstance
+    private let trackSyncer = Track.shared
+    private let reportSyncer = Report.shared
     private var cartridgeSyncers:[String:Cartridge] = [:]
     
     private var syncInProgress = false
@@ -161,7 +161,7 @@ public class SyncCoordinator {
     ///     - size: The number of reported actions to trigger a sync.
     ///
     public func setSizeToSync(forReport size: Int?) {
-        reportSyncer.updateTriggers(sizeToSync: size, timerStartsAt: nil, timerExpiresIn: nil)
+        reportSyncer.updateTriggers(timerStartsAt: nil, timerExpiresIn: nil)
     }
     
     /// Erase the sync objects along with their data
