@@ -15,7 +15,7 @@ internal class Report : NSObject, NSCoding {
     
     private let defaults = UserDefaults.standard
     private let defaultsKey = "DopamineReport"
-    private let clientVersion = DopamineAPI.customerVersionID ?? "undefinedVersion"
+    @objc private let clientVersion: String
     
     @objc private var reportedActions: [DopeAction]
     @objc private var timerStartedAt: Int64
@@ -33,8 +33,9 @@ internal class Report : NSObject, NSCoding {
     private init(sizeToSync: Int = 15, timerStartsAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
         if let savedReportData = defaults.object(forKey: defaultsKey) as? NSData {
             if let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData as Data) as? Report,
-                savedReport.clientVersion == self.clientVersion
+                savedReport.clientVersion == DopamineAPI.customerVersionID
             {
+                self.clientVersion = savedReport.clientVersion
                 self.reportedActions = savedReport.reportedActions
                 self.timerStartedAt = savedReport.timerStartedAt
                 self.timerExpiresIn = savedReport.timerExpiresIn
@@ -45,6 +46,7 @@ internal class Report : NSObject, NSCoding {
                 DopamineKit.debugLog("Erased outdated report.")
             }
         }
+        self.clientVersion = DopamineAPI.customerVersionID ?? "undefinedVersion"
         self.reportedActions = []
         self.timerStartedAt = timerStartsAt
         self.timerExpiresIn = timerExpiresIn
@@ -54,16 +56,23 @@ internal class Report : NSObject, NSCoding {
     
     /// Decodes a saved report from NSUserDefaults
     ///
-    required init(coder aDecoder: NSCoder) {
-        self.reportedActions = aDecoder.decodeObject(forKey: #keyPath(Report.reportedActions)) as! [DopeAction]
-        self.timerStartedAt = aDecoder.decodeInt64(forKey: #keyPath(Report.timerStartedAt))
-        self.timerExpiresIn = aDecoder.decodeInt64(forKey: #keyPath(Report.timerExpiresIn))
-        //        DopamineKit.debugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+    required init?(coder aDecoder: NSCoder) {
+        if let clientVersion = aDecoder.decodeObject(forKey: #keyPath(Report.clientVersion)) as? String,
+            let reportedActions = aDecoder.decodeObject(forKey: #keyPath(Report.reportedActions)) as? [DopeAction] {
+            self.clientVersion = clientVersion
+            self.reportedActions = reportedActions
+            self.timerStartedAt = aDecoder.decodeInt64(forKey: #keyPath(Report.timerStartedAt))
+            self.timerExpiresIn = aDecoder.decodeInt64(forKey: #keyPath(Report.timerExpiresIn))
+            //        DopamineKit.debugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+        } else {
+            return nil
+        }
     }
     
     /// Encodes a report and saves it to NSUserDefaults
     ///
     func encode(with aCoder: NSCoder) {
+        aCoder.encode(clientVersion, forKey: #keyPath(Report.clientVersion))
         aCoder.encode(reportedActions, forKey: #keyPath(Report.reportedActions))
         aCoder.encode(timerStartedAt, forKey: #keyPath(Report.timerStartedAt))
         aCoder.encode(timerExpiresIn, forKey: #keyPath(Report.timerExpiresIn))
@@ -77,7 +86,7 @@ internal class Report : NSObject, NSCoding {
     ///     - timerStartsAt: The start time for a sync timer. Defaults to the current time.
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to previous timerExpiresIn.
     ///
-    func updateTriggers(timerStartsAt: Int64?=Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64?=nil) {
+    func updateTriggers(timerStartsAt: Int64? = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64? = nil) {
         if let timerStartsAt = timerStartsAt {
             self.timerStartedAt = timerStartsAt
         }
