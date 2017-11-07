@@ -32,15 +32,17 @@
 }
 
 - (BOOL)swizzled_sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event {
-    NSString *selectorName = NSStringFromSelector(action);
-    // Sometimes this method proxies through to its internal method. We want to ignore those calls.
-    if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
-        [DopamineKit track:@"UIApplication" metaData:@{@"tag": @"sendAction",
-                                                       @"sender": NSStringFromClass([sender class]),
-                                                       @"target": NSStringFromClass([target class]),
-                                                       @"selector": selectorName}
-         ];
-        [VisualizerAPI recordActionWithSenderInstance:sender targetInstance:target selectorObj:action event:event];   
+    if ([[DopeConfig shared] trackingApplicationStateEnabled]) {
+        NSString *selectorName = NSStringFromSelector(action);
+        // Sometimes this method proxies through to its internal method. We want to ignore those calls.
+        if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
+            [DopamineKit track:@"UIApplication" metaData:@{@"tag": @"sendAction",
+                                                           @"sender": NSStringFromClass([sender class]),
+                                                           @"target": NSStringFromClass([target class]),
+                                                           @"selector": selectorName}
+             ];
+            [VisualizerAPI recordActionWithSenderInstance:sender targetInstance:target selectorObj:action event:event];
+        }
     }
     
     return [self swizzled_sendAction:action to:target from:sender forEvent:event];

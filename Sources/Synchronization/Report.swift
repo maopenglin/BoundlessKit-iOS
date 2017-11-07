@@ -14,7 +14,9 @@ internal class Report : NSObject, NSCoding {
     static let sharedInstance = Report()
     
     private let defaults = UserDefaults.standard
-    private let defaultsKey = "DopamineReport_v4.1.3"
+    private let defaultsKey = "DopamineReport"
+    private let customerVersion = DopamineAPI.customerVersionID ?? "undefinedVersion"
+    
     private let reportedActionsKey = "reportedActions"
     private let sizeToSyncKey = "sizeToSync"
     private let timerStartsAtKey = "timerStartsAt"
@@ -35,20 +37,26 @@ internal class Report : NSObject, NSCoding {
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
     private init(sizeToSync: Int = 15, timerStartsAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
-        if let savedReportData = defaults.object(forKey: defaultsKey) as? NSData,
-            let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData as Data) as? Report {
-            self.reportedActions = savedReport.reportedActions
-            self.sizeToSync = savedReport.sizeToSync
-            self.timerStartsAt = savedReport.timerStartsAt
-            self.timerExpiresIn = savedReport.timerExpiresIn
-            super.init()
-        } else {
-            self.sizeToSync = sizeToSync;
-            self.timerStartsAt = timerStartsAt;
-            self.timerExpiresIn = timerExpiresIn;
-            super.init()
-            defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
+        if let savedReportData = defaults.object(forKey: defaultsKey) as? NSData {
+            if let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData as Data) as? Report,
+                savedReport.customerVersion == self.customerVersion
+            {
+                self.reportedActions = savedReport.reportedActions
+                self.sizeToSync = savedReport.sizeToSync
+                self.timerStartsAt = savedReport.timerStartsAt
+                self.timerExpiresIn = savedReport.timerExpiresIn
+                super.init()
+                return
+            } else {
+                defaults.removeObject(forKey: defaultsKey)
+                DopamineKit.debugLog("Erased outdated report.")
+            }
         }
+        self.sizeToSync = sizeToSync;
+        self.timerStartsAt = timerStartsAt;
+        self.timerExpiresIn = timerExpiresIn;
+        super.init()
+        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
     
     /// Decodes a saved report from NSUserDefaults
@@ -58,7 +66,7 @@ internal class Report : NSObject, NSCoding {
         self.sizeToSync = aDecoder.decodeInteger(forKey: sizeToSyncKey)
         self.timerStartsAt = aDecoder.decodeInt64(forKey: timerStartsAtKey)
         self.timerExpiresIn = aDecoder.decodeInt64(forKey: timerExpiresInKey)
-//        DopamineKit.debugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+        //        DopamineKit.debugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Encodes a report and saves it to NSUserDefaults
@@ -68,9 +76,9 @@ internal class Report : NSObject, NSCoding {
         aCoder.encode(sizeToSync, forKey: sizeToSyncKey)
         aCoder.encode(timerStartsAt, forKey: timerStartsAtKey)
         aCoder.encode(timerExpiresIn, forKey: timerExpiresInKey)
-//        DopamineKit.debugLog("Encoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+        //        DopamineKit.debugLog("Encoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
-
+    
     /// Updates the sync triggers
     ///
     /// - parameters:
@@ -116,7 +124,7 @@ internal class Report : NSObject, NSCoding {
     private func timerDidExpire() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartsAt + timerExpiresIn)
-//        DopamineKit.debugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
+        //        DopamineKit.debugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
         return isExpired
     }
     
@@ -127,7 +135,7 @@ internal class Report : NSObject, NSCoding {
     private func isSizeToSync() -> Bool {
         let count = reportedActions.count
         let isSize = count >= sizeToSync
-//        DopamineKit.debugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
+        //        DopamineKit.debugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isSize
     }
     
@@ -153,7 +161,6 @@ internal class Report : NSObject, NSCoding {
                 return
             }
             self.syncInProgress = true
-            DopamineKit.debugLog("Report sync in progress...")
             
             if self.reportedActions.count == 0 {
                 defer { self.syncInProgress = false }
@@ -165,11 +172,11 @@ internal class Report : NSObject, NSCoding {
                 DopamineAPI.report(self.reportedActions, completion: { response in
                     defer { self.syncInProgress = false }
                     if let responseStatusCode = response["status"] as? Int {
-                        if responseStatusCode == 200 || responseStatusCode == 406 {
+                        if responseStatusCode == 200 {
                             self.reportedActions.removeAll()
                             self.updateTriggers()
                         }
-                        completion(200)
+                        completion(responseStatusCode)
                     } else {
                         completion(404)
                     }
@@ -192,3 +199,4 @@ internal class Report : NSObject, NSCoding {
         return jsonObject
     }
 }
+

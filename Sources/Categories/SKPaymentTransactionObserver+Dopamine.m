@@ -41,37 +41,40 @@ static NSArray* observerSubclasses = nil;
 }
 
 - (void)swizzled_paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray<SKPaymentTransaction *> *)transactions {
-    for (SKPaymentTransaction* transaction in transactions) {
-        NSString* stateName;
-        switch (transaction.transactionState) {
-            case SKPaymentTransactionStatePurchased:
+    
+    if ([[DopeConfig shared] trackingStorekitObservationsEnabled]) {
+        for (SKPaymentTransaction* transaction in transactions) {
+            NSString* stateName;
+            switch (transaction.transactionState) {
+                case SKPaymentTransactionStatePurchased:
                 stateName = @"Purchased";
                 break;
                 
-            case SKPaymentTransactionStateFailed:
+                case SKPaymentTransactionStateFailed:
                 stateName = @"Failed";
                 break;
                 
-            case SKPaymentTransactionStateRestored:
+                case SKPaymentTransactionStateRestored:
                 stateName = @"Restored";
                 break;
                 
-            case SKPaymentTransactionStateDeferred:
+                case SKPaymentTransactionStateDeferred:
                 stateName = @"Deferred";
                 break;
                 
-            case SKPaymentTransactionStatePurchasing:
+                case SKPaymentTransactionStatePurchasing:
                 stateName = @"Purchasing";
                 break;
                 
-            default:
+                default:
                 stateName = @"unknown";
                 break;
+            }
+            [DopamineKit track:@"SKPaymentTransactionObserver" metaData:@{@"tag": @"updatedTransactions",
+                                                                          @"productID": transaction.payment.productIdentifier,
+                                                                          @"quantity": [NSNumber numberWithInteger:transaction.payment.quantity],
+                                                                          @"transactionState": stateName}];
         }
-        [DopamineKit track:@"SKPaymentTransactionObserver" metaData:@{@"tag": @"updatedTransactions",
-                                                                      @"productID": transaction.payment.productIdentifier,
-                                                                      @"quantity": [NSNumber numberWithInteger:transaction.payment.quantity],
-                                                                      @"transactionState": stateName}];
     }
     
     if ([self respondsToSelector:@selector(swizzled_paymentQueue:updatedTransactions:)]) {

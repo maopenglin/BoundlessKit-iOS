@@ -22,16 +22,19 @@
     if ([self respondsToSelector:@selector(swizzled_viewDidAppear:)])
         [self swizzled_viewDidAppear:animated];
     
-    [DopamineKit track:@"UIViewController" metaData:@{@"instanceClass": NSStringFromClass([self class]),
-                                                      @"tag": @"didAppear"}];
-    //    [Helper logControlActionsWithView:[self view]];
+    if ([[DopeConfig shared] trackingApplicationViewsEnabled]) {
+        [DopamineKit track:@"UIViewController" metaData:@{@"instanceClass": NSStringFromClass([self class]),
+                                                          @"tag": @"didAppear"}];
+    }
 }
 
 - (void) swizzled_viewDidDisappear:(BOOL)animated {
     if ([self respondsToSelector:@selector(swizzled_viewDidDisappear:)])
         [self swizzled_viewDidDisappear:animated];
     
-    [DopamineKit track:@"UIViewController" metaData:@{@"instanceClass": NSStringFromClass([self class]),
-                                                      @"tag": @"didDisappear"}];
+    if ([[DopeConfig shared] trackingApplicationViewsEnabled]) {
+        [DopamineKit track:@"UIViewController" metaData:@{@"instanceClass": NSStringFromClass([self class]),
+                                                          @"tag": @"didDisappear"}];
+    }
 }
 @end

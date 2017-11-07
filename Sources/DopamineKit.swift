@@ -35,6 +35,9 @@ open class DopamineKit : NSObject {
     ///                  Defaults to `nil`.
     ///
     @objc open static func track(_ actionID: String, metaData: [String: Any]? = nil) {
+        guard DopeConfig.shared.trackingEnabled else {
+            return
+        }
         // store the action to be synced
         DispatchQueue.global(qos: .background).async {
             let action = DopeAction(actionID: actionID, metaData:metaData)
@@ -54,7 +57,9 @@ open class DopamineKit : NSObject {
     ///
     @objc open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, completion: @escaping (String) -> ()) {
         let action = DopeAction(actionID: actionID, metaData: metaData)
-        action.reinforcementDecision = syncCoordinator.retrieveReinforcementDecisionFor(actionID: action.actionID)
+        action.reinforcementDecision = DopeConfig.shared.reinforcementEnabled ?
+            syncCoordinator.retrieve(cartridgeFor: action.actionID).remove() :
+            Cartridge.defaultReinforcementDecision
         
         DispatchQueue.main.async(execute: {
             completion(action.reinforcementDecision!)
@@ -74,6 +79,9 @@ open class DopamineKit : NSObject {
     ///
     @objc public static func debugLog(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
         #if DEBUG
+            guard DopeConfig.shared.consoleLoggingEnabled else {
+                return
+            }
             var functionSignature:String = function
             if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
                 functionSignature.replaceSubrange(parameterNames, with: "()")

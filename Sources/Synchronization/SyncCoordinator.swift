@@ -15,7 +15,7 @@ public class SyncCoordinator {
     /// Used to store actionIDs so cartridges can be loaded on init()
     ///
     private let defaults = UserDefaults.standard
-    private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet_v4.1.3"
+    private let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet"
     
     private let trackSyncer = Track.sharedInstance
     private let reportSyncer = Report.sharedInstance
@@ -35,7 +35,7 @@ public class SyncCoordinator {
     
     /// Stores a tracked action to be synced
     ///
-    /// - parameters: 
+    /// - parameters:
     ///     - trackedAction: A tracked action.
     ///
     internal func store(trackedAction: DopeAction) {
@@ -61,14 +61,14 @@ public class SyncCoordinator {
     /// - returns:
     ///     A reinforcement decision
     ///
-    internal func retrieveReinforcementDecisionFor(actionID: String) -> String {
+    internal func retrieve(cartridgeFor actionID: String) -> Cartridge {
         if let cartridge = cartridgeSyncers[actionID] {
-            return cartridge.remove()
+            return cartridge
         } else {
             let cartridge = Cartridge(actionID: actionID)
             cartridgeSyncers[actionID] = cartridge
             defaults.set(cartridgeSyncers.keys.sorted(), forKey: cartridgeActionIDSetKey)
-            return cartridge.remove()
+            return cartridge
         }
     }
     
@@ -76,7 +76,7 @@ public class SyncCoordinator {
     /// that allows time for the DopamineAPI to generate cartridges
     ///
     public func performSync() {
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
             guard !self.syncInProgress else {
                 return
             }
@@ -155,15 +155,6 @@ public class SyncCoordinator {
         }
     }
     
-    /// Modifies the number of tracked actions to trigger a sync
-    ///
-    /// - parameters:
-    ///     - size: The number of tracked actions to trigger a sync.
-    ///
-    public func setSizeToSync(forTrack size: Int?) {
-        trackSyncer.updateTriggers(sizeToSync: size, timerStartsAt: nil, timerExpiresIn: nil)
-    }
-    
     /// Modifies the number of reported actions to trigger a sync
     ///
     /// - parameters:
@@ -191,5 +182,7 @@ public class SyncCoordinator {
             cartridge.erase()
         }
         cartridgeSyncers.removeAll()
+        defaults.removeObject(forKey: cartridgeActionIDSetKey)
     }
 }
+
