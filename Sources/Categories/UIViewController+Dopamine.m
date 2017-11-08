@@ -22,7 +22,7 @@
     if ([self respondsToSelector:@selector(swizzled_viewDidAppear:)])
         [self swizzled_viewDidAppear:animated];
     
-    if ([[DopeConfig shared] trackingApplicationViewsEnabled]) {
+    if ([[DopeConfig shared] applicationViews]) {
         [DopamineKit track:@"UIViewController" metaData:@{@"instanceClass": NSStringFromClass([self class]),
                                                           @"tag": @"didAppear"}];
     }
@@ -32,7 +32,7 @@
     if ([self respondsToSelector:@selector(swizzled_viewDidDisappear:)])
         [self swizzled_viewDidDisappear:animated];
     
-    if ([[DopeConfig shared] trackingApplicationViewsEnabled]) {
+    if ([[DopeConfig shared] applicationViews]) {
         [DopamineKit track:@"UIViewController" metaData:@{@"instanceClass": NSStringFromClass([self class]),
                                                           @"tag": @"didDisappear"}];
     }

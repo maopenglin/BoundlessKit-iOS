@@ -75,7 +75,7 @@ fileprivate extension DopamineKit {
         if let bundleURL = Bundle(for: DopamineKit.classForCoder()).url(forResource: "DopamineKit", withExtension: "bundle") {
             return Bundle(url: bundleURL)
         } else {
-            DopamineKit.debugLog("The DopamineKit framework bundle cannot be found")
+            DopeLog.debug("The DopamineKit framework bundle cannot be found")
             return nil
         }
     }

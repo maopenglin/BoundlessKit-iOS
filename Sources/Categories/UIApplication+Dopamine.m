@@ -32,7 +32,7 @@
 }
 
 - (BOOL)swizzled_sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event {
-    if ([[DopeConfig shared] trackingApplicationStateEnabled]) {
+    if ([[DopeConfig shared] applicationState]) {
         NSString *selectorName = NSStringFromSelector(action);
         // Sometimes this method proxies through to its internal method. We want to ignore those calls.
         if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {

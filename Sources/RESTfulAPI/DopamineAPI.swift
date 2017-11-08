@@ -93,7 +93,7 @@ public class DopamineAPI : NSObject{
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
         payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         
-        DopamineKit.debugLog("Refreshing \(actionID)...")
+        DopeLog.debug("Refreshing \(actionID)...")
         sharedInstance.send(call: .refresh, with: payload, completion: completion)
     }
     
@@ -137,18 +137,18 @@ public class DopamineAPI : NSObject{
     ///
     private func send(call type: CallType, with payload: [String:Any], timeout:TimeInterval = 3.0, completion: @escaping ([String: Any]) -> Void) {
         guard let url = URL(string: type.path) else {
-            DopamineKit.debugLog("Invalid url <\(type.path)>")
+            DopeLog.debug("Invalid url <\(type.path)>")
             return
         }
         
-        DopamineKit.debugLog("Preparing \(type) api call to \(url.absoluteString)...")
+        DopeLog.debug("Preparing \(type) api call to \(url.absoluteString)...")
         do {
             var request = URLRequest(url: url)
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpMethod = "POST"
             request.timeoutInterval = timeout
             let jsonPayload = try JSONSerialization.data(withJSONObject: payload, options: JSONSerialization.WritingOptions())
-//            DopamineKit.debugLog("sending raw payload:\(jsonPayload.debugDescription)")   // hex 16 chars
+//            DopeLog.debugLog("sending raw payload:\(jsonPayload.debugDescription)")   // hex 16 chars
             request.httpBody = jsonPayload
             
             let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
@@ -157,7 +157,7 @@ public class DopamineAPI : NSObject{
                 defer { completion(responseDict) }
                 
                 if responseURL == nil {
-                    DopamineKit.debugLog("❌ invalid response:\(String(describing: error?.localizedDescription))")
+                    DopeLog.debug("❌ invalid response:\(String(describing: error?.localizedDescription))")
                     responseDict["error"] = error?.localizedDescription
                     switch type {
                     case .track:
@@ -181,12 +181,12 @@ public class DopamineAPI : NSObject{
                     else {
                         let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
                         let message = "❌ Error reading \(type.path) response data, not a dictionary: \(json)"
-                        DopamineKit.debugLog(message)
+                        DopeLog.debug(message)
                         Telemetry.storeException(className: "JSONSerialization", message: message)
                         return
                     }
                     responseDict = dict
-                    DopamineKit.debugLog("✅\(type.path) call got response:\(responseDict.debugDescription)")
+                    DopeLog.debug("✅\(type.path) call got response:\(responseDict.debugDescription)")
                     var statusCode: Int = -2
                     if let responseStatusCode = responseDict["status"] as? Int {
                         statusCode = responseStatusCode
@@ -206,7 +206,7 @@ public class DopamineAPI : NSObject{
                     
                 } catch {
                     let message = "❌ Error reading \(type.path) response data: \(responseData.debugDescription)"
-                    DopamineKit.debugLog(message)
+                    DopeLog.debug(message)
                     Telemetry.storeException(className: "JSONSerialization", message: message)
                     return
                 }
@@ -214,12 +214,12 @@ public class DopamineAPI : NSObject{
             })
             
             // send request
-//            DopamineKit.debugLog("Sending \(type.path) api call with payload: \(payload.description)")
+//            DopeLog.debugLog("Sending \(type.path) api call with payload: \(payload.description)")
             task.resume()
             
         } catch {
             let message = "Error sending \(type.path) api call with payload:(\(payload.description))"
-            DopamineKit.debugLog(message)
+            DopeLog.debug(message)
             Telemetry.storeException(className: "JSONSerialization", message: message)
         }
     }
@@ -238,11 +238,11 @@ public class DopamineAPI : NSObject{
         let credentials: [String: Any]
         if let testCredentials = DopamineKit.testCredentials {
             credentials = testCredentials
-            DopamineKit.debugLog("Using test credentials")
+            DopeLog.debug("Using test credentials")
         } else {
             guard let credentialsPath = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist"),
                 let credentialsPlist = NSDictionary(contentsOfFile: credentialsPath) as? [String: Any] else {
-                    DopamineKit.debugLog("[DopamineKit]: Error - cannot find credentials")
+                    DopeLog.debug("[DopamineKit]: Error - cannot find credentials")
                     return dict
             }
             credentials = credentialsPlist
@@ -250,13 +250,13 @@ public class DopamineAPI : NSObject{
         
         
         guard let appID = credentials["appID"] as? String else{
-            DopamineKit.debugLog("<DopamineProperties>: Error no appID key")
+            DopeLog.debug("<DopamineProperties>: Error no appID key")
             return dict
         }
         dict["appID"] = appID
         
         guard let versionID = credentials["versionID"] as? String else{
-            DopamineKit.debugLog("<DopamineProperties>: Error no versionID key")
+            DopeLog.debug("<DopamineProperties>: Error no versionID key")
             return dict
         }
 //        if let newVersionID = UserDefaults.standard.string(forKey: "Visualizer.versionID") {
@@ -267,16 +267,16 @@ public class DopamineAPI : NSObject{
         
         if let inProduction = credentials["inProduction"] as? Bool{
             guard let productionSecret = credentials["productionSecret"] as? String else{
-                DopamineKit.debugLog("<DopamineProperties>: Error no productionSecret key")
+                DopeLog.debug("<DopamineProperties>: Error no productionSecret key")
                 return dict
             }
             guard let developmentSecret = credentials["developmentSecret"] as? String else{
-                DopamineKit.debugLog("<DopamineProperties>: Error no developmentSecret key")
+                DopeLog.debug("<DopamineProperties>: Error no developmentSecret key")
                 return dict
             }
             dict["secret"] = inProduction ? productionSecret : developmentSecret
         } else{
-            DopamineKit.debugLog("<DopamineProperties>: Error no inProduction key")
+            DopeLog.debug("<DopamineProperties>: Error no inProduction key")
             return dict
         }
         
@@ -288,20 +288,20 @@ public class DopamineAPI : NSObject{
     private lazy var primaryIdentity:String = {
         #if DEBUG
             if let tid = DopamineKit.developmentIdentity {
-                DopamineKit.debugLog("Testing with primaryIdentity:(\(tid))")
+                DopeLog.debug("Testing with primaryIdentity:(\(tid))")
                 return tid
             }
         #endif
         if DopeConfig.shared.advertiserID,
             let aid = ASIdentifierManager.shared().adId()?.uuidString,
             aid != "00000000-0000-0000-0000-000000000000" {
-            DopamineKit.debugLog("ASIdentifierManager primaryIdentity:(\(aid))")
+            DopeLog.debug("ASIdentifierManager primaryIdentity:(\(aid))")
             return aid
         } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
-            DopamineKit.debugLog("identifierForVendor primaryIdentity:(\(vid))")
+            DopeLog.debug("identifierForVendor primaryIdentity:(\(vid))")
             return vid
         } else {
-            DopamineKit.debugLog("IDUnavailable for primaryIdentity")
+            DopeLog.debug("IDUnavailable for primaryIdentity")
             return "IDUnavailable"
         }
     }()

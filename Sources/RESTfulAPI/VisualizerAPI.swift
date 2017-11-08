@@ -51,7 +51,7 @@ public class VisualizerAPI : NSObject {
             for actionID in mappings.keys {
                 Cartridge(actionID: actionID).sync()
             }
-            DopamineKit.debugLog("🆕 Updated reward mapping version!")
+            DopeLog.debug("🆕 Updated reward mapping version!")
         }
     }
     
@@ -59,13 +59,13 @@ public class VisualizerAPI : NSObject {
         let pairingKey = [sender, target, selector].joined(separator: "-")
         if visualizerMappings != nil,
             let rewardParameters = visualizerMappings![pairingKey] {
-            DopamineKit.debugLog("Found real time visualizer reward for <\(pairingKey)>")
+            DopeLog.debug("Found real time visualizer reward for <\(pairingKey)>")
             if let reinforcements = rewardParameters["reinforcements"] as? [[String:Any]] {
                 let reinforcement = reinforcements.randomElement()
                 completion(reinforcement)
             }
         } else if let rewardParameters = rewardMappings[pairingKey] {
-            DopamineKit.debugLog("Found reward for <\(pairingKey)>")
+            DopeLog.debug("Found reward for <\(pairingKey)>")
             if let actionID = rewardParameters["actionID"] as? String,
                 let reinforcements = rewardParameters["reinforcements"] as? [[String:Any]] {
                 DopamineKit.reinforce(actionID) { reinforcementType in
@@ -77,10 +77,10 @@ public class VisualizerAPI : NSObject {
                     }
                 }
             } else {
-                DopamineKit.debugLog("Bad reward parameters")
+                DopeLog.debug("Bad reward parameters")
             }
         } else {
-//            DopamineKit.debugLog("No reward pairing found for <\(pairingKey)>")
+//            DopeLog.debugLog("No reward pairing found for <\(pairingKey)>")
         }
     }
     
@@ -151,7 +151,7 @@ public class VisualizerAPI : NSObject {
                                         view = superview
                                         location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                     } else {
-                                        DopamineKit.debugLog("Oh no. TouchView has no superview. No reward for you.")
+                                        DopeLog.debug("Oh no. TouchView has no superview. No reward for you.")
                                         break prepareShowReward
                                     }
                                     
@@ -169,21 +169,21 @@ public class VisualizerAPI : NSObject {
                                                 view = possibleViews[index]
                                                 location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                             } else {
-                                                DopamineKit.debugLog("Oh no. Must select which CustomView with a VALID index. No reward for you.")
+                                                DopeLog.debug("Oh no. Must select which CustomView with a VALID index. No reward for you.")
                                                 break prepareShowReward
                                             }
                                         } else {
-                                            DopamineKit.debugLog("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
+                                            DopeLog.debug("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
                                             break prepareShowReward
                                         }
                                     } else {
-                                        DopamineKit.debugLog("Oh no. No CustomView classname set. No reward for you.")
+                                        DopeLog.debug("Oh no. No CustomView classname set. No reward for you.")
                                         break prepareShowReward
                                     }
                                     
                                     
                                 default:
-                                    DopamineKit.debugLog("Oh no. Unknown reward type primitive. No reward for you.")
+                                    DopeLog.debug("Oh no. Unknown reward type primitive. No reward for you.")
                                     break prepareShowReward
                                 }
                                 
@@ -254,7 +254,7 @@ public class VisualizerAPI : NSObject {
                                     view = sv
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
-                                    DopamineKit.debugLog("Oh no. Sender is not a UIView or has no view property. No reward for you.")
+                                    DopeLog.debug("Oh no. Sender is not a UIView or has no view property. No reward for you.")
                                     break prepareShowReward
                                 }
                                 
@@ -269,7 +269,7 @@ public class VisualizerAPI : NSObject {
                                     view = ssv
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
-                                    DopamineKit.debugLog("Oh no. Sender is not a UIView or has no superview. No reward for you.")
+                                    DopeLog.debug("Oh no. Sender is not a UIView or has no superview. No reward for you.")
                                     break prepareShowReward
                                 }
                                 
@@ -282,7 +282,7 @@ public class VisualizerAPI : NSObject {
                                     view = tv
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
-                                    DopamineKit.debugLog("Oh no. Target is not a UIView and has no view property. Doing touch")
+                                    DopeLog.debug("Oh no. Target is not a UIView and has no view property. Doing touch")
                                     view = UIApplication.shared.keyWindow!
                                     location = Helper.lastTouchLocationInUIWindow
                                 }
@@ -290,7 +290,7 @@ public class VisualizerAPI : NSObject {
                             case "custom":
                                 if viewCustom != "" {
                                     let viewCustomParams = viewCustom.components(separatedBy: "$")
-                                    DopamineKit.debugLog("ViewCustomParams:\(viewCustomParams)")
+                                    DopeLog.debug("ViewCustomParams:\(viewCustomParams)")
                                     if viewCustomParams.count == 2,
                                         let index = Int(viewCustomParams[1]) {
                                         let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: viewCustomParams[0])
@@ -298,21 +298,21 @@ public class VisualizerAPI : NSObject {
                                             view = possibleViews[index]
                                             location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                         } else {
-                                            DopamineKit.debugLog("Oh no. Must select which CustomView with a VALID index. No reward for you.")
+                                            DopeLog.debug("Oh no. Must select which CustomView with a VALID index. No reward for you.")
                                             break prepareShowReward
                                         }
                                     } else {
-                                        DopamineKit.debugLog("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
+                                        DopeLog.debug("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
                                         break prepareShowReward
                                     }
                                 } else {
-                                    DopamineKit.debugLog("Oh no. No CustomView classname set. No reward for you.")
+                                    DopeLog.debug("Oh no. No CustomView classname set. No reward for you.")
                                     break prepareShowReward
                                 }
                                 
                                 
                             default:
-                                DopamineKit.debugLog("Oh no. Unknown view type. No reward for you.")
+                                DopeLog.debug("Oh no. Unknown view type. No reward for you.")
                                 break prepareShowReward
                             }
                             
@@ -415,7 +415,7 @@ public class VisualizerAPI : NSObject {
             }
             
         default:
-            DopamineKit.debugLog("Unknown reinforcement reward type:\(String(describing: reinforcement))")
+            DopeLog.debug("Unknown reinforcement reward type:\(String(describing: reinforcement))")
             // TODO: implement delegate callback for dev defined rewards
         }
     }
@@ -500,11 +500,11 @@ public class VisualizerAPI : NSObject {
             let visualizerUrl = URL(string: type.pathExtenstion, relativeTo: baseURL) {
             url = visualizerUrl
         } else {
-            DopamineKit.debugLog("Could not construct for \(type.pathExtenstion)")
+            DopeLog.debug("Could not construct for \(type.pathExtenstion)")
             return
         }
         tracesQueue.addOperation {
-//            DopamineKit.debugLog("Preparing \(type.pathExtenstion) api call to \(url.absoluteString)...")
+//            DopeLog.debugLog("Preparing \(type.pathExtenstion) api call to \(url.absoluteString)...")
             do {
                 var request = URLRequest(url: url)
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -519,14 +519,14 @@ public class VisualizerAPI : NSObject {
                     defer { completion(responseDict) }
                     
                     if responseURL == nil {
-                        DopamineKit.debugLog("❌ invalid response:\(String(describing: error?.localizedDescription))")
+                        DopeLog.debug("❌ invalid response:\(String(describing: error?.localizedDescription))")
                         responseDict["error"] = error?.localizedDescription
                         return
                     }
                     
                     if let responseData = responseData,
                         responseData.isEmpty {
-                        DopamineKit.debugLog("✅\(type.pathExtenstion) call got empty response.")
+                        DopeLog.debug("✅\(type.pathExtenstion) call got empty response.")
                         return
                     }
                     
@@ -537,13 +537,13 @@ public class VisualizerAPI : NSObject {
                             else {
                                 let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
                                 let message = "❌ Error reading \(type.pathExtenstion) response data, not a dictionary: \(json)"
-                                DopamineKit.debugLog(message)
+                                DopeLog.debug(message)
                                 Telemetry.storeException(className: "JSONSerialization", message: message)
                                 return
                         }
                         responseDict = dict
-                        //                    DopamineKit.debugLog("✅\(type.pathExtenstion) call got response:\(responseDict.debugDescription)")
-                        DopamineKit.debugLog("✅\(type.pathExtenstion) call got response with status:\(responseDict["status"] ?? "unknown")")
+                        //                    DopeLog.debugLog("✅\(type.pathExtenstion) call got response:\(responseDict.debugDescription)")
+                        DopeLog.debug("✅\(type.pathExtenstion) call got response with status:\(responseDict["status"] ?? "unknown")")
                         
                         if (type == .boot) || (type == .submit  && self.tracesQueue.operationCount <= 1) {
                             if (type == .boot && responseDict["status"] as? Int == 205) || (type == .submit && responseDict["status"] as? Int == 200) {
@@ -559,7 +559,7 @@ public class VisualizerAPI : NSObject {
                                             let reinforcements = mappings["reinforcements"] as? [[String: Any]] {
                                             tempDict[actionID] = ["actionID":actionID, "reinforcements":reinforcements]
                                         } else {
-                                            DopamineKit.debugLog("Invalid mapping")
+                                            DopeLog.debug("Invalid mapping")
                                         }
                                     }
                                     if type == .submit {
@@ -568,7 +568,7 @@ public class VisualizerAPI : NSObject {
                                         if let newVersionID = responseDict["newVersionID"] as? String {
                                             VisualizerAPI.shared.setNewRewardMappings(mappings: tempDict, newVersionID: newVersionID)
                                         } else {
-                                            DopamineKit.debugLog("Missing 'newVersionID'")
+                                            DopeLog.debug("Missing 'newVersionID'")
                                         }
                                     }
                                 }
@@ -577,19 +577,19 @@ public class VisualizerAPI : NSObject {
                         
                     } catch {
                         let message = "❌ Error reading \(type.pathExtenstion) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))
-                        DopamineKit.debugLog(message)
+                        DopeLog.debug(message)
                         return
                     }
                     
                 })
                 
                 // send request
-//                DopamineKit.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
+//                DopeLog.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
                 task.resume()
                 
             } catch {
                 let message = "Error sending \(type.pathExtenstion) api call with payload:(\(payload.description))"
-                DopamineKit.debugLog(message)
+                DopeLog.debug(message)
                 Telemetry.storeException(className: "JSONSerialization", message: message)
             }
         }
@@ -613,24 +613,24 @@ public class VisualizerAPI : NSObject {
         let credentialsFilename = "DopamineProperties"
         var path:String
         guard let credentialsPath = Bundle.main.path(forResource: credentialsFilename, ofType: "plist") else{
-            DopamineKit.debugLog("[DopamineKit]: Error - cannot find credentials in (\(credentialsFilename))")
+            DopeLog.debug("[DopamineKit]: Error - cannot find credentials in (\(credentialsFilename))")
             return dict
         }
         path = credentialsPath
         
         guard let credentialsPlist = NSDictionary(contentsOfFile: path) as? [String: Any] else{
-            DopamineKit.debugLog("[DopamineKit]: Error - (\(credentialsFilename)) is in the wrong format")
+            DopeLog.debug("[DopamineKit]: Error - (\(credentialsFilename)) is in the wrong format")
             return dict
         }
         
         guard let appID = credentialsPlist["appID"] as? String else{
-            DopamineKit.debugLog("[DopamineKit]: Error no appID - (\(credentialsFilename)) is in the wrong format")
+            DopeLog.debug("[DopamineKit]: Error no appID - (\(credentialsFilename)) is in the wrong format")
             return dict
         }
         dict["appID"] = appID
         
         guard let versionID = credentialsPlist["versionID"] as? String else{
-            DopamineKit.debugLog("[DopamineKit]: Error no versionID - (\(credentialsFilename)) is in the wrong format")
+            DopeLog.debug("[DopamineKit]: Error no versionID - (\(credentialsFilename)) is in the wrong format")
             return dict
         }
         dict["versionID"] = versionID
@@ -638,19 +638,19 @@ public class VisualizerAPI : NSObject {
         if let inProduction = credentialsPlist["inProduction"] as? Bool{
             if(inProduction){
                 guard let productionSecret = credentialsPlist["productionSecret"] as? String else{
-                    DopamineKit.debugLog("[DopamineKit]: Error no productionSecret - (\(credentialsFilename)) is in the wrong format")
+                    DopeLog.debug("[DopamineKit]: Error no productionSecret - (\(credentialsFilename)) is in the wrong format")
                     return dict
                 }
                 dict["secret"] = productionSecret
             } else{
                 guard let developmentSecret = credentialsPlist["developmentSecret"] as? String else{
-                    DopamineKit.debugLog("[DopamineKit]: Error no developmentSecret - (\(credentialsFilename)) is in the wrong format")
+                    DopeLog.debug("[DopamineKit]: Error no developmentSecret - (\(credentialsFilename)) is in the wrong format")
                     return dict
                 }
                 dict["secret"] = developmentSecret
             }
         } else{
-            DopamineKit.debugLog("[DopamineKit]: Error no inProduction - (\(credentialsFilename)) is in the wrong format")
+            DopeLog.debug("[DopamineKit]: Error no inProduction - (\(credentialsFilename)) is in the wrong format")
             return dict
         }
         
@@ -664,19 +664,19 @@ public class VisualizerAPI : NSObject {
     private lazy var primaryIdentity:String = {
         #if DEBUG
             if let tid = DopamineKit.developmentIdentity {
-                DopamineKit.debugLog("Testing with primaryIdentity:(\(tid))")
+                DopeLog.debug("Testing with primaryIdentity:(\(tid))")
                 return tid
             }
         #endif
         if let aid = ASIdentifierManager.shared().adId()?.uuidString,
             aid != "00000000-0000-0000-0000-000000000000" {
-            DopamineKit.debugLog("ASIdentifierManager primaryIdentity:(\(aid))")
+            DopeLog.debug("ASIdentifierManager primaryIdentity:(\(aid))")
             return aid
         } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
-            DopamineKit.debugLog("identifierForVendor primaryIdentity:(\(vid))")
+            DopeLog.debug("identifierForVendor primaryIdentity:(\(vid))")
             return vid
         } else {
-            DopamineKit.debugLog("IDUnavailable for primaryIdentity")
+            DopeLog.debug("IDUnavailable for primaryIdentity")
             return "IDUnavailable"
         }
     }()

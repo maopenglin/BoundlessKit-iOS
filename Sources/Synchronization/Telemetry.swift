@@ -115,7 +115,7 @@ internal class Telemetry {
                 
                 syncOverview.trackTriggers[SyncOverview.syncResponseKey] = syncResponse
             } else {
-                DopamineKit.debugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
+                DopeLog.debug("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
             }
         }
     }
@@ -138,7 +138,7 @@ internal class Telemetry {
                 
                 syncOverview.reportTriggers[SyncOverview.syncResponseKey] = syncResponse
             } else {
-                DopamineKit.debugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
+                DopeLog.debug("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
             }
         }
     }
@@ -165,7 +165,7 @@ internal class Telemetry {
                     syncOverview.cartridgesTriggers[actionID] = cartridge
                 }
             } else {
-                DopamineKit.debugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
+                DopeLog.debug("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
             }
         }
     }
@@ -182,9 +182,9 @@ internal class Telemetry {
                 syncOverview.totalSyncTime = Int64(1000*NSDate().timeIntervalSince1970) - syncOverview.utc
                 syncOverviewArray.append(syncOverview)
                 currentSyncOverview = nil
-//                DopamineKit.debugLog("Saved a sync overview, totaling \(syncOverviewArray.count) overviews - \n\(syncOverview.toJSONType())")
+//                DopeLog.debugLog("Saved a sync overview, totaling \(syncOverviewArray.count) overviews - \n\(syncOverview.toJSONType())")
             } else {
-                DopamineKit.debugLog("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
+                DopeLog.debug("No recording has started. Did you rememeber to execute startRecordingSync() at the beginning of the sync performance?")
             }
             
             if(successfulSync) {
@@ -193,7 +193,7 @@ internal class Telemetry {
                         if response["status"] as? Int == 200 {
                             syncOverviews = []
                             dopeExceptions = []
-                            DopamineKit.debugLog("Cleared sync overview array and dope exceptions array.")
+                            DopeLog.debug("Cleared sync overview array and dope exceptions array.")
                         } else {
                             syncOverviews = syncOverviewArray
                         }

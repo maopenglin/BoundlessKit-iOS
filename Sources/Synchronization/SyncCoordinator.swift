@@ -110,7 +110,7 @@ public class SyncCoordinator {
                 
                 self.trackSyncer.sync() { status in
                     guard status == 200 || status == 0 else {
-                        DopamineKit.debugLog("Track failed during sync. Halting sync.")
+                        DopeLog.debug("Track failed during sync. Halting sync.")
                         goodProgress = false
                         Telemetry.stopRecordingSync(successfulSync: false)
                         return
@@ -123,7 +123,7 @@ public class SyncCoordinator {
                 if reportShouldSync {
                     self.reportSyncer.sync() { status in
                         guard status == 200 || status == 0 else {
-                            DopamineKit.debugLog("Report failed during sync. Halting sync.")
+                            DopeLog.debug("Report failed during sync. Halting sync.")
                             goodProgress = false
                             Telemetry.stopRecordingSync(successfulSync: false)
                             return
@@ -139,7 +139,7 @@ public class SyncCoordinator {
                 for (actionID, cartridge) in self.cartridgeSyncers where goodProgress && cartridge.isTriggered() {
                     cartridge.sync() { status in
                         guard status == 200 || status == 0 else {
-                            DopamineKit.debugLog("Refresh for \(actionID) failed during sync. Halting sync.")
+                            DopeLog.debug("Refresh for \(actionID) failed during sync. Halting sync.")
                             goodProgress = false
                             Telemetry.stopRecordingSync(successfulSync: false)
                             return

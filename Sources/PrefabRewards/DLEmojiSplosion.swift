@@ -33,7 +33,7 @@ public extension UIView {
     
     public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, lifetimeRange: Float, fadeout: Float, birthRate: Float, birthCycles: Double, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat) {
         guard let content = content else {
-            DopamineKit.debugLog("❌ received nil image content!")
+            DopeLog.debug("❌ received nil image content!")
             return
         }
         DispatchQueue.main.async {
@@ -66,7 +66,7 @@ public extension UIView {
             
             emitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(emitter)
-            DopamineKit.debugLog("💥 Emojisplosion on <\(NSStringFromClass(type(of: self)))> at <\(location)>!")
+            DopeLog.debug("💥 Emojisplosion on <\(NSStringFromClass(type(of: self)))> at <\(location)>!")
             DispatchQueue.main.asyncAfter(deadline: .now() + birthCycles) {
                 emitter.birthRate = 0
                 DispatchQueue.main.asyncAfter(deadline: .now() + Double(lifetime + lifetimeRange + 0.2)) {

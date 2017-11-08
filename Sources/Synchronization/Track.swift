@@ -62,7 +62,7 @@ internal class Track : NSObject, NSCoding {
         aCoder.encode(trackedActions, forKey: #keyPath(Track.trackedActions))
         aCoder.encode(timerStartedAt, forKey: #keyPath(Track.timerStartedAt))
         aCoder.encode(timerExpiresIn, forKey: #keyPath(Track.timerExpiresIn))
-        //        DopamineKit.debugLog("Encoded TrackSyncer with trackedActions:\(trackedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+        //        DopeLog.debugLog("Encoded TrackSyncer with trackedActions:\(trackedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Updates the sync triggers
@@ -108,7 +108,7 @@ internal class Track : NSObject, NSCoding {
     private func timerDidExpire() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartedAt + timerExpiresIn)
-        //        DopamineKit.debugLog("Track timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
+        //        DopeLog.debugLog("Track timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
         return isExpired
     }
     
@@ -118,8 +118,8 @@ internal class Track : NSObject, NSCoding {
     ///
     private func batchIsFull() -> Bool {
         let count = trackedActions.count
-        let isBatchSizeReached = count >= DopeConfig.shared.trackingBatchSize
-        //        DopamineKit.debugLog("Track has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
+        let isBatchSizeReached = count >= DopeConfig.shared.trackBatchSize
+        //        DopeLog.debugLog("Track has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isBatchSizeReached
     }
     
@@ -149,7 +149,7 @@ internal class Track : NSObject, NSCoding {
                 return
             }
             self.syncInProgress = true
-            DopamineKit.debugLog("Track sync in progress...")
+            DopeLog.debug("Track sync in progress...")
             self.trackedActionsQueue.waitUntilAllOperationsAreFinished()
             self.trackedActionsQueue.isSuspended = true
             let syncFinished = {
@@ -159,12 +159,12 @@ internal class Track : NSObject, NSCoding {
             
             if self.trackedActions.count == 0 {
                 defer { syncFinished() }
-                DopamineKit.debugLog("No tracked actions to sync.")
+                DopeLog.debug("No tracked actions to sync.")
                 completion(0)
                 self.updateTriggers()
                 return
             } else {
-                DopamineKit.debugLog("Sending \(self.trackedActions.count) tracked actions...")
+                DopeLog.debug("Sending \(self.trackedActions.count) tracked actions...")
                 DopamineAPI.track(self.trackedActions) { response in
                     defer { syncFinished() }
                     if let responseStatusCode = response["status"] as? Int {

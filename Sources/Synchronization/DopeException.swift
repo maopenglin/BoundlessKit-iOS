@@ -66,7 +66,7 @@ internal class DopeException : NSObject, NSCoding {
         jsonObject[DopeException.exceptionClassNameKey] = exceptionClassName
         jsonObject[DopeException.messageKey] = message
         jsonObject[DopeException.stackTraceKey] = stackTrace
-        DopamineKit.debugLog(jsonObject.description)
+        DopeLog.debug(jsonObject.description)
         return jsonObject
     }
     

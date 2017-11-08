@@ -9,18 +9,9 @@ import Foundation
 
 
 @objc
-public class DopeConfig : NSObject, NSCoding {
+public class DopeConfig : NSObject {
     
     fileprivate static var _shared: DopeConfig?
-    @objc public static var shared: DopeConfig {
-        if let savedConfigData = DopeConfig.defaults.object(forKey: DopeConfig.defaultsKey) as? NSData,
-            let savedConfig = NSKeyedUnarchiver.unarchiveObject(with: savedConfigData as Data) as? DopeConfig {
-            _shared = savedConfig
-        } else {
-            _shared = DopeConfig()
-        }
-        return _shared!
-    }
     
     private static let defaults = UserDefaults.standard
     private static let defaultsKey = "DopamineConfiguration"
@@ -28,161 +19,219 @@ public class DopeConfig : NSObject, NSCoding {
     @objc public var configID: String?
     
     @objc public var reinforcementEnabled: Bool
-    @objc public var triggerEnabled: Bool
-    @objc public var trackingEnabled: Bool
+    @objc public var reportBatchSize: Int
     
-    @objc public var trackingCapabilities: [String: Any]
-    @objc public var batchSize: [String: Any]
+    @objc public var triggerEnabled: Bool
+    
+    @objc public var trackingEnabled: Bool
+    @objc public var trackBatchSize: Int
     
     @objc public var integrationMethod: String
     @objc public var advertiserID: Bool
     @objc public var consoleLoggingEnabled: Bool
     
-    @objc public var trackingApplicationStateEnabled: Bool {
-        get {
-            return trackingCapabilities["applicationState"] as? Bool ?? true
-        }
-        set {
-            trackingCapabilities["applicationState"] = newValue
-        }
-    }
-    @objc public var trackingApplicationViewsEnabled: Bool {
-        get {
-            return trackingCapabilities["applicationViews"] as? Bool ?? true
-        }
-        set {
-            trackingCapabilities["applicationViews"] = newValue
-        }
-    }
-    @objc public var trackingCustomViews: [String] {
-        get {
-            return trackingCapabilities["customViews"] as? [String] ?? []
-        }
-        set {
-            trackingCapabilities["customViews"] = newValue
-        }
-    }
-    @objc public var trackingCustomEvents: [String: String] {
-        get {
-            return trackingCapabilities["customEvents"] as? [String: String] ?? [:]
-        }
-        set {
-            trackingCapabilities["customEvents"] = newValue
-        }
-    }
-    @objc public var trackingNotificationObservationsEnabled: Bool {
-        get {
-            return trackingCapabilities["notificationObservations"] as? Bool ?? true
-        }
-        set {
-            trackingCapabilities["notificationObservations"] = newValue
-        }
-    }
-    @objc public var trackingStorekitObservationsEnabled: Bool {
-        get {
-            return trackingCapabilities["storekitObservations"] as? Bool ?? true
-        }
-        set {
-            trackingCapabilities["storekitObservations"] = newValue
-        }
-    }
-    @objc public var trackingLocationObservationsEnabled: Bool {
-        get {
-            return trackingCapabilities["locationObservations"] as? Bool ?? true
-        }
-        set {
-            trackingCapabilities["locationObservations"] = newValue
-        }
-    }
-    @objc public var trackingBatchSize: Int {
-        get {
-            return batchSize["track"] as? Int ?? 20
-        }
-        set {
-            batchSize["track"] = newValue
-        }
-    }
-    @objc public var reportBatchSize: Int {
-        get {
-            return batchSize["report"] as? Int ?? 20
-        }
-        set {
-            batchSize["report"] = newValue
-        }
-    }
+    @objc public var notificationObservations: Bool
+    @objc public var storekitObservations: Bool
+    @objc public var locationObservations: Bool
+    @objc public var applicationState: Bool
+    @objc public var applicationViews: Bool
+    @objc public var customViews: [String]
+    @objc public var customEvents: [[String: String]]
     
-    init(configID: String? = nil,
-                  reinforcementEnabled: Bool = true,
-                  triggerEnabled: Bool = false,
-                  trackingEnabled: Bool = true,
-                  trackingCapabilities: [String: Any] = ["applicationState": true,
-                                                         "applicationViews": true,
-                                                         "customViews": [String](),
-                                                         "customEvents": [String: String](),
-                                                         "notificationObservations": true,
-                                                         "storekitObservations": true,
-                                                         "locationObservations": true
-                                                         ],
-                  batchSize: [String: Any] = ["track": 20, "report": 20],
-                  integrationMethod: String = "codeless",
-                  advertiserID: Bool = true,
-                  consoleLoggingEnabled: Bool = true
+    init(configID: String?,
+                  reinforcementEnabled: Bool,
+                  triggerEnabled: Bool,
+                  trackingEnabled: Bool,
+                  applicationState: Bool,
+                  applicationViews: Bool,
+                  customViews: [String],
+                  customEvents: [[String: String]],
+                  notificationObservations: Bool,
+                  storekitObservations: Bool,
+                  locationObservations: Bool,
+                  trackBatchSize: Int,
+                  reportBatchSize: Int,
+                  integrationMethod: String,
+                  advertiserID: Bool,
+                  consoleLoggingEnabled: Bool
                   ) {
         self.configID = configID
         self.reinforcementEnabled = reinforcementEnabled
         self.triggerEnabled = triggerEnabled
         self.trackingEnabled = trackingEnabled
-        self.trackingCapabilities = trackingCapabilities
-        self.batchSize = batchSize
+        self.applicationState = applicationState
+        self.applicationViews = applicationViews
+        self.customViews = customViews
+        self.customEvents = customEvents
+        self.notificationObservations = notificationObservations
+        self.storekitObservations = storekitObservations
+        self.locationObservations = locationObservations
+        self.trackBatchSize = trackBatchSize
+        self.reportBatchSize = reportBatchSize
         self.integrationMethod = integrationMethod
         self.advertiserID = advertiserID
         self.consoleLoggingEnabled = consoleLoggingEnabled
         super.init()
     }
     
+    required public convenience init?(coder aDecoder: NSCoder) {
+        self.init(acoder: aDecoder)
+    }
+    
+    static var standard: DopeConfig {
+        var standardConfig: [String: Any] = [:]
+        standardConfig["configID"] = nil
+        standardConfig["reinforcementEnabled"] = true
+        standardConfig["triggerEnabled"] = false
+        standardConfig["trackingEnabled"] = true
+        standardConfig["trackingCapabilities"] = ["applicationState": true,
+                                                  "applicationViews": true,
+                                                  "customViews": [String](),
+                                                  "customEvents": [[String: String]](),
+                                                  "notificationObservations": true,
+                                                  "storekitObservations": true,
+                                                  "locationObservations": true
+        ]
+        standardConfig["batchSize"] = ["track": 20, "report": 20]
+        standardConfig["integrationMethod"] = "codeless"
+        standardConfig["advertiserID"] = true
+        standardConfig["consoleLoggingEnabled"] = true
+        return DopeConfig.convert(configDictionary: standardConfig)!
+    }
+    
+}
+
+extension DopeConfig {
+    
+    @objc public static var shared: DopeConfig {
+        if let _shared = _shared {
+            return _shared
+        } else {
+            _shared = retreive()
+            return _shared!
+        }
+    }
+    
+    static func save(config: DopeConfig? = _shared) {
+        DopeConfig.defaults.set(config, forKey: DopeConfig.defaultsKey)
+        _shared = config
+    }
+    
+    static func retreive() -> DopeConfig {
+        if let _shared = _shared {
+            return _shared
+        } else if let savedConfigData = DopeConfig.defaults.object(forKey: DopeConfig.defaultsKey) as? NSData,
+            let savedConfig = NSKeyedUnarchiver.unarchiveObject(with: savedConfigData as Data) as? DopeConfig {
+            return savedConfig
+        } else {
+            print("using standard configuration")
+            return standard
+        }
+    }
+    
+    static func convert(configDictionary: [String: Any]) -> DopeConfig? {
+        if let configID = configDictionary["configID"] as? String?,
+            let reinforcementEnabled = configDictionary["reinforcementEnabled"] as? Bool,
+            let triggerEnabled = configDictionary["triggerEnabled"] as? Bool,
+            let trackingEnabled = configDictionary["trackingEnabled"] as? Bool,
+            let trackingCapabilities = configDictionary["trackingCapabilities"] as? [String: Any],
+            let applicationState = trackingCapabilities["applicationState"] as? Bool,
+            let applicationViews = trackingCapabilities["applicationViews"] as? Bool,
+            let customViews = trackingCapabilities["customViews"] as? [String],
+            let customEvents = trackingCapabilities["customEvents"] as? [[String: String]],
+            let notificationObservations = trackingCapabilities["notificationObservations"] as? Bool,
+            let storekitObservations = trackingCapabilities["storekitObservations"] as? Bool,
+            let locationObservations = trackingCapabilities["locationObservations"] as? Bool,
+            let batchSize = configDictionary["batchSize"] as? [String: Any],
+            let trackBatchSize = batchSize["track"] as? Int,
+            let reportBatchSize = batchSize["report"] as? Int,
+            let integrationMethod = configDictionary["integrationMethod"] as? String,
+            let advertiserID = configDictionary["advertiserID"] as? Bool,
+            let consoleLoggingEnabled = configDictionary["consoleLoggingEnabled"] as? Bool
+        {
+            return DopeConfig.init(
+                configID: configID,
+                reinforcementEnabled: reinforcementEnabled,
+                triggerEnabled: triggerEnabled,
+                trackingEnabled: trackingEnabled,
+                applicationState: applicationState,
+                applicationViews: applicationViews,
+                customViews: customViews,
+                customEvents: customEvents,
+                notificationObservations: notificationObservations,
+                storekitObservations: storekitObservations,
+                locationObservations: locationObservations,
+                trackBatchSize: trackBatchSize,
+                reportBatchSize: reportBatchSize,
+                integrationMethod: integrationMethod,
+                advertiserID: advertiserID,
+                consoleLoggingEnabled: consoleLoggingEnabled
+            )
+        } else {
+            print("Error")
+            return nil
+        }
+    }
+}
+
+
+extension DopeConfig : NSCoding {
     public func encode(with aCoder: NSCoder) {
         aCoder.encode(configID, forKey: #keyPath(DopeConfig.configID))
         aCoder.encode(reinforcementEnabled, forKey: #keyPath(DopeConfig.reinforcementEnabled))
         aCoder.encode(triggerEnabled, forKey: #keyPath(DopeConfig.triggerEnabled))
         aCoder.encode(trackingEnabled, forKey: #keyPath(DopeConfig.trackingEnabled))
-        aCoder.encode(trackingCapabilities, forKey: #keyPath(DopeConfig.trackingCapabilities))
-        aCoder.encode(batchSize, forKey: #keyPath(DopeConfig.batchSize))
+        aCoder.encode(applicationState, forKey: #keyPath(DopeConfig.applicationState))
+        aCoder.encode(applicationViews, forKey: #keyPath(DopeConfig.applicationViews))
+        aCoder.encode(customViews, forKey: #keyPath(DopeConfig.customViews))
+        aCoder.encode(customEvents, forKey: #keyPath(DopeConfig.customEvents))
+        aCoder.encode(notificationObservations, forKey: #keyPath(DopeConfig.notificationObservations))
+        aCoder.encode(storekitObservations, forKey: #keyPath(DopeConfig.storekitObservations))
+        aCoder.encode(locationObservations, forKey: #keyPath(DopeConfig.locationObservations))
+        aCoder.encode(trackBatchSize, forKey: #keyPath(DopeConfig.trackBatchSize))
+        aCoder.encode(reportBatchSize, forKey: #keyPath(DopeConfig.reportBatchSize))
         aCoder.encode(integrationMethod, forKey: #keyPath(DopeConfig.integrationMethod))
         aCoder.encode(advertiserID, forKey: #keyPath(DopeConfig.advertiserID))
         aCoder.encode(consoleLoggingEnabled, forKey: #keyPath(DopeConfig.consoleLoggingEnabled))
     }
     
-    required public convenience init?(coder aDecoder: NSCoder) {
-        self.init()
-        if let configID = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? String? {
-            self.configID = configID
-        }
-        if let reinforcementEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? Bool {
-            self.reinforcementEnabled = reinforcementEnabled
-        }
-        if let triggerEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? Bool {
-            self.triggerEnabled = triggerEnabled
-        }
-        if let trackingEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? Bool {
-            self.trackingEnabled = trackingEnabled
-        }
-        if let trackingCapabilities = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? [String: Any] {
-            self.trackingCapabilities = trackingCapabilities
-        }
-        if let batchSize = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? [String: Any] {
-            self.batchSize = batchSize
-        }
-        if let integrationMethod = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? String {
-            self.integrationMethod = integrationMethod
-        }
-        if let advertiserID = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? Bool {
-            self.advertiserID = advertiserID
-        }
-        if let consoleLoggingEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? Bool {
-            self.consoleLoggingEnabled = consoleLoggingEnabled
+    convenience public init?(acoder aDecoder: NSCoder) {
+        if let configID = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? String?,
+            let reinforcementEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.reinforcementEnabled)) as? Bool,
+            let triggerEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.triggerEnabled)) as? Bool,
+            let trackingEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.trackingEnabled)) as? Bool,
+            let applicationState = aDecoder.value(forKey: #keyPath(DopeConfig.applicationState)) as? Bool,
+            let applicationViews = aDecoder.value(forKey: #keyPath(DopeConfig.applicationViews)) as? Bool,
+            let customViews = aDecoder.value(forKey: #keyPath(DopeConfig.customViews)) as? [String],
+            let customEvents = aDecoder.value(forKey: #keyPath(DopeConfig.customEvents)) as? [[String: String]],
+            let notificationObservations = aDecoder.value(forKey: #keyPath(DopeConfig.notificationObservations)) as? Bool,
+            let storekitObservations = aDecoder.value(forKey: #keyPath(DopeConfig.storekitObservations)) as? Bool,
+            let locationObservations = aDecoder.value(forKey: #keyPath(DopeConfig.locationObservations)) as? Bool,
+            let trackBatchSize = aDecoder.value(forKey: #keyPath(DopeConfig.trackBatchSize)) as? Int,
+            let reportBatchSize = aDecoder.value(forKey: #keyPath(DopeConfig.reportBatchSize)) as? Int,
+            let integrationMethod = aDecoder.value(forKey: #keyPath(DopeConfig.integrationMethod)) as? String,
+            let advertiserID = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? Bool,
+            let consoleLoggingEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? Bool {
+            self.init(
+                configID: configID,
+                reinforcementEnabled: reinforcementEnabled,
+                triggerEnabled: triggerEnabled,
+                trackingEnabled: trackingEnabled,
+                applicationState: applicationState,
+                applicationViews: applicationViews,
+                customViews: customViews,
+                customEvents: customEvents,
+                notificationObservations: notificationObservations,
+                storekitObservations: storekitObservations,
+                locationObservations: locationObservations,
+                trackBatchSize: trackBatchSize,
+                reportBatchSize: reportBatchSize,
+                integrationMethod: integrationMethod,
+                advertiserID: advertiserID,
+                consoleLoggingEnabled: consoleLoggingEnabled
+            )
+        } else {
+            return nil
         }
     }
-    
-
 }
-

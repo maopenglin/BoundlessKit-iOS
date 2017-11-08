@@ -43,7 +43,7 @@ internal class Report : NSObject, NSCoding {
                 return
             } else {
                 defaults.removeObject(forKey: defaultsKey)
-                DopamineKit.debugLog("Erased outdated report.")
+                DopeLog.debug("Erased outdated report.")
             }
         }
         self.clientVersion = DopamineAPI.customerVersionID ?? "undefinedVersion"
@@ -63,7 +63,7 @@ internal class Report : NSObject, NSCoding {
             self.reportedActions = reportedActions
             self.timerStartedAt = aDecoder.decodeInt64(forKey: #keyPath(Report.timerStartedAt))
             self.timerExpiresIn = aDecoder.decodeInt64(forKey: #keyPath(Report.timerExpiresIn))
-            //        DopamineKit.debugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+            //        DopeLog.debugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
         } else {
             return nil
         }
@@ -76,7 +76,7 @@ internal class Report : NSObject, NSCoding {
         aCoder.encode(reportedActions, forKey: #keyPath(Report.reportedActions))
         aCoder.encode(timerStartedAt, forKey: #keyPath(Report.timerStartedAt))
         aCoder.encode(timerExpiresIn, forKey: #keyPath(Report.timerExpiresIn))
-        //        DopamineKit.debugLog("Encoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+        //        DopeLog.debugLog("Encoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
     /// Updates the sync triggers
@@ -120,7 +120,7 @@ internal class Report : NSObject, NSCoding {
     private func timerDidExpire() -> Bool {
         let currentTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let isExpired = currentTime >= (timerStartedAt + timerExpiresIn)
-        //        DopamineKit.debugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
+        //        DopeLog.debugLog("Report timer expires in \(timerStartsAt + timerExpiresIn - currentTime)ms so the timer \(isExpired ? "will" : "won't") trigger a sync...")
         return isExpired
     }
     
@@ -131,7 +131,7 @@ internal class Report : NSObject, NSCoding {
     private func batchIsFull() -> Bool {
         let count = reportedActions.count
         let isBatchSizeReached = count >= DopeConfig.shared.reportBatchSize
-        //        DopamineKit.debugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
+        //        DopeLog.debugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isBatchSizeReached
     }
     
@@ -160,11 +160,11 @@ internal class Report : NSObject, NSCoding {
             
             if self.reportedActions.count == 0 {
                 defer { self.syncInProgress = false }
-                DopamineKit.debugLog("No reported actions to sync.")
+                DopeLog.debug("No reported actions to sync.")
                 completion(0)
                 self.updateTriggers()
             } else {
-                DopamineKit.debugLog("Sending \(self.reportedActions.count) reported actions...")
+                DopeLog.debug("Sending \(self.reportedActions.count) reported actions...")
                 DopamineAPI.report(self.reportedActions, completion: { response in
                     defer { self.syncInProgress = false }
                     if let responseStatusCode = response["status"] as? Int {
