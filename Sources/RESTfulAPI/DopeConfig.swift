@@ -35,7 +35,7 @@ public class DopeConfig : NSObject {
     @objc public var locationObservations: Bool
     @objc public var applicationState: Bool
     @objc public var applicationViews: Bool
-    @objc public var customViews: [String]
+    @objc public var customViews: [String: Any]
     @objc public var customEvents: [String: Any]
     
     init(configID: String?,
@@ -44,7 +44,7 @@ public class DopeConfig : NSObject {
                   trackingEnabled: Bool,
                   applicationState: Bool,
                   applicationViews: Bool,
-                  customViews: [String],
+                  customViews: [String: Any],
                   customEvents: [String: Any],
                   notificationObservations: Bool,
                   storekitObservations: Bool,
@@ -93,8 +93,8 @@ public class DopeConfig : NSObject {
         standardConfig["trackingEnabled"] = true
         standardConfig["trackingCapabilities"] = ["applicationState": true,
                                                   "applicationViews": true,
-                                                  "customViews": [String](),
-                                                  // "customEvents": [String: Any](),
+                                                  "customViews": [String: Any](),
+//                                                  "customEvents": [String: Any](),
                                                   "customEvents": customEvents,
                                                   "notificationObservations": true,
                                                   "storekitObservations": true,
@@ -147,7 +147,7 @@ extension DopeConfig {
             let trackingCapabilities = configDictionary["trackingCapabilities"] as? [String: Any],
             let applicationState = trackingCapabilities["applicationState"] as? Bool,
             let applicationViews = trackingCapabilities["applicationViews"] as? Bool,
-            let customViews = trackingCapabilities["customViews"] as? [String],
+            let customViews = trackingCapabilities["customViews"] as? [String: Any],
             let customEvents = trackingCapabilities["customEvents"] as? [String: Any],
             let notificationObservations = trackingCapabilities["notificationObservations"] as? Bool,
             let storekitObservations = trackingCapabilities["storekitObservations"] as? Bool,
@@ -212,7 +212,7 @@ extension DopeConfig : NSCoding {
             let trackingEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.trackingEnabled)) as? Bool,
             let applicationState = aDecoder.value(forKey: #keyPath(DopeConfig.applicationState)) as? Bool,
             let applicationViews = aDecoder.value(forKey: #keyPath(DopeConfig.applicationViews)) as? Bool,
-            let customViews = aDecoder.value(forKey: #keyPath(DopeConfig.customViews)) as? [String],
+            let customViews = aDecoder.value(forKey: #keyPath(DopeConfig.customViews)) as? [String: Any],
             let customEvents = aDecoder.value(forKey: #keyPath(DopeConfig.customEvents)) as? [String: Any],
             let notificationObservations = aDecoder.value(forKey: #keyPath(DopeConfig.notificationObservations)) as? Bool,
             let storekitObservations = aDecoder.value(forKey: #keyPath(DopeConfig.storekitObservations)) as? Bool,
