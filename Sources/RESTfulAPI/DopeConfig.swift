@@ -13,8 +13,8 @@ public class DopeConfig : NSObject {
     
     fileprivate static var _shared: DopeConfig?
     
-    private static let defaults = UserDefaults.standard
-    private static let defaultsKey = "DopamineConfiguration"
+    fileprivate static let defaults = UserDefaults.standard
+    fileprivate static let defaultsKey = "DopamineConfiguration"
     
     @objc public var configID: String?
     

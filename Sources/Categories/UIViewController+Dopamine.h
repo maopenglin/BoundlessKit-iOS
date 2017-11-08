@@ -10,7 +10,9 @@
 #define UIViewController_Dopamine_h
 
 @interface DopamineViewController : UIViewController
+
 + (void) swizzleSelectors;
+
 @end
 
 #endif /* UIViewController_Dopamine_h */

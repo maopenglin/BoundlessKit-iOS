@@ -10,7 +10,6 @@ import Foundation
 
 @objc public class DopeLog : NSObject {
     
-    
     /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
     ///
     /// - parameters:

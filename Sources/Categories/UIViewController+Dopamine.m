@@ -10,6 +10,7 @@
 
 #import <DopamineKit/DopamineKit-swift.h>
 #import <SwizzleHelper.h>
+#import <objc/runtime.h>
 
 @implementation DopamineViewController
 
@@ -23,8 +24,11 @@
         [self swizzled_viewDidAppear:animated];
     
     if ([[DopeConfig shared] applicationViews]) {
-        [DopamineKit track:@"UIViewController" metaData:@{@"instanceClass": NSStringFromClass([self class]),
-                                                          @"tag": @"didAppear"}];
+        [DopamineKit track:@"UIViewController" metaData:@{
+                                                          @"tag": @"didAppear",
+                                                          @"classname": NSStringFromClass([self class]),
+                                                          @"time": [Helper trackStartTimeFor:[self description]]
+                                                          }];
     }
 }
 
@@ -33,8 +37,10 @@
         [self swizzled_viewDidDisappear:animated];
     
     if ([[DopeConfig shared] applicationViews]) {
-        [DopamineKit track:@"UIViewController" metaData:@{@"instanceClass": NSStringFromClass([self class]),
-                                                          @"tag": @"didDisappear"}];
+        [DopamineKit track:@"UIViewController" metaData:@{@"tag": @"didDisappear",
+                                                          @"classname": NSStringFromClass([self class]),
+                                                          @"time": [Helper timeTrackedFor:[self description]]
+                                                              }];
     }
 }
 @end
