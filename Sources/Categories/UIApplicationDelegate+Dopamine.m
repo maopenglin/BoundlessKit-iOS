@@ -56,12 +56,13 @@ static NSDate *lastActive;
     if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
         [self swizzled_applicationDidBecomeActive:application];
     
-    lastActive = [[NSDate alloc] init];
-    double recordedUTC = [lastActive timeIntervalSince1970] * 1000;
+    if ([[DopeConfig shared] applicationState]) {
+        lastActive = [[NSDate alloc] init];
+        double recordedUTC = [lastActive timeIntervalSince1970] * 1000;
+        [DopamineKit track:@"UIApplicationDelegate" metaData:@{@"tag":@"didBecomeActive",
+                                                               @"startTime": [NSNumber numberWithDouble:recordedUTC]}];
+    }
     
-    [DopamineKit track:@"UIApplicationDelegate" metaData:@{@"tag":@"didBecomeActive",
-                                                           @"startTime": [NSNumber numberWithDouble:recordedUTC]}];
-
 #ifdef DEBUG
     [VisualizerAPI promptPairing];
 #endif
@@ -70,14 +71,16 @@ static NSDate *lastActive;
 }
 
 - (void) swizzled_applicationWillResignActive:(UIApplication*)application {
-    NSDate *now = [[NSDate alloc] init];
-    double recordedUTC = [now timeIntervalSince1970] * 1000;
-    double millisActive = (lastActive) ? 1000*[now timeIntervalSinceDate:lastActive] : 0;
-    [DopamineKit track:@"UIApplicationDelegate" metaData:@{@"tag":@"willResignActive",
-                                                           @"startTime": [NSNumber numberWithDouble:recordedUTC],
-                                                           @"endTime": [NSNumber numberWithDouble:recordedUTC],
-                                                           @"millisActive": [NSNumber numberWithDouble:millisActive]
-                                              }];
+    if ([[DopeConfig shared] applicationState]) {
+        NSDate *now = [[NSDate alloc] init];
+        double recordedUTC = [now timeIntervalSince1970] * 1000;
+        double millisActive = (lastActive) ? 1000*[now timeIntervalSinceDate:lastActive] : 0;
+        [DopamineKit track:@"UIApplicationDelegate" metaData:@{@"tag":@"willResignActive",
+                                                               @"startTime": [NSNumber numberWithDouble:recordedUTC],
+                                                               @"endTime": [NSNumber numberWithDouble:recordedUTC],
+                                                               @"millisActive": [NSNumber numberWithDouble:millisActive]
+                                                               }];
+    }
     
     if ([self respondsToSelector:@selector(swizzled_applicationWillResignActive:)])
         [self swizzled_applicationWillResignActive:application];
