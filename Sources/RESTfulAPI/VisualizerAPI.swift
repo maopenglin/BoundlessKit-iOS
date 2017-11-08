@@ -222,6 +222,15 @@ public class VisualizerAPI : NSObject {
             let senderClassname = NSStringFromClass(type(of: senderInstance))
             let targetClassname = NSStringFromClass(type(of: targetInstance))
             let selectorName = NSStringFromSelector(selectorObj)
+//            print("sender:\(senderClassname) target:\(targetClassname) selector:\(selectorName)")
+            
+            if DopeConfig.shared.customEvents[[senderClassname, targetClassname, selectorName].joined(separator: "-")] != nil {
+                DopamineKit.track("UIApplication", metaData: ["tag": "sendAction",
+                                                              "sender": senderClassname,
+                                                              "target": targetClassname,
+                                                              "selector": selectorName
+                                                              ])
+            }
             
             // display reward if reward is set for this event
             shared.getMappingFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in

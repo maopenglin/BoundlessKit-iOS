@@ -36,11 +36,11 @@
         NSString *selectorName = NSStringFromSelector(action);
         // Sometimes this method proxies through to its internal method. We want to ignore those calls.
         if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
-            [DopamineKit track:@"UIApplication" metaData:@{@"tag": @"sendAction",
-                                                           @"sender": NSStringFromClass([sender class]),
-                                                           @"target": NSStringFromClass([target class]),
-                                                           @"selector": selectorName}
-             ];
+//            [DopamineKit track:@"UIApplication" metaData:@{@"tag": @"sendAction",
+//                                                           @"sender": NSStringFromClass([sender class]),
+//                                                           @"target": NSStringFromClass([target class]),
+//                                                           @"selector": selectorName}
+//             ];
             [VisualizerAPI recordActionWithSenderInstance:sender targetInstance:target selectorObj:action event:event];
         }
     }

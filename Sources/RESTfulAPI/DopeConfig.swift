@@ -36,7 +36,7 @@ public class DopeConfig : NSObject {
     @objc public var applicationState: Bool
     @objc public var applicationViews: Bool
     @objc public var customViews: [String]
-    @objc public var customEvents: [[String: String]]
+    @objc public var customEvents: [String: Any]
     
     init(configID: String?,
                   reinforcementEnabled: Bool,
@@ -45,7 +45,7 @@ public class DopeConfig : NSObject {
                   applicationState: Bool,
                   applicationViews: Bool,
                   customViews: [String],
-                  customEvents: [[String: String]],
+                  customEvents: [String: Any],
                   notificationObservations: Bool,
                   storekitObservations: Bool,
                   locationObservations: Bool,
@@ -78,7 +78,14 @@ public class DopeConfig : NSObject {
         self.init(acoder: aDecoder)
     }
     
+    // test config
     static var standard: DopeConfig {
+        
+        var customEvents: [[String: String]] = []
+        customEvents.append(["sender":"UIButton",
+                             "target":"DopamineKit_Example.ViewController",
+                             "selector":"action2Performed"])
+        
         var standardConfig: [String: Any] = [:]
         standardConfig["configID"] = nil
         standardConfig["reinforcementEnabled"] = true
@@ -87,7 +94,8 @@ public class DopeConfig : NSObject {
         standardConfig["trackingCapabilities"] = ["applicationState": true,
                                                   "applicationViews": true,
                                                   "customViews": [String](),
-                                                  "customEvents": [[String: String]](),
+                                                  // "customEvents": [[String: String]](),
+                                                  "customEvents": customEvents,
                                                   "notificationObservations": true,
                                                   "storekitObservations": true,
                                                   "locationObservations": true
@@ -96,6 +104,7 @@ public class DopeConfig : NSObject {
         standardConfig["integrationMethod"] = "codeless"
         standardConfig["advertiserID"] = true
         standardConfig["consoleLoggingEnabled"] = true
+        
         return DopeConfig.convert(configDictionary: standardConfig)!
     }
     
@@ -122,9 +131,10 @@ extension DopeConfig {
             return _shared
         } else if let savedConfigData = DopeConfig.defaults.object(forKey: DopeConfig.defaultsKey) as? NSData,
             let savedConfig = NSKeyedUnarchiver.unarchiveObject(with: savedConfigData as Data) as? DopeConfig {
+            print("using saved dopamine configuration")
             return savedConfig
         } else {
-            print("using standard configuration")
+            print("using standard dopamine configuration")
             return standard
         }
     }
@@ -138,7 +148,7 @@ extension DopeConfig {
             let applicationState = trackingCapabilities["applicationState"] as? Bool,
             let applicationViews = trackingCapabilities["applicationViews"] as? Bool,
             let customViews = trackingCapabilities["customViews"] as? [String],
-            let customEvents = trackingCapabilities["customEvents"] as? [[String: String]],
+            let customEventsArray = trackingCapabilities["customEvents"] as? [[String: Any]],
             let notificationObservations = trackingCapabilities["notificationObservations"] as? Bool,
             let storekitObservations = trackingCapabilities["storekitObservations"] as? Bool,
             let locationObservations = trackingCapabilities["locationObservations"] as? Bool,
@@ -149,6 +159,13 @@ extension DopeConfig {
             let advertiserID = configDictionary["advertiserID"] as? Bool,
             let consoleLoggingEnabled = configDictionary["consoleLoggingEnabled"] as? Bool
         {
+            var customEvents = [String: Any]()
+            for event in customEventsArray {
+                let sender = event["sender"] as! String
+                let target = event["target"] as! String
+                let selector = event["selector"] as! String
+                customEvents[[sender, target, selector].joined(separator: "-")] = event
+            }
             return DopeConfig.init(
                 configID: configID,
                 reinforcementEnabled: reinforcementEnabled,
@@ -168,7 +185,7 @@ extension DopeConfig {
                 consoleLoggingEnabled: consoleLoggingEnabled
             )
         } else {
-            print("Error")
+            DopeLog.error("could not convert Config dictionary")
             return nil
         }
     }
@@ -203,7 +220,7 @@ extension DopeConfig : NSCoding {
             let applicationState = aDecoder.value(forKey: #keyPath(DopeConfig.applicationState)) as? Bool,
             let applicationViews = aDecoder.value(forKey: #keyPath(DopeConfig.applicationViews)) as? Bool,
             let customViews = aDecoder.value(forKey: #keyPath(DopeConfig.customViews)) as? [String],
-            let customEvents = aDecoder.value(forKey: #keyPath(DopeConfig.customEvents)) as? [[String: String]],
+            let customEvents = aDecoder.value(forKey: #keyPath(DopeConfig.customEvents)) as? [String: Any],
             let notificationObservations = aDecoder.value(forKey: #keyPath(DopeConfig.notificationObservations)) as? Bool,
             let storekitObservations = aDecoder.value(forKey: #keyPath(DopeConfig.storekitObservations)) as? Bool,
             let locationObservations = aDecoder.value(forKey: #keyPath(DopeConfig.locationObservations)) as? Bool,

@@ -66,7 +66,7 @@ class ViewController: UIViewController {
     
     @objc func action2Performed(){
         // Tracking call is sent asynchronously
-        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
+//        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
     }
     
     
