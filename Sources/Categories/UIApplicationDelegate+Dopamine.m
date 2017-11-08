@@ -50,17 +50,14 @@ static NSArray* delegateSubclasses = nil;
 
 // Application State Swizzles
 
-static NSDate *_lastActive;
-
 - (void) swizzled_applicationDidBecomeActive:(UIApplication*)application {
     if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
         [self swizzled_applicationDidBecomeActive:application];
     
     if ([[DopeConfig shared] applicationState]) {
-        _lastActive = [[NSDate alloc] init];
-        double recordedUTC = [_lastActive timeIntervalSince1970] * 1000;
         [DopamineKit track:@"UIApplicationDelegate" metaData:@{@"tag":@"didBecomeActive",
-                                                               @"startTime": [NSNumber numberWithDouble:recordedUTC]}];
+                                                               @"time": [Helper trackStartTimeFor:[self description]]
+                                                               }];
     }
     
 #ifdef DEBUG
@@ -72,13 +69,8 @@ static NSDate *_lastActive;
 
 - (void) swizzled_applicationWillResignActive:(UIApplication*)application {
     if ([[DopeConfig shared] applicationState]) {
-        NSDate *now = [[NSDate alloc] init];
-        double recordedUTC = [now timeIntervalSince1970] * 1000;
-        double millisActive = (_lastActive) ? 1000*[now timeIntervalSinceDate:_lastActive] : 0;
         [DopamineKit track:@"UIApplicationDelegate" metaData:@{@"tag":@"willResignActive",
-                                                               @"startTime": [NSNumber numberWithDouble:recordedUTC],
-                                                               @"endTime": [NSNumber numberWithDouble:recordedUTC],
-                                                               @"millisActive": [NSNumber numberWithDouble:millisActive]
+                                                               @"time": [Helper timeTrackedFor:[self description]]
                                                                }];
     }
     
