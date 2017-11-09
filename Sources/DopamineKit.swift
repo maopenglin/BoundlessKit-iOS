@@ -69,26 +69,4 @@ open class DopamineKit : NSObject {
         syncCoordinator.store(reportedAction: action)
     }
     
-//    /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
-//    ///
-//    /// - parameters:
-//    ///     - message: The debug message.
-//    ///     - filePath: Used to get filename of bug. Do not use this parameter. Defaults to #file.
-//    ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
-//    ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
-//    ///
-//    @objc public static func debugLog(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
-//        #if DEBUG
-//            guard DopeConfig.shared.consoleLoggingEnabled else {
-//                return
-//            }
-//            var functionSignature:String = function
-//            if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
-//                functionSignature.replaceSubrange(parameterNames, with: "()")
-//            }
-//            let fileName = NSString(string: filePath).lastPathComponent
-//            print("[\(fileName):\(line):\(functionSignature)] - \(message)")
-//        #endif
-//    }
-
 }

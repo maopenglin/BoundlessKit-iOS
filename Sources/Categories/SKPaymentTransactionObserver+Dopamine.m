@@ -71,6 +71,7 @@ static NSArray* observerSubclasses = nil;
                 break;
             }
             [DopamineKit track:@"SKPaymentTransactionObserver" metaData:@{@"tag": @"updatedTransactions",
+                                                                          @"classname": NSStringFromClass([self class]),
                                                                           @"productID": transaction.payment.productIdentifier,
                                                                           @"quantity": [NSNumber numberWithInteger:transaction.payment.quantity],
                                                                           @"transactionState": stateName}];

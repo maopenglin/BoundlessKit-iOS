@@ -86,6 +86,10 @@ public class DopeConfig : NSObject {
                              "target":"DopamineKit_Example.ViewController",
                              "selector":"action2Performed"]
         
+        let customViews = ["DopamineKit_Example.ViewController": "DopamineKit_Example.ViewController",
+                           "LayerPlayer.ClassListViewController": "LayerPlayer.ClassListViewController"
+                           ]
+        
         var standardConfig: [String: Any] = [:]
         standardConfig["configID"] = nil
         standardConfig["reinforcementEnabled"] = true
@@ -93,7 +97,8 @@ public class DopeConfig : NSObject {
         standardConfig["trackingEnabled"] = true
         standardConfig["trackingCapabilities"] = ["applicationState": true,
                                                   "applicationViews": true,
-                                                  "customViews": [String: Any](),
+                                                  "customViews": customViews,
+//                                                  "customViews": [String: Any](),
 //                                                  "customEvents": [String: Any](),
                                                   "customEvents": customEvents,
                                                   "notificationObservations": true,
