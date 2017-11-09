@@ -26,7 +26,7 @@
         [DopamineKit track:@"UIViewController" metaData:@{
                                                           @"tag": @"didAppear",
                                                           @"classname": NSStringFromClass([self class]),
-                                                          @"time": [Helper trackStartTimeFor:[self description]]
+                                                          @"time": [DopeTracking trackStartTimeFor:[self description]]
                                                           }];
     }
 }
@@ -38,7 +38,7 @@
     if ([[DopeConfig shared] applicationViews]) {
         [DopamineKit track:@"UIViewController" metaData:@{@"tag": @"didDisappear",
                                                           @"classname": NSStringFromClass([self class]),
-                                                          @"time": [Helper timeTrackedFor:[self description]]
+                                                          @"time": [DopeTracking timeTrackedFor:[self description]]
                                                               }];
     }
 }
