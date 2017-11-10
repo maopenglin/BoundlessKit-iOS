@@ -90,7 +90,10 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
-        DopamineKit.syncCoordinator.performSync()
+        
+        DispatchQueue.concurrentPerform(iterations: 100) { count in
+            DopamineKit.track("testingActionConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
+        }
         
 //        testQueue.isSuspended = true
 //        for _ in 1...100 {

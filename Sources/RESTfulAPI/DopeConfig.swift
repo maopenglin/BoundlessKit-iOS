@@ -103,7 +103,7 @@ public class DopeConfig : NSObject {
                                                   "customEvents": customEvents,
                                                   "notificationObservations": false,
                                                   "storekitObservations": false,
-                                                  "locationObservations": false
+                                                  "locationObservations": true
         ]
         standardConfig["batchSize"] = ["track": 15, "report": 15]
         standardConfig["integrationMethod"] = "codeless"
