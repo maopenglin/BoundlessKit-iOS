@@ -16,14 +16,16 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     public var canGetLocation: Bool = true
     fileprivate var lastLocation: CLLocation?
     fileprivate var expiresAt = Date()
-    fileprivate var timeAccuracy: TimeInterval = 3
+    fileprivate var timeAccuracy: TimeInterval = 5
     
     fileprivate var queue = OperationQueue()
     
     fileprivate override init() {
         super.init()
-        locationManager = CLLocationManager()
-        locationManager.delegate = self
+        DispatchQueue.main.sync {
+            self.locationManager = CLLocationManager()
+            self.locationManager.delegate = self
+        }
     }
     
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
@@ -58,25 +60,27 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
             DopeLog.debug("Last location available")
             callback(["lat": lastLocation.coordinate.latitude, "long": lastLocation.coordinate.longitude])
         } else {
-            DopeLog.debug("Getting location...")
-            self.queue.isSuspended = true
+            if !queue.isSuspended {
+                DopeLog.debug("Getting location...")
+                self.queue.isSuspended = true
+                DispatchQueue.global(qos: .userInitiated).async {
+                    self.locationManager.startUpdatingLocation()
+                    DopeLog.debug("Started locationmanager")
+                }
+                // Stop waiting for location after 3 seconds
+                DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+                    if self.queue.isSuspended {
+                        DopeLog.debug("getLocation() timed out")
+                        self.canGetLocation = false
+                        self.queue.isSuspended = false
+                    }
+                }
+            }
             self.queue.addOperation {
                 if let lastLocation = self.lastLocation {
                     callback(["lat": lastLocation.coordinate.latitude, "long": lastLocation.coordinate.longitude])
                 } else {
                     callback(nil)
-                }
-            }
-            DispatchQueue.global(qos: .userInitiated).async {
-                self.locationManager.startUpdatingLocation()
-                DopeLog.debug("Started locationmanager")
-            }
-            // Stop waiting for location after 3 seconds
-            DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
-                if self.queue.isSuspended {
-                    DopeLog.debug("getLocation() timed out")
-                    self.canGetLocation = false
-                    self.queue.isSuspended = false
                 }
             }
         }
