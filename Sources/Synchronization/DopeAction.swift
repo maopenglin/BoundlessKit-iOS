@@ -76,6 +76,19 @@ internal class DopeAction : NSObject, NSCoding {
         aCoder.encode(timezoneOffset, forKey: timezoneOffsetKey)
     }
     
+    func addMetaData(_ newData: [String: Any]?) {
+        guard let newData = newData else {
+            return
+        }
+        if metaData != nil {
+            for (key,value) in newData {
+                metaData?.updateValue(value, forKey: key)
+            }
+        } else {
+            metaData = newData
+        }
+    }
+    
     /// This function converts a DopeAction to a JSON compatible Object
     ///
     func toJSONType() -> [String : Any] {

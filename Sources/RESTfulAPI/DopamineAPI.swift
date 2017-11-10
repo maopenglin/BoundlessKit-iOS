@@ -298,13 +298,13 @@ public class DopamineAPI : NSObject{
         if DopeConfig.shared.advertiserID,
             let aid = ASIdentifierManager.shared().adId()?.uuidString,
             aid != "00000000-0000-0000-0000-000000000000" {
-            DopeLog.debug("ASIdentifierManager primaryIdentity:(\(aid))")
+//            DopeLog.debug("ASIdentifierManager primaryIdentity:(\(aid))")
             return aid
         } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
-            DopeLog.debug("identifierForVendor primaryIdentity:(\(vid))")
+//            DopeLog.debug("identifierForVendor primaryIdentity:(\(vid))")
             return vid
         } else {
-            DopeLog.debug("IDUnavailable for primaryIdentity")
+//            DopeLog.debug("IDUnavailable for primaryIdentity")
             return "IDUnavailable"
         }
     }()

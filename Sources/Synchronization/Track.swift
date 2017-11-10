@@ -18,6 +18,8 @@ internal class Track : NSObject, NSCoding {
     
     private let trackedActionsQueue = OperationQueue()
     
+    @objc fileprivate let dopeLocation = DopeLocation.shared
+    
     @objc private var trackedActions: [DopeAction]
     @objc private var timerStartedAt: Int64
     @objc private var timerExpiresIn: Int64
@@ -131,12 +133,7 @@ internal class Track : NSObject, NSCoding {
     func add(action: DopeAction) {
         DopeLocation.shared.getLocation { location in
             if let location = location {
-                if action.metaData != nil {
-                    action.metaData?.updateValue(location, forKey: "location")
-                }
-                else {
-                    action.metaData = ["location": location]
-                }
+                action.addMetaData(["location": location])
             }
             
             self.trackedActionsQueue.addOperation {

@@ -8,6 +8,7 @@
 
 import UIKit
 import DopamineKit
+import CoreLocation
 
 class ViewController: UIViewController {
     
@@ -67,9 +68,11 @@ class ViewController: UIViewController {
     @objc func action2Performed(){
         // Tracking call is sent asynchronously
 //        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
+        locationManager.delegate = self
+        locationManager.requestAlwaysAuthorization()
     }
     
-    
+    var locationManager = CLLocationManager()
     
     
     ///////////////////////////////////////
@@ -155,3 +158,6 @@ class ViewController: UIViewController {
     
 }
 
+extension ViewController : CLLocationManagerDelegate {
+    
+}
