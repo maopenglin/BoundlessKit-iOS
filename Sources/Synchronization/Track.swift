@@ -129,11 +129,22 @@ internal class Track : NSObject, NSCoding {
     ///     - action: The action to be stored.
     ///
     func add(action: DopeAction) {
-        self.trackedActionsQueue.addOperation {
-            self.trackedActions.append(action)
-            DopeLog.debug("tracked:\(action.actionID) with metadata:\(String(describing: action.metaData))")
-            if self.trackedActionsQueue.operationCount == 1 {
-                self.defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: self.defaultsKey)
+        DopeLocation.shared.getLocation { location in
+            if let location = location {
+                if action.metaData != nil {
+                    action.metaData?.updateValue(location, forKey: "location")
+                }
+                else {
+                    action.metaData = ["location": location]
+                }
+            }
+            
+            self.trackedActionsQueue.addOperation {
+                self.trackedActions.append(action)
+                DopeLog.debug("tracked:\(action.actionID) with metadata:\(String(describing: action.metaData))")
+                if self.trackedActionsQueue.operationCount == 1 {
+                    self.defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: self.defaultsKey)
+                }
             }
         }
     }

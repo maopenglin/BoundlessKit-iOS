@@ -46,21 +46,27 @@ public class DopeLocation : NSObject, CLLocationManagerDelegate {
         print(error)
     }
     
-    public func getLocation(callback: @escaping (CLLocation?)->()) {
-        if let lastActive = lastActive,
+    public func getLocation(callback: @escaping ([String: Any]?)->()) {
+        if let lastLocation = lastLocation,
+            let lastActive = lastActive,
             Date().timeIntervalSince(lastActive) < expiresIn
         {
-            callback(lastLocation)
-        }
-        
-        else {
-            queue.isSuspended = true
-            queue.addOperation({
-                callback(self.lastLocation)
-            })
+            callback(["lat": lastLocation.coordinate.latitude, "long": lastLocation.coordinate.longitude])
+        } else {
             DispatchQueue.main.async {
+                self.queue.isSuspended = true
+                self.queue.addOperation {
+                    var dict: [String: Any]?
+                    if let lastLocation = self.lastLocation {
+                        dict = ["lat": lastLocation.coordinate.latitude, "long": lastLocation.coordinate.longitude]
+                    }
+                    callback(dict)
+                }
                 self.locationManager.startUpdatingLocation()
                 print("Started locationmanager")
+                DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+                    self.queue.isSuspended = false
+                }
             }
         }
     }
