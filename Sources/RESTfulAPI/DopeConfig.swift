@@ -95,15 +95,15 @@ public class DopeConfig : NSObject {
         standardConfig["reinforcementEnabled"] = false
         standardConfig["triggerEnabled"] = false
         standardConfig["trackingEnabled"] = true
-        standardConfig["trackingCapabilities"] = ["applicationState": false,
-                                                  "applicationViews": false,
+        standardConfig["trackingCapabilities"] = ["applicationState": true,
+                                                  "applicationViews": true,
                                                   "customViews": customViews,
 //                                                  "customViews": [String: Any](),
 //                                                  "customEvents": [String: Any](),
                                                   "customEvents": customEvents,
                                                   "notificationObservations": false,
                                                   "storekitObservations": false,
-                                                  "locationObservations": true
+                                                  "locationObservations": false
         ]
         standardConfig["batchSize"] = ["track": 15, "report": 15]
         standardConfig["integrationMethod"] = "codeless"

@@ -36,7 +36,7 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print("getLocation got location:\(locations.last?.description ?? "nil")")
+        DopeLog.debug("getLocation got location:\(locations.last?.description ?? "nil")")
         
         locationManager.stopUpdatingLocation()
         expiresAt = Date().addingTimeInterval(timeAccuracy)
@@ -67,9 +67,9 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
                     callback(nil)
                 }
             }
-            DispatchQueue.main.async {
+            DispatchQueue.global(qos: .userInitiated).async {
                 self.locationManager.startUpdatingLocation()
-                print("Started locationmanager")
+                DopeLog.debug("Started locationmanager")
             }
             // Stop waiting for location after 3 seconds
             DispatchQueue.global().asyncAfter(deadline: .now() + 3) {

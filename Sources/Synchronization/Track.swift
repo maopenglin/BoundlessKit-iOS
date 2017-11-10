@@ -130,12 +130,14 @@ internal class Track : NSObject, NSCoding {
     ///
     func add(action: DopeAction) {
         let dispatchGroup = DispatchGroup()
-        dispatchGroup.enter()
-        DopeLocation.shared.getLocation { location in
-            if let location = location {
-                action.addMetaData(["location": location])
+        if DopeConfig.shared.locationObservations {
+            dispatchGroup.enter()
+            DopeLocation.shared.getLocation { location in
+                if let location = location {
+                    action.addMetaData(["location": location])
+                }
+                dispatchGroup.leave()
             }
-            dispatchGroup.leave()
         }
         dispatchGroup.notify(queue: .global()) {
             self.trackedActionsQueue.addOperation {
