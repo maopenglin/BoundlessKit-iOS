@@ -87,12 +87,10 @@ internal class Track : NSObject, NSCoding {
     /// Clears the saved track sync triggers from NSUserDefaults
     ///
     func erase() {
-        trackedActionsQueue.addOperation {
-            self.trackedActions.removeAll()
-            self.timerStartedAt = Int64( 1000*NSDate().timeIntervalSince1970 )
-            self.timerExpiresIn = 172800000
-            self.defaults.removeObject(forKey: self.defaultsKey)
-        }
+        self.trackedActions.removeAll()
+        self.timerStartedAt = Int64( 1000*NSDate().timeIntervalSince1970 )
+        self.timerExpiresIn = 172800000
+        self.defaults.removeObject(forKey: self.defaultsKey)
     }
     
     /// Check whether the track has been triggered for a sync
@@ -131,11 +129,15 @@ internal class Track : NSObject, NSCoding {
     ///     - action: The action to be stored.
     ///
     func add(action: DopeAction) {
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
         DopeLocation.shared.getLocation { location in
             if let location = location {
                 action.addMetaData(["location": location])
             }
-            
+            dispatchGroup.leave()
+        }
+        dispatchGroup.notify(queue: .global()) {
             self.trackedActionsQueue.addOperation {
                 self.trackedActions.append(action)
                 DopeLog.debug("tracked:\(action.actionID) with metadata:\(String(describing: action.metaData))")
