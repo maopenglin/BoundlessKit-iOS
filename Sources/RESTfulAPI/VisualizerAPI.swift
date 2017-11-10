@@ -493,6 +493,9 @@ public class VisualizerAPI : NSObject {
     ///     - completion: A closure with a JSON formatted dictionary.
     ///
     private func send(call type: CallType, with payload: [String:Any], timeout:TimeInterval = 3.0, completion: @escaping ([String: Any]) -> Void) {
+        if true {
+            return
+        }
         let url: URL
         if type == .boot,
             let bootURL = URL(string: type.pathExtenstion) {

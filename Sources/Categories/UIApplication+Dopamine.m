@@ -11,7 +11,6 @@
 
 #import <DopamineKit/DopamineKit-Swift.h>
 #import <SwizzleHelper.h>
-#import <DopeLocation.h>
 
 @implementation DopamineApp
 

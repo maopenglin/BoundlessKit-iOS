@@ -11,8 +11,6 @@
 #endif
 
 #import "ASIdentifierManager+ASIdentifierManagerHelper.h"
-#import "CLLocationManagerDelegate+Dopamine.h"
-#import "DopeLocation.h"
 #import "SKPaymentTransactionObserver+Dopamine.h"
 #import "UIApplication+Dopamine.h"
 #import "UIApplicationDelegate+Dopamine.h"

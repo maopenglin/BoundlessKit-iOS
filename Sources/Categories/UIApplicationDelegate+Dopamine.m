@@ -11,7 +11,6 @@
 
 #import <DopamineKit/DopamineKit-Swift.h>
 #import <SwizzleHelper.h>
-#import <DopeLocation.h>
 
 @implementation DopamineAppDelegate
 
@@ -66,6 +65,7 @@ static NSArray* delegateSubclasses = nil;
 //        [DopeLocation getLocation:true];
 //        [DopeLocation onfocus:true];
 //        (void)[DopeLocation shared];
+        (void)[DopeLocation shared];
     }
 
 #ifdef DEBUG

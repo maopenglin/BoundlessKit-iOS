@@ -67,8 +67,6 @@ class ViewController: UIViewController {
     @objc func action2Performed(){
         // Tracking call is sent asynchronously
 //        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
-        DopeLocation.shared.start = Date()
-        DopeLocation.shared.locationManager.startUpdatingLocation()
     }
     
     
@@ -90,7 +88,6 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         loadBasicUI()
         DopamineKit.syncCoordinator.performSync()
-        _ = DopeLocation.shared
         
 //        testQueue.isSuspended = true
 //        for _ in 1...100 {

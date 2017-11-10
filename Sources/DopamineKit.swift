@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 @objc
 open class DopamineKit : NSObject {
@@ -42,7 +43,7 @@ open class DopamineKit : NSObject {
         DispatchQueue.global(qos: .background).async {
             let action = DopeAction(actionID: actionID, metaData:metaData)
             syncCoordinator.store(trackedAction: action)
-            DopeLog.debug("tracked:\(actionID) with metadata:\(String(describing: metaData))")
+//            DopeLog.debug("tracked:\(actionID) with metadata:\(String(describing: metaData))")
         }
     }
     
