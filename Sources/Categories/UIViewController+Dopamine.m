@@ -24,8 +24,7 @@
     if ([self respondsToSelector:@selector(swizzled_viewDidAppear:)])
         [self swizzled_viewDidAppear:animated];
     if ([[DopeConfig shared] applicationViews] || [[[DopeConfig shared] customViews] objectForKey:NSStringFromClass([self class])]) {
-        [DopamineKit track:@"UIViewController" metaData:@{
-                                                          @"tag": @"didAppear",
+        [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didAppear",
                                                           @"classname": NSStringFromClass([self class]),
                                                           @"time": [DopeTracking trackStartTimeFor:[self description]]
                                                           }];
@@ -37,7 +36,7 @@
         [self swizzled_viewDidDisappear:animated];
     
     if ([[DopeConfig shared] applicationViews]) {
-        [DopamineKit track:@"UIViewController" metaData:@{@"tag": @"didDisappear",
+        [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didDisappear",
                                                           @"classname": NSStringFromClass([self class]),
                                                           @"time": [DopeTracking timeTrackedFor:[self description]]
                                                               }];
