@@ -11,6 +11,7 @@
 
 #import <DopamineKit/DopamineKit-Swift.h>
 #import <SwizzleHelper.h>
+#import <DopeLocation.h>
 
 @implementation DopamineAppDelegate
 
@@ -61,6 +62,12 @@ static NSArray* delegateSubclasses = nil;
                                                                }];
     }
     
+    if ([[DopeConfig shared] locationObservations]) {
+//        [DopeLocation getLocation:true];
+//        [DopeLocation onfocus:true];
+//        (void)[DopeLocation shared];
+    }
+
 #ifdef DEBUG
     [VisualizerAPI promptPairing];
 #endif
@@ -74,6 +81,10 @@ static NSArray* delegateSubclasses = nil;
                                                                @"time": [DopeTracking timeTrackedFor:[self description]]
                                                                }];
     }
+    
+//    if ([[DopeConfig shared] locationObservations]) {
+//        [DopeLocation onfocus:false];
+//    }
     
     if ([self respondsToSelector:@selector(swizzled_applicationWillResignActive:)])
         [self swizzled_applicationWillResignActive:application];
