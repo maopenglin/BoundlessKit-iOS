@@ -11,7 +11,7 @@ import CoreLocation
 class DopeLocation : NSObject, CLLocationManagerDelegate {
     
     @objc public static var shared = DopeLocation()
-    public var locationManager: CLLocationManager!
+    public var locationManager: CLLocationManager?
     
     public var canGetLocation: Bool = true
     fileprivate var lastLocation: CLLocation?
@@ -22,9 +22,9 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     
     fileprivate override init() {
         super.init()
-        DispatchQueue.main.sync {
+        DispatchQueue.main.async {
             self.locationManager = CLLocationManager()
-            self.locationManager.delegate = self
+            self.locationManager?.delegate = self
         }
     }
     
@@ -40,7 +40,7 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         DopeLog.debug("getLocation got location:\(locations.last?.description ?? "nil")")
         
-        locationManager.stopUpdatingLocation()
+        locationManager?.stopUpdatingLocation()
         expiresAt = Date().addingTimeInterval(timeAccuracy)
         if let location = locations.last {
             lastLocation = location
@@ -50,18 +50,16 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         DopeLog.error("locationManager didFailWithError:\(error)")
-        self.canGetLocation = false
+        canGetLocation = false
+        queue.isSuspended = false
     }
     
     public func getLocation(callback: @escaping ([String: Any]?)->()) {
         if !canGetLocation {
-//            DopeLog.debug("Cannnot get location")
             callback(nil)
         } else if Date() < expiresAt {
-//            DopeLog.debug("Last location available")
             callback(locationInfo)
         } else {
-//            DopeLog.debug("Last location old")
             forceUpdate() {
                 callback(self.locationInfo)
             }
@@ -69,25 +67,26 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     }
     
     func forceUpdate(completion: @escaping ()->()) {
-        
-        if self.queue.isSuspended {
-//            DopeLog.debug("Still updating location...")
-            self.queue.addOperation(completion)
-            return
-        }
-        
-        self.queue.isSuspended = true
-        self.queue.addOperation(completion)
-        DopeLog.debug("Updating location...")
-        DispatchQueue.global(qos: .userInitiated).async {
-            self.locationManager.startUpdatingLocation()
-            DopeLog.debug("Started locationmanager")
-        }
-        // If no location after 3 seconds unsuspend the queue
-        DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+        DispatchQueue.global().async {
+            defer {
+                self.queue.addOperation(completion)
+            }
+            
             if self.queue.isSuspended {
-                DopeLog.debug("Location update timed out")
-                self.queue.isSuspended = false
+                return
+            }
+            self.queue.isSuspended = true
+            
+            DispatchQueue.main.async {
+                DopeLog.debug("Updating location...")
+                self.locationManager?.startUpdatingLocation()
+            }
+            // If no location after 3 seconds unsuspend the queue
+            DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+                if self.queue.isSuspended {
+                    DopeLog.debug("Location update timed out")
+                    self.queue.isSuspended = false
+                }
             }
         }
     }
