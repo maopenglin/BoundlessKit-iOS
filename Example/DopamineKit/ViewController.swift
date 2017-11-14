@@ -108,6 +108,13 @@ class ViewController: UIViewController {
 //        }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+//        DispatchQueue.concurrentPerform(iterations: 100) { count in
+//            DopamineKit.track("testingActionConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
+//        }
+    }
+    
     @objc func loadBasicUI(){
         let viewSize = self.view.frame.size
         let viewCenter = self.view.center

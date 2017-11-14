@@ -132,9 +132,7 @@ extension DopeConfig {
     }
     
     static func retreive() -> DopeConfig {
-        if let _shared = _shared {
-            return _shared
-        } else if let savedConfigData = DopeConfig.defaults.object(forKey: DopeConfig.defaultsKey) as? NSData,
+        if let savedConfigData = DopeConfig.defaults.object(forKey: DopeConfig.defaultsKey) as? NSData,
             let savedConfig = NSKeyedUnarchiver.unarchiveObject(with: savedConfigData as Data) as? DopeConfig {
             print("using saved dopamine configuration")
             return savedConfig
