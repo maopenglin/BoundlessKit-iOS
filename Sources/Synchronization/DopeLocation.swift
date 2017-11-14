@@ -50,38 +50,66 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         DopeLog.error("locationManager didFailWithError:\(error)")
+        self.canGetLocation = false
     }
     
     public func getLocation(callback: @escaping ([String: Any]?)->()) {
         if !canGetLocation {
-            DopeLog.debug("Cannnot get location")
+//            DopeLog.debug("Cannnot get location")
             callback(nil)
-        } else if let lastLocation = lastLocation, Date() < expiresAt {
-            DopeLog.debug("Last location available")
-            callback(["lat": lastLocation.coordinate.latitude, "long": lastLocation.coordinate.longitude])
+        } else if Date() < expiresAt {
+//            DopeLog.debug("Last location available")
+            callback(locationInfo)
         } else {
-            if !queue.isSuspended {
-                DopeLog.debug("Getting location...")
-                self.queue.isSuspended = true
-                DispatchQueue.global(qos: .userInitiated).async {
-                    self.locationManager.startUpdatingLocation()
-                    DopeLog.debug("Started locationmanager")
-                }
-                // Stop waiting for location after 3 seconds
-                DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
-                    if self.queue.isSuspended {
-                        DopeLog.debug("getLocation() timed out")
-                        self.canGetLocation = false
-                        self.queue.isSuspended = false
-                    }
-                }
+//            DopeLog.debug("Last location old")
+            forceUpdate() {
+                callback(self.locationInfo)
             }
-            self.queue.addOperation {
-                if let lastLocation = self.lastLocation {
-                    callback(["lat": lastLocation.coordinate.latitude, "long": lastLocation.coordinate.longitude])
-                } else {
-                    callback(nil)
+        }
+    }
+    
+    func forceUpdate(completion: @escaping ()->()) {
+        
+        if self.queue.isSuspended {
+//            DopeLog.debug("Still updating location...")
+            self.queue.addOperation(completion)
+            return
+        }
+        
+        self.queue.isSuspended = true
+        self.queue.addOperation(completion)
+        DopeLog.debug("Updating location...")
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.locationManager.startUpdatingLocation()
+            DopeLog.debug("Started locationmanager")
+        }
+        // If no location after 3 seconds unsuspend the queue
+        DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+            if self.queue.isSuspended {
+                DopeLog.debug("Location update timed out")
+                self.queue.isSuspended = false
+            }
+        }
+    }
+    
+    fileprivate var locationInfo: [String: Any]? {
+        get {
+            if let lastLocation = self.lastLocation {
+                var locationInfo: [String: Any] = ["timestamp": lastLocation.timestamp.timeIntervalSince1970 * 1000,
+                                                   "latitude": lastLocation.coordinate.latitude,
+                                                   "horizontalAccuracy": lastLocation.horizontalAccuracy,
+                                                   "longitude": lastLocation.coordinate.longitude,
+                                                   "verticalAccuracy": lastLocation.verticalAccuracy,
+                                                   "altitude": lastLocation.altitude,
+                                                   "speed": lastLocation.speed,
+                                                   "course": lastLocation.course
+                ]
+                if let floor = lastLocation.floor?.level {
+                    locationInfo["floor"] = floor
                 }
+                return locationInfo
+            } else {
+                return nil
             }
         }
     }
