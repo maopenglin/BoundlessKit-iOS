@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     
     @objc func action1Performed(){
         // Reinforce the action to make it sticky!!
-        DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {
+        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
             reinforcement in
                 // Update UI to display reinforcement decision on screen for learning purposes
                 self.responseLabel.text = reinforcement
@@ -66,10 +66,16 @@ class ViewController: UIViewController {
     }
     
     @objc func action2Performed(){
-        // Tracking call is sent asynchronously
-//        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
-        locationManager.delegate = self
-        locationManager.requestAlwaysAuthorization()
+//        // Tracking call is sent asynchronously
+////        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
+//        locationManager.delegate = self
+//        locationManager.requestAlwaysAuthorization()
+        
+        DopamineKit.reinforce("a2") { reinforcement in
+            // Update UI to display reinforcement decision on screen for learning purposes
+            self.responseLabel.text = reinforcement
+            self.flash(self.responseLabel)
+        }
     }
     
     var locationManager = CLLocationManager()
@@ -85,34 +91,18 @@ class ViewController: UIViewController {
     @objc var action1Button:UIButton!
     @objc var trackedActionButton:UIButton!
     
-    let testQueue = OperationQueue()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
         
-        DispatchQueue.concurrentPerform(iterations: 100) { count in
-            DopamineKit.track("testingActionConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
-        }
-        
-//        testQueue.isSuspended = true
-//        for _ in 1...100 {
-//            testQueue.addOperation {
-//                DopamineKit.track("test") {_ in}
-//            }
+//        DispatchQueue.concurrentPerform(iterations: 100) { count in
+//            DopamineKit.track("testingActionConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
 //        }
-//        testQueue.isSuspended = false
         
-//        DispatchQueue.global().asyncAfter(deadline: .now()) {
-//            CandyBar(title: "title", subtitle: "Subtitle").show(duration: 3.0)
-//        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-//        DispatchQueue.concurrentPerform(iterations: 100) { count in
-//            DopamineKit.track("testingActionConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
-//        }
     }
     
     @objc func loadBasicUI(){

@@ -15,10 +15,10 @@ public class VisualizerAPI : NSObject {
     ///
     internal enum CallType{
         case identify, accept, submit, boot
-        var pathExtenstion:String{ switch self{
-        case .identify: return "codeless/pair/customer/identity/"
-        case .accept: return "codeless/pair/customer/accept/"
-        case .submit: return "codeless/visualizer/customer/submit/"
+        var path:String{ switch self{
+        case .identify: return "https://dashboard-api.usedopamine.com/codeless/pair/customer/identity/"
+        case .accept: return "https://dashboard-api.usedopamine.com/codeless/pair/customer/accept/"
+        case .submit: return "https://dashboard-api.usedopamine.com/codeless/visualizer/customer/submit/"
         case .boot: return "https://api.usedopamine.com/v5/app/boot"
             }
         }
@@ -26,7 +26,6 @@ public class VisualizerAPI : NSObject {
     
     @objc
     public static let shared = VisualizerAPI()
-    private static let baseURL = "https://dashboard-api.usedopamine.com/"
     
     private static let clientSDKVersion = Bundle(for: DopamineAPI.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     private static let clientOS = "iOS"
@@ -43,7 +42,7 @@ public class VisualizerAPI : NSObject {
     
     @objc
     public func retrieveRewards() {
-        var payload = credentials
+        var payload = DopaminePropertiesControl.current.apiCredentials
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
         payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         send(call: .boot, with: payload){ _ in }
@@ -149,7 +148,7 @@ public class VisualizerAPI : NSObject {
                 
                 // send event to visualizer if connected
                 if let connectionID = connectionID {
-                    var payload = shared.credentials
+                    var payload = DopaminePropertiesControl.current.apiCredentials
                     payload["connectionUUID"] = connectionID
                     payload["sender"] = senderClassname
                     payload["target"] = targetName
@@ -279,7 +278,7 @@ public class VisualizerAPI : NSObject {
             
             // send event to visualizer if connected
             if let connectionID = connectionID {
-                var payload = shared.credentials
+                var payload = DopaminePropertiesControl.current.apiCredentials
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                 payload["connectionUUID"] = connectionID
@@ -375,7 +374,7 @@ public class VisualizerAPI : NSObject {
     
     @objc
     public static func promptPairing() {
-        var payload = shared.credentials
+        var payload = DopaminePropertiesControl.current.apiCredentials
         payload["deviceName"] = UIDevice.current.name
         
         shared.send(call: .identify, with: payload){ response in
@@ -417,7 +416,7 @@ public class VisualizerAPI : NSObject {
         let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
         
         pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
-            var payload = shared.credentials
+            var payload = DopaminePropertiesControl.current.apiCredentials
             payload["deviceName"] = UIDevice.current.name
             payload["connectionUUID"] = connectionID
             shared.send(call: .accept, with: payload) {response in
@@ -448,15 +447,8 @@ public class VisualizerAPI : NSObject {
         if true {
             return
         }
-        let url: URL
-        if type == .boot,
-            let bootURL = URL(string: type.pathExtenstion) {
-            url = bootURL
-        } else if let baseURL = URL(string: VisualizerAPI.baseURL),
-            let visualizerUrl = URL(string: type.pathExtenstion, relativeTo: baseURL) {
-            url = visualizerUrl
-        } else {
-            DopeLog.debug("Could not construct for \(type.pathExtenstion)")
+        guard let url = URL(string: type.path) else {
+            DopeLog.debug("Invalid url <\(type.path)>")
             return
         }
         tracesQueue.addOperation {
@@ -482,7 +474,7 @@ public class VisualizerAPI : NSObject {
                     
                     if let responseData = responseData,
                         responseData.isEmpty {
-                        DopeLog.debug("✅\(type.pathExtenstion) call got empty response.")
+                        DopeLog.debug("✅\(type.path) call got empty response.")
                         return
                     }
                     
@@ -492,14 +484,14 @@ public class VisualizerAPI : NSObject {
                             let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
                             else {
                                 let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
-                                let message = "❌ Error reading \(type.pathExtenstion) response data, not a dictionary: \(json)"
+                                let message = "❌ Error reading \(type.path) response data, not a dictionary: \(json)"
                                 DopeLog.debug(message)
                                 Telemetry.storeException(className: "JSONSerialization", message: message)
                                 return
                         }
                         responseDict = dict
                         //                    DopeLog.debugLog("✅\(type.pathExtenstion) call got response:\(responseDict.debugDescription)")
-                        DopeLog.debug("✅\(type.pathExtenstion) call got response with status:\(responseDict["status"] ?? "unknown")")
+                        DopeLog.debug("✅\(type.path) call got response with status:\(responseDict["status"] ?? "unknown")")
                         
                         if (type == .boot) || (type == .submit  && self.tracesQueue.operationCount <= 1) {
                             if (type == .boot && responseDict["status"] as? Int == 205) || (type == .submit && responseDict["status"] as? Int == 200) {
@@ -532,7 +524,7 @@ public class VisualizerAPI : NSObject {
                         }
                         
                     } catch {
-                        let message = "❌ Error reading \(type.pathExtenstion) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))
+                        let message = "❌ Error reading \(type.path) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))
                         DopeLog.debug(message)
                         return
                     }
@@ -544,99 +536,12 @@ public class VisualizerAPI : NSObject {
                 task.resume()
                 
             } catch {
-                let message = "Error sending \(type.pathExtenstion) api call with payload:(\(payload.description))"
+                let message = "Error sending \(type.path) api call with payload:(\(payload.description))"
                 DopeLog.debug(message)
                 Telemetry.storeException(className: "JSONSerialization", message: message)
             }
         }
     }
-    
-    
-    
-    
-    /// Computes the basic fields for a request call
-    ///
-    /// Add this to your payload before calling `send()`
-    ///
-    private lazy var credentials: [String: Any] = {
-        
-        var dict: [String: Any] = [ "clientOS": "iOS",
-                                    "clientOSVersion": VisualizerAPI.clientOSVersion,
-                                    "clientSDKVersion": VisualizerAPI.clientSDKVersion,
-                                    "primaryIdentity" : self.primaryIdentity ]
-        
-        // create a credentials dict from .plist
-        let credentialsFilename = "DopamineProperties"
-        var path:String
-        guard let credentialsPath = Bundle.main.path(forResource: credentialsFilename, ofType: "plist") else{
-            DopeLog.debug("[DopamineKit]: Error - cannot find credentials in (\(credentialsFilename))")
-            return dict
-        }
-        path = credentialsPath
-        
-        guard let credentialsPlist = NSDictionary(contentsOfFile: path) as? [String: Any] else{
-            DopeLog.debug("[DopamineKit]: Error - (\(credentialsFilename)) is in the wrong format")
-            return dict
-        }
-        
-        guard let appID = credentialsPlist["appID"] as? String else{
-            DopeLog.debug("[DopamineKit]: Error no appID - (\(credentialsFilename)) is in the wrong format")
-            return dict
-        }
-        dict["appID"] = appID
-        
-        guard let versionID = credentialsPlist["versionID"] as? String else{
-            DopeLog.debug("[DopamineKit]: Error no versionID - (\(credentialsFilename)) is in the wrong format")
-            return dict
-        }
-        dict["versionID"] = versionID
-        
-        if let inProduction = credentialsPlist["inProduction"] as? Bool{
-            if(inProduction){
-                guard let productionSecret = credentialsPlist["productionSecret"] as? String else{
-                    DopeLog.debug("[DopamineKit]: Error no productionSecret - (\(credentialsFilename)) is in the wrong format")
-                    return dict
-                }
-                dict["secret"] = productionSecret
-            } else{
-                guard let developmentSecret = credentialsPlist["developmentSecret"] as? String else{
-                    DopeLog.debug("[DopamineKit]: Error no developmentSecret - (\(credentialsFilename)) is in the wrong format")
-                    return dict
-                }
-                dict["secret"] = developmentSecret
-            }
-        } else{
-            DopeLog.debug("[DopamineKit]: Error no inProduction - (\(credentialsFilename)) is in the wrong format")
-            return dict
-        }
-        
-        return dict
-    }()
-    
-    /// Computes a primary identity for the user
-    ///
-    /// This variable computes an identity for the user and saves it to NSUserDefaults for future use.
-    ///
-    private lazy var primaryIdentity:String = {
-        #if DEBUG
-            if let tid = DopamineKit.developmentIdentity {
-                DopeLog.debug("Testing with primaryIdentity:(\(tid))")
-                return tid
-            }
-        #endif
-        if let aid = ASIdentifierManager.shared().adId()?.uuidString,
-            aid != "00000000-0000-0000-0000-000000000000" {
-            DopeLog.debug("ASIdentifierManager primaryIdentity:(\(aid))")
-            return aid
-        } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
-            DopeLog.debug("identifierForVendor primaryIdentity:(\(vid))")
-            return vid
-        } else {
-            DopeLog.debug("IDUnavailable for primaryIdentity")
-            return "IDUnavailable"
-        }
-    }()
-
 }
 
 fileprivate extension UIResponder {

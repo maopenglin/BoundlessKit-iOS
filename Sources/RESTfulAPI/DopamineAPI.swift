@@ -27,11 +27,6 @@ public class DopamineAPI : NSObject{
     
     internal static let shared: DopamineAPI = DopamineAPI()
     
-    private static let clientSDKVersion = Bundle(for: DopamineAPI.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-    private static let clientOS = "iOS"
-    private static let clientOSVersion = UIDevice.current.systemVersion
-    internal static var customerVersionID: String? {return shared.credentials["versionID"] as? String}
-    
     private override init() {
         super.init()
     }
@@ -44,7 +39,7 @@ public class DopamineAPI : NSObject{
     ///
     internal static func track(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
         // create dict with credentials
-        var payload = shared.credentials
+        var payload = DopaminePropertiesControl.current.apiCredentials
         
         // get JSON formatted actions
         var trackedActionsJSONArray = Array<Any>()
@@ -66,7 +61,7 @@ public class DopamineAPI : NSObject{
     ///     - completion: A closure to handle the JSON formatted response.
     ///
     internal static func report(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
-        var payload = shared.credentials
+        var payload = DopaminePropertiesControl.current.apiCredentials
         
         var reinforcedActionsArray = Array<Any>()
         for action in actions{
@@ -87,7 +82,7 @@ public class DopamineAPI : NSObject{
     ///     - completion: A closure to handle the JSON formatted response.
     ///
     internal static func refresh(_ actionID: String, completion: @escaping ([String:Any]) -> ()){
-        var payload = shared.credentials
+        var payload = DopaminePropertiesControl.current.apiCredentials
         
         payload["actionID"] = actionID
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
@@ -105,7 +100,7 @@ public class DopamineAPI : NSObject{
     ///     - completion: A closure to handle the JSON formatted response.
     ///
     internal static func sync( syncOverviews: [SyncOverview], dopeExceptions: [DopeException], completion: @escaping ([String:Any]) -> ()){
-        var payload = shared.credentials
+        var payload = DopaminePropertiesControl.current.apiCredentials
         
         var syncOverviewJSONArray: [Any] = []
         for syncOverview in syncOverviews {
@@ -227,85 +222,4 @@ public class DopamineAPI : NSObject{
         }
     }
     
-    /// Computes the basic fields for a request call
-    ///
-    /// Add this to your payload before calling `send()`
-    ///
-    private lazy var credentials: [String: Any] = {
-        
-        var dict: [String: Any] = [ "clientOS": "iOS",
-                                    "clientOSVersion": DopamineAPI.clientOSVersion,
-                                    "clientSDKVersion": DopamineAPI.clientSDKVersion,
-                                    "primaryIdentity": self.primaryIdentity ]
-        
-        let credentials: [String: Any]
-        if let testCredentials = DopamineKit.testCredentials {
-            credentials = testCredentials
-            DopeLog.debug("Using test credentials")
-        } else {
-            guard let credentialsPath = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist"),
-                let credentialsPlist = NSDictionary(contentsOfFile: credentialsPath) as? [String: Any] else {
-                    DopeLog.debug("[DopamineKit]: Error - cannot find credentials")
-                    return dict
-            }
-            credentials = credentialsPlist
-        }
-        
-        
-        guard let appID = credentials["appID"] as? String else{
-            DopeLog.debug("<DopamineProperties>: Error no appID key")
-            return dict
-        }
-        dict["appID"] = appID
-        
-        guard let versionID = credentials["versionID"] as? String else{
-            DopeLog.debug("<DopamineProperties>: Error no versionID key")
-            return dict
-        }
-//        if let newVersionID = UserDefaults.standard.string(forKey: "Visualizer.versionID") {
-//            dict["versionID"] = newVersionID
-//        } else {
-            dict["versionID"] = versionID
-//        }
-        
-        if let inProduction = credentials["inProduction"] as? Bool{
-            guard let productionSecret = credentials["productionSecret"] as? String else{
-                DopeLog.debug("<DopamineProperties>: Error no productionSecret key")
-                return dict
-            }
-            guard let developmentSecret = credentials["developmentSecret"] as? String else{
-                DopeLog.debug("<DopamineProperties>: Error no developmentSecret key")
-                return dict
-            }
-            dict["secret"] = inProduction ? productionSecret : developmentSecret
-        } else{
-            DopeLog.debug("<DopamineProperties>: Error no inProduction key")
-            return dict
-        }
-        
-        return dict
-    }()
-    
-    /// Computes a primary identity for the user
-    ///
-    private lazy var primaryIdentity:String = {
-        #if DEBUG
-            if let tid = DopamineKit.developmentIdentity {
-                DopeLog.debug("Testing with primaryIdentity:(\(tid))")
-                return tid
-            }
-        #endif
-        if DopamineConfigurationControl.current.advertiserID,
-            let aid = ASIdentifierManager.shared().adId()?.uuidString,
-            aid != "00000000-0000-0000-0000-000000000000" {
-//            DopeLog.debug("ASIdentifierManager primaryIdentity:(\(aid))")
-            return aid
-        } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
-//            DopeLog.debug("identifierForVendor primaryIdentity:(\(vid))")
-            return vid
-        } else {
-//            DopeLog.debug("IDUnavailable for primaryIdentity")
-            return "IDUnavailable"
-        }
-    }()
 }

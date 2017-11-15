@@ -31,6 +31,13 @@ public class SyncCoordinator {
                 cartridgeSyncers[actionID] = Cartridge(actionID: actionID)
             }
         }
+        
+        NotificationCenter.default.addObserver(forName: DopamineVersionControl.VersionChangeNotification.name, object: nil, queue: nil) { notification in
+            self.flush()
+            for actionID in DopamineVersionControl.current.reinforcementActionIDs() {
+                self.retrieve(cartridgeFor: actionID).sync()
+            }
+        }
     }
     
     /// Stores a tracked action to be synced
@@ -166,16 +173,6 @@ public class SyncCoordinator {
     
     /// Erase the sync objects along with their data
     ///
-    public func eraseSyncers() {
-        trackSyncer.erase()
-        reportSyncer.erase()
-        for (_, cartridge) in cartridgeSyncers {
-            cartridge.erase()
-        }
-        cartridgeSyncers.removeAll()
-        defaults.removeObject(forKey: cartridgeActionIDSetKey)
-    }
-    
     public func flush() {
         trackSyncer.erase()
         reportSyncer.erase()
