@@ -176,7 +176,8 @@ public class SyncCoordinator {
         defaults.removeObject(forKey: cartridgeActionIDSetKey)
     }
     
-    public func flushVersionedSyncers() {
+    public func flush() {
+        trackSyncer.erase()
         reportSyncer.erase()
         for (_, cartridge) in cartridgeSyncers {
             cartridge.erase()

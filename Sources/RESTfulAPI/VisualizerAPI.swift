@@ -34,55 +34,7 @@ public class VisualizerAPI : NSObject {
     
     static var connectionID: String?
     private let tracesQueue = OperationQueue()
-    private var visualizerMappings: [String:[String:Any]]? = nil
-    private var rewardMappings: [String:[String:Any]] = {
-        if let rm = UserDefaults.standard.dictionary(forKey: "Visualizer.rewardMappings") as? [String: [String:Any]] { return rm }
-        else { return [:] }
-    }()
-    private func setNewRewardMappings(mappings: [String:[String:Any]], newVersionID: String) {
-        let currentVersionID = UserDefaults.standard.string(forKey: "Visualizer.versionID")
-        if currentVersionID != nil && newVersionID == currentVersionID {
-            return
-        } else {
-            rewardMappings = mappings
-            UserDefaults.standard.set(newVersionID, forKey: "Visualizer.versionID")
-            UserDefaults.standard.set(mappings, forKey: "Visualizer.rewardMappings")
-            SyncCoordinator.shared.flushVersionedSyncers()
-            for actionID in mappings.keys {
-                Cartridge(actionID: actionID).sync()
-            }
-            DopeLog.debug("🆕 Updated reward mapping version!")
-        }
-    }
-    
-    public func getMappingFor(sender: String, target: String, selector: String, completion: @escaping ([String:Any]) -> ()) {
-        let pairingKey = [sender, target, selector].joined(separator: "-")
-        if visualizerMappings != nil,
-            let rewardParameters = visualizerMappings![pairingKey] {
-            DopeLog.debug("Found real time visualizer reward for <\(pairingKey)>")
-            if let reinforcements = rewardParameters["reinforcements"] as? [[String:Any]] {
-                let reinforcement = reinforcements.randomElement()
-                completion(reinforcement)
-            }
-        } else if let rewardParameters = rewardMappings[pairingKey] {
-            DopeLog.debug("Found reward for <\(pairingKey)>")
-            if let actionID = rewardParameters["actionID"] as? String,
-                let reinforcements = rewardParameters["reinforcements"] as? [[String:Any]] {
-                DopamineKit.reinforce(actionID) { reinforcementType in
-                    for reinforcement in reinforcements {
-                        if reinforcement["primitive"] as? String == reinforcementType {
-                            completion(reinforcement)
-                            return
-                        }
-                    }
-                }
-            } else {
-                DopeLog.debug("Bad reward parameters")
-            }
-        } else {
-//            DopeLog.debugLog("No reward pairing found for <\(pairingKey)>")
-        }
-    }
+    var visualizerMappings: [String:[String:Any]]? = nil
     
     private override init() {
         super.init()
@@ -120,7 +72,7 @@ public class VisualizerAPI : NSObject {
                 
                 
                 // display reward if reward is set for this event
-                shared.getMappingFor(sender: senderClassname, target: targetName, selector: selectorName) { reinforcement in
+                DopeVersion.shared.reinforcementFor(sender: senderClassname, target: targetName, selector: selectorName) { reinforcement in
                     
                     if let delay = reinforcement["Delay"] as? Double,
                         let viewOption = reinforcement["ViewOption"] as? String,
@@ -225,7 +177,7 @@ public class VisualizerAPI : NSObject {
 //            print("sender:\(senderClassname) target:\(targetClassname) selector:\(selectorName)")
             
             // display reward if reward is set for this event
-            shared.getMappingFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
+            DopeVersion.shared.reinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
                 if let delay = reinforcement["Delay"] as? Double,
                     let viewOption = reinforcement["ViewOption"] as? String,
                     let viewCustom = reinforcement["ViewCustom"] as? String,
@@ -570,7 +522,7 @@ public class VisualizerAPI : NSObject {
                                         VisualizerAPI.shared.visualizerMappings = tempDict
                                     } else { // .boot
                                         if let newVersionID = responseDict["newVersionID"] as? String {
-                                            VisualizerAPI.shared.setNewRewardMappings(mappings: tempDict, newVersionID: newVersionID)
+                                            DopeVersion(versionID: newVersionID, reinforcementMappings: tempDict).set()
                                         } else {
                                             DopeLog.debug("Missing 'newVersionID'")
                                         }
@@ -755,12 +707,6 @@ fileprivate extension UIImage {
             NSLog("Could not create PNG representation of UIImage...")
             return nil
         }
-    }
-}
-
-fileprivate extension Array {
-    func randomElement() -> Element {
-        return self[Int(arc4random_uniform(UInt32(self.count)))]
     }
 }
 

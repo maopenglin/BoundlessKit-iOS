@@ -50,3 +50,9 @@ public extension UIColor {
         )
     }
 }
+
+extension Array {
+    func selectRandom() -> Element {
+        return self[Int(arc4random_uniform(UInt32(self.count)))]
+    }
+}
