@@ -14,7 +14,7 @@ public class DopamineConfigurationControl : NSObject {
         if let _current = _current {
             return _current
         } else {
-            _current = retreive()
+            _current = retrieve()
             return _current!
         }
     }
@@ -24,13 +24,13 @@ public class DopamineConfigurationControl : NSObject {
         _current = config
     }
     
-    public static func retreive() -> DopamineConfiguration {
-        if let savedConfigData = DopamineConfiguration.defaults.object(forKey: DopamineConfiguration.defaultsKey) as? NSData,
-            let savedConfig = NSKeyedUnarchiver.unarchiveObject(with: savedConfigData as Data) as? DopamineConfiguration {
-            print("using saved dopamine configuration")
+    public static func retrieve() -> DopamineConfiguration {
+        if let savedConfigData = DopamineConfiguration.defaults.object(forKey: DopamineConfiguration.defaultsKey) as? Data,
+            let savedConfig = NSKeyedUnarchiver.unarchiveObject(with: savedConfigData) as? DopamineConfiguration {
+            DopeLog.debug("using saved dopamine configuration")
             return savedConfig
         } else {
-            print("using standard dopamine configuration")
+            DopeLog.debug("using standard dopamine configuration")
             return DopamineConfiguration.standard
         }
     }
@@ -174,7 +174,7 @@ public class DopamineConfiguration : NSObject, NSCoding {
         
         var standardConfig: [String: Any] = [:]
         standardConfig["configID"] = nil
-        standardConfig["reinforcementEnabled"] = false
+        standardConfig["reinforcementEnabled"] = true
         standardConfig["triggerEnabled"] = false
         standardConfig["trackingEnabled"] = true
         standardConfig["trackingCapabilities"] = ["applicationState": true,

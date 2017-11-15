@@ -34,8 +34,8 @@ internal class Track : NSObject, NSCoding {
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
     private init(timerStartedAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
-        if let savedTrackData = defaults.object(forKey: defaultsKey) as? NSData,
-            let savedTrack = NSKeyedUnarchiver.unarchiveObject(with: savedTrackData as Data) as? Track {
+        if let savedTrackData = defaults.object(forKey: defaultsKey) as? Data,
+            let savedTrack = NSKeyedUnarchiver.unarchiveObject(with: savedTrackData) as? Track {
             self.trackedActions = savedTrack.trackedActions
             self.timerStartedAt = savedTrack.timerStartedAt
             self.timerExpiresIn = savedTrack.timerExpiresIn

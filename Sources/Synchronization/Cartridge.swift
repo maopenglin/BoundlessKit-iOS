@@ -11,23 +11,19 @@ import Foundation
 @objc
 internal class Cartridge : NSObject, NSCoding {
     
+    @objc public static var defaultReinforcementDecision = "neutralResponse"
+    
     private let defaults = UserDefaults.standard
     private var defaultsKey: String { get { return "DopamineCartridgeSyncer_For_\(self.actionID)" } }
-    private let customerVersion = DopamineAPI.customerVersionID ?? "undefinedVersion"
-    private let actionIDKey = "actionID"
-    private let reinforcementDecisionsKey = "reinforcementDecisions"
-    private let initialSizeKey = "initialSize"
-    private let timerStartsAtKey = "timerStartsAt"
-    private let timerExpiresInKey = "timerExpiresIn"
     
-    let actionID: String
-    private var reinforcementDecisions: [String] = []
-    public static var defaultReinforcementDecision = "neutralResponse"
-    private var initialSize: Int = 0
-    private var timerStartsAt: Int64 = 0
-    private var timerExpiresIn: Int64 = 0
-    private static let capacityToSync = 0.25
-    private static let minimumSize = 2
+    @objc private let customerVersion: String?
+    @objc let actionID: String
+    @objc private var reinforcementDecisions: [String]
+    @objc private var initialSize: Int = 0
+    @objc private var timerStartsAt: Int64 = 0
+    @objc private var timerExpiresIn: Int64 = 0
+    @objc private static let capacityToSync = 0.25
+    @objc private static let minimumSize = 2
     
     private var syncInProgress = false
     
@@ -44,10 +40,12 @@ internal class Cartridge : NSObject, NSCoding {
     ///     - timerExpiresIn: The timer length for a sync timer.
     ///
     init(actionID: String, initialSize: Int=0, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 0) {
+        self.customerVersion = DopamineVersionControl.current.versionID
         self.actionID = actionID
+        self.reinforcementDecisions = []
         super.init()
-        if let savedCartridgeData = defaults.object(forKey: defaultsKey) as? NSData {
-            if let savedCartridge = NSKeyedUnarchiver.unarchiveObject(with: savedCartridgeData as Data) as? Cartridge,
+        if let savedCartridgeData = defaults.object(forKey: defaultsKey) as? Data {
+            if let savedCartridge = NSKeyedUnarchiver.unarchiveObject(with: savedCartridgeData) as? Cartridge,
                 savedCartridge.customerVersion == self.customerVersion {
                 self.reinforcementDecisions = savedCartridge.reinforcementDecisions
                 self.initialSize = savedCartridge.initialSize
@@ -67,23 +65,31 @@ internal class Cartridge : NSObject, NSCoding {
     
     /// Decodes a saved cartridge from NSUserDefaults
     ///
-    required init(coder aDecoder: NSCoder) {
-        self.actionID = aDecoder.decodeObject(forKey: actionIDKey) as! String
-        self.reinforcementDecisions = aDecoder.decodeObject(forKey: reinforcementDecisionsKey) as! [String]
-        self.initialSize = aDecoder.decodeInteger(forKey: initialSizeKey)
-        self.timerStartsAt = aDecoder.decodeInt64(forKey: timerStartsAtKey)
-        self.timerExpiresIn = aDecoder.decodeInt64(forKey: timerExpiresInKey)
-        //        DopeLog.debugLog("Decoded cartridge with actionID:\(actionID) reinforcementDecisions:\(reinforcementDecisions.count) initialSize:\(initialSize) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+    required init?(coder aDecoder: NSCoder) {
+        if let customerVersion = aDecoder.decodeObject(forKey: #keyPath(Cartridge.customerVersion)) as? String?,
+            let actionID = aDecoder.decodeObject(forKey: #keyPath(Cartridge.actionID)) as? String,
+            let reinforcementDecisions = aDecoder.decodeObject(forKey: #keyPath(Cartridge.reinforcementDecisions)) as? [String] {
+            self.customerVersion = customerVersion
+            self.actionID = actionID
+            self.reinforcementDecisions = reinforcementDecisions
+            self.initialSize = aDecoder.decodeInteger(forKey: #keyPath(Cartridge.initialSize))
+            self.timerStartsAt = aDecoder.decodeInt64(forKey: #keyPath(Cartridge.timerStartsAt))
+            self.timerExpiresIn = aDecoder.decodeInt64(forKey: #keyPath(Cartridge.timerExpiresIn))
+//            DopeLog.debugLog("Decoded cartridge with actionID:\(actionID) reinforcementDecisions:\(reinforcementDecisions.count) initialSize:\(initialSize) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+        } else {
+            return nil
+        }
     }
     
     /// Encodes a cartridge and saves it to NSUserDefaults
     ///
     func encode(with aCoder: NSCoder) {
-        aCoder.encode(actionID, forKey: actionIDKey)
-        aCoder.encode(reinforcementDecisions, forKey: reinforcementDecisionsKey)
-        aCoder.encode(initialSize, forKey: initialSizeKey)
-        aCoder.encode(timerStartsAt, forKey: timerStartsAtKey)
-        aCoder.encode(timerExpiresIn, forKey: timerExpiresInKey)
+        aCoder.encode(customerVersion, forKey: #keyPath(Cartridge.customerVersion))
+        aCoder.encode(actionID, forKey: #keyPath(Cartridge.actionID))
+        aCoder.encode(reinforcementDecisions, forKey: #keyPath(Cartridge.reinforcementDecisions))
+        aCoder.encode(initialSize, forKey: #keyPath(Cartridge.initialSize))
+        aCoder.encode(timerStartsAt, forKey: #keyPath(Cartridge.timerStartsAt))
+        aCoder.encode(timerExpiresIn, forKey: #keyPath(Cartridge.timerExpiresIn))
         //        DopeLog.debugLog("Encoded cartridge with actionID:\(actionID) reinforcementDecisions:\(reinforcementDecisions.count) initialSize:\(initialSize) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
     }
     
@@ -198,12 +204,12 @@ internal class Cartridge : NSObject, NSCoding {
     ///
     func toJSONType() -> [String: Any] {
         return [
-            actionIDKey : actionID,
+            "actionID" : actionID,
             "size" : reinforcementDecisions.count,
-            initialSizeKey : initialSize,
+            "initialSize" : initialSize,
             "capacityToSync" : Cartridge.capacityToSync,
-            timerStartsAtKey : NSNumber(value: timerStartsAt),
-            timerExpiresInKey : NSNumber(value: timerExpiresIn)
+            "timerStartsAt" : NSNumber(value: timerStartsAt),
+            "timerExpiresIn" : NSNumber(value: timerExpiresIn)
         ]
     }
     

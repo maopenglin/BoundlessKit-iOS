@@ -15,8 +15,8 @@ internal class Report : NSObject, NSCoding {
     
     private let defaults = UserDefaults.standard
     private let defaultsKey = "DopamineReport"
-    @objc private let clientVersion: String
     
+    @objc private let customerVersion: String?
     @objc private var reportedActions: [DopeAction]
     @objc private var timerStartedAt: Int64
     @objc private var timerExpiresIn: Int64
@@ -31,11 +31,11 @@ internal class Report : NSObject, NSCoding {
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
     private init(sizeToSync: Int = 15, timerStartsAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
-        if let savedReportData = defaults.object(forKey: defaultsKey) as? NSData {
-            if let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData as Data) as? Report,
-                savedReport.clientVersion == DopamineAPI.customerVersionID
+        if let savedReportData = defaults.object(forKey: defaultsKey) as? Data {
+            if let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData) as? Report,
+                savedReport.customerVersion == DopamineVersionControl.current.versionID
             {
-                self.clientVersion = savedReport.clientVersion
+                self.customerVersion = savedReport.customerVersion
                 self.reportedActions = savedReport.reportedActions
                 self.timerStartedAt = savedReport.timerStartedAt
                 self.timerExpiresIn = savedReport.timerExpiresIn
@@ -46,7 +46,7 @@ internal class Report : NSObject, NSCoding {
                 DopeLog.debug("Erased outdated report.")
             }
         }
-        self.clientVersion = DopamineAPI.customerVersionID ?? "undefinedVersion"
+        self.customerVersion = DopamineVersionControl.current.versionID
         self.reportedActions = []
         self.timerStartedAt = timerStartsAt
         self.timerExpiresIn = timerExpiresIn
@@ -57,9 +57,9 @@ internal class Report : NSObject, NSCoding {
     /// Decodes a saved report from NSUserDefaults
     ///
     required init?(coder aDecoder: NSCoder) {
-        if let clientVersion = aDecoder.decodeObject(forKey: #keyPath(Report.clientVersion)) as? String,
+        if let customerVersion = aDecoder.decodeObject(forKey: #keyPath(Report.customerVersion)) as? String?,
             let reportedActions = aDecoder.decodeObject(forKey: #keyPath(Report.reportedActions)) as? [DopeAction] {
-            self.clientVersion = clientVersion
+            self.customerVersion = customerVersion
             self.reportedActions = reportedActions
             self.timerStartedAt = aDecoder.decodeInt64(forKey: #keyPath(Report.timerStartedAt))
             self.timerExpiresIn = aDecoder.decodeInt64(forKey: #keyPath(Report.timerExpiresIn))
@@ -72,7 +72,7 @@ internal class Report : NSObject, NSCoding {
     /// Encodes a report and saves it to NSUserDefaults
     ///
     func encode(with aCoder: NSCoder) {
-        aCoder.encode(clientVersion, forKey: #keyPath(Report.clientVersion))
+        aCoder.encode(customerVersion, forKey: #keyPath(Report.customerVersion))
         aCoder.encode(reportedActions, forKey: #keyPath(Report.reportedActions))
         aCoder.encode(timerStartedAt, forKey: #keyPath(Report.timerStartedAt))
         aCoder.encode(timerExpiresIn, forKey: #keyPath(Report.timerExpiresIn))
@@ -168,7 +168,7 @@ internal class Report : NSObject, NSCoding {
                 DopamineAPI.report(self.reportedActions, completion: { response in
                     defer { self.syncInProgress = false }
                     if let responseStatusCode = response["status"] as? Int {
-                        if responseStatusCode == 200 {
+                        if responseStatusCode == 200 { //TO-DO: account for 406 - check respond w/ ramsay
                             self.reportedActions.removeAll()
                             self.updateTriggers()
                         }

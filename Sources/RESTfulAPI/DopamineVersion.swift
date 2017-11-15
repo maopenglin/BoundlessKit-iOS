@@ -9,32 +9,36 @@ import Foundation
 
 public class DopamineVersionControl : NSObject {
     
+    static let VersionChangeNotification = Notification(name: NSNotification.Name(rawValue: "DopamineVersionControl.DidSetNotification"), object: nil)
+    
     fileprivate static var _current: DopamineVersion?
     @objc public static var current: DopamineVersion {
         if let _current = _current {
             return _current
         } else {
-            _current = retreive()
+            _current = retrieve()
             return _current!
         }
     }
     
     public static func set(_ version: DopamineVersion) {
-        if _current?.versionID != version.versionID {
-            SyncCoordinator.shared.flush()
+        if current.versionID != version.versionID {
+//            SyncCoordinator.shared.flush()
+            DopeLog.debug("DopamineVersion updated!")
+            NotificationCenter.default.post(VersionChangeNotification)
         }
         
         DopamineVersion.defaults.set(version, forKey: DopamineVersion.defaultsKey)
         _current = version
         
-        for actionID in (version.reinforcementMappings).keys{
-            Cartridge(actionID: actionID).sync()
-        }
+//        for actionID in (version.reinforcementMappings).keys{
+//            Cartridge(actionID: actionID).sync()
+//        }
     }
     
-    public static func retreive() -> DopamineVersion {
-        if let savedVersionData = DopamineVersion.defaults.object(forKey: DopamineVersion.defaultsKey) as? NSData,
-            let savedVersion = NSKeyedUnarchiver.unarchiveObject(with: savedVersionData as Data) as? DopamineVersion {
+    public static func retrieve() -> DopamineVersion {
+        if let savedVersionData = DopamineVersion.defaults.object(forKey: DopamineVersion.defaultsKey) as? Data,
+            let savedVersion = NSKeyedUnarchiver.unarchiveObject(with: savedVersionData) as? DopamineVersion {
             print("using saved dopamine version")
             return savedVersion
         } else {
@@ -86,17 +90,23 @@ public class DopamineVersion : NSObject, NSCoding {
         DopamineVersionControl.set(self)
     }
     
+    public func reinforcementActionIDs() -> [String] {
+        return reinforcementMappings.keys.sorted()
+    }
+    
     public func reinforcementFor(sender: String, target: String, selector: String, completion: @escaping ([String:Any]) -> ()) {
-        let reinforcementKey = [sender, target, selector].joined(separator: "-")
-        
+        reinforcementFor(actionID: [sender, target, selector].joined(separator: "-"), completion: completion)
+    }
+    
+    public func reinforcementFor(actionID: String, completion: @escaping ([String:Any]) -> ()) {
         if VisualizerAPI.shared.visualizerMappings != nil,
-            let reinforcementParameters = VisualizerAPI.shared.visualizerMappings![reinforcementKey] {
-            DopeLog.debug("Found visualizer reinforcement for <\(reinforcementKey)>")
+            let reinforcementParameters = VisualizerAPI.shared.visualizerMappings![actionID] {
+            DopeLog.debug("Found visualizer reinforcement for <\(actionID)>")
             if let reinforcements = reinforcementParameters["reinforcements"] as? [[String:Any]] {
                 completion(reinforcements.selectRandom())
             }
-        } else if let reinforcementParameters = reinforcementMappings[reinforcementKey] as? [String:Any] {
-            DopeLog.debug("Found reinforcement for <\(reinforcementKey)>")
+        } else if let reinforcementParameters = reinforcementMappings[actionID] as? [String:Any] {
+            DopeLog.debug("Found reinforcement for <\(actionID)>")
             if let actionID = reinforcementParameters["actionID"] as? String,
                 let reinforcements = reinforcementParameters["reinforcements"] as? [[String:Any]] {
                 DopamineKit.reinforce(actionID) { reinforcementType in
@@ -112,8 +122,7 @@ public class DopamineVersion : NSObject, NSCoding {
                 DopeLog.error("Bad reinforcement parameters")
             }
         } else {
-            DopeLog.debug("No reinforcement mapping found for <\(reinforcementKey)>")
+//            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
         }
     }
-    
 }

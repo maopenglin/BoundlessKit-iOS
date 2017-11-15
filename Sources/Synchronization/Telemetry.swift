@@ -21,8 +21,8 @@ internal class Telemetry {
     private static var currentSyncOverview: SyncOverview?
     private static var syncOverviews: [SyncOverview] {
         get{
-            if let savedOverviewsData = defaults.object(forKey: syncOverviewsKey) as? NSData,
-                let savedOverviews = NSKeyedUnarchiver.unarchiveObject(with: savedOverviewsData as Data) as? [SyncOverview] {
+            if let savedOverviewsData = defaults.object(forKey: syncOverviewsKey) as? Data,
+                let savedOverviews = NSKeyedUnarchiver.unarchiveObject(with: savedOverviewsData) as? [SyncOverview] {
                 return savedOverviews
             } else {
                 return []
@@ -34,8 +34,8 @@ internal class Telemetry {
     }
     private static var dopeExceptions: [DopeException] {
         get{
-            if let savedDopeExceptionsData = defaults.object(forKey: dopeExceptionsKey) as? NSData,
-                let savedDopeExceptions = NSKeyedUnarchiver.unarchiveObject(with: savedDopeExceptionsData as Data) as? [DopeException] {
+            if let savedDopeExceptionsData = defaults.object(forKey: dopeExceptionsKey) as? Data,
+                let savedDopeExceptions = NSKeyedUnarchiver.unarchiveObject(with: savedDopeExceptionsData) as? [DopeException] {
                 return savedDopeExceptions
             } else {
                 return []
