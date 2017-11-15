@@ -43,7 +43,7 @@ public class VisualizerAPI : NSObject {
     
     @objc
     public func retrieveRewards() {
-        var payload = configurationData
+        var payload = credentials
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
         payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         send(call: .boot, with: payload){ _ in }
@@ -149,7 +149,7 @@ public class VisualizerAPI : NSObject {
                 
                 // send event to visualizer if connected
                 if let connectionID = connectionID {
-                    var payload = shared.configurationData
+                    var payload = shared.credentials
                     payload["connectionUUID"] = connectionID
                     payload["sender"] = senderClassname
                     payload["target"] = targetName
@@ -279,7 +279,7 @@ public class VisualizerAPI : NSObject {
             
             // send event to visualizer if connected
             if let connectionID = connectionID {
-                var payload = shared.configurationData
+                var payload = shared.credentials
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                 payload["connectionUUID"] = connectionID
@@ -300,9 +300,9 @@ public class VisualizerAPI : NSObject {
                         payload["senderImage"] = imageString
                     } else {
                         NSLog("Cannot create image, please message team@usedopamine.com to add support for visualizer snapshots of class type:<\(type(of: senderInstance))>!")
+                        payload["senderImage"] = ""
                     }
                 }
-//                payload["senderImage"] = ""
                 shared.send(call: .submit, with: payload){ response in
                     if response["status"] as? Int != 200 {
                         VisualizerAPI.connectionID = nil
@@ -375,7 +375,7 @@ public class VisualizerAPI : NSObject {
     
     @objc
     public static func promptPairing() {
-        var payload = shared.configurationData
+        var payload = shared.credentials
         payload["deviceName"] = UIDevice.current.name
         
         shared.send(call: .identify, with: payload){ response in
@@ -417,7 +417,7 @@ public class VisualizerAPI : NSObject {
         let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
         
         pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
-            var payload = shared.configurationData
+            var payload = shared.credentials
             payload["deviceName"] = UIDevice.current.name
             payload["connectionUUID"] = connectionID
             shared.send(call: .accept, with: payload) {response in
@@ -558,7 +558,7 @@ public class VisualizerAPI : NSObject {
     ///
     /// Add this to your payload before calling `send()`
     ///
-    private lazy var configurationData: [String: Any] = {
+    private lazy var credentials: [String: Any] = {
         
         var dict: [String: Any] = [ "clientOS": "iOS",
                                     "clientOSVersion": VisualizerAPI.clientOSVersion,

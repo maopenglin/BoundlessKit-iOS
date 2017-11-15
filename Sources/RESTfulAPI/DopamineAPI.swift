@@ -25,12 +25,12 @@ public class DopamineAPI : NSObject{
         }
     }
     
-    internal static let sharedInstance: DopamineAPI = DopamineAPI()
+    internal static let shared: DopamineAPI = DopamineAPI()
     
     private static let clientSDKVersion = Bundle(for: DopamineAPI.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     private static let clientOS = "iOS"
     private static let clientOSVersion = UIDevice.current.systemVersion
-    internal static var customerVersionID: String? {return sharedInstance.configurationData["versionID"] as? String}
+    internal static var customerVersionID: String? {return shared.credentials["versionID"] as? String}
     
     private override init() {
         super.init()
@@ -44,7 +44,7 @@ public class DopamineAPI : NSObject{
     ///
     internal static func track(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
         // create dict with credentials
-        var payload = sharedInstance.configurationData
+        var payload = shared.credentials
         
         // get JSON formatted actions
         var trackedActionsJSONArray = Array<Any>()
@@ -56,7 +56,7 @@ public class DopamineAPI : NSObject{
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
         payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         
-        sharedInstance.send(call: .track, with: payload, completion: completion)
+        shared.send(call: .track, with: payload, completion: completion)
     }
 
     /// Send an array of actions to the DopamineAPI's `/report` path
@@ -66,7 +66,7 @@ public class DopamineAPI : NSObject{
     ///     - completion: A closure to handle the JSON formatted response.
     ///
     internal static func report(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
-        var payload = sharedInstance.configurationData
+        var payload = shared.credentials
         
         var reinforcedActionsArray = Array<Any>()
         for action in actions{
@@ -77,7 +77,7 @@ public class DopamineAPI : NSObject{
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
         payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         
-        sharedInstance.send(call: .report, with: payload, completion: completion)
+        shared.send(call: .report, with: payload, completion: completion)
     }
     
     /// Send an actionID to the DopamineAPI's `/refresh` path to generate a new cartridge of reinforcement decisions
@@ -87,14 +87,14 @@ public class DopamineAPI : NSObject{
     ///     - completion: A closure to handle the JSON formatted response.
     ///
     internal static func refresh(_ actionID: String, completion: @escaping ([String:Any]) -> ()){
-        var payload = sharedInstance.configurationData
+        var payload = shared.credentials
         
         payload["actionID"] = actionID
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
         payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         
         DopeLog.debug("Refreshing \(actionID)...")
-        sharedInstance.send(call: .refresh, with: payload, completion: completion)
+        shared.send(call: .refresh, with: payload, completion: completion)
     }
     
     /// Send sync overviews and raised exceptions to the DopamineAPI's `/sync` path to increase service quality
@@ -105,7 +105,7 @@ public class DopamineAPI : NSObject{
     ///     - completion: A closure to handle the JSON formatted response.
     ///
     internal static func sync( syncOverviews: [SyncOverview], dopeExceptions: [DopeException], completion: @escaping ([String:Any]) -> ()){
-        var payload = sharedInstance.configurationData
+        var payload = shared.credentials
         
         var syncOverviewJSONArray: [Any] = []
         for syncOverview in syncOverviews {
@@ -122,7 +122,7 @@ public class DopamineAPI : NSObject{
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
         payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         
-        sharedInstance.send(call: .telemetry, with: payload, completion: completion)
+        shared.send(call: .telemetry, with: payload, completion: completion)
     }
     
     private lazy var session = URLSession.shared
@@ -231,7 +231,7 @@ public class DopamineAPI : NSObject{
     ///
     /// Add this to your payload before calling `send()`
     ///
-    private lazy var configurationData: [String: Any] = {
+    private lazy var credentials: [String: Any] = {
         
         var dict: [String: Any] = [ "clientOS": "iOS",
                                     "clientOSVersion": DopamineAPI.clientOSVersion,

@@ -19,12 +19,12 @@ public class DopamineConfigurationControl : NSObject {
         }
     }
     
-    static func set(_ config: DopamineConfiguration) {
+    public static func set(_ config: DopamineConfiguration) {
         DopamineConfiguration.defaults.set(config, forKey: DopamineConfiguration.defaultsKey)
         _current = config
     }
     
-    static func retreive() -> DopamineConfiguration {
+    public static func retreive() -> DopamineConfiguration {
         if let savedConfigData = DopamineConfiguration.defaults.object(forKey: DopamineConfiguration.defaultsKey) as? NSData,
             let savedConfig = NSKeyedUnarchiver.unarchiveObject(with: savedConfigData as Data) as? DopamineConfiguration {
             print("using saved dopamine configuration")
