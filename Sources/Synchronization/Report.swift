@@ -130,7 +130,7 @@ internal class Report : NSObject, NSCoding {
     ///
     private func batchIsFull() -> Bool {
         let count = reportedActions.count
-        let isBatchSizeReached = count >= DopeConfig.shared.reportBatchSize
+        let isBatchSizeReached = count >= DopamineConfigurationControl.current.reportBatchSize
         //        DopeLog.debugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isBatchSizeReached
     }

@@ -36,7 +36,7 @@ open class DopamineKit : NSObject {
     ///                  Defaults to `nil`.
     ///
     @objc open static func track(_ actionID: String, metaData: [String: Any]? = nil) {
-        guard DopeConfig.shared.trackingEnabled else {
+        guard DopamineConfigurationControl.current.trackingEnabled else {
             return
         }
         // store the action to be synced
@@ -57,7 +57,7 @@ open class DopamineKit : NSObject {
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
     @objc open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, completion: @escaping (String) -> ()) {
-        guard DopeConfig.shared.reinforcementEnabled else {
+        guard DopamineConfigurationControl.current.reinforcementEnabled else {
             completion(Cartridge.defaultReinforcementDecision)
             return
         }

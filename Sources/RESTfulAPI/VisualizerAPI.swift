@@ -72,7 +72,7 @@ public class VisualizerAPI : NSObject {
                 
                 
                 // display reward if reward is set for this event
-                DopeVersion.shared.reinforcementFor(sender: senderClassname, target: targetName, selector: selectorName) { reinforcement in
+                DopamineVersionControl.current.reinforcementFor(sender: senderClassname, target: targetName, selector: selectorName) { reinforcement in
                     
                     if let delay = reinforcement["Delay"] as? Double,
                         let viewOption = reinforcement["ViewOption"] as? String,
@@ -177,7 +177,7 @@ public class VisualizerAPI : NSObject {
 //            print("sender:\(senderClassname) target:\(targetClassname) selector:\(selectorName)")
             
             // display reward if reward is set for this event
-            DopeVersion.shared.reinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
+            DopamineVersionControl.current.reinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
                 if let delay = reinforcement["Delay"] as? Double,
                     let viewOption = reinforcement["ViewOption"] as? String,
                     let viewCustom = reinforcement["ViewCustom"] as? String,
@@ -522,7 +522,7 @@ public class VisualizerAPI : NSObject {
                                         VisualizerAPI.shared.visualizerMappings = tempDict
                                     } else { // .boot
                                         if let newVersionID = responseDict["newVersionID"] as? String {
-                                            DopeVersion(versionID: newVersionID, reinforcementMappings: tempDict).set()
+                                            DopamineVersion(versionID: newVersionID, reinforcementMappings: tempDict).set()
                                         } else {
                                             DopeLog.debug("Missing 'newVersionID'")
                                         }

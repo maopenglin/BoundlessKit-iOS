@@ -1,5 +1,5 @@
 //
-//  DopeVersion.swift
+//  DopamineVersion.swift
 //  DopamineKit
 //
 //  Created by Akash Desai on 11/14/17.
@@ -7,10 +7,10 @@
 
 import Foundation
 
-public class DopeVersionControl : NSObject {
+public class DopamineVersionControl : NSObject {
     
-    fileprivate static var _current: DopeVersion?
-    @objc public static var current: DopeVersion {
+    fileprivate static var _current: DopamineVersion?
+    @objc public static var current: DopamineVersion {
         if let _current = _current {
             return _current
         } else {
@@ -19,12 +19,12 @@ public class DopeVersionControl : NSObject {
         }
     }
     
-    static func set(_ version: DopeVersion) {
+    public static func set(_ version: DopamineVersion) {
         if _current?.versionID != version.versionID {
             SyncCoordinator.shared.flush()
         }
         
-        DopeVersion.defaults.set(version, forKey: DopeVersion.defaultsKey)
+        DopamineVersion.defaults.set(version, forKey: DopamineVersion.defaultsKey)
         _current = version
         
         for actionID in (version.reinforcementMappings).keys{
@@ -32,20 +32,21 @@ public class DopeVersionControl : NSObject {
         }
     }
     
-    static func retreive() -> DopeVersion {
-        if let savedVersionData = DopeVersion.defaults.object(forKey: DopeVersion.defaultsKey) as? NSData,
-            let savedVersion = NSKeyedUnarchiver.unarchiveObject(with: savedVersionData as Data) as? DopeVersion {
+    public static func retreive() -> DopamineVersion {
+        if let savedVersionData = DopamineVersion.defaults.object(forKey: DopamineVersion.defaultsKey) as? NSData,
+            let savedVersion = NSKeyedUnarchiver.unarchiveObject(with: savedVersionData as Data) as? DopamineVersion {
             print("using saved dopamine version")
             return savedVersion
         } else {
             print("using standard dopamine version")
-            return DopeVersion.standard
+            return DopamineVersion.standard
         }
     }
+    
 }
 
 @objc
-public class DopeVersion : NSObject, NSCoding {
+public class DopamineVersion : NSObject, NSCoding {
     
     fileprivate static let defaults = UserDefaults.standard
     fileprivate static let defaultsKey = "DopamineVersion"
@@ -61,8 +62,8 @@ public class DopeVersion : NSObject, NSCoding {
     }
     
     required public convenience init?(coder aDecoder: NSCoder) {
-        if let versionID = aDecoder.value(forKey: #keyPath(DopeVersion.versionID)) as? String?,
-            let reinforcementMappings = aDecoder.value(forKey: #keyPath(DopeVersion.versionID)) as? [String:[String:Any]] {
+        if let versionID = aDecoder.value(forKey: #keyPath(DopamineVersion.versionID)) as? String?,
+            let reinforcementMappings = aDecoder.value(forKey: #keyPath(DopamineVersion.versionID)) as? [String:[String:Any]] {
             self.init(
                 versionID: versionID,
                 reinforcementMappings: reinforcementMappings
@@ -73,12 +74,16 @@ public class DopeVersion : NSObject, NSCoding {
     }
     
     public func encode(with aCoder: NSCoder) {
-        aCoder.encode(versionID, forKey: #keyPath(DopeVersion.versionID))
-        aCoder.encode(reinforcementMappings, forKey: #keyPath(DopeVersion.reinforcementMappings))
+        aCoder.encode(versionID, forKey: #keyPath(DopamineVersion.versionID))
+        aCoder.encode(reinforcementMappings, forKey: #keyPath(DopamineVersion.reinforcementMappings))
     }
     
-    static var standard: DopeVersion {
-        return DopeVersion(versionID: nil, reinforcementMappings: [:])
+    static var standard: DopamineVersion {
+        return DopamineVersion(versionID: nil, reinforcementMappings: [:])
+    }
+    
+    public func set() {
+        DopamineVersionControl.set(self)
     }
     
     public func reinforcementFor(sender: String, target: String, selector: String, completion: @escaping ([String:Any]) -> ()) {

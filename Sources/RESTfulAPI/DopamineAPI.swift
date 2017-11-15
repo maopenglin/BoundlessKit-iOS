@@ -295,7 +295,7 @@ public class DopamineAPI : NSObject{
                 return tid
             }
         #endif
-        if DopeConfig.shared.advertiserID,
+        if DopamineConfigurationControl.current.advertiserID,
             let aid = ASIdentifierManager.shared().adId()?.uuidString,
             aid != "00000000-0000-0000-0000-000000000000" {
 //            DopeLog.debug("ASIdentifierManager primaryIdentity:(\(aid))")

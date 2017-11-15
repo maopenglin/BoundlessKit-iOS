@@ -1,5 +1,5 @@
 //
-//  DopeConfig.swift
+//  DopamineConfiguration.swift
 //  DopamineKit
 //
 //  Created by Akash Desai on 11/7/17.
@@ -7,11 +7,38 @@
 
 import Foundation
 
+public class DopamineConfigurationControl : NSObject {
+    
+    fileprivate static var _current: DopamineConfiguration?
+    @objc public static var current: DopamineConfiguration {
+        if let _current = _current {
+            return _current
+        } else {
+            _current = retreive()
+            return _current!
+        }
+    }
+    
+    static func set(_ config: DopamineConfiguration) {
+        DopamineConfiguration.defaults.set(config, forKey: DopamineConfiguration.defaultsKey)
+        _current = config
+    }
+    
+    static func retreive() -> DopamineConfiguration {
+        if let savedConfigData = DopamineConfiguration.defaults.object(forKey: DopamineConfiguration.defaultsKey) as? NSData,
+            let savedConfig = NSKeyedUnarchiver.unarchiveObject(with: savedConfigData as Data) as? DopamineConfiguration {
+            print("using saved dopamine configuration")
+            return savedConfig
+        } else {
+            print("using standard dopamine configuration")
+            return DopamineConfiguration.standard
+        }
+    }
+    
+}
 
 @objc
-public class DopeConfig : NSObject {
-    
-    fileprivate static var _shared: DopeConfig?
+public class DopamineConfiguration : NSObject, NSCoding {
     
     fileprivate static let defaults = UserDefaults.standard
     fileprivate static let defaultsKey = "DopamineConfiguration"
@@ -74,12 +101,67 @@ public class DopeConfig : NSObject {
         super.init()
     }
     
+    public func encode(with aCoder: NSCoder) {
+        aCoder.encode(configID, forKey: #keyPath(DopamineConfiguration.configID))
+        aCoder.encode(reinforcementEnabled, forKey: #keyPath(DopamineConfiguration.reinforcementEnabled))
+        aCoder.encode(triggerEnabled, forKey: #keyPath(DopamineConfiguration.triggerEnabled))
+        aCoder.encode(trackingEnabled, forKey: #keyPath(DopamineConfiguration.trackingEnabled))
+        aCoder.encode(applicationState, forKey: #keyPath(DopamineConfiguration.applicationState))
+        aCoder.encode(applicationViews, forKey: #keyPath(DopamineConfiguration.applicationViews))
+        aCoder.encode(customViews, forKey: #keyPath(DopamineConfiguration.customViews))
+        aCoder.encode(customEvents, forKey: #keyPath(DopamineConfiguration.customEvents))
+        aCoder.encode(notificationObservations, forKey: #keyPath(DopamineConfiguration.notificationObservations))
+        aCoder.encode(storekitObservations, forKey: #keyPath(DopamineConfiguration.storekitObservations))
+        aCoder.encode(locationObservations, forKey: #keyPath(DopamineConfiguration.locationObservations))
+        aCoder.encode(trackBatchSize, forKey: #keyPath(DopamineConfiguration.trackBatchSize))
+        aCoder.encode(reportBatchSize, forKey: #keyPath(DopamineConfiguration.reportBatchSize))
+        aCoder.encode(integrationMethod, forKey: #keyPath(DopamineConfiguration.integrationMethod))
+        aCoder.encode(advertiserID, forKey: #keyPath(DopamineConfiguration.advertiserID))
+        aCoder.encode(consoleLoggingEnabled, forKey: #keyPath(DopamineConfiguration.consoleLoggingEnabled))
+    }
+    
     required public convenience init?(coder aDecoder: NSCoder) {
-        self.init(acoder: aDecoder)
+        if let configID = aDecoder.value(forKey: #keyPath(DopamineConfiguration.configID)) as? String?,
+            let reinforcementEnabled = aDecoder.value(forKey: #keyPath(DopamineConfiguration.reinforcementEnabled)) as? Bool,
+            let triggerEnabled = aDecoder.value(forKey: #keyPath(DopamineConfiguration.triggerEnabled)) as? Bool,
+            let trackingEnabled = aDecoder.value(forKey: #keyPath(DopamineConfiguration.trackingEnabled)) as? Bool,
+            let applicationState = aDecoder.value(forKey: #keyPath(DopamineConfiguration.applicationState)) as? Bool,
+            let applicationViews = aDecoder.value(forKey: #keyPath(DopamineConfiguration.applicationViews)) as? Bool,
+            let customViews = aDecoder.value(forKey: #keyPath(DopamineConfiguration.customViews)) as? [String: Any],
+            let customEvents = aDecoder.value(forKey: #keyPath(DopamineConfiguration.customEvents)) as? [String: Any],
+            let notificationObservations = aDecoder.value(forKey: #keyPath(DopamineConfiguration.notificationObservations)) as? Bool,
+            let storekitObservations = aDecoder.value(forKey: #keyPath(DopamineConfiguration.storekitObservations)) as? Bool,
+            let locationObservations = aDecoder.value(forKey: #keyPath(DopamineConfiguration.locationObservations)) as? Bool,
+            let trackBatchSize = aDecoder.value(forKey: #keyPath(DopamineConfiguration.trackBatchSize)) as? Int,
+            let reportBatchSize = aDecoder.value(forKey: #keyPath(DopamineConfiguration.reportBatchSize)) as? Int,
+            let integrationMethod = aDecoder.value(forKey: #keyPath(DopamineConfiguration.integrationMethod)) as? String,
+            let advertiserID = aDecoder.value(forKey: #keyPath(DopamineConfiguration.configID)) as? Bool,
+            let consoleLoggingEnabled = aDecoder.value(forKey: #keyPath(DopamineConfiguration.configID)) as? Bool {
+            self.init(
+                configID: configID,
+                reinforcementEnabled: reinforcementEnabled,
+                triggerEnabled: triggerEnabled,
+                trackingEnabled: trackingEnabled,
+                applicationState: applicationState,
+                applicationViews: applicationViews,
+                customViews: customViews,
+                customEvents: customEvents,
+                notificationObservations: notificationObservations,
+                storekitObservations: storekitObservations,
+                locationObservations: locationObservations,
+                trackBatchSize: trackBatchSize,
+                reportBatchSize: reportBatchSize,
+                integrationMethod: integrationMethod,
+                advertiserID: advertiserID,
+                consoleLoggingEnabled: consoleLoggingEnabled
+            )
+        } else {
+            return nil
+        }
     }
     
     // test config
-    static var standard: DopeConfig {
+    static var standard: DopamineConfiguration {
         
         var customEvents: [String: [String:String]] = [:]
         customEvents["UIButton-DopamineKit_Example.ViewController-action2Performed"] = ["sender":"UIButton",
@@ -110,39 +192,13 @@ public class DopeConfig : NSObject {
         standardConfig["advertiserID"] = true
         standardConfig["consoleLoggingEnabled"] = true
         
-        return DopeConfig.convert(configDictionary: standardConfig)!
+        return DopamineConfiguration.convert(configDictionary: standardConfig)!
     }
     
 }
 
-extension DopeConfig {
-    
-    @objc public static var shared: DopeConfig {
-        if let _shared = _shared {
-            return _shared
-        } else {
-            _shared = retreive()
-            return _shared!
-        }
-    }
-    
-    static func save(config: DopeConfig? = _shared) {
-        DopeConfig.defaults.set(config, forKey: DopeConfig.defaultsKey)
-        _shared = config
-    }
-    
-    static func retreive() -> DopeConfig {
-        if let savedConfigData = DopeConfig.defaults.object(forKey: DopeConfig.defaultsKey) as? NSData,
-            let savedConfig = NSKeyedUnarchiver.unarchiveObject(with: savedConfigData as Data) as? DopeConfig {
-            print("using saved dopamine configuration")
-            return savedConfig
-        } else {
-            print("using standard dopamine configuration")
-            return standard
-        }
-    }
-    
-    static func convert(configDictionary: [String: Any]) -> DopeConfig? {
+extension DopamineConfiguration {
+    static func convert(configDictionary: [String: Any]) -> DopamineConfiguration? {
         if let configID = configDictionary["configID"] as? String?,
             let reinforcementEnabled = configDictionary["reinforcementEnabled"] as? Bool,
             let triggerEnabled = configDictionary["triggerEnabled"] as? Bool,
@@ -162,7 +218,7 @@ extension DopeConfig {
             let advertiserID = configDictionary["advertiserID"] as? Bool,
             let consoleLoggingEnabled = configDictionary["consoleLoggingEnabled"] as? Bool
         {
-            return DopeConfig.init(
+            return DopamineConfiguration.init(
                 configID: configID,
                 reinforcementEnabled: reinforcementEnabled,
                 triggerEnabled: triggerEnabled,
@@ -187,64 +243,3 @@ extension DopeConfig {
     }
 }
 
-
-extension DopeConfig : NSCoding {
-    public func encode(with aCoder: NSCoder) {
-        aCoder.encode(configID, forKey: #keyPath(DopeConfig.configID))
-        aCoder.encode(reinforcementEnabled, forKey: #keyPath(DopeConfig.reinforcementEnabled))
-        aCoder.encode(triggerEnabled, forKey: #keyPath(DopeConfig.triggerEnabled))
-        aCoder.encode(trackingEnabled, forKey: #keyPath(DopeConfig.trackingEnabled))
-        aCoder.encode(applicationState, forKey: #keyPath(DopeConfig.applicationState))
-        aCoder.encode(applicationViews, forKey: #keyPath(DopeConfig.applicationViews))
-        aCoder.encode(customViews, forKey: #keyPath(DopeConfig.customViews))
-        aCoder.encode(customEvents, forKey: #keyPath(DopeConfig.customEvents))
-        aCoder.encode(notificationObservations, forKey: #keyPath(DopeConfig.notificationObservations))
-        aCoder.encode(storekitObservations, forKey: #keyPath(DopeConfig.storekitObservations))
-        aCoder.encode(locationObservations, forKey: #keyPath(DopeConfig.locationObservations))
-        aCoder.encode(trackBatchSize, forKey: #keyPath(DopeConfig.trackBatchSize))
-        aCoder.encode(reportBatchSize, forKey: #keyPath(DopeConfig.reportBatchSize))
-        aCoder.encode(integrationMethod, forKey: #keyPath(DopeConfig.integrationMethod))
-        aCoder.encode(advertiserID, forKey: #keyPath(DopeConfig.advertiserID))
-        aCoder.encode(consoleLoggingEnabled, forKey: #keyPath(DopeConfig.consoleLoggingEnabled))
-    }
-    
-    convenience public init?(acoder aDecoder: NSCoder) {
-        if let configID = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? String?,
-            let reinforcementEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.reinforcementEnabled)) as? Bool,
-            let triggerEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.triggerEnabled)) as? Bool,
-            let trackingEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.trackingEnabled)) as? Bool,
-            let applicationState = aDecoder.value(forKey: #keyPath(DopeConfig.applicationState)) as? Bool,
-            let applicationViews = aDecoder.value(forKey: #keyPath(DopeConfig.applicationViews)) as? Bool,
-            let customViews = aDecoder.value(forKey: #keyPath(DopeConfig.customViews)) as? [String: Any],
-            let customEvents = aDecoder.value(forKey: #keyPath(DopeConfig.customEvents)) as? [String: Any],
-            let notificationObservations = aDecoder.value(forKey: #keyPath(DopeConfig.notificationObservations)) as? Bool,
-            let storekitObservations = aDecoder.value(forKey: #keyPath(DopeConfig.storekitObservations)) as? Bool,
-            let locationObservations = aDecoder.value(forKey: #keyPath(DopeConfig.locationObservations)) as? Bool,
-            let trackBatchSize = aDecoder.value(forKey: #keyPath(DopeConfig.trackBatchSize)) as? Int,
-            let reportBatchSize = aDecoder.value(forKey: #keyPath(DopeConfig.reportBatchSize)) as? Int,
-            let integrationMethod = aDecoder.value(forKey: #keyPath(DopeConfig.integrationMethod)) as? String,
-            let advertiserID = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? Bool,
-            let consoleLoggingEnabled = aDecoder.value(forKey: #keyPath(DopeConfig.configID)) as? Bool {
-            self.init(
-                configID: configID,
-                reinforcementEnabled: reinforcementEnabled,
-                triggerEnabled: triggerEnabled,
-                trackingEnabled: trackingEnabled,
-                applicationState: applicationState,
-                applicationViews: applicationViews,
-                customViews: customViews,
-                customEvents: customEvents,
-                notificationObservations: notificationObservations,
-                storekitObservations: storekitObservations,
-                locationObservations: locationObservations,
-                trackBatchSize: trackBatchSize,
-                reportBatchSize: reportBatchSize,
-                integrationMethod: integrationMethod,
-                advertiserID: advertiserID,
-                consoleLoggingEnabled: consoleLoggingEnabled
-            )
-        } else {
-            return nil
-        }
-    }
-}

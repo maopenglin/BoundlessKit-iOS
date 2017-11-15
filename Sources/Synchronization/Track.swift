@@ -118,7 +118,7 @@ internal class Track : NSObject, NSCoding {
     ///
     private func batchIsFull() -> Bool {
         let count = trackedActions.count
-        let isBatchSizeReached = count >= DopeConfig.shared.trackBatchSize
+        let isBatchSizeReached = count >= DopamineConfigurationControl.current.trackBatchSize
         //        DopeLog.debugLog("Track has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isBatchSizeReached
     }
@@ -130,7 +130,7 @@ internal class Track : NSObject, NSCoding {
     ///
     func add(action: DopeAction) {
         let dispatchGroup = DispatchGroup()
-        if DopeConfig.shared.locationObservations {
+        if DopamineConfigurationControl.current.locationObservations {
             dispatchGroup.enter()
             DopeLocation.shared.getLocation { location in
                 if let location = location {
