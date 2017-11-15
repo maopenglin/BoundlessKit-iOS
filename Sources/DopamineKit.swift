@@ -57,10 +57,13 @@ open class DopamineKit : NSObject {
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
     @objc open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, completion: @escaping (String) -> ()) {
+        guard DopeConfig.shared.reinforcementEnabled else {
+            completion(Cartridge.defaultReinforcementDecision)
+            return
+        }
+        
         let action = DopeAction(actionID: actionID, metaData: metaData)
-        action.reinforcementDecision = DopeConfig.shared.reinforcementEnabled ?
-            syncCoordinator.retrieve(cartridgeFor: action.actionID).remove() :
-            Cartridge.defaultReinforcementDecision
+        action.reinforcementDecision = syncCoordinator.retrieve(cartridgeFor: action.actionID).remove()
         
         DispatchQueue.main.async(execute: {
             completion(action.reinforcementDecision!)

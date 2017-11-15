@@ -39,22 +39,22 @@ public class DopeConfig : NSObject {
     @objc public var customEvents: [String: Any]
     
     init(configID: String?,
-                  reinforcementEnabled: Bool,
-                  triggerEnabled: Bool,
-                  trackingEnabled: Bool,
-                  applicationState: Bool,
-                  applicationViews: Bool,
-                  customViews: [String: Any],
-                  customEvents: [String: Any],
-                  notificationObservations: Bool,
-                  storekitObservations: Bool,
-                  locationObservations: Bool,
-                  trackBatchSize: Int,
-                  reportBatchSize: Int,
-                  integrationMethod: String,
-                  advertiserID: Bool,
-                  consoleLoggingEnabled: Bool
-                  ) {
+         reinforcementEnabled: Bool,
+         triggerEnabled: Bool,
+         trackingEnabled: Bool,
+         applicationState: Bool,
+         applicationViews: Bool,
+         customViews: [String: Any],
+         customEvents: [String: Any],
+         notificationObservations: Bool,
+         storekitObservations: Bool,
+         locationObservations: Bool,
+         trackBatchSize: Int,
+         reportBatchSize: Int,
+         integrationMethod: String,
+         advertiserID: Bool,
+         consoleLoggingEnabled: Bool
+        ) {
         self.configID = configID
         self.reinforcementEnabled = reinforcementEnabled
         self.triggerEnabled = triggerEnabled
