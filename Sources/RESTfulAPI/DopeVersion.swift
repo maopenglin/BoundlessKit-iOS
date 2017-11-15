@@ -7,11 +7,45 @@
 
 import Foundation
 
+public class DopeVersionControl : NSObject {
+    
+    fileprivate static var _current: DopeVersion?
+    @objc public static var current: DopeVersion {
+        if let _current = _current {
+            return _current
+        } else {
+            _current = retreive()
+            return _current!
+        }
+    }
+    
+    static func set(_ version: DopeVersion) {
+        if _current?.versionID != version.versionID {
+            SyncCoordinator.shared.flush()
+        }
+        
+        DopeVersion.defaults.set(version, forKey: DopeVersion.defaultsKey)
+        _current = version
+        
+        for actionID in (version.reinforcementMappings).keys{
+            Cartridge(actionID: actionID).sync()
+        }
+    }
+    
+    static func retreive() -> DopeVersion {
+        if let savedVersionData = DopeVersion.defaults.object(forKey: DopeVersion.defaultsKey) as? NSData,
+            let savedVersion = NSKeyedUnarchiver.unarchiveObject(with: savedVersionData as Data) as? DopeVersion {
+            print("using saved dopamine version")
+            return savedVersion
+        } else {
+            print("using standard dopamine version")
+            return DopeVersion.standard
+        }
+    }
+}
 
 @objc
-public class DopeVersion : NSObject {
-    
-    fileprivate static var _shared: DopeVersion?
+public class DopeVersion : NSObject, NSCoding {
     
     fileprivate static let defaults = UserDefaults.standard
     fileprivate static let defaultsKey = "DopamineVersion"
@@ -27,7 +61,20 @@ public class DopeVersion : NSObject {
     }
     
     required public convenience init?(coder aDecoder: NSCoder) {
-        self.init(acoder: aDecoder)
+        if let versionID = aDecoder.value(forKey: #keyPath(DopeVersion.versionID)) as? String?,
+            let reinforcementMappings = aDecoder.value(forKey: #keyPath(DopeVersion.versionID)) as? [String:[String:Any]] {
+            self.init(
+                versionID: versionID,
+                reinforcementMappings: reinforcementMappings
+            )
+        } else {
+            return nil
+        }
+    }
+    
+    public func encode(with aCoder: NSCoder) {
+        aCoder.encode(versionID, forKey: #keyPath(DopeVersion.versionID))
+        aCoder.encode(reinforcementMappings, forKey: #keyPath(DopeVersion.reinforcementMappings))
     }
     
     static var standard: DopeVersion {
@@ -61,67 +108,6 @@ public class DopeVersion : NSObject {
             }
         } else {
             DopeLog.debug("No reinforcement mapping found for <\(reinforcementKey)>")
-        }
-    }
-    
-}
-
-extension DopeVersion {
-    
-    @objc public static var shared: DopeVersion {
-        if let _shared = _shared {
-            return _shared
-        } else {
-            _shared = retreive()
-            return _shared!
-        }
-    }
-    
-    func set() {
-        if DopeVersion.shared.versionID != self.versionID {
-            SyncCoordinator.shared.flush()
-        }
-        DopeVersion.save(version: self)
-        for actionID in (self.reinforcementMappings).keys{
-            Cartridge(actionID: actionID).sync()
-        }
-    }
-    
-    fileprivate static func save(version: DopeVersion? = _shared) {
-        DopeVersion.defaults.set(version, forKey: DopeVersion.defaultsKey)
-        _shared = version
-    }
-    
-    static func retreive() -> DopeVersion {
-        if let savedVersionData = DopeVersion.defaults.object(forKey: DopeVersion.defaultsKey) as? NSData,
-            let savedVersion = NSKeyedUnarchiver.unarchiveObject(with: savedVersionData as Data) as? DopeVersion {
-            print("using saved dopamine version")
-            return savedVersion
-        } else {
-            print("using standard dopamine version")
-            return standard
-        }
-    }
-    
-}
-
-
-extension DopeVersion : NSCoding {
-    
-    public func encode(with aCoder: NSCoder) {
-        aCoder.encode(versionID, forKey: #keyPath(DopeVersion.versionID))
-        aCoder.encode(reinforcementMappings, forKey: #keyPath(DopeVersion.reinforcementMappings))
-    }
-    
-    convenience public init?(acoder aDecoder: NSCoder) {
-        if let versionID = aDecoder.value(forKey: #keyPath(DopeVersion.versionID)) as? String?,
-            let reinforcementMappings = aDecoder.value(forKey: #keyPath(DopeVersion.versionID)) as? [String:[String:Any]] {
-            self.init(
-                versionID: versionID,
-                reinforcementMappings: reinforcementMappings
-            )
-        } else {
-            return nil
         }
     }
     
