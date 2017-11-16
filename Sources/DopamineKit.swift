@@ -20,7 +20,7 @@ open class DopamineKit : NSObject {
     ///
     @objc public static var developmentIdentity:String?
     
-    @objc public static let sharedInstance: DopamineKit = DopamineKit()
+    @objc public static let shared: DopamineKit = DopamineKit()
     public static let syncCoordinator = SyncCoordinator.shared
     
     private override init() {

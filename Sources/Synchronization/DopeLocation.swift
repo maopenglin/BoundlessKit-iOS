@@ -10,13 +10,23 @@ import CoreLocation
 
 class DopeLocation : NSObject, CLLocationManagerDelegate {
     
-    @objc public static var shared = DopeLocation()
-    public var locationManager: CLLocationManager?
+    fileprivate static var _shared: DopeLocation?
+    @objc public static var shared: DopeLocation {
+        get {
+            if let _shared = _shared {
+                return _shared
+            } else {
+                _shared = DopeLocation()
+                return _shared!
+            }
+        }
+    }
     
+    public var locationManager: CLLocationManager?
     public var canGetLocation: Bool = true
     fileprivate var lastLocation: CLLocation?
     fileprivate var expiresAt = Date()
-    fileprivate var timeAccuracy: TimeInterval = 5
+    fileprivate var timeAccuracy: TimeInterval = 60 //seconds
     
     fileprivate var queue = OperationQueue()
     

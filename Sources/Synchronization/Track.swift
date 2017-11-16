@@ -11,14 +11,36 @@ import Foundation
 @objc
 internal class Track : NSObject, NSCoding {
     
-    static let shared = Track()
+    fileprivate static var _current: Track?
+    static var current: Track {
+        get {
+            if let _current = _current {
+                return _current
+            } else {
+                _current = get()
+                return _current!
+            }
+        }
+    }
     
-    private let defaults = UserDefaults.standard
-    private let defaultsKey = "DopamineTrack"
+    private static let defaults = UserDefaults.standard
+    private static let defaultsKey = "DopamineTrack"
     
-    private let trackedActionsQueue = OperationQueue()
+    fileprivate static func get() -> Track {
+        if let savedTrackData = Track.defaults.object(forKey: Track.defaultsKey) as? Data,
+            let savedTrack = NSKeyedUnarchiver.unarchiveObject(with: savedTrackData) as? Track {
+            return savedTrack
+        } else {
+            let newTrack = Track()
+            Track.set(newTrack)
+            return newTrack
+        }
+    }
+    fileprivate static func remove() { defaults.removeObject(forKey: defaultsKey) }
+    fileprivate static func set(_ track: Track) { defaults.set(NSKeyedArchiver.archivedData(withRootObject: track), forKey: defaultsKey) }
     
-    @objc fileprivate let dopeLocation = DopeLocation.shared
+//    private let dispatchGroup = DispatchGroup()
+    private let dispatchQueue = DispatchQueue(label: "Dopamine.Track")
     
     @objc private var trackedActions: [DopeAction]
     @objc private var timerStartedAt: Int64
@@ -29,33 +51,29 @@ internal class Track : NSObject, NSCoding {
     /// Loads the track from NSUserDefaults or creates a new one and saves it to NSUserDefaults
     ///
     /// - parameters:
-    ///     - sizeToSync: The number of tracked actions to trigger a sync. Defaults to 15.
+    ///     - trackedActions: An array of DopeAction's
     ///     - timerStartsAt: The start time for a sync timer. Defaults to 0.
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
-    private init(timerStartedAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
-        if let savedTrackData = defaults.object(forKey: defaultsKey) as? Data,
-            let savedTrack = NSKeyedUnarchiver.unarchiveObject(with: savedTrackData) as? Track {
-            self.trackedActions = savedTrack.trackedActions
-            self.timerStartedAt = savedTrack.timerStartedAt
-            self.timerExpiresIn = savedTrack.timerExpiresIn
-            super.init()
-        } else {
-            self.trackedActions = []
-            self.timerStartedAt = timerStartedAt
-            self.timerExpiresIn = timerExpiresIn
-            super.init()
-            defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
-        }
-        trackedActionsQueue.maxConcurrentOperationCount = 1
+    private init(trackedActions: [DopeAction] = [], timerStartedAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
+        self.trackedActions = trackedActions
+        self.timerStartedAt = timerStartedAt
+        self.timerExpiresIn = timerExpiresIn
+        super.init()
     }
     
     /// Decodes a saved track from NSUserDefaults
     ///
-    required init?(coder aDecoder: NSCoder) {
-        self.trackedActions = aDecoder.decodeObject(forKey: #keyPath(Track.trackedActions)) as! [DopeAction]
-        self.timerStartedAt = aDecoder.decodeInt64(forKey: #keyPath(Track.timerStartedAt))
-        self.timerExpiresIn = aDecoder.decodeInt64(forKey: #keyPath(Track.timerExpiresIn))
+    required convenience init?(coder aDecoder: NSCoder) {
+        if let trackedActions = aDecoder.decodeObject(forKey: #keyPath(Track.trackedActions)) as? [DopeAction] {
+            self.init(trackedActions: trackedActions,
+                      timerStartedAt: aDecoder.decodeInt64(forKey: #keyPath(Track.timerStartedAt)),
+                      timerExpiresIn: aDecoder.decodeInt64(forKey: #keyPath(Track.timerExpiresIn))
+            )
+            DopeLog.debug("Decoded track with trackedActions:\(trackedActions.count) sizeToSync:\(DopamineConfiguration.current.trackBatchSize) timerStartsAt:\(timerStartedAt) timerExpiresIn:\(timerExpiresIn)")
+        } else {
+            return nil
+        }
     }
     
     /// Encodes a track and saves it to NSUserDefaults
@@ -81,16 +99,15 @@ internal class Track : NSObject, NSCoding {
         if let timerExpiresIn = timerExpiresIn {
             self.timerExpiresIn = timerExpiresIn
         }
-        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
+        Track.set(self)
     }
     
     /// Clears the saved track sync triggers from NSUserDefaults
     ///
-    func erase() {
-        self.trackedActions.removeAll()
-        self.timerStartedAt = Int64( 1000*NSDate().timeIntervalSince1970 )
-        self.timerExpiresIn = 172800000
-        self.defaults.removeObject(forKey: self.defaultsKey)
+    static func flush() {
+        remove()
+        _current = Track()
+        set(_current!)
     }
     
     /// Check whether the track has been triggered for a sync
@@ -130,22 +147,20 @@ internal class Track : NSObject, NSCoding {
     ///
     func add(action: DopeAction) {
         let dispatchGroup = DispatchGroup()
-        if DopamineConfiguration.current.locationObservations {
-            dispatchGroup.enter()
-            DopeLocation.shared.getLocation { location in
-                if let location = location {
-                    action.addMetaData(["location": location])
+        dispatchQueue.async(group: dispatchGroup) {
+            if DopamineConfiguration.current.locationObservations {
+                dispatchGroup.enter()
+                DopeLocation.shared.getLocation { location in
+                    if let location = location {
+                        action.addMetaData(["location": location])
+                    }
+                    dispatchGroup.leave()
                 }
-                dispatchGroup.leave()
             }
-        }
-        dispatchGroup.notify(queue: .global()) {
-            self.trackedActionsQueue.addOperation {
+            dispatchGroup.notify(queue: self.dispatchQueue) {
                 self.trackedActions.append(action)
-                DopeLog.debug("tracked:\(action.actionID) with metadata:\(String(describing: action.metaData))")
-                if self.trackedActionsQueue.operationCount == 1 {
-                    self.defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: self.defaultsKey)
-                }
+                Track.set(self)
+                DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
             }
         }
     }
@@ -156,18 +171,18 @@ internal class Track : NSObject, NSCoding {
     ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if there were no actions to sync.
     ///
     func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
-        DispatchQueue.global().async{
+        dispatchQueue.async() {
             guard !self.syncInProgress else {
                 completion(0)
                 return
             }
             self.syncInProgress = true
             DopeLog.debug("Track sync in progress...")
-            self.trackedActionsQueue.waitUntilAllOperationsAreFinished()
-            self.trackedActionsQueue.isSuspended = true
+//            self.trackedActionsQueue.waitUntilAllOperationsAreFinished()
+//            self.trackedActionsQueue.isSuspended = true
             let syncFinished = {
                 self.syncInProgress = false
-                self.trackedActionsQueue.isSuspended = false
+//                self.trackedActionsQueue.isSuspended = false
             }
             
             if self.trackedActions.count == 0 {
@@ -182,6 +197,7 @@ internal class Track : NSObject, NSCoding {
                     defer { syncFinished() }
                     if let responseStatusCode = response["status"] as? Int {
                         if responseStatusCode == 200 {
+                            DopeLog.debug("Sent \(self.trackedActions.count) tracked actions!")
                             self.trackedActions.removeAll()
                             self.updateTriggers()
                         }

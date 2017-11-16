@@ -11,6 +11,44 @@ import Foundation
 @objc
 internal class Cartridge : NSObject, NSCoding {
     
+    private static let defaults = UserDefaults.standard
+    private static let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet"
+    private static func saveCartridgeActionIDsSet() { defaults.set(cartridgeSyncers.keys.sorted(), forKey: cartridgeActionIDSetKey) }
+    
+    internal static var cartridgeSyncers:[String:Cartridge] = {
+        var cartridges:[String: Cartridge] = [:]
+        if let savedActionIDSetData = defaults.object(forKey: cartridgeActionIDSetKey) as? [String] {
+            for actionID in savedActionIDSetData {
+                cartridges[actionID] = Cartridge(actionID: actionID)
+            }
+        }
+        return cartridges
+    }()
+    
+    internal static func flush() {
+        for (_, cartridge) in cartridgeSyncers {
+            cartridge.erase()
+        }
+        cartridgeSyncers.removeAll()
+        saveCartridgeActionIDsSet()
+    }
+    
+    internal static func flush(_ cartridge: Cartridge) {
+        cartridge.erase()
+        cartridgeSyncers.removeValue(forKey: cartridge.actionID)
+        saveCartridgeActionIDsSet()
+    }
+    
+    internal static func create(_ actionID: String) -> Cartridge {
+        let cartridge = Cartridge(actionID: actionID)
+        cartridgeSyncers[actionID] = cartridge
+        saveCartridgeActionIDsSet()
+        if cartridge.isTriggered() {
+            cartridge.sync()
+        }
+        return cartridge
+    }
+    
     @objc public static var defaultReinforcementDecision = "neutralResponse"
     
     private let defaults = UserDefaults.standard
@@ -107,16 +145,6 @@ internal class Cartridge : NSObject, NSCoding {
         defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
     
-    /// Clears the saved reinforcement decisions and sync triggers from NSUserDefaults
-    ///
-    func erase() {
-        self.reinforcementDecisions.removeAll()
-        self.initialSize = 0
-        self.timerStartsAt = 0
-        self.timerExpiresIn = 0
-        defaults.removeObject(forKey: defaultsKey)
-    }
-    
     /// Returns whether the cartridge has been triggered for a sync
     ///
     func isTriggered() -> Bool {
@@ -145,12 +173,6 @@ internal class Cartridge : NSObject, NSCoding {
         let result = count < Cartridge.minimumSize || Double(count) / Double(initialSize) <= Cartridge.capacityToSync;
         //        DopeLog.debugLog("Cartridge for \(actionID) has \(count)/\(initialSize) decisions so \(result ? "does" : "doesn't") need to sync since a cartridge requires at least \(Cartridge.minimumSize) decisions or \(Cartridge.capacityToSync*100)%% capacity.")
         return result
-    }
-    
-    /// Adds a reinforcement decision to the cartridge
-    ///
-    func add(reinforcementDecision: String) {
-        reinforcementDecisions.append(reinforcementDecision)
     }
     
     /// Removes a reinforcement decision from the cartridge
@@ -182,22 +204,29 @@ internal class Cartridge : NSObject, NSCoding {
             
             DopamineAPI.refresh(self.actionID) { response in
                 defer { self.syncInProgress = false }
-                if let responseStatusCode = response["status"] as? Int,
-                    let cartridgeDecisions = response["reinforcementCartridge"] as? [String],
-                    let expiresIn = response["expiresIn"] as? Int
-                {
-                    completion(responseStatusCode)
-                    if responseStatusCode == 200 {
+                if let responseStatusCode = response["status"] as? Int {
+                    if responseStatusCode == 200,
+                        let cartridgeDecisions = response["reinforcementCartridge"] as? [String],
+                        let expiresIn = response["expiresIn"] as? Int
+                    {
                         self.reinforcementDecisions = cartridgeDecisions
                         self.updateTriggers(initialSize: cartridgeDecisions.count, timerExpiresIn: Int64(expiresIn) )
                         DopeLog.debug("✅ \(self.actionID) refreshed!")
+                    } else if responseStatusCode == 400 {
+                        DopeLog.debug("Cartridge contained outdated actionID. Flushing.")
+                        Cartridge.flush(self)
                     }
+                    completion(responseStatusCode)
                 } else {
                     DopeLog.debug("❌ Could not read cartridge for (\(self.actionID))")
                     completion(404)
                 }
             }
         }
+    }
+    
+    fileprivate func erase() {
+        defaults.removeObject(forKey: defaultsKey)
     }
     
     /// This function returns a snapshot of this instance as a JSON compatible Object

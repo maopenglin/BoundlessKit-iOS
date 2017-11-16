@@ -11,12 +11,46 @@ import Foundation
 @objc
 internal class Report : NSObject, NSCoding {
     
-    static let shared = Report()
+    fileprivate static var _current: Report?
+    static var current: Report {
+        get {
+            if let _current = _current {
+                return _current
+            } else {
+                _current = get()
+                return _current!
+            }
+        }
+    }
     
-    private let defaults = UserDefaults.standard
-    private let defaultsKey = "DopamineReport"
+    private static let defaults = UserDefaults.standard
+    private static let defaultsKey = "DopamineReport"
     
-    @objc private let customerVersion: String?
+    fileprivate static func get() -> Report {
+        if let savedReportData = Report.defaults.object(forKey: Report.defaultsKey) as? Data,
+            let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData) as? Report {
+            return savedReport
+        } else {
+            let newReport = Report()
+            Report.set(newReport)
+            return newReport
+        }
+    }
+    fileprivate static func remove() { defaults.removeObject(forKey: defaultsKey) }
+    fileprivate static func set(_ report: Report) { defaults.set(NSKeyedArchiver.archivedData(withRootObject: report), forKey: defaultsKey) }
+    
+    static func flush() {
+        remove()
+        _current = Report()
+        set(_current!)
+    }
+    
+    func clean() {
+        reportedActions.removeAll()
+        updateTriggers()
+    }
+    
+    @objc private let versionID: String?
     @objc private var reportedActions: [DopeAction]
     @objc private var timerStartedAt: Int64
     @objc private var timerExpiresIn: Int64
@@ -30,40 +64,25 @@ internal class Report : NSObject, NSCoding {
     ///     - timerStartsAt: The start time for a sync timer. Defaults to 0.
     ///     - timerExpiresIn: The timer length, in ms, for a sync timer. Defaults to 48 hours.
     ///
-    private init(sizeToSync: Int = 15, timerStartsAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
-        if let savedReportData = defaults.object(forKey: defaultsKey) as? Data {
-            if let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData) as? Report,
-                savedReport.customerVersion == DopamineVersion.current.versionID
-            {
-                self.customerVersion = savedReport.customerVersion
-                self.reportedActions = savedReport.reportedActions
-                self.timerStartedAt = savedReport.timerStartedAt
-                self.timerExpiresIn = savedReport.timerExpiresIn
-                super.init()
-                return
-            } else {
-                defaults.removeObject(forKey: defaultsKey)
-                DopeLog.debug("Erased outdated report.")
-            }
-        }
-        self.customerVersion = DopamineVersion.current.versionID
-        self.reportedActions = []
+    private init(versionID: String? = DopamineVersion.current.versionID, reportedActions: [DopeAction] = [], timerStartsAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
+        self.versionID = versionID
+        self.reportedActions = reportedActions
         self.timerStartedAt = timerStartsAt
         self.timerExpiresIn = timerExpiresIn
         super.init()
-        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
     }
     
     /// Decodes a saved report from NSUserDefaults
     ///
-    required init?(coder aDecoder: NSCoder) {
-        if let customerVersion = aDecoder.decodeObject(forKey: #keyPath(Report.customerVersion)) as? String?,
+    required convenience init?(coder aDecoder: NSCoder) {
+        if let versionID = aDecoder.decodeObject(forKey: #keyPath(Report.versionID)) as? String?,
             let reportedActions = aDecoder.decodeObject(forKey: #keyPath(Report.reportedActions)) as? [DopeAction] {
-            self.customerVersion = customerVersion
-            self.reportedActions = reportedActions
-            self.timerStartedAt = aDecoder.decodeInt64(forKey: #keyPath(Report.timerStartedAt))
-            self.timerExpiresIn = aDecoder.decodeInt64(forKey: #keyPath(Report.timerExpiresIn))
-            //        DopeLog.debugLog("Decoded report with reportedActions:\(reportedActions.count) sizeToSync:\(sizeToSync) timerStartsAt:\(timerStartsAt) timerExpiresIn:\(timerExpiresIn)")
+            self.init(versionID: versionID,
+                      reportedActions: reportedActions,
+                      timerStartsAt: aDecoder.decodeInt64(forKey: #keyPath(Report.timerStartedAt)),
+                      timerExpiresIn: aDecoder.decodeInt64(forKey: #keyPath(Report.timerExpiresIn))
+            )
+            DopeLog.debug("Decoded report with versionID:\(versionID ?? "nil") reportedActions:\(reportedActions.count) sizeToSync:\(DopamineConfiguration.current.reportBatchSize) timerStartsAt:\(timerStartedAt) timerExpiresIn:\(timerExpiresIn)")
         } else {
             return nil
         }
@@ -72,7 +91,7 @@ internal class Report : NSObject, NSCoding {
     /// Encodes a report and saves it to NSUserDefaults
     ///
     func encode(with aCoder: NSCoder) {
-        aCoder.encode(customerVersion, forKey: #keyPath(Report.customerVersion))
+        aCoder.encode(versionID, forKey: #keyPath(Report.versionID))
         aCoder.encode(reportedActions, forKey: #keyPath(Report.reportedActions))
         aCoder.encode(timerStartedAt, forKey: #keyPath(Report.timerStartedAt))
         aCoder.encode(timerExpiresIn, forKey: #keyPath(Report.timerExpiresIn))
@@ -93,16 +112,7 @@ internal class Report : NSObject, NSCoding {
         if let timerExpiresIn = timerExpiresIn {
             self.timerExpiresIn = timerExpiresIn
         }
-        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
-    }
-    
-    /// Clears the saved report sync triggers from NSUserDefaults
-    ///
-    func erase() {
-        self.reportedActions.removeAll()
-        self.timerStartedAt = Int64( 1000*NSDate().timeIntervalSince1970 )
-        self.timerExpiresIn = 172800000
-        defaults.removeObject(forKey: defaultsKey)
+        Report.set(self)
     }
     
     /// Check whether the report has been triggered for a sync
@@ -142,7 +152,7 @@ internal class Report : NSObject, NSCoding {
     ///
     func add(action: DopeAction) {
         reportedActions.append(action)
-        defaults.set(NSKeyedArchiver.archivedData(withRootObject: self), forKey: defaultsKey)
+        Report.set(self)
     }
     
     /// Sends reinforced actions over the DopamineAPI
@@ -168,9 +178,10 @@ internal class Report : NSObject, NSCoding {
                 DopamineAPI.report(self.reportedActions, completion: { response in
                     defer { self.syncInProgress = false }
                     if let responseStatusCode = response["status"] as? Int {
-                        if responseStatusCode == 200 { //TO-DO: account for 406 - check respond w/ ramsay
-                            self.reportedActions.removeAll()
-                            self.updateTriggers()
+                        if responseStatusCode == 200 {
+                            self.clean()
+                        } else if responseStatusCode == 406 {
+                            Report.flush()
                         }
                         completion(responseStatusCode)
                     } else {

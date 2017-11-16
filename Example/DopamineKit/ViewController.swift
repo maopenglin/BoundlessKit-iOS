@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     
     @objc func action1Performed(){
         // Reinforce the action to make it sticky!!
-        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
+        DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {
             reinforcement in
                 // Update UI to display reinforcement decision on screen for learning purposes
                 self.responseLabel.text = reinforcement
@@ -68,14 +68,15 @@ class ViewController: UIViewController {
     @objc func action2Performed(){
 //        // Tracking call is sent asynchronously
 ////        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
-//        locationManager.delegate = self
-//        locationManager.requestAlwaysAuthorization()
-        
-        DopamineKit.reinforce("a2") { reinforcement in
-            // Update UI to display reinforcement decision on screen for learning purposes
-            self.responseLabel.text = reinforcement
-            self.flash(self.responseLabel)
-        }
+        locationManager.delegate = self
+        locationManager.requestAlwaysAuthorization()
+
+        DopamineKit.track("action2peformed")
+//        DopamineKit.reinforce("a2") { reinforcement in
+//            // Update UI to display reinforcement decision on screen for learning purposes
+//            self.responseLabel.text = reinforcement
+//            self.flash(self.responseLabel)
+//        }
     }
     
     var locationManager = CLLocationManager()

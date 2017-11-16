@@ -59,6 +59,7 @@ internal class DopamineProperties : NSObject, NSCoding {
     
     fileprivate static let defaults = UserDefaults.standard
     fileprivate static let defaultsKey = "DopamineProperties"
+    fileprivate static func set(_ properties: DopamineProperties) { defaults.set(properties, forKey: defaultsKey) }
     
     static var current: DopamineProperties { get { return DopaminePropertiesControl.current } }
     
@@ -68,9 +69,9 @@ internal class DopamineProperties : NSObject, NSCoding {
     let clientBuild = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     @objc let appID: String
-    @objc var version: DopamineVersion { didSet { DopamineProperties.defaults.set(self, forKey: DopamineProperties.defaultsKey) } }
-    @objc var configuration: DopamineConfiguration { didSet { DopamineProperties.defaults.set(self, forKey: DopamineProperties.defaultsKey) } }
-    @objc var inProduction: Bool { didSet { DopamineProperties.defaults.set(self, forKey: DopamineProperties.defaultsKey) } }
+    @objc var version: DopamineVersion { didSet { DopamineProperties.set(self); SyncCoordinator.shared.flush()  } }
+    @objc var configuration: DopamineConfiguration { didSet { DopamineProperties.set(self) } }
+    @objc var inProduction: Bool { didSet { DopamineProperties.set(self) } }
     @objc let developmentSecret: String
     @objc let productionSecret: String
     

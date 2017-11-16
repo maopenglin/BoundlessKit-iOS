@@ -7,155 +7,163 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		048A6BF39F58893C298A058BFF9C8333 /* sheen.png in Sources */ = {isa = PBXBuildFile; fileRef = 75CF66B81A599C9F81A09F4591AEBD28 /* sheen.png */; };
-		084433C75D4F309F44B3063A02167B2D /* UIApplication+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = 7CE6562DC4E80174EBB07A746E29EBAD /* UIApplication+Dopamine.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		09499BE02CCAD1FEDE0327F91C1D552D /* DLConfetti.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE074FF0FB8A4FCF8C6EAF7A7112492A /* DLConfetti.swift */; };
-		10E0F95F7B91E642011CD54DAF26C03E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
-		130C6739BCE0088C0129597F9BC1CDE8 /* DopamineAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B81D6965E64B10EEB0A1F6D25CE522 /* DopamineAPI.swift */; };
-		17FEDA08FEC5274BAC1590AF83B3AC31 /* SyncOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11DE523F7FB93F03E7E4D94905F619C /* SyncOverview.swift */; };
-		1BC8A741879BBEE0771C6CFD25004293 /* DopamineKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = DF646F2441EDE4B33B33EBEDBD57D7FE /* DopamineKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		007187608724F7290989D92B15F3CFA3 /* DLShake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34705D54F4B91CF4D61A508140626FA7 /* DLShake.swift */; };
+		0604E20B2EAA9DE36907D514411DC5CE /* ASIdentifierManager+ASIdentifierManagerHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2987C488DB37CA779654F271BD0926B9 /* ASIdentifierManager+ASIdentifierManagerHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0679E384621BFD9F53A9FB2B5BC682C8 /* UIApplication+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = 256FDFD352189F6F2CAE6730C9B2ED12 /* UIApplication+Dopamine.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0A1E476B7E40436E8B2C1CD76A87F985 /* UIViewController+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = 9F31690EB1B2837075D464E4F4AD6D33 /* UIViewController+Dopamine.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0C39FA80DA3F6548CB3544AA439104C5 /* SwizzleHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = B3B4A2F16D875958AAEA59CFAAA8040C /* SwizzleHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1211555119005B332EFCAC41861005E8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
+		1AAF7F6087C6F006999A5E5307AA6D62 /* DopamineAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267BD39ACC98AE316256E593F61A351F /* DopamineAPI.swift */; };
 		1EACACE7D59B6CD539FB42C863634E97 /* Pods-DopamineKit_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C0432E7482FF606EF28ED29A9AD71C6 /* Pods-DopamineKit_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22AB9ADC01558F41BE17D7F52C3EC168 /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9023DB9DF45827026BAC9D0F5B7E6CDC /* Report.swift */; };
 		243F708012CF975F1011ED75B136D226 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 		245BF248F468326BD8376B9A4F32D8EE /* Pods-DopamineKit_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = BCB50A43A300BE12D82B869B121CF3A8 /* Pods-DopamineKit_Example-dummy.m */; };
-		2E3D5B16DBE10F6CEEC41EB0B9832A66 /* UIViewController+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = AEF0C256EF50FF128216410B50A4E3E0 /* UIViewController+Dopamine.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		34DB89F654AE36553ACA40844E8CFFFA /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64E371184B184167C958540F242723A /* Telemetry.swift */; };
-		3501D7973076E3480F2182BD56280ECF /* UIViewController+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C11B138FD6EFAE0849917E5464D8480 /* UIViewController+Dopamine.m */; };
-		42EFF033F66287022B33F9E7576E0FA5 /* DLEmojiSplosion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA872FE4012B978B00A40BCD85F1AC28 /* DLEmojiSplosion.swift */; };
-		47BB340C8DC6546760BDF391C7C803D0 /* DopeTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6B9ADF604B57F9D1A960143A34938F /* DopeTracking.swift */; };
-		47C1EDD8A64A93519D1552ACAAFB3D0F /* SwizzleHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 98456B9704BFCEEF136E4016B5DFD71F /* SwizzleHelper.m */; };
-		4D09E1871DAF7839B3DBE6932BDC5432 /* DopamineKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F252DC9E2AC5B65052FAEC39C579AF6 /* DopamineKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		506FFDA86D33636B3CDEC61DCB8A09F8 /* sheen.png in Resources */ = {isa = PBXBuildFile; fileRef = 75CF66B81A599C9F81A09F4591AEBD28 /* sheen.png */; };
-		55320180B2AAE57C49184C8336D55B0D /* SwizzleHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4ABA6D0DB8C64B2069652AE7E6C7DD26 /* SwizzleHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5AD9B9DD7A5DACB414F26397DEF010BD /* DopeException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D584C33657165C943FEA9225E30759 /* DopeException.swift */; };
-		5E109242CCD4A4D13568D1F253212359 /* DopeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BF916A102C3DAC416D3EDA9199ADFF /* DopeLog.swift */; };
-		6706E60289788D980BA54178D69DD00A /* VisualizerAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBE8F7A6493665007C206D984DDE60B /* VisualizerAPI.swift */; };
-		699A2E1549B3A4C28D69CEAC884D49BE /* UIApplication+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = 9541DF6888806BC57F5A64932769F90D /* UIApplication+Dopamine.m */; };
-		702691787A48DF70A7CA0F01CA528D6C /* Cartridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFEC96DFA380C058F7C3F53B723683FE /* Cartridge.swift */; };
-		719741D8D9EEE42105F2C2DC4A4E6AD2 /* UIApplicationDelegate+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FD7431A9D1EE66C3DFE496D011A55BC /* UIApplicationDelegate+Dopamine.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		745B4B3FE82BED30AA13216C58C04A74 /* DopeLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58144BC877A5D3746FEE4F5E9621A100 /* DopeLocation.swift */; };
-		77EDC6FE39A0BDEB6615A2CC5A216D43 /* ASIdentifierManager+ASIdentifierManagerHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 75B7A6605AF94C44C7B0AE6A9635DEC9 /* ASIdentifierManager+ASIdentifierManagerHelper.m */; };
-		7886D6E7E9E00E711E34835A618202CF /* SKPaymentTransactionObserver+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CDC822A86A03F39DC7802C5189899F6 /* SKPaymentTransactionObserver+Dopamine.m */; };
-		7C35441F8F1AEC4E42A087FE7A6E679C /* ASIdentifierManager+ASIdentifierManagerHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 393EF6049FC6FCCD835929DF3AC79F11 /* ASIdentifierManager+ASIdentifierManagerHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		81E063D8C301AFA2C07D1F93A5E16224 /* DLSheen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E5B3B2CCE356662D8BDE2F4AF43D9E /* DLSheen.swift */; };
-		822628E0006DC825A39CD69484DD4D13 /* DLShake.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3320D85FA2FD6F1A8C33F48B5A11B54 /* DLShake.swift */; };
-		844B12051FBCE2E300565E77 /* DopamineProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844B12041FBCE2E300565E77 /* DopamineProperties.swift */; };
-		854F4C4E336A7F73C6B0D0DE8430BC51 /* DopamineConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B4BB06DDBB356CAC01AE70E83821ED /* DopamineConfiguration.swift */; };
+		2B6EDB2280833C4EB8B8425CC34EAF98 /* UIApplicationDelegate+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = 8EBD0822ACC072617A93D9718D1FF548 /* UIApplicationDelegate+Dopamine.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D341C23F6716A2B2B4C57E7B09B9CF2 /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74948AAA168D72AA59BBBC02666CC312 /* Report.swift */; };
+		3D7D3D5D9DD68B81CA27ED9CB7150E80 /* DLCandyBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB3895D9B75B07899F731DE7DE0183AE /* DLCandyBar.swift */; };
+		3E10F747C7431642A9D6DCDBDFE3EC6B /* DLGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97BADB615AADE2D53C212707F1B9D6B /* DLGlow.swift */; };
+		3F86601EB2F3D2313747102494839984 /* SKPaymentTransactionObserver+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = ABE0A0CACE4C71512A43D6D29D0E2504 /* SKPaymentTransactionObserver+Dopamine.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4255E1A782A1720014CF2E8665934B77 /* sheen.png in Resources */ = {isa = PBXBuildFile; fileRef = 502599F6DDC938C53A889134DC883590 /* sheen.png */; };
+		4741703F025073753086912AA296C7E5 /* DLConfetti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D53A57DF0E6303DD881FE7C374157 /* DLConfetti.swift */; };
+		47FEEBC8B5248D666C45F2ACB22B66B3 /* DopamineVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A34BCADB483ACB4E8D4396B298F06C7A /* DopamineVersion.swift */; };
+		4974ADD1A2E107FE39983D793F9E6918 /* DopamineConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932CBE101689C7A38991555A3DFF7D14 /* DopamineConfiguration.swift */; };
+		4E51D258737486E8CDF61377A38B9A38 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCC79A1C783DD1EDB4559840749DE7A /* Track.swift */; };
+		5721EDFF912B6E1D75BA123CBD90120C /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7C740C3E47F0EBE025EC22D54CD8DF /* SyncCoordinator.swift */; };
+		5C59833DB51E5875487D5443B3124455 /* SyncOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E85E27A33630684453285E64A2998562 /* SyncOverview.swift */; };
+		5F3EA75DD333DF2AAF1E4B46DE60FD7F /* DLSheen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76748C1C989360A081EFE5B0143AE1F /* DLSheen.swift */; };
+		6667705DAF78548DADF876427694CD83 /* DTMethodSwizzling.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F17937AE590EFD3978292D742C06D1C /* DTMethodSwizzling.m */; };
+		7707E3F030A4788E743B4146EAD7AFDA /* SwizzleHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = D865CE6395DE724D2626627CADFAA694 /* SwizzleHelper.m */; };
+		7D6E85FEF8F4BA7B0A7BFF0D7AFBDF42 /* UIApplication+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = 4503922974314B51D62800B9192BB134 /* UIApplication+Dopamine.m */; };
+		850B0660017DD9094E91F8676991A5D6 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E2DDEBA0DF0F324F71185E2A275EE2A /* Telemetry.swift */; };
+		893C0B133DA499C7A7A07755DD39398B /* DLEmojiSplosion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717AF073507371CC8277CB31BFC474FD /* DLEmojiSplosion.swift */; };
 		8AFEAB4EF5EE024828B285DC397D37B7 /* Pods-DopamineKit_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C52B24D3596967BD4F17CA99753F541 /* Pods-DopamineKit_Tests-dummy.m */; };
-		94232389A7E664AE9990C07127795B86 /* DopamineKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7163D8DB9EB0C1BEA0C4154F25D7F74F /* DopamineKit.bundle */; };
-		9667E7A5B52161EA1E8434ECFE9D4478 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5EC17E7E786B92080C35DE47868AD9 /* SyncCoordinator.swift */; };
-		96BC933C862267431577FB7E45683D65 /* DopeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6121B219B28D16C5E71247994F8DA424 /* DopeAction.swift */; };
-		AB4BCAB7F1E2FE30681ABCA849FC2095 /* DopamineKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 3500F0635AFA805FB34498584AA93CAD /* DopamineKit-dummy.m */; };
-		B1E639F0CE01754DC8F9FC8565DD52DB /* DopamineVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEDA74954CAABA014E5343DE7E4D43C /* DopamineVersion.swift */; };
-		C356EC8EDB77435139BE796D2941CD6C /* UIApplicationDelegate+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = 882AA4A301600CAFD1F95C0856950700 /* UIApplicationDelegate+Dopamine.m */; };
-		CF6A3A87B7706295C18E4734ABCE1169 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311CD8A78C89AE9EFF8F1612E611CAF6 /* Track.swift */; };
+		8CCFAD4F579488B251B93ED6BC93CC68 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B1ED4708C29DBFA0950224738E97B4 /* Helper.swift */; };
+		8F0B6D1ECFCE7AC12EFD5A5F1899FD34 /* UIViewController+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6D6C6859C430B2F346094F2F096F40 /* UIViewController+Dopamine.m */; };
+		9550761661BD16CAFD10ECDCC441CE42 /* sheen.png in Sources */ = {isa = PBXBuildFile; fileRef = 502599F6DDC938C53A889134DC883590 /* sheen.png */; };
+		9C579B170D92BE59336A7B7E60968038 /* VisualizerAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C26B18BF760301C7C40EA03C72648E0 /* VisualizerAPI.swift */; };
+		9E51EDA67D51414F66447274C8E1B910 /* Cartridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0658B80F869FD8641700D7E58B7440 /* Cartridge.swift */; };
+		AD0BB68A360DDE0A23D3AC0678E48E68 /* DopeTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6727579F5D4A8805B1BC981191FA27D4 /* DopeTracking.swift */; };
+		B64322306BFFADC1FCD2E2679D3520E0 /* DopamineProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3C2CA68AAB8C6092385C551E89901D /* DopamineProperties.swift */; };
+		BB4C21E1A1CFA5529A598F664F7D10AE /* DopeException.swift in Sources */ = {isa = PBXBuildFile; fileRef = D153C84576F08F3FFDFF9FA23DFB34C0 /* DopeException.swift */; };
+		C0409A65C299296FF46E9FD3678AB3EA /* DopamineKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7163D8DB9EB0C1BEA0C4154F25D7F74F /* DopamineKit.bundle */; };
+		C2A5B0C03E1AA4EF7391B626D11ABF7A /* DopamineKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A84CAB9E83480AF3B24622383573AE4 /* DopamineKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C4D82B574A3D248646F07DAAEB99B415 /* DopamineKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58E1C7EBC6D30C5E2BA0AAFA8EF9E5A4 /* DopamineKit.swift */; };
+		C749CEEAF6413729ABBD47F2E0A15A23 /* SKPaymentTransactionObserver+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B07E2C6925054E71C7F4F28033A091D /* SKPaymentTransactionObserver+Dopamine.m */; };
+		D529BE8C6B6429B8D629D41CDC9BD72A /* ASIdentifierManager+ASIdentifierManagerHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 90EF437F373AE8FFB19DF3A43A271BD2 /* ASIdentifierManager+ASIdentifierManagerHelper.m */; };
 		D9B1026BF205C72B8FDC19D6206D7059 /* Pods-DopamineKit_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 613E0AB4F58AD2A5F39FF738DC2E8E37 /* Pods-DopamineKit_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E3C22DFF8C4A0534EFEBFBBCC1534D27 /* DLCandyBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C195DF7F1B8FE25BB0561A09754AE2AE /* DLCandyBar.swift */; };
-		E9B6C4A5D63DA6F72F2C2961AEE6EAD2 /* DTMethodSwizzling.m in Sources */ = {isa = PBXBuildFile; fileRef = 86820CAD0BBDEEA8E5E6067138BAF548 /* DTMethodSwizzling.m */; };
-		F1A7F3C70DA9383C4FB6C92E5D69988D /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D83305E8FD4A25D20336C0963D10C2 /* Helper.swift */; };
-		F206E8089B32A20EA1A74F51C2672541 /* SKPaymentTransactionObserver+Dopamine.h in Headers */ = {isa = PBXBuildFile; fileRef = 74B01E3F9A335A3401362D3A9FB8BE04 /* SKPaymentTransactionObserver+Dopamine.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F60B0D6302F23C494B80867F1A23105C /* DopamineKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 593F9D87AB429B8B054684E13BF62BB8 /* DopamineKit.swift */; };
-		F841037A94E123F939448C971E0AD60B /* DLGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20454DD0D17031B97483B6DCC0C9C95 /* DLGlow.swift */; };
+		EA4487F3857082D61A31A721D33DE97F /* DopamineKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CAE9C245B6091EC72F8C8B4AB4E2D58 /* DopamineKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EAFCD6F847A9951486E322EE5DE144F9 /* DopamineKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 25DDCB3097482E996DA54F3EAC152216 /* DopamineKit-dummy.m */; };
+		F4776BAC4B7F0A87B32DC89F77E26DAE /* UIApplicationDelegate+Dopamine.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D3440E64132F554B2EE29A9E4266475 /* UIApplicationDelegate+Dopamine.m */; };
+		FBE76E7CCE01BC491416C561CA997271 /* DopeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EF8A885143ECD4F2492E9D7B8287D5 /* DopeAction.swift */; };
+		FC340881ACF29B9692EE6A34C2AB17C3 /* DopeLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C991489072DF5E099E27CA86143DE4C /* DopeLocation.swift */; };
+		FCD4786B039FF0184D75F7AA491812F8 /* DopeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19BFAB37712CBB5088E500F5195ADD8 /* DopeLog.swift */; };
 		FECE8FB32D1EEA5DC57F317C82CD674E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		7D219B7EA17F095CCDBE6F1B5049BD20 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2180742411B7D5C8BF231F25F1C5FFE4;
-			remoteInfo = "DopamineKit-DopamineKit";
-		};
 		BF5F8AE95A8F4150D9650E8A36E92070 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 66A0B1A0D890F3268318125BC4BE2D6B;
+			remoteGlobalIDString = A3A039334C12F7C5BCDBB6B411D196DE;
 			remoteInfo = DopamineKit;
+		};
+		CD41B63BB266B4A2D10F9138F5DCD024 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 923355F212072682B304EFF8719C4DF4;
+			remoteInfo = "DopamineKit-DopamineKit";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		03BF916A102C3DAC416D3EDA9199ADFF /* DopeLog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DopeLog.swift; path = Sources/DopeLog.swift; sourceTree = "<group>"; };
 		03EC12842F9AE4AF1625AD64778233F3 /* Pods-DopamineKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DopamineKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		04453859393965C0E94C0F49B23F3210 /* Pods-DopamineKit_Tests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Tests-frameworks.sh"; sourceTree = "<group>"; };
-		05D584C33657165C943FEA9225E30759 /* DopeException.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeException.swift; sourceTree = "<group>"; };
+		0A84CAB9E83480AF3B24622383573AE4 /* DopamineKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DopamineKit-umbrella.h"; sourceTree = "<group>"; };
 		0C0432E7482FF606EF28ED29A9AD71C6 /* Pods-DopamineKit_Tests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-DopamineKit_Tests-umbrella.h"; sourceTree = "<group>"; };
 		0EFB39368BCCB20253E353C332374A52 /* Pods-DopamineKit_Tests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Tests-resources.sh"; sourceTree = "<group>"; };
-		0F252DC9E2AC5B65052FAEC39C579AF6 /* DopamineKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DopamineKit.h; path = Sources/DopamineKit.h; sourceTree = "<group>"; };
+		112D53A57DF0E6303DD881FE7C374157 /* DLConfetti.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLConfetti.swift; sourceTree = "<group>"; };
 		1402C8679B8629AC2FB7DBCEF3EEE690 /* Pods-DopamineKit_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-DopamineKit_Example-acknowledgements.plist"; sourceTree = "<group>"; };
 		176FB7D61215325FEF9AF904A93A4A45 /* Pods-DopamineKit_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-DopamineKit_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		18A5DF57ECD0BBED4FEAA9C31EFA84EC /* Pods-DopamineKit_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-DopamineKit_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
-		1C11B138FD6EFAE0849917E5464D8480 /* UIViewController+Dopamine.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Dopamine.m"; sourceTree = "<group>"; };
-		257AE9C2ED9505F79A337E44DA3DCD0D /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1D8075C6448FA710F69F5884F7261504 /* ResourceBundle-DopamineKit-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-DopamineKit-Info.plist"; sourceTree = "<group>"; };
+		1EE60C316CE6BE3AFFB843FF64CE1109 /* DopamineKit.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = DopamineKit.xcconfig; sourceTree = "<group>"; };
+		256FDFD352189F6F2CAE6730C9B2ED12 /* UIApplication+Dopamine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIApplication+Dopamine.h"; sourceTree = "<group>"; };
+		25DDCB3097482E996DA54F3EAC152216 /* DopamineKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "DopamineKit-dummy.m"; sourceTree = "<group>"; };
+		267BD39ACC98AE316256E593F61A351F /* DopamineAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineAPI.swift; sourceTree = "<group>"; };
 		288BF5FB588AF286DA9322FAB66617D0 /* Pods-DopamineKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DopamineKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
-		2C5EC17E7E786B92080C35DE47868AD9 /* SyncCoordinator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
-		311CD8A78C89AE9EFF8F1612E611CAF6 /* Track.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
+		2987C488DB37CA779654F271BD0926B9 /* ASIdentifierManager+ASIdentifierManagerHelper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "ASIdentifierManager+ASIdentifierManagerHelper.h"; sourceTree = "<group>"; };
+		2B07E2C6925054E71C7F4F28033A091D /* SKPaymentTransactionObserver+Dopamine.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SKPaymentTransactionObserver+Dopamine.m"; sourceTree = "<group>"; };
+		2F0658B80F869FD8641700D7E58B7440 /* Cartridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Cartridge.swift; sourceTree = "<group>"; };
 		31A74B0854F5A456CDAD650659E1DA48 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3500F0635AFA805FB34498584AA93CAD /* DopamineKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "DopamineKit-dummy.m"; sourceTree = "<group>"; };
+		34705D54F4B91CF4D61A508140626FA7 /* DLShake.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLShake.swift; sourceTree = "<group>"; };
 		37BE7792B0F5B9374EBB368BCD36D181 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		393EF6049FC6FCCD835929DF3AC79F11 /* ASIdentifierManager+ASIdentifierManagerHelper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "ASIdentifierManager+ASIdentifierManagerHelper.h"; sourceTree = "<group>"; };
-		490D960CE564261E5565E02B457CBE7B /* ResourceBundle-DopamineKit-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-DopamineKit-Info.plist"; sourceTree = "<group>"; };
-		4ABA6D0DB8C64B2069652AE7E6C7DD26 /* SwizzleHelper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SwizzleHelper.h; path = Sources/SwizzleHelper.h; sourceTree = "<group>"; };
+		3BEC28E7BEF06B7DC884EF3C6DF916A7 /* DopamineKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DopamineKit-prefix.pch"; sourceTree = "<group>"; };
+		4503922974314B51D62800B9192BB134 /* UIApplication+Dopamine.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+Dopamine.m"; sourceTree = "<group>"; };
 		4C52B24D3596967BD4F17CA99753F541 /* Pods-DopamineKit_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-DopamineKit_Tests-dummy.m"; sourceTree = "<group>"; };
-		57A00282AF12D892F1459F98B66AFB71 /* DopamineKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = DopamineKit.modulemap; sourceTree = "<group>"; };
-		58144BC877A5D3746FEE4F5E9621A100 /* DopeLocation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeLocation.swift; sourceTree = "<group>"; };
-		593F9D87AB429B8B054684E13BF62BB8 /* DopamineKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DopamineKit.swift; path = Sources/DopamineKit.swift; sourceTree = "<group>"; };
-		6121B219B28D16C5E71247994F8DA424 /* DopeAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeAction.swift; sourceTree = "<group>"; };
+		4CAE9C245B6091EC72F8C8B4AB4E2D58 /* DopamineKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DopamineKit.h; path = Sources/DopamineKit.h; sourceTree = "<group>"; };
+		4E2DDEBA0DF0F324F71185E2A275EE2A /* Telemetry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
+		4F17937AE590EFD3978292D742C06D1C /* DTMethodSwizzling.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = DTMethodSwizzling.m; path = Sources/DTMethodSwizzling.m; sourceTree = "<group>"; };
+		502599F6DDC938C53A889134DC883590 /* sheen.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = sheen.png; sourceTree = "<group>"; };
+		58E1C7EBC6D30C5E2BA0AAFA8EF9E5A4 /* DopamineKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DopamineKit.swift; path = Sources/DopamineKit.swift; sourceTree = "<group>"; };
+		5D3440E64132F554B2EE29A9E4266475 /* UIApplicationDelegate+Dopamine.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIApplicationDelegate+Dopamine.m"; sourceTree = "<group>"; };
 		613E0AB4F58AD2A5F39FF738DC2E8E37 /* Pods-DopamineKit_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-DopamineKit_Example-umbrella.h"; sourceTree = "<group>"; };
-		61CD57E3A50D8C7BDFEFE55CF7C5B926 /* DopamineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DopamineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		61CD57E3A50D8C7BDFEFE55CF7C5B926 /* DopamineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = DopamineKit.framework; path = DopamineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		6B168362AE7E6B54115C175E2ABD92C2 /* Pods_DopamineKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		6BBE8F7A6493665007C206D984DDE60B /* VisualizerAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VisualizerAPI.swift; sourceTree = "<group>"; };
-		7163D8DB9EB0C1BEA0C4154F25D7F74F /* DopamineKit.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DopamineKit.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		74B01E3F9A335A3401362D3A9FB8BE04 /* SKPaymentTransactionObserver+Dopamine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SKPaymentTransactionObserver+Dopamine.h"; sourceTree = "<group>"; };
+		6727579F5D4A8805B1BC981191FA27D4 /* DopeTracking.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeTracking.swift; sourceTree = "<group>"; };
+		6B168362AE7E6B54115C175E2ABD92C2 /* Pods_DopamineKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_DopamineKit_Example.framework; path = "Pods-DopamineKit_Example.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7163D8DB9EB0C1BEA0C4154F25D7F74F /* DopamineKit.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = DopamineKit.bundle; path = DopamineKit.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		717AF073507371CC8277CB31BFC474FD /* DLEmojiSplosion.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLEmojiSplosion.swift; sourceTree = "<group>"; };
+		74948AAA168D72AA59BBBC02666CC312 /* Report.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
 		7555C005FD3F95381466C1E2DE4D4F46 /* Pods-DopamineKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Example-resources.sh"; sourceTree = "<group>"; };
-		75B7A6605AF94C44C7B0AE6A9635DEC9 /* ASIdentifierManager+ASIdentifierManagerHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "ASIdentifierManager+ASIdentifierManagerHelper.m"; sourceTree = "<group>"; };
-		75CF66B81A599C9F81A09F4591AEBD28 /* sheen.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = sheen.png; sourceTree = "<group>"; };
-		7CDC822A86A03F39DC7802C5189899F6 /* SKPaymentTransactionObserver+Dopamine.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SKPaymentTransactionObserver+Dopamine.m"; sourceTree = "<group>"; };
-		7CE6562DC4E80174EBB07A746E29EBAD /* UIApplication+Dopamine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIApplication+Dopamine.h"; sourceTree = "<group>"; };
-		7FD7431A9D1EE66C3DFE496D011A55BC /* UIApplicationDelegate+Dopamine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+Dopamine.h"; sourceTree = "<group>"; };
-		844B12041FBCE2E300565E77 /* DopamineProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DopamineProperties.swift; sourceTree = "<group>"; };
-		86820CAD0BBDEEA8E5E6067138BAF548 /* DTMethodSwizzling.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = DTMethodSwizzling.m; path = Sources/DTMethodSwizzling.m; sourceTree = "<group>"; };
-		882AA4A301600CAFD1F95C0856950700 /* UIApplicationDelegate+Dopamine.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIApplicationDelegate+Dopamine.m"; sourceTree = "<group>"; };
-		89C5B576D8CE0DA5136760567753A624 /* Pods_DopamineKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		9023DB9DF45827026BAC9D0F5B7E6CDC /* Report.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
-		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		94E602D2C33E2E9FC4082B1F07DC8F3E /* Pods-DopamineKit_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-DopamineKit_Example.modulemap"; sourceTree = "<group>"; };
-		9541DF6888806BC57F5A64932769F90D /* UIApplication+Dopamine.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+Dopamine.m"; sourceTree = "<group>"; };
-		98456B9704BFCEEF136E4016B5DFD71F /* SwizzleHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SwizzleHelper.m; path = Sources/SwizzleHelper.m; sourceTree = "<group>"; };
-		A20454DD0D17031B97483B6DCC0C9C95 /* DLGlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLGlow.swift; sourceTree = "<group>"; };
-		AC6B9ADF604B57F9D1A960143A34938F /* DopeTracking.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeTracking.swift; sourceTree = "<group>"; };
-		AEF0C256EF50FF128216410B50A4E3E0 /* UIViewController+Dopamine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Dopamine.h"; sourceTree = "<group>"; };
-		B0E5B3B2CCE356662D8BDE2F4AF43D9E /* DLSheen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLSheen.swift; sourceTree = "<group>"; };
-		B11DE523F7FB93F03E7E4D94905F619C /* SyncOverview.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncOverview.swift; sourceTree = "<group>"; };
-		B6B81D6965E64B10EEB0A1F6D25CE522 /* DopamineAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineAPI.swift; sourceTree = "<group>"; };
-		B9D83305E8FD4A25D20336C0963D10C2 /* Helper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Helper.swift; path = Sources/Helper.swift; sourceTree = "<group>"; };
-		BC712BD5A44905028B74C926FB07AAB9 /* Pods-DopamineKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-DopamineKit_Tests.modulemap"; sourceTree = "<group>"; };
+		7C991489072DF5E099E27CA86143DE4C /* DopeLocation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeLocation.swift; sourceTree = "<group>"; };
+		81B1ED4708C29DBFA0950224738E97B4 /* Helper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Helper.swift; path = Sources/Helper.swift; sourceTree = "<group>"; };
+		89C5B576D8CE0DA5136760567753A624 /* Pods_DopamineKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_DopamineKit_Tests.framework; path = "Pods-DopamineKit_Tests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8C26B18BF760301C7C40EA03C72648E0 /* VisualizerAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VisualizerAPI.swift; sourceTree = "<group>"; };
+		8EBD0822ACC072617A93D9718D1FF548 /* UIApplicationDelegate+Dopamine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+Dopamine.h"; sourceTree = "<group>"; };
+		90EF437F373AE8FFB19DF3A43A271BD2 /* ASIdentifierManager+ASIdentifierManagerHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "ASIdentifierManager+ASIdentifierManagerHelper.m"; sourceTree = "<group>"; };
+		932CBE101689C7A38991555A3DFF7D14 /* DopamineConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineConfiguration.swift; sourceTree = "<group>"; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		94E602D2C33E2E9FC4082B1F07DC8F3E /* Pods-DopamineKit_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-DopamineKit_Example.modulemap"; sourceTree = "<group>"; };
+		9CCC79A1C783DD1EDB4559840749DE7A /* Track.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
+		9F31690EB1B2837075D464E4F4AD6D33 /* UIViewController+Dopamine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Dopamine.h"; sourceTree = "<group>"; };
+		9F3C2CA68AAB8C6092385C551E89901D /* DopamineProperties.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineProperties.swift; sourceTree = "<group>"; };
+		A19BFAB37712CBB5088E500F5195ADD8 /* DopeLog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DopeLog.swift; path = Sources/DopeLog.swift; sourceTree = "<group>"; };
+		A34BCADB483ACB4E8D4396B298F06C7A /* DopamineVersion.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineVersion.swift; sourceTree = "<group>"; };
+		ABE0A0CACE4C71512A43D6D29D0E2504 /* SKPaymentTransactionObserver+Dopamine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SKPaymentTransactionObserver+Dopamine.h"; sourceTree = "<group>"; };
+		B3B4A2F16D875958AAEA59CFAAA8040C /* SwizzleHelper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SwizzleHelper.h; path = Sources/SwizzleHelper.h; sourceTree = "<group>"; };
+		B97BADB615AADE2D53C212707F1B9D6B /* DLGlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLGlow.swift; sourceTree = "<group>"; };
+		BC712BD5A44905028B74C926FB07AAB9 /* Pods-DopamineKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-DopamineKit_Tests.modulemap"; sourceTree = "<group>"; };
 		BCB50A43A300BE12D82B869B121CF3A8 /* Pods-DopamineKit_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-DopamineKit_Example-dummy.m"; sourceTree = "<group>"; };
-		C195DF7F1B8FE25BB0561A09754AE2AE /* DLCandyBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLCandyBar.swift; sourceTree = "<group>"; };
-		CFEC96DFA380C058F7C3F53B723683FE /* Cartridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Cartridge.swift; sourceTree = "<group>"; };
-		D64E371184B184167C958540F242723A /* Telemetry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
-		DA872FE4012B978B00A40BCD85F1AC28 /* DLEmojiSplosion.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLEmojiSplosion.swift; sourceTree = "<group>"; };
-		DF646F2441EDE4B33B33EBEDBD57D7FE /* DopamineKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DopamineKit-umbrella.h"; sourceTree = "<group>"; };
+		BD6F6A6BA9CD9A2F8CF5770562DF560A /* DopamineKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = DopamineKit.modulemap; sourceTree = "<group>"; };
+		C7EF8A885143ECD4F2492E9D7B8287D5 /* DopeAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeAction.swift; sourceTree = "<group>"; };
+		CE6D6C6859C430B2F346094F2F096F40 /* UIViewController+Dopamine.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Dopamine.m"; sourceTree = "<group>"; };
+		D153C84576F08F3FFDFF9FA23DFB34C0 /* DopeException.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeException.swift; sourceTree = "<group>"; };
+		D865CE6395DE724D2626627CADFAA694 /* SwizzleHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SwizzleHelper.m; path = Sources/SwizzleHelper.m; sourceTree = "<group>"; };
 		E0318C8FA7B6AE30863D47A061606E3A /* Pods-DopamineKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DopamineKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
-		E3320D85FA2FD6F1A8C33F48B5A11B54 /* DLShake.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLShake.swift; sourceTree = "<group>"; };
+		E76748C1C989360A081EFE5B0143AE1F /* DLSheen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLSheen.swift; sourceTree = "<group>"; };
 		E844B40E16277A1E364E80531E8D71C1 /* Pods-DopamineKit_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-DopamineKit_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
+		E85E27A33630684453285E64A2998562 /* SyncOverview.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncOverview.swift; sourceTree = "<group>"; };
 		E8C82F218024BED642819A5BF926D73C /* Pods-DopamineKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DopamineKit_Example.release.xcconfig"; sourceTree = "<group>"; };
-		E8F657BD1D4D7C07D9D1957677E465AD /* DopamineKit.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = DopamineKit.xcconfig; sourceTree = "<group>"; };
 		E9CB3DAE67CF3AF0771D90DBEE80413F /* Pods-DopamineKit_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-DopamineKit_Example-frameworks.sh"; sourceTree = "<group>"; };
-		F86F01D48763A8B3A25A6FED67D878D6 /* DopamineKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DopamineKit-prefix.pch"; sourceTree = "<group>"; };
-		F8B4BB06DDBB356CAC01AE70E83821ED /* DopamineConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineConfiguration.swift; sourceTree = "<group>"; };
-		FE074FF0FB8A4FCF8C6EAF7A7112492A /* DLConfetti.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLConfetti.swift; sourceTree = "<group>"; };
-		FFEDA74954CAABA014E5343DE7E4D43C /* DopamineVersion.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopamineVersion.swift; sourceTree = "<group>"; };
+		EB3895D9B75B07899F731DE7DE0183AE /* DLCandyBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DLCandyBar.swift; sourceTree = "<group>"; };
+		EC6347A295F397904A04D210D77C7607 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FF7C740C3E47F0EBE025EC22D54CD8DF /* SyncCoordinator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		3B4CB7C46F22F4D4CDFFCD0F28E4B819 /* Frameworks */ = {
+		8B057BE2D6DB36C11845A11651E2A637 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8DED3EE6106EA42F8A3D26227CC5FA0A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1211555119005B332EFCAC41861005E8 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,83 +183,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D4A9A169019B8E75802477235F1FBB67 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				10E0F95F7B91E642011CD54DAF26C03E /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1AC08AC28454284894FF20DD41F3B3AE /* RESTfulAPI */ = {
+		079D5314937454A7D8A03CF9E3668FC3 /* PrefabRewards */ = {
 			isa = PBXGroup;
 			children = (
-				B6B81D6965E64B10EEB0A1F6D25CE522 /* DopamineAPI.swift */,
-				844B12041FBCE2E300565E77 /* DopamineProperties.swift */,
-				F8B4BB06DDBB356CAC01AE70E83821ED /* DopamineConfiguration.swift */,
-				FFEDA74954CAABA014E5343DE7E4D43C /* DopamineVersion.swift */,
-				6BBE8F7A6493665007C206D984DDE60B /* VisualizerAPI.swift */,
+				EB3895D9B75B07899F731DE7DE0183AE /* DLCandyBar.swift */,
+				112D53A57DF0E6303DD881FE7C374157 /* DLConfetti.swift */,
+				717AF073507371CC8277CB31BFC474FD /* DLEmojiSplosion.swift */,
+				B97BADB615AADE2D53C212707F1B9D6B /* DLGlow.swift */,
+				34705D54F4B91CF4D61A508140626FA7 /* DLShake.swift */,
+				E76748C1C989360A081EFE5B0143AE1F /* DLSheen.swift */,
 			);
-			name = RESTfulAPI;
-			path = Sources/RESTfulAPI;
+			name = PrefabRewards;
+			path = Sources/PrefabRewards;
 			sourceTree = "<group>";
 		};
-		251B9B034CAAAA8AB294D121AEFB8CC5 /* Synchronization */ = {
+		22E278FFF03ECF4EB6803C91A8FE53DF /* Assets */ = {
 			isa = PBXGroup;
 			children = (
-				CFEC96DFA380C058F7C3F53B723683FE /* Cartridge.swift */,
-				6121B219B28D16C5E71247994F8DA424 /* DopeAction.swift */,
-				05D584C33657165C943FEA9225E30759 /* DopeException.swift */,
-				58144BC877A5D3746FEE4F5E9621A100 /* DopeLocation.swift */,
-				AC6B9ADF604B57F9D1A960143A34938F /* DopeTracking.swift */,
-				9023DB9DF45827026BAC9D0F5B7E6CDC /* Report.swift */,
-				2C5EC17E7E786B92080C35DE47868AD9 /* SyncCoordinator.swift */,
-				B11DE523F7FB93F03E7E4D94905F619C /* SyncOverview.swift */,
-				D64E371184B184167C958540F242723A /* Telemetry.swift */,
-				311CD8A78C89AE9EFF8F1612E611CAF6 /* Track.swift */,
+				502599F6DDC938C53A889134DC883590 /* sheen.png */,
 			);
-			name = Synchronization;
-			path = Sources/Synchronization;
-			sourceTree = "<group>";
-		};
-		39B2BFCDC042040D1D2634B46ED43F69 /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				57A00282AF12D892F1459F98B66AFB71 /* DopamineKit.modulemap */,
-				E8F657BD1D4D7C07D9D1957677E465AD /* DopamineKit.xcconfig */,
-				3500F0635AFA805FB34498584AA93CAD /* DopamineKit-dummy.m */,
-				F86F01D48763A8B3A25A6FED67D878D6 /* DopamineKit-prefix.pch */,
-				DF646F2441EDE4B33B33EBEDBD57D7FE /* DopamineKit-umbrella.h */,
-				257AE9C2ED9505F79A337E44DA3DCD0D /* Info.plist */,
-				490D960CE564261E5565E02B457CBE7B /* ResourceBundle-DopamineKit-Info.plist */,
-			);
-			name = "Support Files";
-			path = "Example/Pods/Target Support Files/DopamineKit";
-			sourceTree = "<group>";
-		};
-		5C0901005EEFF660B902AF46AC94133B /* DopamineKit */ = {
-			isa = PBXGroup;
-			children = (
-				0F252DC9E2AC5B65052FAEC39C579AF6 /* DopamineKit.h */,
-				593F9D87AB429B8B054684E13BF62BB8 /* DopamineKit.swift */,
-				03BF916A102C3DAC416D3EDA9199ADFF /* DopeLog.swift */,
-				86820CAD0BBDEEA8E5E6067138BAF548 /* DTMethodSwizzling.m */,
-				B9D83305E8FD4A25D20336C0963D10C2 /* Helper.swift */,
-				4ABA6D0DB8C64B2069652AE7E6C7DD26 /* SwizzleHelper.h */,
-				98456B9704BFCEEF136E4016B5DFD71F /* SwizzleHelper.m */,
-				E7E9CC3F726465E4B6BC200BBF40A6FD /* Assets */,
-				DE7A0118E50272C109412D2641B803C9 /* Categories */,
-				E85F06E2FD5C2A78770BED817B76E80C /* PrefabRewards */,
-				A815F147635DD624316C9D10B35AE260 /* Resources */,
-				1AC08AC28454284894FF20DD41F3B3AE /* RESTfulAPI */,
-				39B2BFCDC042040D1D2634B46ED43F69 /* Support Files */,
-				251B9B034CAAAA8AB294D121AEFB8CC5 /* Synchronization */,
-			);
-			name = DopamineKit;
-			path = ../..;
+			name = Assets;
+			path = Sources/Assets;
 			sourceTree = "<group>";
 		};
 		7DB346D0F39D3F0E887471402A8071AB = {
@@ -263,6 +218,34 @@
 				F163008B2932F2044D47CAA535829C20 /* Products */,
 				F8C245E8221D70827C0BD64A8AA995C6 /* Targets Support Files */,
 			);
+			sourceTree = "<group>";
+		};
+		85BB7620A7C0E5248CDC37225A9BA2A9 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				BD6F6A6BA9CD9A2F8CF5770562DF560A /* DopamineKit.modulemap */,
+				1EE60C316CE6BE3AFFB843FF64CE1109 /* DopamineKit.xcconfig */,
+				25DDCB3097482E996DA54F3EAC152216 /* DopamineKit-dummy.m */,
+				3BEC28E7BEF06B7DC884EF3C6DF916A7 /* DopamineKit-prefix.pch */,
+				0A84CAB9E83480AF3B24622383573AE4 /* DopamineKit-umbrella.h */,
+				EC6347A295F397904A04D210D77C7607 /* Info.plist */,
+				1D8075C6448FA710F69F5884F7261504 /* ResourceBundle-DopamineKit-Info.plist */,
+			);
+			name = "Support Files";
+			path = "Example/Pods/Target Support Files/DopamineKit";
+			sourceTree = "<group>";
+		};
+		8D0206CAAAFA4177273535A22CE9E1B4 /* RESTfulAPI */ = {
+			isa = PBXGroup;
+			children = (
+				267BD39ACC98AE316256E593F61A351F /* DopamineAPI.swift */,
+				932CBE101689C7A38991555A3DFF7D14 /* DopamineConfiguration.swift */,
+				9F3C2CA68AAB8C6092385C551E89901D /* DopamineProperties.swift */,
+				A34BCADB483ACB4E8D4396B298F06C7A /* DopamineVersion.swift */,
+				8C26B18BF760301C7C40EA03C72648E0 /* VisualizerAPI.swift */,
+			);
+			name = RESTfulAPI;
+			path = Sources/RESTfulAPI;
 			sourceTree = "<group>";
 		};
 		97622B50585522774618D84B3AB6328B /* Pods-DopamineKit_Tests */ = {
@@ -283,13 +266,6 @@
 			path = "Target Support Files/Pods-DopamineKit_Tests";
 			sourceTree = "<group>";
 		};
-		A815F147635DD624316C9D10B35AE260 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Resources;
-			sourceTree = "<group>";
-		};
 		BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -301,9 +277,67 @@
 		C41483C014882020B6FC0B1736A976D0 /* Development Pods */ = {
 			isa = PBXGroup;
 			children = (
-				5C0901005EEFF660B902AF46AC94133B /* DopamineKit */,
+				CED53A44A8AEB132E0067EDF0195432E /* DopamineKit */,
 			);
 			name = "Development Pods";
+			sourceTree = "<group>";
+		};
+		C7DFF87AB4447A661C024DF675958EA2 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				2987C488DB37CA779654F271BD0926B9 /* ASIdentifierManager+ASIdentifierManagerHelper.h */,
+				90EF437F373AE8FFB19DF3A43A271BD2 /* ASIdentifierManager+ASIdentifierManagerHelper.m */,
+				ABE0A0CACE4C71512A43D6D29D0E2504 /* SKPaymentTransactionObserver+Dopamine.h */,
+				2B07E2C6925054E71C7F4F28033A091D /* SKPaymentTransactionObserver+Dopamine.m */,
+				256FDFD352189F6F2CAE6730C9B2ED12 /* UIApplication+Dopamine.h */,
+				4503922974314B51D62800B9192BB134 /* UIApplication+Dopamine.m */,
+				8EBD0822ACC072617A93D9718D1FF548 /* UIApplicationDelegate+Dopamine.h */,
+				5D3440E64132F554B2EE29A9E4266475 /* UIApplicationDelegate+Dopamine.m */,
+				9F31690EB1B2837075D464E4F4AD6D33 /* UIViewController+Dopamine.h */,
+				CE6D6C6859C430B2F346094F2F096F40 /* UIViewController+Dopamine.m */,
+			);
+			name = Categories;
+			path = Sources/Categories;
+			sourceTree = "<group>";
+		};
+		CED53A44A8AEB132E0067EDF0195432E /* DopamineKit */ = {
+			isa = PBXGroup;
+			children = (
+				4CAE9C245B6091EC72F8C8B4AB4E2D58 /* DopamineKit.h */,
+				58E1C7EBC6D30C5E2BA0AAFA8EF9E5A4 /* DopamineKit.swift */,
+				A19BFAB37712CBB5088E500F5195ADD8 /* DopeLog.swift */,
+				4F17937AE590EFD3978292D742C06D1C /* DTMethodSwizzling.m */,
+				81B1ED4708C29DBFA0950224738E97B4 /* Helper.swift */,
+				B3B4A2F16D875958AAEA59CFAAA8040C /* SwizzleHelper.h */,
+				D865CE6395DE724D2626627CADFAA694 /* SwizzleHelper.m */,
+				22E278FFF03ECF4EB6803C91A8FE53DF /* Assets */,
+				C7DFF87AB4447A661C024DF675958EA2 /* Categories */,
+				079D5314937454A7D8A03CF9E3668FC3 /* PrefabRewards */,
+				D420641138EFE23F040604113047EF8B /* Resources */,
+				8D0206CAAAFA4177273535A22CE9E1B4 /* RESTfulAPI */,
+				85BB7620A7C0E5248CDC37225A9BA2A9 /* Support Files */,
+				CF5753A5F714A9000BE79E3B287162BE /* Synchronization */,
+			);
+			name = DopamineKit;
+			path = ../..;
+			sourceTree = "<group>";
+		};
+		CF5753A5F714A9000BE79E3B287162BE /* Synchronization */ = {
+			isa = PBXGroup;
+			children = (
+				2F0658B80F869FD8641700D7E58B7440 /* Cartridge.swift */,
+				C7EF8A885143ECD4F2492E9D7B8287D5 /* DopeAction.swift */,
+				D153C84576F08F3FFDFF9FA23DFB34C0 /* DopeException.swift */,
+				7C991489072DF5E099E27CA86143DE4C /* DopeLocation.swift */,
+				6727579F5D4A8805B1BC981191FA27D4 /* DopeTracking.swift */,
+				74948AAA168D72AA59BBBC02666CC312 /* Report.swift */,
+				FF7C740C3E47F0EBE025EC22D54CD8DF /* SyncCoordinator.swift */,
+				E85E27A33630684453285E64A2998562 /* SyncOverview.swift */,
+				4E2DDEBA0DF0F324F71185E2A275EE2A /* Telemetry.swift */,
+				9CCC79A1C783DD1EDB4559840749DE7A /* Track.swift */,
+			);
+			name = Synchronization;
+			path = Sources/Synchronization;
 			sourceTree = "<group>";
 		};
 		D35AF013A5F0BAD4F32504907A52519E /* iOS */ = {
@@ -314,45 +348,11 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		DE7A0118E50272C109412D2641B803C9 /* Categories */ = {
+		D420641138EFE23F040604113047EF8B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				393EF6049FC6FCCD835929DF3AC79F11 /* ASIdentifierManager+ASIdentifierManagerHelper.h */,
-				75B7A6605AF94C44C7B0AE6A9635DEC9 /* ASIdentifierManager+ASIdentifierManagerHelper.m */,
-				74B01E3F9A335A3401362D3A9FB8BE04 /* SKPaymentTransactionObserver+Dopamine.h */,
-				7CDC822A86A03F39DC7802C5189899F6 /* SKPaymentTransactionObserver+Dopamine.m */,
-				7CE6562DC4E80174EBB07A746E29EBAD /* UIApplication+Dopamine.h */,
-				9541DF6888806BC57F5A64932769F90D /* UIApplication+Dopamine.m */,
-				7FD7431A9D1EE66C3DFE496D011A55BC /* UIApplicationDelegate+Dopamine.h */,
-				882AA4A301600CAFD1F95C0856950700 /* UIApplicationDelegate+Dopamine.m */,
-				AEF0C256EF50FF128216410B50A4E3E0 /* UIViewController+Dopamine.h */,
-				1C11B138FD6EFAE0849917E5464D8480 /* UIViewController+Dopamine.m */,
 			);
-			name = Categories;
-			path = Sources/Categories;
-			sourceTree = "<group>";
-		};
-		E7E9CC3F726465E4B6BC200BBF40A6FD /* Assets */ = {
-			isa = PBXGroup;
-			children = (
-				75CF66B81A599C9F81A09F4591AEBD28 /* sheen.png */,
-			);
-			name = Assets;
-			path = Sources/Assets;
-			sourceTree = "<group>";
-		};
-		E85F06E2FD5C2A78770BED817B76E80C /* PrefabRewards */ = {
-			isa = PBXGroup;
-			children = (
-				C195DF7F1B8FE25BB0561A09754AE2AE /* DLCandyBar.swift */,
-				FE074FF0FB8A4FCF8C6EAF7A7112492A /* DLConfetti.swift */,
-				DA872FE4012B978B00A40BCD85F1AC28 /* DLEmojiSplosion.swift */,
-				A20454DD0D17031B97483B6DCC0C9C95 /* DLGlow.swift */,
-				E3320D85FA2FD6F1A8C33F48B5A11B54 /* DLShake.swift */,
-				B0E5B3B2CCE356662D8BDE2F4AF43D9E /* DLSheen.swift */,
-			);
-			name = PrefabRewards;
-			path = Sources/PrefabRewards;
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		F163008B2932F2044D47CAA535829C20 /* Products */ = {
@@ -396,26 +396,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		7664A02040BD30432C62E2925A7128B8 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7C35441F8F1AEC4E42A087FE7A6E679C /* ASIdentifierManager+ASIdentifierManagerHelper.h in Headers */,
-				1BC8A741879BBEE0771C6CFD25004293 /* DopamineKit-umbrella.h in Headers */,
-				4D09E1871DAF7839B3DBE6932BDC5432 /* DopamineKit.h in Headers */,
-				F206E8089B32A20EA1A74F51C2672541 /* SKPaymentTransactionObserver+Dopamine.h in Headers */,
-				55320180B2AAE57C49184C8336D55B0D /* SwizzleHelper.h in Headers */,
-				084433C75D4F309F44B3063A02167B2D /* UIApplication+Dopamine.h in Headers */,
-				719741D8D9EEE42105F2C2DC4A4E6AD2 /* UIApplicationDelegate+Dopamine.h in Headers */,
-				2E3D5B16DBE10F6CEEC41EB0B9832A66 /* UIViewController+Dopamine.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		7A8138A77A9C938E9E7F8C4031B65676 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				D9B1026BF205C72B8FDC19D6206D7059 /* Pods-DopamineKit_Example-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BA877B0E6BDEF9BF41D60A49CF6D40C7 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0604E20B2EAA9DE36907D514411DC5CE /* ASIdentifierManager+ASIdentifierManagerHelper.h in Headers */,
+				C2A5B0C03E1AA4EF7391B626D11ABF7A /* DopamineKit-umbrella.h in Headers */,
+				EA4487F3857082D61A31A721D33DE97F /* DopamineKit.h in Headers */,
+				3F86601EB2F3D2313747102494839984 /* SKPaymentTransactionObserver+Dopamine.h in Headers */,
+				0C39FA80DA3F6548CB3544AA439104C5 /* SwizzleHelper.h in Headers */,
+				0679E384621BFD9F53A9FB2B5BC682C8 /* UIApplication+Dopamine.h in Headers */,
+				2B6EDB2280833C4EB8B8425CC34EAF98 /* UIApplicationDelegate+Dopamine.h in Headers */,
+				0A1E476B7E40436E8B2C1CD76A87F985 /* UIViewController+Dopamine.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -430,13 +430,13 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		2180742411B7D5C8BF231F25F1C5FFE4 /* DopamineKit-DopamineKit */ = {
+		923355F212072682B304EFF8719C4DF4 /* DopamineKit-DopamineKit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D7343D13D25C4BE4D52BF3846271B39D /* Build configuration list for PBXNativeTarget "DopamineKit-DopamineKit" */;
+			buildConfigurationList = 7CBE909B1417B754B08D74747182B51C /* Build configuration list for PBXNativeTarget "DopamineKit-DopamineKit" */;
 			buildPhases = (
-				A44F51225E57A0466D1ABD30385D9B07 /* Sources */,
-				3B4CB7C46F22F4D4CDFFCD0F28E4B819 /* Frameworks */,
-				DF5976A97C99392061CBB9B57AC0DE7B /* Resources */,
+				E0829BA9DA2E84DC367957C4BBF7CDFA /* Sources */,
+				8B057BE2D6DB36C11845A11651E2A637 /* Frameworks */,
+				66074F49D539203E870D7C8573D63939 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -447,19 +447,19 @@
 			productReference = 7163D8DB9EB0C1BEA0C4154F25D7F74F /* DopamineKit.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
-		66A0B1A0D890F3268318125BC4BE2D6B /* DopamineKit */ = {
+		A3A039334C12F7C5BCDBB6B411D196DE /* DopamineKit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B095D1AAD423F8E0C444ADB9E5284695 /* Build configuration list for PBXNativeTarget "DopamineKit" */;
+			buildConfigurationList = 936C2487E26E25473FF0681D5780DBF2 /* Build configuration list for PBXNativeTarget "DopamineKit" */;
 			buildPhases = (
-				B53D92CBA12B3D88DA196317E1988773 /* Sources */,
-				D4A9A169019B8E75802477235F1FBB67 /* Frameworks */,
-				59D9BFFBDEC18188BFF4CAA152033A51 /* Resources */,
-				7664A02040BD30432C62E2925A7128B8 /* Headers */,
+				4322030B003F9D860B2199FDF7C581C7 /* Sources */,
+				8DED3EE6106EA42F8A3D26227CC5FA0A /* Frameworks */,
+				A2D4DF09DC77632D405CBD9541455FE2 /* Resources */,
+				BA877B0E6BDEF9BF41D60A49CF6D40C7 /* Headers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				06A3852D2F81AF51A3FBEEDA0A7141EC /* PBXTargetDependency */,
+				07C4166DE484AD620F7FD6ECA9ACAB2E /* PBXTargetDependency */,
 			);
 			name = DopamineKit;
 			productName = DopamineKit;
@@ -522,8 +522,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				66A0B1A0D890F3268318125BC4BE2D6B /* DopamineKit */,
-				2180742411B7D5C8BF231F25F1C5FFE4 /* DopamineKit-DopamineKit */,
+				A3A039334C12F7C5BCDBB6B411D196DE /* DopamineKit */,
+				923355F212072682B304EFF8719C4DF4 /* DopamineKit-DopamineKit */,
 				B0894FD08B8B02C17BADC47B5BEDEDA1 /* Pods-DopamineKit_Example */,
 				F51AB8B652ECFD47269292F3270AD6B5 /* Pods-DopamineKit_Tests */,
 			);
@@ -531,19 +531,19 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		59D9BFFBDEC18188BFF4CAA152033A51 /* Resources */ = {
+		66074F49D539203E870D7C8573D63939 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				94232389A7E664AE9990C07127795B86 /* DopamineKit.bundle in Resources */,
+				4255E1A782A1720014CF2E8665934B77 /* sheen.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DF5976A97C99392061CBB9B57AC0DE7B /* Resources */ = {
+		A2D4DF09DC77632D405CBD9541455FE2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				506FFDA86D33636B3CDEC61DCB8A09F8 /* sheen.png in Resources */,
+				C0409A65C299296FF46E9FD3678AB3EA /* DopamineKit.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -558,10 +558,43 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A44F51225E57A0466D1ABD30385D9B07 /* Sources */ = {
+		4322030B003F9D860B2199FDF7C581C7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D529BE8C6B6429B8D629D41CDC9BD72A /* ASIdentifierManager+ASIdentifierManagerHelper.m in Sources */,
+				9E51EDA67D51414F66447274C8E1B910 /* Cartridge.swift in Sources */,
+				3D7D3D5D9DD68B81CA27ED9CB7150E80 /* DLCandyBar.swift in Sources */,
+				4741703F025073753086912AA296C7E5 /* DLConfetti.swift in Sources */,
+				893C0B133DA499C7A7A07755DD39398B /* DLEmojiSplosion.swift in Sources */,
+				3E10F747C7431642A9D6DCDBDFE3EC6B /* DLGlow.swift in Sources */,
+				007187608724F7290989D92B15F3CFA3 /* DLShake.swift in Sources */,
+				5F3EA75DD333DF2AAF1E4B46DE60FD7F /* DLSheen.swift in Sources */,
+				1AAF7F6087C6F006999A5E5307AA6D62 /* DopamineAPI.swift in Sources */,
+				4974ADD1A2E107FE39983D793F9E6918 /* DopamineConfiguration.swift in Sources */,
+				EAFCD6F847A9951486E322EE5DE144F9 /* DopamineKit-dummy.m in Sources */,
+				C4D82B574A3D248646F07DAAEB99B415 /* DopamineKit.swift in Sources */,
+				B64322306BFFADC1FCD2E2679D3520E0 /* DopamineProperties.swift in Sources */,
+				47FEEBC8B5248D666C45F2ACB22B66B3 /* DopamineVersion.swift in Sources */,
+				FBE76E7CCE01BC491416C561CA997271 /* DopeAction.swift in Sources */,
+				BB4C21E1A1CFA5529A598F664F7D10AE /* DopeException.swift in Sources */,
+				FC340881ACF29B9692EE6A34C2AB17C3 /* DopeLocation.swift in Sources */,
+				FCD4786B039FF0184D75F7AA491812F8 /* DopeLog.swift in Sources */,
+				AD0BB68A360DDE0A23D3AC0678E48E68 /* DopeTracking.swift in Sources */,
+				6667705DAF78548DADF876427694CD83 /* DTMethodSwizzling.m in Sources */,
+				8CCFAD4F579488B251B93ED6BC93CC68 /* Helper.swift in Sources */,
+				3D341C23F6716A2B2B4C57E7B09B9CF2 /* Report.swift in Sources */,
+				9550761661BD16CAFD10ECDCC441CE42 /* sheen.png in Sources */,
+				C749CEEAF6413729ABBD47F2E0A15A23 /* SKPaymentTransactionObserver+Dopamine.m in Sources */,
+				7707E3F030A4788E743B4146EAD7AFDA /* SwizzleHelper.m in Sources */,
+				5721EDFF912B6E1D75BA123CBD90120C /* SyncCoordinator.swift in Sources */,
+				5C59833DB51E5875487D5443B3124455 /* SyncOverview.swift in Sources */,
+				850B0660017DD9094E91F8676991A5D6 /* Telemetry.swift in Sources */,
+				4E51D258737486E8CDF61377A38B9A38 /* Track.swift in Sources */,
+				7D6E85FEF8F4BA7B0A7BFF0D7AFBDF42 /* UIApplication+Dopamine.m in Sources */,
+				F4776BAC4B7F0A87B32DC89F77E26DAE /* UIApplicationDelegate+Dopamine.m in Sources */,
+				8F0B6D1ECFCE7AC12EFD5A5F1899FD34 /* UIViewController+Dopamine.m in Sources */,
+				9C579B170D92BE59336A7B7E60968038 /* VisualizerAPI.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -573,64 +606,48 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B53D92CBA12B3D88DA196317E1988773 /* Sources */ = {
+		E0829BA9DA2E84DC367957C4BBF7CDFA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				77EDC6FE39A0BDEB6615A2CC5A216D43 /* ASIdentifierManager+ASIdentifierManagerHelper.m in Sources */,
-				702691787A48DF70A7CA0F01CA528D6C /* Cartridge.swift in Sources */,
-				E3C22DFF8C4A0534EFEBFBBCC1534D27 /* DLCandyBar.swift in Sources */,
-				09499BE02CCAD1FEDE0327F91C1D552D /* DLConfetti.swift in Sources */,
-				42EFF033F66287022B33F9E7576E0FA5 /* DLEmojiSplosion.swift in Sources */,
-				F841037A94E123F939448C971E0AD60B /* DLGlow.swift in Sources */,
-				822628E0006DC825A39CD69484DD4D13 /* DLShake.swift in Sources */,
-				81E063D8C301AFA2C07D1F93A5E16224 /* DLSheen.swift in Sources */,
-				130C6739BCE0088C0129597F9BC1CDE8 /* DopamineAPI.swift in Sources */,
-				854F4C4E336A7F73C6B0D0DE8430BC51 /* DopamineConfiguration.swift in Sources */,
-				AB4BCAB7F1E2FE30681ABCA849FC2095 /* DopamineKit-dummy.m in Sources */,
-				F60B0D6302F23C494B80867F1A23105C /* DopamineKit.swift in Sources */,
-				B1E639F0CE01754DC8F9FC8565DD52DB /* DopamineVersion.swift in Sources */,
-				96BC933C862267431577FB7E45683D65 /* DopeAction.swift in Sources */,
-				5AD9B9DD7A5DACB414F26397DEF010BD /* DopeException.swift in Sources */,
-				745B4B3FE82BED30AA13216C58C04A74 /* DopeLocation.swift in Sources */,
-				5E109242CCD4A4D13568D1F253212359 /* DopeLog.swift in Sources */,
-				47BB340C8DC6546760BDF391C7C803D0 /* DopeTracking.swift in Sources */,
-				E9B6C4A5D63DA6F72F2C2961AEE6EAD2 /* DTMethodSwizzling.m in Sources */,
-				F1A7F3C70DA9383C4FB6C92E5D69988D /* Helper.swift in Sources */,
-				22AB9ADC01558F41BE17D7F52C3EC168 /* Report.swift in Sources */,
-				048A6BF39F58893C298A058BFF9C8333 /* sheen.png in Sources */,
-				7886D6E7E9E00E711E34835A618202CF /* SKPaymentTransactionObserver+Dopamine.m in Sources */,
-				47C1EDD8A64A93519D1552ACAAFB3D0F /* SwizzleHelper.m in Sources */,
-				9667E7A5B52161EA1E8434ECFE9D4478 /* SyncCoordinator.swift in Sources */,
-				17FEDA08FEC5274BAC1590AF83B3AC31 /* SyncOverview.swift in Sources */,
-				844B12051FBCE2E300565E77 /* DopamineProperties.swift in Sources */,
-				34DB89F654AE36553ACA40844E8CFFFA /* Telemetry.swift in Sources */,
-				CF6A3A87B7706295C18E4734ABCE1169 /* Track.swift in Sources */,
-				699A2E1549B3A4C28D69CEAC884D49BE /* UIApplication+Dopamine.m in Sources */,
-				C356EC8EDB77435139BE796D2941CD6C /* UIApplicationDelegate+Dopamine.m in Sources */,
-				3501D7973076E3480F2182BD56280ECF /* UIViewController+Dopamine.m in Sources */,
-				6706E60289788D980BA54178D69DD00A /* VisualizerAPI.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		06A3852D2F81AF51A3FBEEDA0A7141EC /* PBXTargetDependency */ = {
+		07C4166DE484AD620F7FD6ECA9ACAB2E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "DopamineKit-DopamineKit";
-			target = 2180742411B7D5C8BF231F25F1C5FFE4 /* DopamineKit-DopamineKit */;
-			targetProxy = 7D219B7EA17F095CCDBE6F1B5049BD20 /* PBXContainerItemProxy */;
+			target = 923355F212072682B304EFF8719C4DF4 /* DopamineKit-DopamineKit */;
+			targetProxy = CD41B63BB266B4A2D10F9138F5DCD024 /* PBXContainerItemProxy */;
 		};
 		A8CBBBE3814B4DD7E75E5FB53B297B8A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = DopamineKit;
-			target = 66A0B1A0D890F3268318125BC4BE2D6B /* DopamineKit */;
+			target = A3A039334C12F7C5BCDBB6B411D196DE /* DopamineKit */;
 			targetProxy = BF5F8AE95A8F4150D9650E8A36E92070 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		093B4AA3F79A35583BA302B6A6ECC88A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1EE60C316CE6BE3AFFB843FF64CE1109 /* DopamineKit.xcconfig */;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/DopamineKit";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/DopamineKit/ResourceBundle-DopamineKit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				PRODUCT_NAME = DopamineKit;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
 		0CBEA311340E851E0DC54CAD869C6CCA /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E0318C8FA7B6AE30863D47A061606E3A /* Pods-DopamineKit_Tests.release.xcconfig */;
@@ -666,42 +683,6 @@
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
-		};
-		3A123358FA29ED5F30905040AF296CE7 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E8F657BD1D4D7C07D9D1957677E465AD /* DopamineKit.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/DopamineKit/DopamineKit-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/DopamineKit/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/DopamineKit/DopamineKit.modulemap";
-				MTL_ENABLE_DEBUG_INFO = YES;
-				OTHER_SWIFT_FLAGS = "-DDEBUG";
-				PRODUCT_NAME = DopamineKit;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
 		};
 		46F60EF68BA1BF9593238AA5993BD378 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -741,23 +722,6 @@
 			};
 			name = Release;
 		};
-		5AB0ED1D590D1A10CA78EF7F1ADAE70D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E8F657BD1D4D7C07D9D1957677E465AD /* DopamineKit.xcconfig */;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/DopamineKit";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "Target Support Files/DopamineKit/ResourceBundle-DopamineKit-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				PRODUCT_NAME = DopamineKit;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Debug;
-		};
 		5F0017E97D0D2AC6925303D17E939080 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 288BF5FB588AF286DA9322FAB66617D0 /* Pods-DopamineKit_Tests.debug.xcconfig */;
@@ -793,6 +757,58 @@
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
+		};
+		78B2E904ED15305B546B9EC4A1BFF3B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1EE60C316CE6BE3AFFB843FF64CE1109 /* DopamineKit.xcconfig */;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/DopamineKit";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/DopamineKit/ResourceBundle-DopamineKit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				PRODUCT_NAME = DopamineKit;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+		93E3761D58E799266379B18340E2D3F0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1EE60C316CE6BE3AFFB843FF64CE1109 /* DopamineKit.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/DopamineKit/DopamineKit-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/DopamineKit/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/DopamineKit/DopamineKit.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = DopamineKit;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
 		};
 		97803B46811A9BDB5E70FA1303AFBFFE /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -842,58 +858,6 @@
 				SYMROOT = "${SRCROOT}/../build";
 			};
 			name = Debug;
-		};
-		9EC437B3F0CBA084C94B0AF722FFD0C4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E8F657BD1D4D7C07D9D1957677E465AD /* DopamineKit.xcconfig */;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/DopamineKit";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "Target Support Files/DopamineKit/ResourceBundle-DopamineKit-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				PRODUCT_NAME = DopamineKit;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Release;
-		};
-		A268721F991A7E9C6D4870467135C213 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E8F657BD1D4D7C07D9D1957677E465AD /* DopamineKit.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/DopamineKit/DopamineKit-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/DopamineKit/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/DopamineKit/DopamineKit.modulemap";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = DopamineKit;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
 		};
 		BDD0139D6EB93FA375F887ABD62DAB2E /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -978,6 +942,42 @@
 			};
 			name = Debug;
 		};
+		F6EA9158E80A503687374A2D48E3DA28 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1EE60C316CE6BE3AFFB843FF64CE1109 /* DopamineKit.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/DopamineKit/DopamineKit-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/DopamineKit/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/DopamineKit/DopamineKit.modulemap";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_SWIFT_FLAGS = "-DDEBUG";
+				PRODUCT_NAME = DopamineKit;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -999,11 +999,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B095D1AAD423F8E0C444ADB9E5284695 /* Build configuration list for PBXNativeTarget "DopamineKit" */ = {
+		7CBE909B1417B754B08D74747182B51C /* Build configuration list for PBXNativeTarget "DopamineKit-DopamineKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3A123358FA29ED5F30905040AF296CE7 /* Debug */,
-				A268721F991A7E9C6D4870467135C213 /* Release */,
+				093B4AA3F79A35583BA302B6A6ECC88A /* Debug */,
+				78B2E904ED15305B546B9EC4A1BFF3B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		936C2487E26E25473FF0681D5780DBF2 /* Build configuration list for PBXNativeTarget "DopamineKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F6EA9158E80A503687374A2D48E3DA28 /* Debug */,
+				93E3761D58E799266379B18340E2D3F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1013,15 +1022,6 @@
 			buildConfigurations = (
 				5F0017E97D0D2AC6925303D17E939080 /* Debug */,
 				0CBEA311340E851E0DC54CAD869C6CCA /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D7343D13D25C4BE4D52BF3846271B39D /* Build configuration list for PBXNativeTarget "DopamineKit-DopamineKit" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5AB0ED1D590D1A10CA78EF7F1ADAE70D /* Debug */,
-				9EC437B3F0CBA084C94B0AF722FFD0C4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
