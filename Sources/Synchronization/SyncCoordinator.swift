@@ -31,13 +31,6 @@ public class SyncCoordinator {
                 cartridgeSyncers[actionID] = Cartridge(actionID: actionID)
             }
         }
-        
-        NotificationCenter.default.addObserver(forName: DopamineVersionControl.VersionChangeNotification.name, object: nil, queue: nil) { notification in
-            self.flush()
-            for actionID in DopamineVersionControl.current.reinforcementActionIDs() {
-                self.retrieve(cartridgeFor: actionID).sync()
-            }
-        }
     }
     
     /// Stores a tracked action to be synced
@@ -129,11 +122,17 @@ public class SyncCoordinator {
                 
                 if reportShouldSync {
                     self.reportSyncer.sync() { status in
-                        guard status == 200 || status == 0 else {
+                        if status == 0 {
+                            DopeLog.debug("Report has nothing to sync")
+                        } else if status == 200 {
+                            DopeLog.debug("Report successfully synced")
+                        } else if status == 406 {
+                            DopeLog.debug("Report contained outdated actions. Flushing.")
+                            reportSyncer.erase()
+                        } else {
                             DopeLog.debug("Report failed during sync. Halting sync.")
                             goodProgress = false
                             Telemetry.stopRecordingSync(successfulSync: false)
-                            return
                         }
                     }
                 }

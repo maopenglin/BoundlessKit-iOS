@@ -39,7 +39,7 @@
         
         [VisualizerAPI recordActionWithSenderInstance:sender targetInstance:target selectorObj:action event:event];
         
-        if ([[[DopamineConfigurationControl current] customEvents] objectForKey:[@[NSStringFromClass([sender class]), NSStringFromClass([target class]), selectorName] componentsJoinedByString:@"-"]]) {
+        if ([[[DopamineConfiguration current] customEvents] objectForKey:[@[NSStringFromClass([sender class]), NSStringFromClass([target class]), selectorName] componentsJoinedByString:@"-"]]) {
             [DopamineKit track:@"UIApplication" metaData:@{@"tag": @"sendAction",
                                                            @"sender": NSStringFromClass([sender class]),
                                                            @"target": NSStringFromClass([target class]),

@@ -33,7 +33,7 @@ internal class Report : NSObject, NSCoding {
     private init(sizeToSync: Int = 15, timerStartsAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
         if let savedReportData = defaults.object(forKey: defaultsKey) as? Data {
             if let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData) as? Report,
-                savedReport.customerVersion == DopamineVersionControl.current.versionID
+                savedReport.customerVersion == DopamineVersion.current.versionID
             {
                 self.customerVersion = savedReport.customerVersion
                 self.reportedActions = savedReport.reportedActions
@@ -46,7 +46,7 @@ internal class Report : NSObject, NSCoding {
                 DopeLog.debug("Erased outdated report.")
             }
         }
-        self.customerVersion = DopamineVersionControl.current.versionID
+        self.customerVersion = DopamineVersion.current.versionID
         self.reportedActions = []
         self.timerStartedAt = timerStartsAt
         self.timerExpiresIn = timerExpiresIn
@@ -130,7 +130,7 @@ internal class Report : NSObject, NSCoding {
     ///
     private func batchIsFull() -> Bool {
         let count = reportedActions.count
-        let isBatchSizeReached = count >= DopamineConfigurationControl.current.reportBatchSize
+        let isBatchSizeReached = count >= DopamineConfiguration.current.reportBatchSize
         //        DopeLog.debugLog("Report has \(count)/\(sizeToSync) actions so the size \(isSize ? "will" : "won't") trigger a sync...")
         return isBatchSizeReached
     }

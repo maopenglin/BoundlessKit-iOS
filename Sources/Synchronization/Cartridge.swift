@@ -40,7 +40,7 @@ internal class Cartridge : NSObject, NSCoding {
     ///     - timerExpiresIn: The timer length for a sync timer.
     ///
     init(actionID: String, initialSize: Int=0, timerStartsAt: Int64 = 0, timerExpiresIn: Int64 = 0) {
-        self.customerVersion = DopamineVersionControl.current.versionID
+        self.customerVersion = DopamineVersion.current.versionID
         self.actionID = actionID
         self.reinforcementDecisions = []
         super.init()

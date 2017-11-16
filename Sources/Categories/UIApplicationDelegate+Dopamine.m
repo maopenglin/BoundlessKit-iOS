@@ -54,7 +54,7 @@ static NSArray* delegateSubclasses = nil;
     if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
         [self swizzled_applicationDidBecomeActive:application];
     
-    if ([[DopamineConfigurationControl current] applicationState]) {
+    if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"didBecomeActive",
                                                           @"classname": NSStringFromClass([self class]),
                                                           @"time": [DopeTracking trackStartTimeFor:[self description]]
@@ -69,7 +69,7 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (void) swizzled_applicationWillResignActive:(UIApplication*)application {
-    if ([[DopamineConfigurationControl current] applicationState]) {
+    if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"willResignActive",
                                                           @"classname": NSStringFromClass([self class]),
                                                           @"time": [DopeTracking timeTrackedFor:[self description]]

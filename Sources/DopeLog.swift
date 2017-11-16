@@ -19,7 +19,7 @@ import Foundation
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
     @objc public static func print(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
-        guard DopamineConfigurationControl.current.consoleLoggingEnabled else {
+        guard DopamineConfiguration.current.consoleLoggingEnabled else {
             return
         }
         var functionSignature:String = function
@@ -40,7 +40,7 @@ import Foundation
     ///
     @objc public static func debug(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
         #if DEBUG
-            guard DopamineConfigurationControl.current.consoleLoggingEnabled else {
+            guard DopamineConfiguration.current.consoleLoggingEnabled else {
                 return
             }
             var functionSignature:String = function

@@ -7,41 +7,10 @@
 
 import Foundation
 
-public class DopamineConfigurationControl : NSObject {
-    
-    fileprivate static var _current: DopamineConfiguration?
-    @objc public static var current: DopamineConfiguration {
-        if let _current = _current {
-            return _current
-        } else {
-            _current = retrieve()
-            return _current!
-        }
-    }
-    
-    public static func set(_ config: DopamineConfiguration) {
-        DopamineConfiguration.defaults.set(config, forKey: DopamineConfiguration.defaultsKey)
-        _current = config
-    }
-    
-    public static func retrieve() -> DopamineConfiguration {
-        if let savedConfigData = DopamineConfiguration.defaults.object(forKey: DopamineConfiguration.defaultsKey) as? Data,
-            let savedConfig = NSKeyedUnarchiver.unarchiveObject(with: savedConfigData) as? DopamineConfiguration {
-            DopeLog.debug("using saved dopamine configuration")
-            return savedConfig
-        } else {
-            DopeLog.debug("using standard dopamine configuration")
-            return DopamineConfiguration.standard
-        }
-    }
-    
-}
-
 @objc
 public class DopamineConfiguration : NSObject, NSCoding {
     
-    fileprivate static let defaults = UserDefaults.standard
-    fileprivate static let defaultsKey = "DopamineConfiguration"
+    @objc public static var current: DopamineConfiguration { get { return DopaminePropertiesControl.current.configuration } }
     
     @objc public var configID: String?
     
@@ -99,6 +68,12 @@ public class DopamineConfiguration : NSObject, NSCoding {
         self.advertiserID = advertiserID
         self.consoleLoggingEnabled = consoleLoggingEnabled
         super.init()
+    }
+    
+    static func initStandard(with configID: String?) -> DopamineConfiguration {
+        let standard = DopamineConfiguration.standard
+        standard.configID = configID
+        return standard
     }
     
     public func encode(with aCoder: NSCoder) {

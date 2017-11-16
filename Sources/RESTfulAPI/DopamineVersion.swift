@@ -7,53 +7,10 @@
 
 import Foundation
 
-public class DopamineVersionControl : NSObject {
-    
-    static let VersionChangeNotification = Notification(name: NSNotification.Name(rawValue: "DopamineVersionControl.DidSetNotification"), object: nil)
-    
-    fileprivate static var _current: DopamineVersion?
-    @objc public static var current: DopamineVersion {
-        if let _current = _current {
-            return _current
-        } else {
-            _current = retrieve()
-            return _current!
-        }
-    }
-    
-    public static func set(_ version: DopamineVersion) {
-        if current.versionID != version.versionID {
-//            SyncCoordinator.shared.flush()
-            DopeLog.debug("DopamineVersion updated!")
-            NotificationCenter.default.post(VersionChangeNotification)
-        }
-        
-        DopamineVersion.defaults.set(version, forKey: DopamineVersion.defaultsKey)
-        _current = version
-        
-//        for actionID in (version.reinforcementMappings).keys{
-//            Cartridge(actionID: actionID).sync()
-//        }
-    }
-    
-    public static func retrieve() -> DopamineVersion {
-        if let savedVersionData = DopamineVersion.defaults.object(forKey: DopamineVersion.defaultsKey) as? Data,
-            let savedVersion = NSKeyedUnarchiver.unarchiveObject(with: savedVersionData) as? DopamineVersion {
-            print("using saved dopamine version")
-            return savedVersion
-        } else {
-            print("using standard dopamine version")
-            return DopamineVersion.standard
-        }
-    }
-    
-}
-
 @objc
 public class DopamineVersion : NSObject, NSCoding {
     
-    fileprivate static let defaults = UserDefaults.standard
-    fileprivate static let defaultsKey = "DopamineVersion"
+    public static var current: DopamineVersion { get { return DopaminePropertiesControl.current.version } }
     
     @objc public var versionID: String?
     @objc fileprivate var reinforcementMappings: [String:Any]
@@ -84,10 +41,6 @@ public class DopamineVersion : NSObject, NSCoding {
     
     static var standard: DopamineVersion {
         return DopamineVersion(versionID: nil, reinforcementMappings: [:])
-    }
-    
-    public func set() {
-        DopamineVersionControl.set(self)
     }
     
     public func reinforcementActionIDs() -> [String] {
