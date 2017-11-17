@@ -150,7 +150,7 @@ internal class Report : NSObject, NSCoding {
     /// - parameters:
     ///     - action: The action to be stored.
     ///
-    func add(action: DopeAction) {
+    func add(_ action: DopeAction) {
         reportedActions.append(action)
         Report.set(self)
     }

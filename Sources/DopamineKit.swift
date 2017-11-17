@@ -42,7 +42,7 @@ open class DopamineKit : NSObject {
         // store the action to be synced
         DispatchQueue.global(qos: .background).async {
             let action = DopeAction(actionID: actionID, metaData:metaData)
-            syncCoordinator.store(trackedAction: action)
+            syncCoordinator.store(track: action)
 //            DopeLog.debug("tracked:\(actionID) with metadata:\(String(describing: metaData))")
         }
     }
@@ -70,7 +70,7 @@ open class DopamineKit : NSObject {
         })
         
         // store the action to be synced
-        syncCoordinator.store(reportedAction: action)
+        syncCoordinator.store(report: action)
     }
     
 }

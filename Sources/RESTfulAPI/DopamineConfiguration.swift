@@ -96,41 +96,43 @@ public class DopamineConfiguration : NSObject, NSCoding {
     }
     
     required public convenience init?(coder aDecoder: NSCoder) {
-        if let configID = aDecoder.value(forKey: #keyPath(DopamineConfiguration.configID)) as? String?,
-            let reinforcementEnabled = aDecoder.value(forKey: #keyPath(DopamineConfiguration.reinforcementEnabled)) as? Bool,
-            let triggerEnabled = aDecoder.value(forKey: #keyPath(DopamineConfiguration.triggerEnabled)) as? Bool,
-            let trackingEnabled = aDecoder.value(forKey: #keyPath(DopamineConfiguration.trackingEnabled)) as? Bool,
-            let applicationState = aDecoder.value(forKey: #keyPath(DopamineConfiguration.applicationState)) as? Bool,
-            let applicationViews = aDecoder.value(forKey: #keyPath(DopamineConfiguration.applicationViews)) as? Bool,
-            let customViews = aDecoder.value(forKey: #keyPath(DopamineConfiguration.customViews)) as? [String: Any],
-            let customEvents = aDecoder.value(forKey: #keyPath(DopamineConfiguration.customEvents)) as? [String: Any],
-            let notificationObservations = aDecoder.value(forKey: #keyPath(DopamineConfiguration.notificationObservations)) as? Bool,
-            let storekitObservations = aDecoder.value(forKey: #keyPath(DopamineConfiguration.storekitObservations)) as? Bool,
-            let locationObservations = aDecoder.value(forKey: #keyPath(DopamineConfiguration.locationObservations)) as? Bool,
-            let trackBatchSize = aDecoder.value(forKey: #keyPath(DopamineConfiguration.trackBatchSize)) as? Int,
-            let reportBatchSize = aDecoder.value(forKey: #keyPath(DopamineConfiguration.reportBatchSize)) as? Int,
-            let integrationMethod = aDecoder.value(forKey: #keyPath(DopamineConfiguration.integrationMethod)) as? String,
-            let advertiserID = aDecoder.value(forKey: #keyPath(DopamineConfiguration.configID)) as? Bool,
-            let consoleLoggingEnabled = aDecoder.value(forKey: #keyPath(DopamineConfiguration.configID)) as? Bool {
+        if let configID = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.configID)) as? String?,
+//            let reinforcementEnabled = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.reinforcementEnabled)) as? Bool,
+//            let triggerEnabled = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.triggerEnabled)) as? Bool,
+//            let trackingEnabled = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.trackingEnabled)) as? Bool,
+//            let applicationState = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.applicationState)) as? Bool,
+//            let applicationViews = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.applicationViews)) as? Bool,
+            let customViews = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.customViews)) as? [String: Any],
+            let customEvents = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.customEvents)) as? [String: Any],
+//            let notificationObservations = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.notificationObservations)) as? Bool,
+//            let storekitObservations = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.storekitObservations)) as? Bool,
+//            let locationObservations = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.locationObservations)) as? Bool,
+//            let trackBatchSize = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.trackBatchSize)) as? Int,
+//            let reportBatchSize = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.reportBatchSize)) as? Int,
+            let integrationMethod = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.integrationMethod)) as? String
+//            let advertiserID = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.advertiserID)) as? Bool,
+//            let consoleLoggingEnabled = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.consoleLoggingEnabled)) as? Bool
+        {
             self.init(
                 configID: configID,
-                reinforcementEnabled: reinforcementEnabled,
-                triggerEnabled: triggerEnabled,
-                trackingEnabled: trackingEnabled,
-                applicationState: applicationState,
-                applicationViews: applicationViews,
+                reinforcementEnabled: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.reinforcementEnabled)),
+                triggerEnabled: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.triggerEnabled)),
+                trackingEnabled: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.trackingEnabled)),
+                applicationState: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.applicationState)),
+                applicationViews: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.applicationViews)),
                 customViews: customViews,
                 customEvents: customEvents,
-                notificationObservations: notificationObservations,
-                storekitObservations: storekitObservations,
-                locationObservations: locationObservations,
-                trackBatchSize: trackBatchSize,
-                reportBatchSize: reportBatchSize,
+                notificationObservations: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.notificationObservations)),
+                storekitObservations: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.storekitObservations)),
+                locationObservations: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.locationObservations)),
+                trackBatchSize: aDecoder.decodeInteger(forKey: #keyPath(DopamineConfiguration.trackBatchSize)),
+                reportBatchSize: aDecoder.decodeInteger(forKey: #keyPath(DopamineConfiguration.reportBatchSize)),
                 integrationMethod: integrationMethod,
-                advertiserID: advertiserID,
-                consoleLoggingEnabled: consoleLoggingEnabled
+                advertiserID: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.advertiserID)),
+                consoleLoggingEnabled: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.consoleLoggingEnabled))
             )
         } else {
+            print("Invalid DopamineConfiguration saved to user defaults.")
             return nil
         }
     }

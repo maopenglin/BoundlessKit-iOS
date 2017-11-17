@@ -145,7 +145,7 @@ internal class Track : NSObject, NSCoding {
     /// - parameters:
     ///     - action: The action to be stored.
     ///
-    func add(action: DopeAction) {
+    func add(_ action: DopeAction) {
         let dispatchGroup = DispatchGroup()
         dispatchQueue.async(group: dispatchGroup) {
             if DopamineConfiguration.current.locationObservations {

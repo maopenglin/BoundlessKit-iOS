@@ -9,7 +9,7 @@ import Foundation
 
 internal class DopaminePropertiesControl : NSObject {
     
-    fileprivate static var _current: DopamineProperties?
+    private static var _current: DopamineProperties?
     static var current: DopamineProperties {
         if let _current = _current {
             return _current
@@ -20,16 +20,11 @@ internal class DopaminePropertiesControl : NSObject {
     }
     
     public static func retrieve() -> DopamineProperties {
-        if let testProperties = loadTest() {
-            return testProperties
-        } else if let defaultsProperties = loadDefaults() {
-            return defaultsProperties
-        } else {
-            return loadPlist()
-        }
+        return loadTest() ?? loadDefaults() ?? loadPlist()
     }
     
-    fileprivate static func loadTest() -> DopamineProperties? {
+    private static func loadTest() -> DopamineProperties? {
+        print("1")
         if let propertiesDictionary = DopamineKit.testCredentials {
             return DopamineProperties.convert(propertiesDictionary: propertiesDictionary)
         } else {
@@ -37,29 +32,38 @@ internal class DopaminePropertiesControl : NSObject {
         }
     }
     
-    fileprivate static func loadPlist() -> DopamineProperties {
-        let propertiesFile = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist")!
-        let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as! [String: Any]
-        return DopamineProperties.convert(propertiesDictionary: propertiesDictionary)!
-    }
-    
-    fileprivate static func loadDefaults() -> DopamineProperties? {
-        if let savedPropertiesData = DopamineProperties.defaults.object(forKey: DopamineProperties.defaultsKey) as? Data,
-            let savedProperties = NSKeyedUnarchiver.unarchiveObject(with: savedPropertiesData) as? DopamineProperties {
-            DopeLog.debug("Using saved dopamine properties")
+    private static func loadDefaults() -> DopamineProperties? {
+        print("2")
+        if let savedProperties = DopamineProperties.get() {
+            print("Using saved dopamine properties")
             return savedProperties
         } else {
             return nil
         }
     }
     
+    private static func loadPlist() -> DopamineProperties {
+        print("3")
+        let propertiesFile = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist")!
+        let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as! [String: Any]
+        let properties = DopamineProperties.convert(propertiesDictionary: propertiesDictionary)!
+        DopamineProperties.set(properties)
+        return properties
+    }
+    
 }
 
 internal class DopamineProperties : NSObject, NSCoding {
     
-    fileprivate static let defaults = UserDefaults.standard
-    fileprivate static let defaultsKey = "DopamineProperties"
-    fileprivate static func set(_ properties: DopamineProperties) { defaults.set(properties, forKey: defaultsKey) }
+    private static let defaults = UserDefaults.standard
+    private static let defaultsKey = "DopamineProperties"
+    fileprivate static func set(_ properties: DopamineProperties) { defaults.set(NSKeyedArchiver.archivedData(withRootObject: properties), forKey: defaultsKey) }
+    fileprivate static func get() -> DopamineProperties? {
+        if let savedPropertiesData = defaults.object(forKey: defaultsKey) as? Data,
+            let savedProperties = NSKeyedUnarchiver.unarchiveObject(with: savedPropertiesData) as? DopamineProperties {
+            return savedProperties
+        } else { return nil }
+    }
     
     static var current: DopamineProperties { get { return DopaminePropertiesControl.current } }
     
@@ -105,14 +109,21 @@ internal class DopamineProperties : NSObject, NSCoding {
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
-        if let appID = aDecoder.value(forKey: #keyPath(DopamineProperties.appID)) as? String,
-            let version = aDecoder.value(forKey: #keyPath(DopamineProperties.version)) as? DopamineVersion,
-            let configuration = aDecoder.value(forKey: #keyPath(DopamineProperties.configuration)) as? DopamineConfiguration,
-            let inProduction = aDecoder.value(forKey: #keyPath(DopamineProperties.inProduction)) as? Bool,
-            let developmentSecret = aDecoder.value(forKey: #keyPath(DopamineProperties.developmentSecret)) as? String,
-            let productionSecret = aDecoder.value(forKey: #keyPath(DopamineProperties.productionSecret)) as? String {
-            self.init(appID: appID, version: version, configuration: configuration, inProduction: inProduction, developmentSecret: developmentSecret, productionSecret: productionSecret)
+        if let appID = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.appID)) as? String,
+            let version = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.version)) as? DopamineVersion,
+            let configuration = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.configuration)) as? DopamineConfiguration,
+            let developmentSecret = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.developmentSecret)) as? String,
+            let productionSecret = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.productionSecret)) as? String {
+            self.init(
+                appID: appID,
+                version: version,
+                configuration: configuration,
+                inProduction: aDecoder.decodeBool(forKey: #keyPath(DopamineProperties.inProduction)),
+                developmentSecret: developmentSecret,
+                productionSecret: productionSecret
+            )
         } else {
+            print("Invalid DopamineProperties saved to user defaults.")
             return nil
         }
     }
@@ -167,8 +178,6 @@ extension DopamineProperties {
                 developmentSecret: developmentSecret,
                 productionSecret: productionSecret
             )
-        } else {
-            return nil
-        }
+        } else { return nil }
     }
 }

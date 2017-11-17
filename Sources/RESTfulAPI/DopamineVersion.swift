@@ -23,13 +23,13 @@ public class DopamineVersion : NSObject, NSCoding {
     }
     
     required public convenience init?(coder aDecoder: NSCoder) {
-        if let versionID = aDecoder.value(forKey: #keyPath(DopamineVersion.versionID)) as? String?,
-            let reinforcementMappings = aDecoder.value(forKey: #keyPath(DopamineVersion.versionID)) as? [String:[String:Any]] {
+        if let versionID = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? String? {
             self.init(
                 versionID: versionID,
-                reinforcementMappings: reinforcementMappings
+                reinforcementMappings: aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? [String:[String:Any]] ?? [:]
             )
         } else {
+            print("Invalid DopamineVersion saved to user defaults.")
             return nil
         }
     }

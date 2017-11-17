@@ -25,8 +25,8 @@ public class SyncCoordinator {
     /// - parameters:
     ///     - trackedAction: A tracked action.
     ///
-    internal func store(trackedAction: DopeAction) {
-        Track.current.add(action: trackedAction)
+    internal func store(track action: DopeAction) {
+        Track.current.add(action)
         self.performSync()
     }
     
@@ -35,8 +35,8 @@ public class SyncCoordinator {
     /// - parameters:
     ///     - reportedAction: A reinforced action.
     ///
-    internal func store(reportedAction: DopeAction) {
-        Report.current.add(action: reportedAction)
+    internal func store(report action: DopeAction) {
+        Report.current.add(action)
         performSync()
     }
     
