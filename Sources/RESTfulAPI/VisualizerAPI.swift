@@ -49,6 +49,18 @@ public class VisualizerAPI : NSObject {
     }
     
     @objc
+    public func boot() {
+        var payload = DopamineProperties.current.apiCredentials
+        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
+        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+        payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
+        payload["currentConfig"] = DopamineConfiguration.current.configID ?? "nil"
+        send(call: .boot, with: payload){ response in
+            DopeLog.debug("Boot got response:\(response)")
+        }
+    }
+    
+    @objc
     public static func recordEvent(touch: UITouch) {
         DispatchQueue.global().async {
             if let touchView = touch.view {
@@ -444,9 +456,9 @@ public class VisualizerAPI : NSObject {
     ///     - completion: A closure with a JSON formatted dictionary.
     ///
     private func send(call type: CallType, with payload: [String:Any], timeout:TimeInterval = 3.0, completion: @escaping ([String: Any]) -> Void) {
-        if true {
-            return
-        }
+//        if true {
+//            return
+//        }
         guard let url = URL(string: type.path) else {
             DopeLog.debug("Invalid url <\(type.path)>")
             return
@@ -493,35 +505,35 @@ public class VisualizerAPI : NSObject {
                         //                    DopeLog.debugLog("✅\(type.pathExtenstion) call got response:\(responseDict.debugDescription)")
                         DopeLog.debug("✅\(type.path) call got response with status:\(responseDict["status"] ?? "unknown")")
                         
-                        if (type == .boot) || (type == .submit  && self.tracesQueue.operationCount <= 1) {
-                            if (type == .boot && responseDict["status"] as? Int == 205) || (type == .submit && responseDict["status"] as? Int == 200) {
-                                if let apiMappings = responseDict["mappings"] as? [[String:Any]] {
-                                    var tempDict = [String : [String : Any]]()
-                                    for mappings in apiMappings {
-                                        if let sender = mappings["sender"],
-                                            let target = mappings["target"],
-                                            let selector = mappings["selector"]
-                                        {
-                                            tempDict["\(sender)-\(target)-\(selector)"] = mappings
-                                        } else if let actionID = mappings["actionID"] as? String,
-                                            let reinforcements = mappings["reinforcements"] as? [[String: Any]] {
-                                            tempDict[actionID] = ["actionID":actionID, "reinforcements":reinforcements]
-                                        } else {
-                                            DopeLog.debug("Invalid mapping")
-                                        }
-                                    }
-                                    if type == .submit {
-                                        VisualizerAPI.shared.visualizerMappings = tempDict
-                                    } else { // .boot
-                                        if let newVersionID = responseDict["newVersionID"] as? String {
-                                            DopamineProperties.current.version = DopamineVersion(versionID: newVersionID, reinforcementMappings: tempDict)
-                                        } else {
-                                            DopeLog.debug("Missing 'newVersionID'")
-                                        }
-                                    }
-                                }
-                            }
-                        }
+//                        if (type == .boot) || (type == .submit  && self.tracesQueue.operationCount <= 1) {
+//                            if (type == .boot && responseDict["status"] as? Int == 205) || (type == .submit && responseDict["status"] as? Int == 200) {
+//                                if let apiMappings = responseDict["mappings"] as? [[String:Any]] {
+//                                    var tempDict = [String : [String : Any]]()
+//                                    for mappings in apiMappings {
+//                                        if let sender = mappings["sender"],
+//                                            let target = mappings["target"],
+//                                            let selector = mappings["selector"]
+//                                        {
+//                                            tempDict["\(sender)-\(target)-\(selector)"] = mappings
+//                                        } else if let actionID = mappings["actionID"] as? String,
+//                                            let reinforcements = mappings["reinforcements"] as? [[String: Any]] {
+//                                            tempDict[actionID] = ["actionID":actionID, "reinforcements":reinforcements]
+//                                        } else {
+//                                            DopeLog.debug("Invalid mapping")
+//                                        }
+//                                    }
+//                                    if type == .submit {
+//                                        VisualizerAPI.shared.visualizerMappings = tempDict
+//                                    } else { // .boot
+//                                        if let newVersionID = responseDict["newVersionID"] as? String {
+//                                            DopamineProperties.current.version = DopamineVersion(versionID: newVersionID, reinforcementMappings: tempDict)
+//                                        } else {
+//                                            DopeLog.debug("Missing 'newVersionID'")
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
                         
                     } catch {
                         let message = "❌ Error reading \(type.path) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))

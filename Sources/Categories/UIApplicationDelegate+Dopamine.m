@@ -64,7 +64,8 @@ static NSArray* delegateSubclasses = nil;
 #ifdef DEBUG
     [VisualizerAPI promptPairing];
 #endif
-    [[VisualizerAPI shared] retrieveRewards];
+//    [[VisualizerAPI shared] retrieveRewards];
+    [[VisualizerAPI shared] boot];
     
 }
 
