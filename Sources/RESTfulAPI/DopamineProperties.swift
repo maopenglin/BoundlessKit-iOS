@@ -81,7 +81,7 @@ internal class DopamineProperties : NSObject, NSCoding {
     
     init(appID: String, versionID: String?, configID: String?, inProduction: Bool, developmentSecret: String, productionSecret: String) {
         self.appID = appID
-        self.version = DopamineVersion(versionID: versionID, reinforcementMappings: [:])
+        self.version = DopamineVersion(versionID: versionID, mappings: [:])
         self.configuration = DopamineConfiguration.initStandard(with: configID) //TO-DO: get from /boot
         self.inProduction = inProduction
         self.developmentSecret = developmentSecret

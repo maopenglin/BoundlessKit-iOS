@@ -169,13 +169,13 @@ public class DopamineConfiguration : NSObject, NSCoding {
         standardConfig["advertiserID"] = true
         standardConfig["consoleLoggingEnabled"] = true
         
-        return DopamineConfiguration.convert(configDictionary: standardConfig)!
+        return DopamineConfiguration.convert(from: standardConfig)!
     }
     
 }
 
 extension DopamineConfiguration {
-    static func convert(configDictionary: [String: Any]) -> DopamineConfiguration? {
+    static func convert(from configDictionary: [String: Any]) -> DopamineConfiguration? {
         if let configID = configDictionary["configID"] as? String?,
             let reinforcementEnabled = configDictionary["reinforcementEnabled"] as? Bool,
             let triggerEnabled = configDictionary["triggerEnabled"] as? Bool,

@@ -14,6 +14,12 @@ public class Helper: NSObject {
     
     @objc public static var lastTouchLocationInUIWindow: CGPoint = CGPoint.zero
     
+    public static var initialBoot: Date? = {
+        let defaultsKey = "DopamineKit.isInitialBoot"
+        defer { UserDefaults.standard.set(Date(), forKey: defaultsKey) }
+        return UserDefaults.standard.object(forKey: defaultsKey) as? Date
+    }()
+    
 }
 
 

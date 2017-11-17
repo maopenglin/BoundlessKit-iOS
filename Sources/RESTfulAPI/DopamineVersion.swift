@@ -13,12 +13,12 @@ public class DopamineVersion : NSObject, NSCoding {
     public static var current: DopamineVersion { get { return DopaminePropertiesControl.current.version } }
     
     @objc public var versionID: String?
-    @objc fileprivate var reinforcementMappings: [String:Any]
+    @objc fileprivate var mappings: [String:Any]
     
     init(versionID: String?,
-         reinforcementMappings: [String:[String:Any]]) {
+         mappings: [String:[String:Any]]) {
         self.versionID = versionID
-        self.reinforcementMappings = reinforcementMappings
+        self.mappings = mappings
         super.init()
     }
     
@@ -26,7 +26,7 @@ public class DopamineVersion : NSObject, NSCoding {
         if let versionID = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? String? {
             self.init(
                 versionID: versionID,
-                reinforcementMappings: aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? [String:[String:Any]] ?? [:]
+                mappings: aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? [String:[String:Any]] ?? [:]
             )
         } else {
             print("Invalid DopamineVersion saved to user defaults.")
@@ -36,15 +36,15 @@ public class DopamineVersion : NSObject, NSCoding {
     
     public func encode(with aCoder: NSCoder) {
         aCoder.encode(versionID, forKey: #keyPath(DopamineVersion.versionID))
-        aCoder.encode(reinforcementMappings, forKey: #keyPath(DopamineVersion.reinforcementMappings))
+        aCoder.encode(mappings, forKey: #keyPath(DopamineVersion.mappings))
     }
     
     static var standard: DopamineVersion {
-        return DopamineVersion(versionID: nil, reinforcementMappings: [:])
+        return DopamineVersion(versionID: nil, mappings: [:])
     }
     
     public func reinforcementActionIDs() -> [String] {
-        return reinforcementMappings.keys.sorted()
+        return mappings.keys.sorted()
     }
     
     public func reinforcementFor(sender: String, target: String, selector: String, completion: @escaping ([String:Any]) -> ()) {
@@ -58,7 +58,7 @@ public class DopamineVersion : NSObject, NSCoding {
             if let reinforcements = reinforcementParameters["reinforcements"] as? [[String:Any]] {
                 completion(reinforcements.selectRandom())
             }
-        } else if let reinforcementParameters = reinforcementMappings[actionID] as? [String:Any] {
+        } else if let reinforcementParameters = mappings[actionID] as? [String:Any] {
             DopeLog.debug("Found reinforcement for <\(actionID)>")
             if let actionID = reinforcementParameters["actionID"] as? String,
                 let reinforcements = reinforcementParameters["reinforcements"] as? [[String:Any]] {
@@ -77,5 +77,14 @@ public class DopamineVersion : NSObject, NSCoding {
         } else {
 //            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
         }
+    }
+}
+
+public extension DopamineVersion {
+    public static func convert(from versionDictionary: [String: Any]) -> DopamineVersion? {
+        if let versionID = versionDictionary["versionID"] as? String?,
+            let mappings = versionDictionary["mappings"] as? [String:[String: Any]] {
+            return DopamineVersion.init(versionID: versionID, mappings: mappings)
+        } else { return nil }
     }
 }

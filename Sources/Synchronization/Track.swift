@@ -145,24 +145,47 @@ internal class Track : NSObject, NSCoding {
     /// - parameters:
     ///     - action: The action to be stored.
     ///
+    let dispatchGroup = DispatchGroup()
+    let operationQueue = OperationQueue()
     func add(_ action: DopeAction) {
-        let dispatchGroup = DispatchGroup()
-        dispatchQueue.async(group: dispatchGroup) {
+        if operationQueue.maxConcurrentOperationCount != 1 {
+            operationQueue.maxConcurrentOperationCount = 1
+        }
+        operationQueue.addOperation {
             if DopamineConfiguration.current.locationObservations {
-                dispatchGroup.enter()
                 DopeLocation.shared.getLocation { location in
-                    if let location = location {
-                        action.addMetaData(["location": location])
+                    self.operationQueue.addOperation {
+                        if let location = location {
+                            action.addMetaData(["location": location])
+                        }
+                        self.trackedActions.append(action)
+                        Track.set(self)
+                        DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
                     }
-                    dispatchGroup.leave()
                 }
-            }
-            dispatchGroup.notify(queue: self.dispatchQueue) {
+            } else {
                 self.trackedActions.append(action)
                 Track.set(self)
                 DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
             }
         }
+        
+//        dispatchQueue.async(group: dispatchGroup) {
+//            if DopamineConfiguration.current.locationObservations {
+//                self.dispatchGroup.enter()
+//                DopeLocation.shared.getLocation { location in
+//                    if let location = location {
+//                        action.addMetaData(["location": location])
+//                    }
+//                    self.dispatchGroup.leave()
+//                }
+//            }
+//            self.dispatchGroup.notify(queue: self.dispatchQueue) {
+//                self.trackedActions.append(action)
+//                Track.set(self)
+//                DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
+//            }
+//        }
     }
     
     /// Sends tracked actions over the DopamineAPI

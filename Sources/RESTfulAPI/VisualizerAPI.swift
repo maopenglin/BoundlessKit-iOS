@@ -20,6 +20,7 @@ public class VisualizerAPI : NSObject {
         case .accept: return "https://dashboard-api.usedopamine.com/codeless/pair/customer/accept/"
         case .submit: return "https://dashboard-api.usedopamine.com/codeless/visualizer/customer/submit/"
         case .boot: return "https://api.usedopamine.com/v5/app/boot"
+//        case .boot: return "http://10.0.1.158/v5/app/boot:8008"
             }
         }
     }
@@ -53,10 +54,22 @@ public class VisualizerAPI : NSObject {
         var payload = DopamineProperties.current.apiCredentials
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
         payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+        payload["inProduction"] = DopamineProperties.current.inProduction
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
         payload["currentConfig"] = DopamineConfiguration.current.configID ?? "nil"
+        payload["initialBoot"] = (Helper.initialBoot == nil)
         send(call: .boot, with: payload){ response in
             DopeLog.debug("Boot got response:\(response)")
+            if let configDict = response["config"] as? [String: Any] {
+                DopeLog.debug("Converted config:\(DopamineConfiguration.convert(from: configDict))")
+            } else {
+                DopeLog.debug("No config")
+            }
+            if let versionDict = response["version"] as? [String: Any] {
+                DopeLog.debug("Converted version:\(DopamineVersion.convert(from: versionDict))")
+            } else {
+                DopeLog.debug("No version")
+            }
         }
     }
     
@@ -526,7 +539,7 @@ public class VisualizerAPI : NSObject {
 //                                        VisualizerAPI.shared.visualizerMappings = tempDict
 //                                    } else { // .boot
 //                                        if let newVersionID = responseDict["newVersionID"] as? String {
-//                                            DopamineProperties.current.version = DopamineVersion(versionID: newVersionID, reinforcementMappings: tempDict)
+//                                            DopamineProperties.current.version = DopamineVersion(versionID: newVersionID, mappings: tempDict)
 //                                        } else {
 //                                            DopeLog.debug("Missing 'newVersionID'")
 //                                        }
@@ -544,7 +557,7 @@ public class VisualizerAPI : NSObject {
                 })
                 
                 // send request
-//                DopeLog.debugLog("Sending \(type.pathExtenstion) api call with payload: \(payload.description)")
+                DopeLog.debug("Sending \(type.path) api call with payload: \(payload.description)")
                 task.resume()
                 
             } catch {
