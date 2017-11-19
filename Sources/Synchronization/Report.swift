@@ -9,40 +9,27 @@
 import Foundation
 
 @objc
-internal class Report : NSObject, NSCoding {
+internal class Report : UserDefaultsSingleton {
     
-    fileprivate static var _current: Report?
+    fileprivate static var _current: Report? =  { return UserDefaults.dopamine.get() }()
+    {
+        didSet {
+            UserDefaults.dopamine.save(_current)
+        }
+    }
     static var current: Report {
         get {
-            if let _current = _current {
-                return _current
+            if let _ = _current {
             } else {
-                _current = get()
-                return _current!
+                _current = Report()
             }
+            
+            return _current!
         }
     }
-    
-    private static let defaults = UserDefaults.standard
-    private static let defaultsKey = "DopamineReport"
-    
-    fileprivate static func get() -> Report {
-        if let savedReportData = Report.defaults.object(forKey: Report.defaultsKey) as? Data,
-            let savedReport = NSKeyedUnarchiver.unarchiveObject(with: savedReportData) as? Report {
-            return savedReport
-        } else {
-            let newReport = Report()
-            Report.set(newReport)
-            return newReport
-        }
-    }
-    fileprivate static func remove() { defaults.removeObject(forKey: defaultsKey) }
-    fileprivate static func set(_ report: Report) { defaults.set(NSKeyedArchiver.archivedData(withRootObject: report), forKey: defaultsKey) }
     
     static func flush() {
-        remove()
         _current = Report()
-        set(_current!)
     }
     
     func clean() {
@@ -90,7 +77,7 @@ internal class Report : NSObject, NSCoding {
     
     /// Encodes a report and saves it to NSUserDefaults
     ///
-    func encode(with aCoder: NSCoder) {
+    override func encode(with aCoder: NSCoder) {
         aCoder.encode(versionID, forKey: #keyPath(Report.versionID))
         aCoder.encode(reportedActions, forKey: #keyPath(Report.reportedActions))
         aCoder.encode(timerStartedAt, forKey: #keyPath(Report.timerStartedAt))
@@ -112,7 +99,7 @@ internal class Report : NSObject, NSCoding {
         if let timerExpiresIn = timerExpiresIn {
             self.timerExpiresIn = timerExpiresIn
         }
-        Report.set(self)
+        Report._current = self
     }
     
     /// Check whether the report has been triggered for a sync
@@ -152,7 +139,7 @@ internal class Report : NSObject, NSCoding {
     ///
     func add(_ action: DopeAction) {
         reportedActions.append(action)
-        Report.set(self)
+        Report._current = self
     }
     
     /// Sends reinforced actions over the DopamineAPI

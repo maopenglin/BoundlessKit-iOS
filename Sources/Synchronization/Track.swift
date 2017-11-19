@@ -9,35 +9,23 @@
 import Foundation
 
 @objc
-internal class Track : NSObject, NSCoding {
+internal class Track : UserDefaultsSingleton {
     
-    fileprivate static var _current: Track?
+    fileprivate static var _current: Track? =  { return UserDefaults.dopamine.get() }()
+    {
+        didSet {
+            UserDefaults.dopamine.save(_current)
+        }
+    }
     static var current: Track {
         get {
-            if let _current = _current {
-                return _current
+            if let _ = _current {
             } else {
-                _current = get()
-                return _current!
+                _current = Track()
             }
+            return _current!
         }
     }
-    
-    private static let defaults = UserDefaults.standard
-    private static let defaultsKey = "DopamineTrack"
-    
-    fileprivate static func get() -> Track {
-        if let savedTrackData = Track.defaults.object(forKey: Track.defaultsKey) as? Data,
-            let savedTrack = NSKeyedUnarchiver.unarchiveObject(with: savedTrackData) as? Track {
-            return savedTrack
-        } else {
-            let newTrack = Track()
-            Track.set(newTrack)
-            return newTrack
-        }
-    }
-    fileprivate static func remove() { defaults.removeObject(forKey: defaultsKey) }
-    fileprivate static func set(_ track: Track) { defaults.set(NSKeyedArchiver.archivedData(withRootObject: track), forKey: defaultsKey) }
     
 //    private let dispatchGroup = DispatchGroup()
     private let dispatchQueue = DispatchQueue(label: "Dopamine.Track")
@@ -60,6 +48,7 @@ internal class Track : NSObject, NSCoding {
         self.timerStartedAt = timerStartedAt
         self.timerExpiresIn = timerExpiresIn
         super.init()
+        operationQueue.maxConcurrentOperationCount = 1
     }
     
     /// Decodes a saved track from NSUserDefaults
@@ -78,7 +67,7 @@ internal class Track : NSObject, NSCoding {
     
     /// Encodes a track and saves it to NSUserDefaults
     ///
-    func encode(with aCoder: NSCoder) {
+    override func encode(with aCoder: NSCoder) {
         aCoder.encode(trackedActions, forKey: #keyPath(Track.trackedActions))
         aCoder.encode(timerStartedAt, forKey: #keyPath(Track.timerStartedAt))
         aCoder.encode(timerExpiresIn, forKey: #keyPath(Track.timerExpiresIn))
@@ -99,15 +88,13 @@ internal class Track : NSObject, NSCoding {
         if let timerExpiresIn = timerExpiresIn {
             self.timerExpiresIn = timerExpiresIn
         }
-        Track.set(self)
+        Track._current = self
     }
     
     /// Clears the saved track sync triggers from NSUserDefaults
     ///
     static func flush() {
-        remove()
         _current = Track()
-        set(_current!)
     }
     
     /// Check whether the track has been triggered for a sync
@@ -148,9 +135,6 @@ internal class Track : NSObject, NSCoding {
     let dispatchGroup = DispatchGroup()
     let operationQueue = OperationQueue()
     func add(_ action: DopeAction) {
-        if operationQueue.maxConcurrentOperationCount != 1 {
-            operationQueue.maxConcurrentOperationCount = 1
-        }
         operationQueue.addOperation {
             if DopamineConfiguration.current.locationObservations {
                 DopeLocation.shared.getLocation { location in
@@ -159,13 +143,19 @@ internal class Track : NSObject, NSCoding {
                             action.addMetaData(["location": location])
                         }
                         self.trackedActions.append(action)
-                        Track.set(self)
+//                        Track.set(self)
+                        if self.operationQueue.operationCount == 1 {
+                            Track._current = self
+                        }
                         DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
                     }
                 }
             } else {
                 self.trackedActions.append(action)
-                Track.set(self)
+//                Track.set(self)
+                if self.operationQueue.operationCount == 1 {
+                    Track._current = self
+                }
                 DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
             }
         }

@@ -31,6 +31,9 @@ internal class DopamineProperties : UserDefaultsSingleton {
             
             return _current!
         }
+        set {
+            _current = newValue
+        }
     }
     
     let clientOS = "iOS"
@@ -41,7 +44,7 @@ internal class DopamineProperties : UserDefaultsSingleton {
     @objc let appID: String
     var version: DopamineVersion { get { return DopamineVersion.current} set { DopamineVersion.current = newValue } }
     var configuration: DopamineConfiguration { get { return DopamineConfiguration.current} set { DopamineConfiguration.current = newValue } }
-    @objc var inProduction: Bool// { didSet { DopamineProperties.set(self) } }
+    @objc var inProduction: Bool { didSet { DopamineProperties.current = self } }
     @objc let developmentSecret: String
     @objc let productionSecret: String
     

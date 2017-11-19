@@ -58,7 +58,7 @@ static NSArray* delegateSubclasses = nil;
     [VisualizerAPI promptPairing];
 #endif
     //    [[VisualizerAPI shared] retrieveRewards];
-    [VisualizerAPI boot];
+//    [VisualizerAPI boot];
     
     if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"didBecomeActive",
