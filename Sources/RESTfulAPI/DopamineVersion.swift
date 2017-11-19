@@ -8,29 +8,27 @@
 import Foundation
 
 @objc
-public class DopamineVersion : NSObject, NSCoding {
+public class DopamineVersion : UserDefaultsSingleton {
     
-    fileprivate static var _current: DopamineVersion?
+    private static var _current: DopamineVersion? =  { return UserDefaults.dopamine.get() }()
+    {
+        didSet {
+            UserDefaults.dopamine.save(_current)
+        }
+    }
     public static var current: DopamineVersion {
         get {
-            if let _current = _current {
-                return _current
-            } else if let saved: DopamineVersion = UserDefaults.dopamine.get(key: defaultsKey) {
-                _current = saved
-                return _current!
+            if let _ = _current {
+            } else {
+                _current = DopamineVersion.standard
             }
-            else {
-                self.current = DopamineVersion.standard
-                return _current!
-            }
+            
+            return _current!
         }
         set {
             _current = newValue
-            UserDefaults.dopamine.save(_current, forKey: defaultsKey)
         }
     }
-    
-    private static let defaultsKey = "DopamineVersion"
     
     @objc public var versionID: String?
     @objc fileprivate var mappings: [String:Any]
@@ -56,7 +54,7 @@ public class DopamineVersion : NSObject, NSCoding {
         }
     }
     
-    public func encode(with aCoder: NSCoder) {
+    public override func encode(with aCoder: NSCoder) {
         aCoder.encode(versionID, forKey: #keyPath(DopamineVersion.versionID))
         aCoder.encode(mappings, forKey: #keyPath(DopamineVersion.mappings))
         print("Saved DopamineVersion to user defaults.")

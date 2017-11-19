@@ -21,21 +21,26 @@ public class Helper: NSObject {
     
 }
 
-internal class UserDefaultsSingleton {
+open class UserDefaultsSingleton : NSObject, NSCoding {
+    override init() { super.init() }
+    open func encode(with aCoder: NSCoder) {}
+    public required init?(coder aDecoder: NSCoder) {}
+    
     static func defaultsKey() -> String {
         return NSStringFromClass(self)
     }
 }
 
-internal extension UserDefaults {
+public extension UserDefaults {
+    
     static var dopamine: UserDefaults {
         return UserDefaults(suiteName: "com.usedopamine.dopaminekit")!
     }
     
     func get<T>(key: String) -> T? {
         if let data = self.value(forKey: key) as? Data,
-            let obj = NSKeyedUnarchiver.unarchiveObject(with: data) as? T {
-            return obj
+            let t = NSKeyedUnarchiver.unarchiveObject(with: data) as? T {
+            return t
         } else { return nil }
     }
     
@@ -50,6 +55,7 @@ internal extension UserDefaults {
     func save<T:UserDefaultsSingleton>(_ value: T?) {
         save(value, forKey: T.defaultsKey())
     }
+    
 }
 
 

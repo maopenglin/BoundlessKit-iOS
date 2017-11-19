@@ -8,29 +8,27 @@
 import Foundation
 
 @objc
-public class DopamineConfiguration : NSObject, NSCoding {
+public class DopamineConfiguration : UserDefaultsSingleton  {
     
-    fileprivate static var _current: DopamineConfiguration?
+    private static var _current: DopamineConfiguration? = { return UserDefaults.dopamine.get() }()
+    {
+        didSet {
+            UserDefaults.dopamine.save(_current)
+        }
+    }
     @objc public static var current: DopamineConfiguration {
         get {
-            if let _current = _current {
-                return _current
-            } else if let saved: DopamineConfiguration = UserDefaults.dopamine.get(key: defaultsKey) {
-                _current = saved
-                return _current!
+            if let _ = _current {
+            } else {
+                _current = DopamineConfiguration.standard
             }
-            else {
-                self.current = DopamineConfiguration.standard
-                return _current!
-            }
+            
+            return _current!
         }
         set {
             _current = newValue
-            UserDefaults.dopamine.save(_current, forKey: defaultsKey)
         }
     }
-    
-    private static let defaultsKey = "DopamineConfiguration"
     
     @objc public var configID: String?
     
@@ -96,7 +94,7 @@ public class DopamineConfiguration : NSObject, NSCoding {
         return standard
     }
     
-    public func encode(with aCoder: NSCoder) {
+    public override func encode(with aCoder: NSCoder) {
         aCoder.encode(configID, forKey: #keyPath(DopamineConfiguration.configID))
         aCoder.encode(reinforcementEnabled, forKey: #keyPath(DopamineConfiguration.reinforcementEnabled))
         aCoder.encode(triggerEnabled, forKey: #keyPath(DopamineConfiguration.triggerEnabled))

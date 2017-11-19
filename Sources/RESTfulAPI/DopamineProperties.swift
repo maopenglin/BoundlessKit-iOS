@@ -7,25 +7,31 @@
 
 import Foundation
 
-internal class DopamineProperties : NSObject, NSCoding {
+internal class DopamineProperties : UserDefaultsSingleton {
     
-    private static var _current: DopamineProperties?
-    static var current: DopamineProperties {
-        get {
-            if let _current = _current {
-                return _current
-            } else {
-                _current = loadTest() ?? loadDefaults() ?? loadPlist()
-                return _current!
-            }
-        }
-        set {
-            _current = newValue
-            UserDefaults.dopamine.save(_current, forKey: defaultsKey)
+    private static var _current: DopamineProperties? = { return UserDefaults.dopamine.get() }()
+    {
+        didSet {
+            UserDefaults.dopamine.save(_current)
         }
     }
-    
-    private static let defaultsKey = "DopamineProperties"
+    static var current: DopamineProperties {
+        get {
+            if let _ = _current {
+            } else if
+                let propertiesDictionary = DopamineKit.testCredentials,
+                let properties = DopamineProperties.convert(from: propertiesDictionary) {
+                _current = properties
+            } else {
+                let propertiesFile = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist")!
+                let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as! [String: Any]
+                let properties = DopamineProperties.convert(from: propertiesDictionary)!
+                _current = properties
+            }
+            
+            return _current!
+        }
+    }
     
     let clientOS = "iOS"
     let clientOSVersion = UIDevice.current.systemVersion
@@ -59,7 +65,7 @@ internal class DopamineProperties : NSObject, NSCoding {
         _ = self.configuration
     }
     
-    func encode(with aCoder: NSCoder) {
+    override func encode(with aCoder: NSCoder) {
         aCoder.encode(appID, forKey: #keyPath(DopamineProperties.appID))
         aCoder.encode(inProduction, forKey: #keyPath(DopamineProperties.inProduction))
         aCoder.encode(developmentSecret, forKey: #keyPath(DopamineProperties.developmentSecret))
@@ -134,28 +140,5 @@ extension DopamineProperties {
                 productionSecret: productionSecret
             )
         } else { return nil }
-    }
-    
-    
-    fileprivate static func loadTest() -> DopamineProperties? {
-        print("1")
-        if let propertiesDictionary = DopamineKit.testCredentials {
-            return DopamineProperties.convert(from: propertiesDictionary)
-        } else {
-            return nil
-        }
-    }
-    
-    fileprivate static func loadDefaults() -> DopamineProperties? {
-        print("2")
-        return UserDefaults.dopamine.get(key: defaultsKey)
-    }
-    
-    fileprivate static func loadPlist() -> DopamineProperties {
-        print("3")
-        let propertiesFile = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist")!
-        let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as! [String: Any]
-        let properties = DopamineProperties.convert(from: propertiesDictionary)!
-        return properties
     }
 }
