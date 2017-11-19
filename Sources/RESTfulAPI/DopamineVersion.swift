@@ -73,8 +73,8 @@ public class DopamineVersion : UserDefaultsSingleton {
     }
     
     public func reinforcementFor(actionID: String, completion: @escaping ([String:Any]) -> ()) {
-        if VisualizerAPI.shared.visualizerMappings != nil,
-            let reinforcementParameters = VisualizerAPI.shared.visualizerMappings![actionID] {
+        if CodelessAPI.shared.visualizerMappings != nil,
+            let reinforcementParameters = CodelessAPI.shared.visualizerMappings![actionID] {
             DopeLog.debug("Found visualizer reinforcement for <\(actionID)>")
             if let reinforcements = reinforcementParameters["reinforcements"] as? [[String:Any]] {
                 completion(reinforcements.selectRandom())

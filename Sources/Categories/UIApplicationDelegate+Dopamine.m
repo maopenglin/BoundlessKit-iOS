@@ -55,10 +55,10 @@ static NSArray* delegateSubclasses = nil;
         [self swizzled_applicationDidBecomeActive:application];
     
 #ifdef DEBUG
-    [VisualizerAPI promptPairing];
+    [CodelessAPI promptPairing];
 #endif
-    //    [[VisualizerAPI shared] retrieveRewards];
-//    [VisualizerAPI boot];
+    //    [[CodelessAPI shared] retrieveRewards];
+//    [CodelessAPI boot];
     
     if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"didBecomeActive",

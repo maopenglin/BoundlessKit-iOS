@@ -24,7 +24,7 @@
     if (touch != nil) {
         CGPoint local = [touch locationInView:[touch view]];
         Helper.lastTouchLocationInUIWindow = [[touch view] convertPoint:local toView:nil];
-        [VisualizerAPI recordEventWithTouch:touch];
+        [CodelessAPI recordEventWithTouch:touch];
     }
 
     if ([self respondsToSelector:@selector(swizzled_sendEvent:)])
@@ -37,7 +37,7 @@
     // Sometimes this method proxies through to its internal method. We want to ignore those calls.
     if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
         
-        [VisualizerAPI recordActionWithSenderInstance:sender targetInstance:target selectorObj:action event:event];
+        [CodelessAPI recordActionWithSenderInstance:sender targetInstance:target selectorObj:action event:event];
         
         if ([[[DopamineConfiguration current] customEvents] objectForKey:[@[NSStringFromClass([sender class]), NSStringFromClass([target class]), selectorName] componentsJoinedByString:@"-"]]) {
             [DopamineKit track:@"UIApplication" metaData:@{@"tag": @"sendAction",

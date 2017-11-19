@@ -1,5 +1,5 @@
 //
-//  VisualizerAPI.swift
+//  CodelessAPI.swift
 //  Pods
 //
 //  Created by Akash Desai on 9/9/17.
@@ -9,9 +9,9 @@
 import Foundation
 
 @objc
-public class VisualizerAPI : NSObject {
+public class CodelessAPI : NSObject {
     
-    /// Valid API actions appeneded to the VisualizerAPI URL
+    /// Valid API actions appeneded to the CodelessAPI URL
     ///
     internal enum CallType{
         case identify, accept, submit, boot
@@ -26,7 +26,7 @@ public class VisualizerAPI : NSObject {
     }
     
     @objc
-    public static let shared = VisualizerAPI()
+    public static let shared = CodelessAPI()
     
     private static let clientSDKVersion = Bundle(for: DopamineAPI.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     private static let clientOS = "iOS"
@@ -39,14 +39,6 @@ public class VisualizerAPI : NSObject {
     private override init() {
         super.init()
         tracesQueue.maxConcurrentOperationCount = 1
-    }
-    
-    @objc
-    public func retrieveRewards() {
-        var payload = DopamineProperties.current.apiCredentials
-        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
-        send(call: .boot, with: payload){ _ in }
     }
     
     @objc
@@ -185,7 +177,7 @@ public class VisualizerAPI : NSObject {
                     payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                     shared.send(call: .submit, with: payload){ response in
                         if response["status"] as? Int != 200 {
-                            VisualizerAPI.connectionID = nil
+                            CodelessAPI.connectionID = nil
                         }
                     }
                 }
@@ -331,7 +323,7 @@ public class VisualizerAPI : NSObject {
                 }
                 shared.send(call: .submit, with: payload){ response in
                     if response["status"] as? Int != 200 {
-                        VisualizerAPI.connectionID = nil
+                        CodelessAPI.connectionID = nil
                     }
                 }
             }
@@ -423,7 +415,7 @@ public class VisualizerAPI : NSObject {
                     if let connectionID = response["connectionUUID"] as? String {
                         let connectedRestoredAlert = UIAlertController(title: "Visualizer Pairing", message: "Connection restored", preferredStyle: .alert)
                         connectedRestoredAlert.addAction( UIAlertAction(title: "Ok", style: .default, handler: { _ in
-                            VisualizerAPI.connectionID = connectionID
+                            CodelessAPI.connectionID = connectionID
                         }))
                         UIWindow.presentTopLevelAlert(alertController: connectedRestoredAlert)
                     }
@@ -448,7 +440,7 @@ public class VisualizerAPI : NSObject {
             payload["connectionUUID"] = connectionID
             shared.send(call: .accept, with: payload) {response in
                 if response["status"] as? Int == 200 {
-                    VisualizerAPI.connectionID = connectionID
+                    CodelessAPI.connectionID = connectionID
                 }
             }
         }))
@@ -462,7 +454,7 @@ public class VisualizerAPI : NSObject {
     }
     
     
-    /// This function sends a request to the VisualizerAPI
+    /// This function sends a request to the CodelessAPI
     ///
     /// - parameters:
     ///     - callType: The type of call to send.
@@ -538,7 +530,7 @@ public class VisualizerAPI : NSObject {
 //                                        }
 //                                    }
 //                                    if type == .submit {
-//                                        VisualizerAPI.shared.visualizerMappings = tempDict
+//                                        CodelessAPI.shared.visualizerMappings = tempDict
 //                                    } else { // .boot
 //                                        if let newVersionID = responseDict["newVersionID"] as? String {
 //                                            DopamineProperties.current.version = DopamineVersion(versionID: newVersionID, mappings: tempDict)

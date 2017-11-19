@@ -39,6 +39,17 @@ public extension UserDefaults {
         }
     }
     
+    func archive(_ value: Any?, forKey key: String) {
+        if let value = value {
+            self.setValue(NSKeyedArchiver.archivedData(withRootObject: value), forKey: key)
+        } else {
+            self.setValue(value, forKey: key)
+        }
+    }
+    
+    func archive<T:UserDefaultsSingleton>(_ value: T?) {
+        archive(value, forKey: T.defaultsKey())
+    }
     
     func unarchive<T>(key: String) -> T? {
         if let data = self.value(forKey: key) as? Data,
@@ -47,16 +58,8 @@ public extension UserDefaults {
         } else { return nil }
     }
     
-    func archive(_ value: Any?, forKey key: String) {
-        self.setValue((value != nil) ? NSKeyedArchiver.archivedData(withRootObject: value!) as Any? : value, forKey: key)
-    }
-    
     func unarchive<T:UserDefaultsSingleton>() -> T? {
         return unarchive(key: T.defaultsKey())
-    }
-    
-    func archive<T:UserDefaultsSingleton>(_ value: T?) {
-        archive(value, forKey: T.defaultsKey())
     }
     
 }
