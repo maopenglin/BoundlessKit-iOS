@@ -111,9 +111,8 @@ public class SyncCoordinator {
                             DopeLog.debug("Report has nothing to sync")
                         } else if status == 200 {
                             DopeLog.debug("Report successfully synced")
-                        } else if status == 406 {
-                            DopeLog.debug("Report contained outdated actions. Flushing.")
-                            Report.flush()
+                        } else if status == 400 {
+                            DopeLog.debug("Flushed outdated actions.")
                         } else {
                             DopeLog.debug("Report failed during sync. Halting sync.")
                             goodProgress = false

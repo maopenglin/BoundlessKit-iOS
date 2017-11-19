@@ -212,7 +212,7 @@ public class DopamineAPI : NSObject{
             })
             
             // send request
-//            DopeLog.debugLog("Sending \(type.path) api call with payload: \(payload.description)")
+            DopeLog.debug("Sending \(type.path) api call with payload: \(payload.description)")
             task.resume()
             
         } catch {

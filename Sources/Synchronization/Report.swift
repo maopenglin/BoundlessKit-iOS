@@ -164,13 +164,13 @@ internal class Report : UserDefaultsSingleton {
                 DopeLog.debug("Sending \(self.reportedActions.count) reported actions...")
                 DopamineAPI.report(self.reportedActions, completion: { response in
                     defer { self.syncInProgress = false }
-                    if let responseStatusCode = response["status"] as? Int {
-                        if responseStatusCode == 200 {
+                    if let status = response["status"] as? Int {
+                        if status == 200 {
                             self.clean()
-                        } else if responseStatusCode == 406 {
+                        } else if status == 400 {
                             Report.flush()
                         }
-                        completion(responseStatusCode)
+                        completion(status)
                     } else {
                         completion(404)
                     }

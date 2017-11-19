@@ -208,13 +208,13 @@ internal class Track : UserDefaultsSingleton {
                 DopeLog.debug("Sending \(self.trackedActions.count) tracked actions...")
                 DopamineAPI.track(self.trackedActions) { response in
                     defer { syncFinished() }
-                    if let responseStatusCode = response["status"] as? Int {
-                        if responseStatusCode == 200 {
+                    if let status = response["status"] as? Int {
+                        if status == 200 {
                             DopeLog.debug("Sent \(self.trackedActions.count) tracked actions!")
                             self.trackedActions.removeAll()
                             self.updateTriggers()
                         }
-                        completion(responseStatusCode)
+                        completion(status)
                     } else {
                         completion(404)
                     }

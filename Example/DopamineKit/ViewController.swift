@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     
     @objc func action1Performed(){
         // Reinforce the action to make it sticky!!
-        DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {
+        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
             reinforcement in
                 // Update UI to display reinforcement decision on screen for learning purposes
                 self.responseLabel.text = reinforcement
