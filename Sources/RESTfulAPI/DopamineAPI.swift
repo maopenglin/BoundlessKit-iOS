@@ -39,7 +39,7 @@ public class DopamineAPI : NSObject{
     ///
     internal static func track(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
         // create dict with credentials
-        var payload = DopaminePropertiesControl.current.apiCredentials
+        var payload = DopamineProperties.current.apiCredentials
         
         // get JSON formatted actions
         var trackedActionsJSONArray = Array<Any>()
@@ -61,7 +61,7 @@ public class DopamineAPI : NSObject{
     ///     - completion: A closure to handle the JSON formatted response.
     ///
     internal static func report(_ actions: [DopeAction], completion: @escaping ([String:Any]) -> ()){
-        var payload = DopaminePropertiesControl.current.apiCredentials
+        var payload = DopamineProperties.current.apiCredentials
         
         var reinforcedActionsArray = Array<Any>()
         for action in actions{
@@ -82,7 +82,7 @@ public class DopamineAPI : NSObject{
     ///     - completion: A closure to handle the JSON formatted response.
     ///
     internal static func refresh(_ actionID: String, completion: @escaping ([String:Any]) -> ()){
-        var payload = DopaminePropertiesControl.current.apiCredentials
+        var payload = DopamineProperties.current.apiCredentials
         
         payload["actionID"] = actionID
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
@@ -100,7 +100,7 @@ public class DopamineAPI : NSObject{
     ///     - completion: A closure to handle the JSON formatted response.
     ///
     internal static func sync( syncOverviews: [SyncOverview], dopeExceptions: [DopeException], completion: @escaping ([String:Any]) -> ()){
-        var payload = DopaminePropertiesControl.current.apiCredentials
+        var payload = DopamineProperties.current.apiCredentials
         
         var syncOverviewJSONArray: [Any] = []
         for syncOverview in syncOverviews {

@@ -54,18 +54,18 @@ static NSArray* delegateSubclasses = nil;
     if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
         [self swizzled_applicationDidBecomeActive:application];
     
+#ifdef DEBUG
+    [VisualizerAPI promptPairing];
+#endif
+    //    [[VisualizerAPI shared] retrieveRewards];
+    [VisualizerAPI boot];
+    
     if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"didBecomeActive",
                                                           @"classname": NSStringFromClass([self class]),
                                                           @"time": [DopeTracking trackStartTimeFor:[self description]]
                                                           }];
     }
-    
-#ifdef DEBUG
-    [VisualizerAPI promptPairing];
-#endif
-//    [[VisualizerAPI shared] retrieveRewards];
-    [[VisualizerAPI shared] boot];
     
 }
 

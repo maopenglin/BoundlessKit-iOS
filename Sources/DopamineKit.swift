@@ -36,6 +36,7 @@ open class DopamineKit : NSObject {
     ///                  Defaults to `nil`.
     ///
     @objc open static func track(_ actionID: String, metaData: [String: Any]? = nil) {
+        print("Tracking enabled:\(DopamineConfiguration.current.trackingEnabled)")
         guard DopamineConfiguration.current.trackingEnabled else {
             return
         }

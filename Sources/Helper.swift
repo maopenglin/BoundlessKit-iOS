@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import CoreData
 
 @objc
 public class Helper: NSObject {
@@ -20,6 +19,37 @@ public class Helper: NSObject {
         return UserDefaults.standard.object(forKey: defaultsKey) as? Date
     }()
     
+}
+
+internal class UserDefaultsSingleton {
+    static func defaultsKey() -> String {
+        return NSStringFromClass(self)
+    }
+}
+
+internal extension UserDefaults {
+    static var dopamine: UserDefaults {
+        return UserDefaults(suiteName: "com.usedopamine.dopaminekit")!
+    }
+    
+    func get<T>(key: String) -> T? {
+        if let data = self.value(forKey: key) as? Data,
+            let obj = NSKeyedUnarchiver.unarchiveObject(with: data) as? T {
+            return obj
+        } else { return nil }
+    }
+    
+    func save(_ value: Any?, forKey key: String) {
+        self.setValue((value != nil) ? NSKeyedArchiver.archivedData(withRootObject: value!) as Any? : value, forKey: key)
+    }
+    
+    func get<T:UserDefaultsSingleton>() -> T? {
+        return get(key: T.defaultsKey())
+    }
+    
+    func save<T:UserDefaultsSingleton>(_ value: T?) {
+        save(value, forKey: T.defaultsKey())
+    }
 }
 
 

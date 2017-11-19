@@ -7,65 +7,25 @@
 
 import Foundation
 
-internal class DopaminePropertiesControl : NSObject {
+internal class DopamineProperties : NSObject, NSCoding {
     
     private static var _current: DopamineProperties?
     static var current: DopamineProperties {
-        if let _current = _current {
-            return _current
-        } else {
-            _current = retrieve()
-            return _current!
+        get {
+            if let _current = _current {
+                return _current
+            } else {
+                _current = loadTest() ?? loadDefaults() ?? loadPlist()
+                return _current!
+            }
+        }
+        set {
+            _current = newValue
+            UserDefaults.dopamine.save(_current, forKey: defaultsKey)
         }
     }
     
-    public static func retrieve() -> DopamineProperties {
-        return loadTest() ?? loadDefaults() ?? loadPlist()
-    }
-    
-    private static func loadTest() -> DopamineProperties? {
-        print("1")
-        if let propertiesDictionary = DopamineKit.testCredentials {
-            return DopamineProperties.convert(propertiesDictionary: propertiesDictionary)
-        } else {
-            return nil
-        }
-    }
-    
-    private static func loadDefaults() -> DopamineProperties? {
-        print("2")
-        if let savedProperties = DopamineProperties.get() {
-            print("Using saved dopamine properties")
-            return savedProperties
-        } else {
-            return nil
-        }
-    }
-    
-    private static func loadPlist() -> DopamineProperties {
-        print("3")
-        let propertiesFile = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist")!
-        let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as! [String: Any]
-        let properties = DopamineProperties.convert(propertiesDictionary: propertiesDictionary)!
-        DopamineProperties.set(properties)
-        return properties
-    }
-    
-}
-
-internal class DopamineProperties : NSObject, NSCoding {
-    
-    private static let defaults = UserDefaults.standard
     private static let defaultsKey = "DopamineProperties"
-    fileprivate static func set(_ properties: DopamineProperties) { defaults.set(NSKeyedArchiver.archivedData(withRootObject: properties), forKey: defaultsKey) }
-    fileprivate static func get() -> DopamineProperties? {
-        if let savedPropertiesData = defaults.object(forKey: defaultsKey) as? Data,
-            let savedProperties = NSKeyedUnarchiver.unarchiveObject(with: savedPropertiesData) as? DopamineProperties {
-            return savedProperties
-        } else { return nil }
-    }
-    
-    static var current: DopamineProperties { get { return DopaminePropertiesControl.current } }
     
     let clientOS = "iOS"
     let clientOSVersion = UIDevice.current.systemVersion
@@ -73,36 +33,34 @@ internal class DopamineProperties : NSObject, NSCoding {
     let clientBuild = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     @objc let appID: String
-    @objc var version: DopamineVersion { didSet { DopamineProperties.set(self); SyncCoordinator.shared.flush()  } }
-    @objc var configuration: DopamineConfiguration { didSet { DopamineProperties.set(self) } }
-    @objc var inProduction: Bool { didSet { DopamineProperties.set(self) } }
+    var version: DopamineVersion { get { return DopamineVersion.current} set { DopamineVersion.current = newValue } }
+    var configuration: DopamineConfiguration { get { return DopamineConfiguration.current} set { DopamineConfiguration.current = newValue } }
+    @objc var inProduction: Bool// { didSet { DopamineProperties.set(self) } }
     @objc let developmentSecret: String
     @objc let productionSecret: String
     
     init(appID: String, versionID: String?, configID: String?, inProduction: Bool, developmentSecret: String, productionSecret: String) {
         self.appID = appID
-        self.version = DopamineVersion(versionID: versionID, mappings: [:])
-        self.configuration = DopamineConfiguration.initStandard(with: configID) //TO-DO: get from /boot
         self.inProduction = inProduction
         self.developmentSecret = developmentSecret
         self.productionSecret = productionSecret
         super.init()
+        self.version = DopamineVersion(versionID: versionID, mappings: [:])
+        self.configuration = DopamineConfiguration.initStandard(with: configID)
     }
     
-    init(appID: String, version: DopamineVersion, configuration: DopamineConfiguration, inProduction: Bool, developmentSecret: String, productionSecret: String) {
+    init(appID: String, inProduction: Bool, developmentSecret: String, productionSecret: String) {
         self.appID = appID
-        self.version = version
-        self.configuration = configuration
         self.inProduction = inProduction
         self.developmentSecret = developmentSecret
         self.productionSecret = productionSecret
         super.init()
+        _ = self.version
+        _ = self.configuration
     }
     
     func encode(with aCoder: NSCoder) {
         aCoder.encode(appID, forKey: #keyPath(DopamineProperties.appID))
-        aCoder.encode(version, forKey: #keyPath(DopamineProperties.version))
-        aCoder.encode(configuration, forKey: #keyPath(DopamineProperties.configuration))
         aCoder.encode(inProduction, forKey: #keyPath(DopamineProperties.inProduction))
         aCoder.encode(developmentSecret, forKey: #keyPath(DopamineProperties.developmentSecret))
         aCoder.encode(productionSecret, forKey: #keyPath(DopamineProperties.productionSecret))
@@ -110,14 +68,11 @@ internal class DopamineProperties : NSObject, NSCoding {
     
     required convenience init?(coder aDecoder: NSCoder) {
         if let appID = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.appID)) as? String,
-            let version = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.version)) as? DopamineVersion,
-            let configuration = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.configuration)) as? DopamineConfiguration,
             let developmentSecret = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.developmentSecret)) as? String,
             let productionSecret = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.productionSecret)) as? String {
+            print("Found DopamineProperties saved in user defaults.")
             self.init(
                 appID: appID,
-                version: version,
-                configuration: configuration,
                 inProduction: aDecoder.decodeBool(forKey: #keyPath(DopamineProperties.inProduction)),
                 developmentSecret: developmentSecret,
                 productionSecret: productionSecret
@@ -135,7 +90,7 @@ internal class DopamineProperties : NSObject, NSCoding {
                  "clientBuild": clientBuild,
                  "primaryIdentity": primaryIdentity,
                  "appID": appID,
-                 "versionID": version.versionID ?? "",
+                 "versionID": version.versionID ?? "nil",
                  "secret": inProduction ? productionSecret : developmentSecret
         ]
     }()
@@ -165,7 +120,7 @@ internal class DopamineProperties : NSObject, NSCoding {
 }
 
 extension DopamineProperties {
-    static func convert(propertiesDictionary: [String: Any]) -> DopamineProperties? {
+    static func convert(from propertiesDictionary: [String: Any]) -> DopamineProperties? {
         if let appID = propertiesDictionary["appID"] as? String,
             let inProduction = propertiesDictionary["inProduction"] as? Bool,
             let productionSecret = propertiesDictionary["productionSecret"] as? String,
@@ -179,5 +134,28 @@ extension DopamineProperties {
                 productionSecret: productionSecret
             )
         } else { return nil }
+    }
+    
+    
+    fileprivate static func loadTest() -> DopamineProperties? {
+        print("1")
+        if let propertiesDictionary = DopamineKit.testCredentials {
+            return DopamineProperties.convert(from: propertiesDictionary)
+        } else {
+            return nil
+        }
+    }
+    
+    fileprivate static func loadDefaults() -> DopamineProperties? {
+        print("2")
+        return UserDefaults.dopamine.get(key: defaultsKey)
+    }
+    
+    fileprivate static func loadPlist() -> DopamineProperties {
+        print("3")
+        let propertiesFile = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist")!
+        let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as! [String: Any]
+        let properties = DopamineProperties.convert(from: propertiesDictionary)!
+        return properties
     }
 }

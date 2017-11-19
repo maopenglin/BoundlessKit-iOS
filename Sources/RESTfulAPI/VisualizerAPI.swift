@@ -43,14 +43,14 @@ public class VisualizerAPI : NSObject {
     
     @objc
     public func retrieveRewards() {
-        var payload = DopaminePropertiesControl.current.apiCredentials
+        var payload = DopamineProperties.current.apiCredentials
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
         payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         send(call: .boot, with: payload){ _ in }
     }
     
     @objc
-    public func boot() {
+    public static func boot() {
         var payload = DopamineProperties.current.apiCredentials
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
         payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
@@ -58,17 +58,19 @@ public class VisualizerAPI : NSObject {
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
         payload["currentConfig"] = DopamineConfiguration.current.configID ?? "nil"
         payload["initialBoot"] = (Helper.initialBoot == nil)
-        send(call: .boot, with: payload){ response in
-            DopeLog.debug("Boot got response:\(response)")
-            if let configDict = response["config"] as? [String: Any] {
-                DopeLog.debug("Converted config:\(DopamineConfiguration.convert(from: configDict))")
-            } else {
-                DopeLog.debug("No config")
-            }
-            if let versionDict = response["version"] as? [String: Any] {
-                DopeLog.debug("Converted version:\(DopamineVersion.convert(from: versionDict))")
-            } else {
-                DopeLog.debug("No version")
+        shared.send(call: .boot, with: payload){ response in
+            print("Response:\(response.description)")
+            if let status = response["status"] as? Int {
+                if status == 205 {
+                    if let configDict = response["config"] as? [String: Any],
+                        let config = DopamineConfiguration.convert(from: configDict) {
+                        DopamineProperties.current.configuration = config
+                    }
+                    if let versionDict = response["version"] as? [String: Any],
+                        let version = DopamineVersion.convert(from: versionDict) {
+                        DopamineProperties.current.version = version
+                    }
+                }
             }
         }
     }
@@ -173,7 +175,7 @@ public class VisualizerAPI : NSObject {
                 
                 // send event to visualizer if connected
                 if let connectionID = connectionID {
-                    var payload = DopaminePropertiesControl.current.apiCredentials
+                    var payload = DopamineProperties.current.apiCredentials
                     payload["connectionUUID"] = connectionID
                     payload["sender"] = senderClassname
                     payload["target"] = targetName
@@ -303,7 +305,7 @@ public class VisualizerAPI : NSObject {
             
             // send event to visualizer if connected
             if let connectionID = connectionID {
-                var payload = DopaminePropertiesControl.current.apiCredentials
+                var payload = DopamineProperties.current.apiCredentials
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                 payload["connectionUUID"] = connectionID
@@ -399,7 +401,7 @@ public class VisualizerAPI : NSObject {
     
     @objc
     public static func promptPairing() {
-        var payload = DopaminePropertiesControl.current.apiCredentials
+        var payload = DopamineProperties.current.apiCredentials
         payload["deviceName"] = UIDevice.current.name
         
         shared.send(call: .identify, with: payload){ response in
@@ -441,7 +443,7 @@ public class VisualizerAPI : NSObject {
         let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
         
         pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
-            var payload = DopaminePropertiesControl.current.apiCredentials
+            var payload = DopamineProperties.current.apiCredentials
             payload["deviceName"] = UIDevice.current.name
             payload["connectionUUID"] = connectionID
             shared.send(call: .accept, with: payload) {response in
@@ -506,7 +508,7 @@ public class VisualizerAPI : NSObject {
                     do {
                         // turn the response into a json object
                         guard let data = responseData,
-                            let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
+                            let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                             else {
                                 let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
                                 let message = "❌ Error reading \(type.path) response data, not a dictionary: \(json)"

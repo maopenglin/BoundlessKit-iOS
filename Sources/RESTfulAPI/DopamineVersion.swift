@@ -10,23 +10,45 @@ import Foundation
 @objc
 public class DopamineVersion : NSObject, NSCoding {
     
-    public static var current: DopamineVersion { get { return DopaminePropertiesControl.current.version } }
+    fileprivate static var _current: DopamineVersion?
+    public static var current: DopamineVersion {
+        get {
+            if let _current = _current {
+                return _current
+            } else if let saved: DopamineVersion = UserDefaults.dopamine.get(key: defaultsKey) {
+                _current = saved
+                return _current!
+            }
+            else {
+                self.current = DopamineVersion.standard
+                return _current!
+            }
+        }
+        set {
+            _current = newValue
+            UserDefaults.dopamine.save(_current, forKey: defaultsKey)
+        }
+    }
+    
+    private static let defaultsKey = "DopamineVersion"
     
     @objc public var versionID: String?
     @objc fileprivate var mappings: [String:Any]
     
     init(versionID: String?,
-         mappings: [String:[String:Any]]) {
+         mappings: [String:Any]) {
         self.versionID = versionID
         self.mappings = mappings
         super.init()
     }
     
     required public convenience init?(coder aDecoder: NSCoder) {
-        if let versionID = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? String? {
+        if let versionID = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? String?,
+            let mappings = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.mappings)) as? [String:Any] {
+            print("Found DopamineVersion saved in user defaults.")
             self.init(
                 versionID: versionID,
-                mappings: aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? [String:[String:Any]] ?? [:]
+                mappings: mappings
             )
         } else {
             print("Invalid DopamineVersion saved to user defaults.")
@@ -37,6 +59,7 @@ public class DopamineVersion : NSObject, NSCoding {
     public func encode(with aCoder: NSCoder) {
         aCoder.encode(versionID, forKey: #keyPath(DopamineVersion.versionID))
         aCoder.encode(mappings, forKey: #keyPath(DopamineVersion.mappings))
+        print("Saved DopamineVersion to user defaults.")
     }
     
     static var standard: DopamineVersion {
@@ -83,7 +106,7 @@ public class DopamineVersion : NSObject, NSCoding {
 public extension DopamineVersion {
     public static func convert(from versionDictionary: [String: Any]) -> DopamineVersion? {
         if let versionID = versionDictionary["versionID"] as? String?,
-            let mappings = versionDictionary["mappings"] as? [String:[String: Any]] {
+            let mappings = versionDictionary["mappings"] as? [String:Any] {
             return DopamineVersion.init(versionID: versionID, mappings: mappings)
         } else { return nil }
     }

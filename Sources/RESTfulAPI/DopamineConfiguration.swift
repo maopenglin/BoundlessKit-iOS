@@ -10,7 +10,27 @@ import Foundation
 @objc
 public class DopamineConfiguration : NSObject, NSCoding {
     
-    @objc public static var current: DopamineConfiguration { get { return DopaminePropertiesControl.current.configuration } }
+    fileprivate static var _current: DopamineConfiguration?
+    @objc public static var current: DopamineConfiguration {
+        get {
+            if let _current = _current {
+                return _current
+            } else if let saved: DopamineConfiguration = UserDefaults.dopamine.get(key: defaultsKey) {
+                _current = saved
+                return _current!
+            }
+            else {
+                self.current = DopamineConfiguration.standard
+                return _current!
+            }
+        }
+        set {
+            _current = newValue
+            UserDefaults.dopamine.save(_current, forKey: defaultsKey)
+        }
+    }
+    
+    private static let defaultsKey = "DopamineConfiguration"
     
     @objc public var configID: String?
     
@@ -93,6 +113,7 @@ public class DopamineConfiguration : NSObject, NSCoding {
         aCoder.encode(integrationMethod, forKey: #keyPath(DopamineConfiguration.integrationMethod))
         aCoder.encode(advertiserID, forKey: #keyPath(DopamineConfiguration.advertiserID))
         aCoder.encode(consoleLoggingEnabled, forKey: #keyPath(DopamineConfiguration.consoleLoggingEnabled))
+        print("Saved DopamineConfiguration to user defaults.")
     }
     
     required public convenience init?(coder aDecoder: NSCoder) {
@@ -113,6 +134,7 @@ public class DopamineConfiguration : NSObject, NSCoding {
 //            let advertiserID = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.advertiserID)) as? Bool,
 //            let consoleLoggingEnabled = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.consoleLoggingEnabled)) as? Bool
         {
+            print("Found DopamineConfiguration saved in user defaults.")
             self.init(
                 configID: configID,
                 reinforcementEnabled: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.reinforcementEnabled)),
