@@ -10,10 +10,10 @@ import Foundation
 @objc
 public class DopamineVersion : UserDefaultsSingleton {
     
-    private static var _current: DopamineVersion? =  { return UserDefaults.dopamine.get() }()
+    private static var _current: DopamineVersion? =  { return UserDefaults.dopamine.unarchive() }()
     {
         didSet {
-            UserDefaults.dopamine.save(_current)
+            UserDefaults.dopamine.archive(_current)
         }
     }
     public static var current: DopamineVersion {

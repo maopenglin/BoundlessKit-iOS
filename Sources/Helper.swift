@@ -15,8 +15,8 @@ public class Helper: NSObject {
     
     public static var initialBoot: Date? = {
         let defaultsKey = "DopamineKit.isInitialBoot"
-        defer { UserDefaults.standard.set(Date(), forKey: defaultsKey) }
-        return UserDefaults.standard.object(forKey: defaultsKey) as? Date
+        defer { UserDefaults.dopamine.set(Date(), forKey: defaultsKey) }
+        return UserDefaults.dopamine.object(forKey: defaultsKey) as? Date
     }()
     
 }
@@ -34,26 +34,29 @@ open class UserDefaultsSingleton : NSObject, NSCoding {
 public extension UserDefaults {
     
     static var dopamine: UserDefaults {
-        return UserDefaults(suiteName: "com.usedopamine.dopaminekit")!
+        get {
+            return UserDefaults(suiteName: "com.usedopamine.dopaminekit") ?? UserDefaults.standard
+        }
     }
     
-    func get<T>(key: String) -> T? {
+    
+    func unarchive<T>(key: String) -> T? {
         if let data = self.value(forKey: key) as? Data,
             let t = NSKeyedUnarchiver.unarchiveObject(with: data) as? T {
             return t
         } else { return nil }
     }
     
-    func save(_ value: Any?, forKey key: String) {
+    func archive(_ value: Any?, forKey key: String) {
         self.setValue((value != nil) ? NSKeyedArchiver.archivedData(withRootObject: value!) as Any? : value, forKey: key)
     }
     
-    func get<T:UserDefaultsSingleton>() -> T? {
-        return get(key: T.defaultsKey())
+    func unarchive<T:UserDefaultsSingleton>() -> T? {
+        return unarchive(key: T.defaultsKey())
     }
     
-    func save<T:UserDefaultsSingleton>(_ value: T?) {
-        save(value, forKey: T.defaultsKey())
+    func archive<T:UserDefaultsSingleton>(_ value: T?) {
+        archive(value, forKey: T.defaultsKey())
     }
     
 }

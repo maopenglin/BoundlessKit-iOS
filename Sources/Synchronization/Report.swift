@@ -11,10 +11,10 @@ import Foundation
 @objc
 internal class Report : UserDefaultsSingleton {
     
-    fileprivate static var _current: Report? =  { return UserDefaults.dopamine.get() }()
+    fileprivate static var _current: Report? =  { return UserDefaults.dopamine.unarchive() }()
     {
         didSet {
-            UserDefaults.dopamine.save(_current)
+            UserDefaults.dopamine.archive(_current)
         }
     }
     static var current: Report {

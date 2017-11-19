@@ -9,10 +9,10 @@ import Foundation
 
 internal class DopamineProperties : UserDefaultsSingleton {
     
-    private static var _current: DopamineProperties? = { return UserDefaults.dopamine.get() }()
+    private static var _current: DopamineProperties? = { return UserDefaults.dopamine.unarchive() }()
     {
         didSet {
-            UserDefaults.dopamine.save(_current)
+            UserDefaults.dopamine.archive(_current)
         }
     }
     static var current: DopamineProperties {
