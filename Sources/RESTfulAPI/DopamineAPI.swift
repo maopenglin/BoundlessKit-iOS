@@ -184,7 +184,7 @@ public class DopamineAPI : NSObject{
                         return
                     }
                     responseDict = dict
-                    DopeLog.debug("✅\(type.path) call got response:\(responseDict.debugDescription)")
+//                    DopeLog.debug("✅\(type.path) call got response:\(responseDict.debugDescription)")
                     var statusCode: Int = -2
                     if let responseStatusCode = responseDict["status"] as? Int {
                         statusCode = responseStatusCode
@@ -212,11 +212,11 @@ public class DopamineAPI : NSObject{
             })
             
             // send request
-            DopeLog.debug("Sending \(type.path) api call with payload: \(payload.description)")
+//            DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
             task.resume()
             
         } catch {
-            let message = "Error sending \(type.path) api call with payload:(\(payload.description))"
+            let message = "Error sending \(type.path) api call with payload:(\(payload as AnyObject))"
             DopeLog.debug(message)
             Telemetry.storeException(className: "JSONSerialization", message: message)
         }

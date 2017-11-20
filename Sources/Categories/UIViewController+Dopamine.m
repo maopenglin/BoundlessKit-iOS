@@ -23,6 +23,7 @@
 - (void) swizzled_viewDidAppear:(BOOL)animated {
     if ([self respondsToSelector:@selector(swizzled_viewDidAppear:)])
         [self swizzled_viewDidAppear:animated];
+    
     if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
         [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didAppear",
                                                           @"classname": NSStringFromClass([self class]),

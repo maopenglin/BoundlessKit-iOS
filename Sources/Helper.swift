@@ -100,7 +100,8 @@ public extension UIColor {
 }
 
 extension Array {
-    func selectRandom() -> Element {
+    func selectRandom() -> Element? {
+        if self.count == 0 { return nil }
         return self[Int(arc4random_uniform(UInt32(self.count)))]
     }
 }

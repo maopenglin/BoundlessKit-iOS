@@ -70,12 +70,24 @@ class ViewController: UIViewController {
 ////        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
+        
+        UIApplication.shared.keyWindow!.showEmojiSplosion(at: UIApplication.shared.keyWindow!.center)
 
         DopamineKit.track("action2peformed")
 //        DopamineKit.reinforce("a2") { reinforcement in
 //            // Update UI to display reinforcement decision on screen for learning purposes
 //            self.responseLabel.text = reinforcement
 //            self.flash(self.responseLabel)
+//        }
+//        view.showConfetti()
+//        let view = UIView(frame: UIScreen.main.bounds)
+        
+//        DispatchQueue.main.async {
+////            DLUIManager.main.show(false)
+//            DLWindow.shared.view.showConfetti {
+//                print("done")
+////                DLUIManager.main.hide()
+//            }
 //        }
     }
     

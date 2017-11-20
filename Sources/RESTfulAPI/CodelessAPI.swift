@@ -28,13 +28,8 @@ public class CodelessAPI : NSObject {
     @objc
     public static let shared = CodelessAPI()
     
-    private static let clientSDKVersion = Bundle(for: DopamineAPI.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-    private static let clientOS = "iOS"
-    private static let clientOSVersion = UIDevice.current.systemVersion
-    
     static var connectionID: String?
     private let tracesQueue = OperationQueue()
-    var visualizerMappings: [String:[String:Any]]? = nil
     
     private override init() {
         super.init()
@@ -43,6 +38,9 @@ public class CodelessAPI : NSObject {
     
     @objc
     public static func boot() {
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//            UIApplication.shared.keyWindow!.showConfetti()
+//        }
         var payload = DopamineProperties.current.apiCredentials
         payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
         payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
@@ -51,7 +49,6 @@ public class CodelessAPI : NSObject {
         payload["currentConfig"] = DopamineConfiguration.current.configID ?? "nil"
         payload["initialBoot"] = (Helper.initialBoot == nil)
         shared.send(call: .boot, with: payload){ response in
-            print("Response:\(response.description)")
             if let status = response["status"] as? Int {
                 if status == 205 {
                     if let configDict = response["config"] as? [String: Any],
@@ -62,6 +59,91 @@ public class CodelessAPI : NSObject {
                         let version = DopamineVersion.convert(from: versionDict) {
                         DopamineProperties.current.version = version
                     }
+                }
+            }
+            if !DopamineProperties.current.inProduction { promptPairing() }
+        }
+    }
+    
+    @objc
+    public static func recordApplicationEvent(key: String) {
+        DispatchQueue.global().async {
+            
+//            if let mappings = DopamineVersion.current.mappingsForAppEvent(key){
+            
+            // display reward if reward is set for this event
+            DopamineVersion.current.reinforcementFor(sender: "customEvent", target: "ApplicationEvent", selector: key) { reinforcement in
+            
+                DopeLog.debug("Found application mapping with params:\(dump(reinforcement))")
+                if let delay = reinforcement["Delay"] as? Double,
+                    let viewOption = reinforcement["ViewOption"] as? String,
+                    let viewCustom = reinforcement["ViewCustom"] as? String,
+                    let viewMarginX = reinforcement["ViewMarginX"] as? CGFloat,
+                    let viewMarginY = reinforcement["ViewMarginY"] as? CGFloat,
+                    let reinforcementType = reinforcement["primitive"] as? String
+                {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                        prepareShowReward: do {
+                            var view: UIView! = UIApplication.shared.keyWindow! // DLWindow.shared.view
+                            var location: CGPoint = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                            switch viewOption {
+                            case "fixed":
+//                                view = UIApplication.shared.keyWindow!
+                                let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
+                                let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
+                                location = CGPoint(x: xMargin, y: yMargin)
+
+                            case "custom":
+                                if viewCustom != "" {
+                                    let viewCustomParams = viewCustom.components(separatedBy: "$")
+                                    if viewCustomParams.count == 2,
+                                        let index = Int(viewCustomParams[1]) {
+                                        let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: viewCustomParams[0])
+                                        if index <= possibleViews.count-1 {
+                                            view = possibleViews[index]
+                                            location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                        } else {
+//                                            DopeLog.debug("Oh no. Must select which CustomView with a VALID index. No reward for you.")
+//                                            break prepareShowReward
+                                            DopeLog.debug("Forgot to select index. Using 0 by default.")
+                                            if let v = possibleViews.first {
+                                                view = v
+                                            }
+                                            location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                        }
+                                    } else {
+                                        DopeLog.debug("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
+                                        break prepareShowReward
+                                    }
+                                } else {
+                                    DopeLog.debug("Oh no. No CustomView classname set. No reward for you.")
+                                    break prepareShowReward
+                                }
+
+
+                            default:
+//                                DopeLog.debug("Oh no. Unknown reward type primitive. No reward for you.")
+//                                break prepareShowReward
+                                break
+                            }
+                            DopeLog.debug("About to show application event reinforcement")
+                            showReward(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
+                        }
+                    }
+
+                }
+            }
+            
+            var payload = DopamineProperties.current.apiCredentials
+            payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
+            payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+            payload["customEvent"] = ["ApplicationEvent": key]
+            payload["senderImage"] = ""
+            DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+                // send event to visualizer if connected
+                if let connectionID = connectionID {
+                    payload["connectionUUID"] = connectionID
+                    submit(payload)
                 }
             }
         }
@@ -173,13 +255,30 @@ public class CodelessAPI : NSObject {
                     payload["target"] = targetName
                     payload["selector"] = selectorName
                     payload["senderImage"] = ""
+//                    DispatchQueue.main.sync {
+//                    payload["senderImage"] = touchView.imageAsBase64EncodedString()
+                    
+//                        if let view = t as? UIView,
+//                            let imageString = view.imageAsBase64EncodedString() {
+//                            payload["senderImage"] = imageString
+//                        } else if let barItem = senderInstance as? UIBarItem,
+//                            let image = barItem.image,
+//                            let imageString = image.base64EncodedPNGString() {
+//                            payload["senderImage"] = imageString
+//                        } else if senderInstance.responds(to: NSSelectorFromString("view")),
+//                            let sv = senderInstance.value(forKey: "view") as? UIView,
+//                            let imageString = sv.imageAsBase64EncodedString() {
+//                            payload["senderImage"] = imageString
+//                        } else {
+//                            NSLog("Cannot create image, please message team@usedopamine.com to add support for visualizer snapshots of class type:<\(type(of: senderInstance))>!")
+//                            payload["senderImage"] = ""
+//                        }
+//                        
+//                    }
+                    
                     payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                     payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
-                    shared.send(call: .submit, with: payload){ response in
-                        if response["status"] as? Int != 200 {
-                            CodelessAPI.connectionID = nil
-                        }
-                    }
+                    submit(payload)
                 }
                 
             }
@@ -321,10 +420,20 @@ public class CodelessAPI : NSObject {
                         payload["senderImage"] = ""
                     }
                 }
-                shared.send(call: .submit, with: payload){ response in
-                    if response["status"] as? Int != 200 {
-                        CodelessAPI.connectionID = nil
-                    }
+                submit(payload)
+            }
+        }
+    }
+    
+    fileprivate static func submit(_ payload: [String: Any]) {
+        shared.send(call: .submit, with: payload){ response in
+            if response["status"] as? Int != 200 {
+                CodelessAPI.connectionID = nil
+            } else if shared.tracesQueue.operationCount <= 1 {
+                if let visualizerMappings = response["mappings"] as? [String:Any] {
+                    DopamineVersion.current.updateVisualizerMappings(visualizerMappings)
+                } else {
+                    DopeLog.debug("Invalid mappings")
                 }
             }
         }
@@ -374,7 +483,6 @@ public class CodelessAPI : NSObject {
                 let scale = reinforcement["Scale"] as? CGFloat,
                 let velocity = reinforcement["Velocity"] as? CGFloat,
                 let damping = reinforcement["Damping"] as? CGFloat {
-                print("Here!")
                 view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping)
             }
             
@@ -392,7 +500,7 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
-    public static func promptPairing() {
+    private static func promptPairing() {
         var payload = DopamineProperties.current.apiCredentials
         payload["deviceName"] = UIDevice.current.name
         
@@ -413,14 +521,18 @@ public class CodelessAPI : NSObject {
                     
                 case 208:
                     if let connectionID = response["connectionUUID"] as? String {
-                        let connectedRestoredAlert = UIAlertController(title: "Visualizer Pairing", message: "Connection restored", preferredStyle: .alert)
-                        connectedRestoredAlert.addAction( UIAlertAction(title: "Ok", style: .default, handler: { _ in
+//                        let connectedRestoredAlert = UIAlertController(title: "Visualizer Pairing", message: "Connection restored", preferredStyle: .alert)
+//                        connectedRestoredAlert.addAction( UIAlertAction(title: "Ok", style: .default, handler: { _ in
                             CodelessAPI.connectionID = connectionID
-                        }))
-                        UIWindow.presentTopLevelAlert(alertController: connectedRestoredAlert)
+//                        }))
+//                        UIWindow.presentTopLevelAlert(alertController: connectedRestoredAlert)
+                        CandyBar.init(title: "Connection Restored", subtitle: "DopamineKit Visualizer").show(duration: 1.2)
                     }
                     
-                case 500, 204, 201:
+                case 204:
+                    DopamineVersion.current.updateVisualizerMappings([:])
+                    
+                case 500:
                     break
                     
                 default:
@@ -509,38 +621,7 @@ public class CodelessAPI : NSObject {
                                 return
                         }
                         responseDict = dict
-                        //                    DopeLog.debugLog("✅\(type.pathExtenstion) call got response:\(responseDict.debugDescription)")
-                        DopeLog.debug("✅\(type.path) call got response with status:\(responseDict["status"] ?? "unknown")")
-                        
-//                        if (type == .boot) || (type == .submit  && self.tracesQueue.operationCount <= 1) {
-//                            if (type == .boot && responseDict["status"] as? Int == 205) || (type == .submit && responseDict["status"] as? Int == 200) {
-//                                if let apiMappings = responseDict["mappings"] as? [[String:Any]] {
-//                                    var tempDict = [String : [String : Any]]()
-//                                    for mappings in apiMappings {
-//                                        if let sender = mappings["sender"],
-//                                            let target = mappings["target"],
-//                                            let selector = mappings["selector"]
-//                                        {
-//                                            tempDict["\(sender)-\(target)-\(selector)"] = mappings
-//                                        } else if let actionID = mappings["actionID"] as? String,
-//                                            let reinforcements = mappings["reinforcements"] as? [[String: Any]] {
-//                                            tempDict[actionID] = ["actionID":actionID, "reinforcements":reinforcements]
-//                                        } else {
-//                                            DopeLog.debug("Invalid mapping")
-//                                        }
-//                                    }
-//                                    if type == .submit {
-//                                        CodelessAPI.shared.visualizerMappings = tempDict
-//                                    } else { // .boot
-//                                        if let newVersionID = responseDict["newVersionID"] as? String {
-//                                            DopamineProperties.current.version = DopamineVersion(versionID: newVersionID, mappings: tempDict)
-//                                        } else {
-//                                            DopeLog.debug("Missing 'newVersionID'")
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
+//                        DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
                         
                     } catch {
                         let message = "❌ Error reading \(type.path) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))
@@ -551,11 +632,11 @@ public class CodelessAPI : NSObject {
                 })
                 
                 // send request
-                DopeLog.debug("Sending \(type.path) api call with payload: \(payload.description)")
+//                DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
                 task.resume()
                 
             } catch {
-                let message = "Error sending \(type.path) api call with payload:(\(payload.description))"
+                let message = "Error sending \(type.path) api call with payload:(\(payload as AnyObject))"
                 DopeLog.debug(message)
                 Telemetry.storeException(className: "JSONSerialization", message: message)
             }

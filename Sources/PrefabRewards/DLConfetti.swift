@@ -28,7 +28,7 @@ public extension UIView {
                       shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle],
                       colors:[UIColor] = [UIColor.from(hex: "4d81fb", alpha: 0.8), UIColor.from(hex: "4ac4fb", alpha: 0.8), UIColor.from(hex: "9243f9", alpha: 0.8), UIColor.from(hex: "fdc33b", alpha: 0.8), UIColor.from(hex: "f7332f", alpha: 0.8)],
                       completion: @escaping ()->Void = {}) {
-        
+        print("showing confetti!")
         self.confettiBurst(duration: 0.8, size: size, shapes: shapes, colors: colors) {
             self.confettiShower(duration: duration, size: size, shapes: [.rectangle, .rectangle, .circle, .rectangle, .rectangle, .circle], colors: colors, completion: completion)
         }
