@@ -80,7 +80,7 @@ open class CandyBar: UIView {
     ///
     open func show(duration: TimeInterval = 0) {
         DispatchQueue.main.async {
-        CandyBar.topWindow()!.addSubview(self)
+        UIWindow.topWindow!.addSubview(self)
             self.forceUpdates()
         let (damping, velocity) = self.springiness.springValues
             UIView.animate(withDuration: self.animationDuration, delay: 0.0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: .allowUserInteraction, animations: {
@@ -187,14 +187,6 @@ open class CandyBar: UIView {
      
      
      */
-    
-    
-    class func topWindow() -> UIWindow? {
-        for window in UIApplication.shared.windows.reversed() {
-            if window.windowLevel == UIWindowLevelNormal && !window.isHidden && window.frame != CGRect.zero { return window }
-        }
-        return nil
-    }
     
     fileprivate let contentView = UIView()
     fileprivate let labelView = UIView()
@@ -383,7 +375,7 @@ open class CandyBar: UIView {
     
     fileprivate func adjustHeightOffset() {
         guard let superview = superview else { return }
-        if superview === CandyBar.topWindow() && self.position == .top {
+        if superview === UIWindow.topWindow && self.position == .top {
             let statusBarSize = UIApplication.shared.statusBarFrame.size
             let heightOffset = min(statusBarSize.height, statusBarSize.width) // Arbitrary, but looks nice.
             contentTopOffsetConstraint.constant = heightOffset

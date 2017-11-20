@@ -33,4 +33,15 @@
 //        return nil
 //    }
 //}
+//
 
+internal extension UIWindow {
+    class var topWindow: UIWindow? {
+        get {
+            for window in UIApplication.shared.windows.reversed() {
+                if window.windowLevel == UIWindowLevelNormal && !window.isHidden && window.frame != CGRect.zero { return window }
+            }
+            return nil
+        }
+    }
+}

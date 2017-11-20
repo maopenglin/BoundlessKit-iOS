@@ -39,11 +39,9 @@ public class CodelessAPI : NSObject {
     @objc
     public static func boot() {
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//            UIApplication.shared.keyWindow!.showConfetti()
+//            UIWindow.topWindow!.showConfetti()
 //        }
         var payload = DopamineProperties.current.apiCredentials
-        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         payload["inProduction"] = DopamineProperties.current.inProduction
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
         payload["currentConfig"] = DopamineConfiguration.current.configID ?? "nil"
@@ -74,7 +72,7 @@ public class CodelessAPI : NSObject {
             // display reward if reward is set for this event
             DopamineVersion.current.reinforcementFor(sender: "customEvent", target: "ApplicationEvent", selector: key) { reinforcement in
             
-                DopeLog.debug("Found application mapping with params:\(dump(reinforcement))")
+                DopeLog.debug("Found application mapping with params:\(reinforcement as AnyObject)")
                 if let delay = reinforcement["Delay"] as? Double,
                     let viewOption = reinforcement["ViewOption"] as? String,
                     let viewCustom = reinforcement["ViewCustom"] as? String,
@@ -84,11 +82,11 @@ public class CodelessAPI : NSObject {
                 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                         prepareShowReward: do {
-                            var view: UIView! = UIApplication.shared.keyWindow! // DLWindow.shared.view
+                            var view: UIView! = UIWindow.topWindow!
                             var location: CGPoint = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                             switch viewOption {
                             case "fixed":
-//                                view = UIApplication.shared.keyWindow!
+//                                view = UIWindow.topWindow!
                                 let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
                                 let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
                                 location = CGPoint(x: xMargin, y: yMargin)
@@ -135,17 +133,23 @@ public class CodelessAPI : NSObject {
             }
             
             var payload = DopamineProperties.current.apiCredentials
-            payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-            payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
             payload["customEvent"] = ["ApplicationEvent": key]
             payload["senderImage"] = ""
-            DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+            let submitPayload = {
                 // send event to visualizer if connected
                 if let connectionID = connectionID {
                     payload["connectionUUID"] = connectionID
                     submit(payload)
                 }
             }
+            if key == "appLaunch" {
+                DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+                    submitPayload()
+                }
+            } else {
+                submitPayload()
+            }
+            
         }
     }
     
@@ -187,15 +191,15 @@ public class CodelessAPI : NSObject {
                                 var location: CGPoint
                                 switch viewOption {
                                 case "fixed":
-                                    view = UIApplication.shared.keyWindow!
+                                    view = UIWindow.topWindow!
                                     location = CGPoint(x: viewMarginX, y: viewMarginY)
                                     
                                 case "touch":
-                                    view = UIApplication.shared.keyWindow!
+                                    view = UIWindow.topWindow!
                                     location = Helper.lastTouchLocationInUIWindow
                                     
                                 case "sender":
-                                    view = UIApplication.shared.keyWindow!
+                                    view = UIWindow.topWindow!
                                     location = Helper.lastTouchLocationInUIWindow
                                     
                                 case "superview":
@@ -308,11 +312,11 @@ public class CodelessAPI : NSObject {
                             var location: CGPoint
                             switch viewOption {
                             case "fixed":
-                                view = UIApplication.shared.keyWindow!
+                                view = UIWindow.topWindow!
                                 location = CGPoint(x: viewMarginX, y: viewMarginY)
                                 
                             case "touch":
-                                view = UIApplication.shared.keyWindow!
+                                view = UIWindow.topWindow!
                                 location = Helper.lastTouchLocationInUIWindow
                                 
                             case "sender":
@@ -353,7 +357,7 @@ public class CodelessAPI : NSObject {
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
                                     DopeLog.debug("Oh no. Target is not a UIView and has no view property. Doing touch")
-                                    view = UIApplication.shared.keyWindow!
+                                    view = UIWindow.topWindow!
                                     location = Helper.lastTouchLocationInUIWindow
                                 }
                                 
@@ -397,8 +401,6 @@ public class CodelessAPI : NSObject {
             // send event to visualizer if connected
             if let connectionID = connectionID {
                 var payload = DopamineProperties.current.apiCredentials
-                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
                 payload["connectionUUID"] = connectionID
                 payload["sender"] = senderClassname
                 payload["target"] = targetClassname
@@ -521,12 +523,10 @@ public class CodelessAPI : NSObject {
                     
                 case 208:
                     if let connectionID = response["connectionUUID"] as? String {
-//                        let connectedRestoredAlert = UIAlertController(title: "Visualizer Pairing", message: "Connection restored", preferredStyle: .alert)
-//                        connectedRestoredAlert.addAction( UIAlertAction(title: "Ok", style: .default, handler: { _ in
-                            CodelessAPI.connectionID = connectionID
-//                        }))
-//                        UIWindow.presentTopLevelAlert(alertController: connectedRestoredAlert)
-                        CandyBar.init(title: "Connection Restored", subtitle: "DopamineKit Visualizer").show(duration: 1.2)
+                        CodelessAPI.connectionID = connectionID
+                        DispatchQueue.main.async {
+                            CandyBar(title: "Connection Restored", subtitle: "DopamineKit Visualizer").show(duration: 1.2)
+                        }
                     }
                     
                 case 204:
@@ -621,7 +621,7 @@ public class CodelessAPI : NSObject {
                                 return
                         }
                         responseDict = dict
-//                        DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
+                        DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
                         
                     } catch {
                         let message = "❌ Error reading \(type.path) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))
@@ -632,7 +632,7 @@ public class CodelessAPI : NSObject {
                 })
                 
                 // send request
-//                DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
+                DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
                 task.resume()
                 
             } catch {

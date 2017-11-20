@@ -48,8 +48,6 @@ public class DopamineAPI : NSObject{
         }
         
         payload["actions"] = trackedActionsJSONArray
-        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         
         shared.send(call: .track, with: payload, completion: completion)
     }
@@ -69,8 +67,6 @@ public class DopamineAPI : NSObject{
         }
         
         payload["actions"] = reinforcedActionsArray
-        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         
         shared.send(call: .report, with: payload, completion: completion)
     }
@@ -83,10 +79,7 @@ public class DopamineAPI : NSObject{
     ///
     internal static func refresh(_ actionID: String, completion: @escaping ([String:Any]) -> ()){
         var payload = DopamineProperties.current.apiCredentials
-        
         payload["actionID"] = actionID
-        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         
         DopeLog.debug("Refreshing \(actionID)...")
         shared.send(call: .refresh, with: payload, completion: completion)
@@ -114,8 +107,6 @@ public class DopamineAPI : NSObject{
         
         payload["syncOverviews"] = syncOverviewJSONArray
         payload["exceptions"] = exceptionsJSONArray
-        payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-        payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         
         shared.send(call: .telemetry, with: payload, completion: completion)
     }
