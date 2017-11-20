@@ -38,9 +38,6 @@ public class CodelessAPI : NSObject {
     
     @objc
     public static func boot() {
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//            UIWindow.topWindow!.showConfetti()
-//        }
         var payload = DopamineProperties.current.apiCredentials
         payload["inProduction"] = DopamineProperties.current.inProduction
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
@@ -70,7 +67,7 @@ public class CodelessAPI : NSObject {
 //            if let mappings = DopamineVersion.current.mappingsForAppEvent(key){
             
             // display reward if reward is set for this event
-            DopamineVersion.current.reinforcementFor(sender: "customEvent", target: "ApplicationEvent", selector: key) { reinforcement in
+            DopamineVersion.current.codelessReinforcementFor(sender: "customEvent", target: "ApplicationEvent", selector: key) { reinforcement in
             
                 DopeLog.debug("Found application mapping with params:\(reinforcement as AnyObject)")
                 if let delay = reinforcement["Delay"] as? Double,
@@ -92,32 +89,14 @@ public class CodelessAPI : NSObject {
                                 location = CGPoint(x: xMargin, y: yMargin)
 
                             case "custom":
-                                if viewCustom != "" {
-                                    let viewCustomParams = viewCustom.components(separatedBy: "$")
-                                    if viewCustomParams.count == 2,
-                                        let index = Int(viewCustomParams[1]) {
-                                        let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: viewCustomParams[0])
-                                        if index <= possibleViews.count-1 {
-                                            view = possibleViews[index]
-                                            location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                        } else {
-//                                            DopeLog.debug("Oh no. Must select which CustomView with a VALID index. No reward for you.")
-//                                            break prepareShowReward
-                                            DopeLog.debug("Forgot to select index. Using 0 by default.")
-                                            if let v = possibleViews.first {
-                                                view = v
-                                            }
-                                            location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                        }
-                                    } else {
-                                        DopeLog.debug("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
-                                        break prepareShowReward
-                                    }
+                                if viewCustom != "",
+                                    let v = UIView.get(parse: viewCustom) {
+                                    view = v
+                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
-                                    DopeLog.debug("Oh no. No CustomView classname set. No reward for you.")
+                                    DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reward for you.")
                                     break prepareShowReward
                                 }
-
 
                             default:
 //                                DopeLog.debug("Oh no. Unknown reward type primitive. No reward for you.")
@@ -176,7 +155,7 @@ public class CodelessAPI : NSObject {
                 
                 
                 // display reward if reward is set for this event
-                DopamineVersion.current.reinforcementFor(sender: senderClassname, target: targetName, selector: selectorName) { reinforcement in
+                DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetName, selector: selectorName) { reinforcement in
                     
                     if let delay = reinforcement["Delay"] as? Double,
                         let viewOption = reinforcement["ViewOption"] as? String,
@@ -216,27 +195,14 @@ public class CodelessAPI : NSObject {
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                     
                                 case "custom":
-                                    if viewCustom != "" {
-                                        let viewCustomParams = viewCustom.components(separatedBy: "$")
-                                        if viewCustomParams.count == 2,
-                                            let index = Int(viewCustomParams[1]) {
-                                            let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: viewCustomParams[0])
-                                            if index <= possibleViews.count-1 {
-                                                view = possibleViews[index]
-                                                location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                            } else {
-                                                DopeLog.debug("Oh no. Must select which CustomView with a VALID index. No reward for you.")
-                                                break prepareShowReward
-                                            }
-                                        } else {
-                                            DopeLog.debug("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
-                                            break prepareShowReward
-                                        }
+                                    if viewCustom != "",
+                                        let v = UIView.get(parse: viewCustom) {
+                                        view = v
+                                        location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                     } else {
-                                        DopeLog.debug("Oh no. No CustomView classname set. No reward for you.")
+                                        DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reward for you.")
                                         break prepareShowReward
                                     }
-                                    
                                     
                                 default:
                                     DopeLog.debug("Oh no. Unknown reward type primitive. No reward for you.")
@@ -298,7 +264,7 @@ public class CodelessAPI : NSObject {
 //            print("sender:\(senderClassname) target:\(targetClassname) selector:\(selectorName)")
             
             // display reward if reward is set for this event
-            DopamineVersion.current.reinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
+            DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
                 if let delay = reinforcement["Delay"] as? Double,
                     let viewOption = reinforcement["ViewOption"] as? String,
                     let viewCustom = reinforcement["ViewCustom"] as? String,
@@ -362,28 +328,14 @@ public class CodelessAPI : NSObject {
                                 }
                                 
                             case "custom":
-                                if viewCustom != "" {
-                                    let viewCustomParams = viewCustom.components(separatedBy: "$")
-                                    DopeLog.debug("ViewCustomParams:\(viewCustomParams)")
-                                    if viewCustomParams.count == 2,
-                                        let index = Int(viewCustomParams[1]) {
-                                        let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: viewCustomParams[0])
-                                        if index <= possibleViews.count-1 {
-                                            view = possibleViews[index]
-                                            location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                        } else {
-                                            DopeLog.debug("Oh no. Must select which CustomView with a VALID index. No reward for you.")
-                                            break prepareShowReward
-                                        }
-                                    } else {
-                                        DopeLog.debug("Oh no. Must select which CustomView with an index. Add '$0' after CustomView classname. No reward for you.")
-                                        break prepareShowReward
-                                    }
+                                if viewCustom != "",
+                                    let v = UIView.get(parse: viewCustom) {
+                                    view = v
+                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
-                                    DopeLog.debug("Oh no. No CustomView classname set. No reward for you.")
+                                    DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reward for you.")
                                     break prepareShowReward
                                 }
-                                
                                 
                             default:
                                 DopeLog.debug("Oh no. Unknown view type. No reward for you.")
@@ -530,7 +482,9 @@ public class CodelessAPI : NSObject {
                     }
                     
                 case 204:
-                    DopamineVersion.current.updateVisualizerMappings([:])
+                    if DopamineVersion.current.visualizerMappings.count != 0 {
+                        DopamineVersion.current.updateVisualizerMappings([:])
+                    }
                     
                 case 500:
                     break
@@ -701,6 +655,29 @@ fileprivate extension UIView {
         }
         
         return views
+    }
+    
+    static func get(parse viewCustom: String) -> UIView? {
+        let viewCustomParams = viewCustom.components(separatedBy: "$")
+        let classname: String
+        let index: Int
+        if viewCustomParams.count == 2,
+            let i = Int(viewCustomParams[1]) {
+            classname = viewCustomParams[0]
+            index = i
+        } else if viewCustomParams.count == 1 {
+            classname = viewCustomParams[0]
+            index = 0
+        } else {
+            DopeLog.error("Too many params for customView. Should be in the format \"ViewClassname$0\"")
+            return nil
+        }
+        let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: classname)
+        if index <= possibleViews.count-1 {
+            return possibleViews[index]
+        } else {
+            return nil
+        }
     }
 }
 

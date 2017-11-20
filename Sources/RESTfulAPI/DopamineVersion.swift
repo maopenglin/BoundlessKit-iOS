@@ -32,7 +32,7 @@ public class DopamineVersion : UserDefaultsSingleton {
     
     @objc public var versionID: String?
     @objc fileprivate var mappings: [String:Any]
-    @objc fileprivate var visualizerMappings: [String:Any]
+    @objc internal fileprivate(set) var visualizerMappings: [String:Any]
     public func updateVisualizerMappings(_ visualizerMappings: [String: Any]) {
         self.visualizerMappings = visualizerMappings
         UserDefaults.dopamine.archive(self)
@@ -46,7 +46,6 @@ public class DopamineVersion : UserDefaultsSingleton {
         self.mappings = mappings
         self.visualizerMappings = visualizerMappings
         super.init()
-//        self.mappings["ApplicationEvent"] = ["appOpen": "confetti"]
     }
     
     required public convenience init?(coder aDecoder: NSCoder) {
@@ -76,51 +75,11 @@ public class DopamineVersion : UserDefaultsSingleton {
         return DopamineVersion(versionID: nil, mappings: [:], visualizerMappings: [:])
     }
     
-    public func reinforcementActionIDs() -> [String] {
-        return mappings.keys.sorted()
+    public func codelessReinforcementFor(sender: String, target: String, selector: String, completion: @escaping ([String:Any]) -> ()) {
+        codelessReinforcementFor(actionID: [sender, target, selector].joined(separator: "-"), completion: completion)
     }
     
-////    private func searchMappings(key: String) -> Any? {
-////        if CodelessAPI.shared.visualizerMappings != nil,
-////            let reinforcementParameters = CodelessAPI.shared.visualizerMappings![key] {
-////            DopeLog.debug("Found visualizer reinforcement for <\(key)>")
-////            return reinforcementParameters
-////        } else if let reinforcementParameters = mappings[key] {
-////            DopeLog.debug("Found reinforcement for <\(key)>")
-////            return reinforcementParameters
-////        }
-////    }
-//    
-//    private var mappingsForCustomEvents: [String: Any]? {
-//        get {
-//            let customEventKey = "customEvent"
-//            if !DopamineProperties.current.inProduction,
-//            let customEvents = visualizerMappings[customEventKey] as? [String: Any] {
-//                DopeLog.debug("Found visualizer reinforcement for customEvent:<\(customEventKey)> \(customEvents as AnyObject)")
-//                return customEvents
-//            } else if let customEvents = mappings[customEventKey] as? [String:Any] {
-//                DopeLog.debug("Found reinforcement for customEvent:<\(customEventKey)>")
-//                return customEvents
-//            }
-//            return nil
-//        }
-//    }
-//    
-//    public func mappingsForAppEvent(_ key: String) -> [String: Any]? {
-//        print("Looking for app event mapping key:\(key)")
-//        if let mappingsForCustomEvents = mappingsForCustomEvents,
-//            let appEvents = mappingsForCustomEvents["ApplicationEvent"] as? [String: Any] {
-//            DopeLog.debug("Found reinforcement for app event:<\(key)> \(appEvents as AnyObject)")
-//            return appEvents
-//        }
-//        return nil
-//    }
-    
-    public func reinforcementFor(sender: String, target: String, selector: String, completion: @escaping ([String:Any]) -> ()) {
-        reinforcementFor(actionID: [sender, target, selector].joined(separator: "-"), completion: completion)
-    }
-    
-    public func reinforcementFor(actionID: String, completion: @escaping ([String:Any]) -> ()) {
+    public func codelessReinforcementFor(actionID: String, completion: @escaping ([String:Any]) -> ()) {
         if let reinforcementParameters = visualizerMappings[actionID] as? [String: Any] {
             DopeLog.debug("Found visualizer reinforcement for <\(actionID)>")
             if let codeless = reinforcementParameters["codeless"] as? [String: Any],
@@ -128,12 +87,16 @@ public class DopamineVersion : UserDefaultsSingleton {
                 let randomReinforcement = reinforcements.selectRandom() {
                 completion(randomReinforcement)
             } else {
-                DopeLog.debug("Didn't find any reinforcements array")
+                DopeLog.debug("Bad visualizer parameters")
             }
         } else if let reinforcementParameters = mappings[actionID] as? [String:Any] {
             DopeLog.debug("Found reinforcement for <\(actionID)>")
-            if let reinforcements = reinforcementParameters["reinforcements"] as? [[String:Any]] {
+            if let codeless = reinforcementParameters["codeless"] as? [String: Any],
+                let reinforcements = codeless["reinforcements"] as? [[String:Any]] {
                 DopamineKit.reinforce(actionID) { reinforcementType in
+                    if reinforcementType == Cartridge.defaultReinforcementDecision {
+                        return
+                    }
                     for reinforcement in reinforcements {
                         if reinforcement["primitive"] as? String == reinforcementType {
                             completion(reinforcement)
@@ -146,8 +109,9 @@ public class DopamineVersion : UserDefaultsSingleton {
                 DopeLog.error("Bad reinforcement parameters")
             }
         } else {
-            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
-            DopeLog.debug("Visualizer mappings:\(self.visualizerMappings as AnyObject)")
+//            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
+//            DopeLog.debug("Reinforcement mappings:\(self.mappings as AnyObject)")
+//            DopeLog.debug("Visualizer mappings:\(self.visualizerMappings as AnyObject)")
         }
     }
 }
