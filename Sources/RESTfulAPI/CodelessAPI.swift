@@ -383,6 +383,7 @@ public class CodelessAPI : NSObject {
         shared.send(call: .submit, with: payload){ response in
             if response["status"] as? Int != 200 {
                 CodelessAPI.connectionID = nil
+                DopamineVersion.current.updateVisualizerMappings([:])
             } else if shared.tracesQueue.operationCount <= 1 {
                 if let visualizerMappings = response["mappings"] as? [String:Any] {
                     DopamineVersion.current.updateVisualizerMappings(visualizerMappings)

@@ -32,8 +32,6 @@
 		5CAC551BA9AF7A01CFED61895D0C16DA /* DLCandyBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB3895D9B75B07899F731DE7DE0183AE /* DLCandyBar.swift */; };
 		649701F939A76927633DEFBFA3B0BC6E /* DLConfetti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D53A57DF0E6303DD881FE7C374157 /* DLConfetti.swift */; };
 		84C43F121FC1784400EF94F5 /* DLWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C43F111FC1784400EF94F5 /* DLWindow.swift */; };
-		84C43F141FC178A000EF94F5 /* DLUIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C43F131FC178A000EF94F5 /* DLUIManager.swift */; };
-		84C43F161FC178D700EF94F5 /* DLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C43F151FC178D700EF94F5 /* DLViewController.swift */; };
 		872F2E140137978D7755464956A9487C /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B1ED4708C29DBFA0950224738E97B4 /* Helper.swift */; };
 		8839777E5AFF753BC14486CDDB195675 /* DopamineProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BCC57FDF708021DE5695AE1EE0B3A0 /* DopamineProperties.swift */; };
 		8AFEAB4EF5EE024828B285DC397D37B7 /* Pods-DopamineKit_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C52B24D3596967BD4F17CA99753F541 /* Pods-DopamineKit_Tests-dummy.m */; };
@@ -123,8 +121,6 @@
 		7C991489072DF5E099E27CA86143DE4C /* DopeLocation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DopeLocation.swift; sourceTree = "<group>"; };
 		81B1ED4708C29DBFA0950224738E97B4 /* Helper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Helper.swift; path = Sources/Helper.swift; sourceTree = "<group>"; };
 		84C43F111FC1784400EF94F5 /* DLWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DLWindow.swift; sourceTree = "<group>"; };
-		84C43F131FC178A000EF94F5 /* DLUIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DLUIManager.swift; sourceTree = "<group>"; };
-		84C43F151FC178D700EF94F5 /* DLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DLViewController.swift; sourceTree = "<group>"; };
 		89C5B576D8CE0DA5136760567753A624 /* Pods_DopamineKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8EBD0822ACC072617A93D9718D1FF548 /* UIApplicationDelegate+Dopamine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+Dopamine.h"; sourceTree = "<group>"; };
 		90EF437F373AE8FFB19DF3A43A271BD2 /* ASIdentifierManager+ASIdentifierManagerHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "ASIdentifierManager+ASIdentifierManagerHelper.m"; sourceTree = "<group>"; };
@@ -202,8 +198,6 @@
 				34705D54F4B91CF4D61A508140626FA7 /* DLShake.swift */,
 				E76748C1C989360A081EFE5B0143AE1F /* DLSheen.swift */,
 				84C43F111FC1784400EF94F5 /* DLWindow.swift */,
-				84C43F151FC178D700EF94F5 /* DLViewController.swift */,
-				84C43F131FC178A000EF94F5 /* DLUIManager.swift */,
 			);
 			name = PrefabRewards;
 			path = Sources/PrefabRewards;
@@ -587,14 +581,12 @@
 				8839777E5AFF753BC14486CDDB195675 /* DopamineProperties.swift in Sources */,
 				959D92B3567DDA31BE17ADBFCDFB9ECC /* DopamineVersion.swift in Sources */,
 				DC1FD983212784D32568B5711E27E27F /* DopeAction.swift in Sources */,
-				84C43F161FC178D700EF94F5 /* DLViewController.swift in Sources */,
 				21ECA05059B9152D8D387AE7BBB89B07 /* DopeException.swift in Sources */,
 				DA59167D525B44F16CF7219CA0FD65D1 /* DopeLocation.swift in Sources */,
 				20E7CE558CECB3882B014A321750CC56 /* DopeLog.swift in Sources */,
 				84C43F121FC1784400EF94F5 /* DLWindow.swift in Sources */,
 				F0032F4A1DAFDFBE32D02C67E574E2AC /* DopeTracking.swift in Sources */,
 				AE5A22834886BA69F5276F1F083BE130 /* DTMethodSwizzling.m in Sources */,
-				84C43F141FC178A000EF94F5 /* DLUIManager.swift in Sources */,
 				872F2E140137978D7755464956A9487C /* Helper.swift in Sources */,
 				DBF3DBF25797A3829F5BC170D1012197 /* Report.swift in Sources */,
 				9A6FA520BD5CE9F3CE9662931BEB3A15 /* sheen.png in Sources */,
