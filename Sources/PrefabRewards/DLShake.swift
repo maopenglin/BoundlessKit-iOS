@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import AudioToolbox
 
 public extension UIView {
     
@@ -41,7 +42,7 @@ public extension UIView {
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: rotateAnimation)
     }
     
-    func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, completion: @escaping ()->Void = {}) {
+    public func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, completion: @escaping ()->Void = {}) {
         
         let pulse = CASpringAnimation(keyPath: "transform.scale")
         pulse.repeatCount = count
@@ -53,15 +54,50 @@ public extension UIView {
         
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: pulse)
     }
+    
+    public func visualVibrate(count:Int = 6, duration:TimeInterval = 1.0, translation:Int = 20, vibrateSpeed:Float = 3, scale: CGFloat = 0.95, scaleVelocity: CGFloat = 5.0, scaleDamping: CGFloat = 8)  {
+        
+        let path = UIBezierPath()
+        path.move(to: .zero)
+        for _ in 1...count {
+            path.addLine(to: CGPoint(x: translation, y: 0))
+            path.addLine(to: CGPoint(x: -translation, y: 0))
+        }
+        path.close()
+        
+        let vibrateAnimation = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        vibrateAnimation.repeatCount = 1
+        vibrateAnimation.duration = duration
+        vibrateAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        vibrateAnimation.path = path.cgPath
+        vibrateAnimation.speed = vibrateSpeed
+        
+        let scaleAnimation = CASpringAnimation(keyPath: "transform.scale")
+        scaleAnimation.repeatCount = 0
+        scaleAnimation.duration = 0.3
+        scaleAnimation.fromValue = 1
+        scaleAnimation.toValue = scale
+        scaleAnimation.autoreverses = true
+        scaleAnimation.initialVelocity = scaleVelocity
+        scaleAnimation.damping = scaleDamping
+        
+        let group = CAAnimationGroup()
+        group.animations = [vibrateAnimation, scaleAnimation]
+        group.duration = duration
+        CoreAnimationDelegate(didStart:{
+            AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+        }).start(view: self, animation: group)
+    }
+    
 }
 
 fileprivate class CoreAnimationDelegate : NSObject, CAAnimationDelegate {
     
-    let willStart: (()->Void)->Void
+    let willStart: (@escaping()->Void)->Void
     let didStart: ()->Void
     let didStop: ()->Void
     
-    init(willStart: @escaping (()->Void)->Void = {startAnimation in startAnimation()}, didStart: @escaping ()->Void = {}, didStop: @escaping ()->Void = {}) {
+    init(willStart: @escaping (@escaping()->Void)->Void = {startAnimation in startAnimation()}, didStart: @escaping ()->Void = {}, didStop: @escaping ()->Void = {}) {
         self.willStart = willStart
         self.didStart = didStart
         self.didStop = didStop
@@ -83,4 +119,5 @@ fileprivate class CoreAnimationDelegate : NSObject, CAAnimationDelegate {
             didStop()
         }
     }
+    
 }
