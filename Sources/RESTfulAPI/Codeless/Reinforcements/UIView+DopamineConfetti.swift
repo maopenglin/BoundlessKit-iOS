@@ -257,21 +257,5 @@ fileprivate extension ConfettiShape {
     }
 }
 
-fileprivate extension CGImage {
-     fileprivate func blurImage(radius: Int) -> CGImage {
-        guard radius != 0 else {
-            return self
-        }
-        let imageToBlur = CIImage(cgImage: self)
-        let blurfilter = CIFilter(name: "CIGaussianBlur")!
-        blurfilter.setValue(radius, forKey: kCIInputRadiusKey)
-        blurfilter.setValue(imageToBlur, forKey: kCIInputImageKey)
-        let resultImage = blurfilter.value(forKey: kCIOutputImageKey) as! CIImage
-        
-        let context = CIContext(options: nil)
-        return context.createCGImage(resultImage, from: resultImage.extent)!
-    }
-}
-
 
 

@@ -186,14 +186,3 @@ fileprivate class CoreAnimationDelegate : NSObject, CAAnimationDelegate {
     }
     
 }
-
-fileprivate extension DopamineKit {
-    fileprivate class var frameworkBundle: Bundle? {
-        if let bundleURL = Bundle(for: DopamineKit.classForCoder()).url(forResource: "DopamineKit", withExtension: "bundle") {
-            return Bundle(url: bundleURL)
-        } else {
-            DopeLog.debug("The DopamineKit framework bundle cannot be found")
-            return nil
-        }
-    }
-}

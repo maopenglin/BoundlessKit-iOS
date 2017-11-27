@@ -1,5 +1,5 @@
 //
-//  UIView+DopamineEmojiSplosion.swift
+//  UIView+DopamineGifSplosion.swift
 //  DopamineKit
 //
 //  Created by Akash Desai on 5/28/17.
@@ -8,10 +8,9 @@
 
 import Foundation
 import UIKit
-import AVFoundation
 
 public extension UIView {
-    public func showEmojiSplosion(at location:CGPoint,
+    public func showGifSplosion(at location:CGPoint,
                                   content: CGImage? = "❤️".image().cgImage,
                                   scale: CGFloat = 1.0,
                                   scaleSpeed: CGFloat = 0,
@@ -28,10 +27,10 @@ public extension UIView {
                                   range: CGFloat = 0,
                                   spin: CGFloat = 0
         ) {
-        showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin)
+        showGifSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin)
     }
     
-    public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, lifetimeRange: Float, fadeout: Float, birthRate: Float, birthCycles: Double, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat) {
+    public func showGifSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, lifetimeRange: Float, fadeout: Float, birthRate: Float, birthCycles: Double, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat) {
         guard let content = content else {
             DopeLog.debug("❌ received nil image content!")
             return
@@ -76,4 +75,3 @@ public extension UIView {
         }
     }
 }
-
