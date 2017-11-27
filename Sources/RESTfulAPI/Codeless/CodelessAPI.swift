@@ -66,7 +66,7 @@ public class CodelessAPI : NSObject {
             
 //            if let mappings = DopamineVersion.current.mappingsForAppEvent(key){
             
-            // display reward if reward is set for this event
+            // display reinforcement if reinforcement is set for this event
             DopamineVersion.current.codelessReinforcementFor(sender: "customEvent", target: "ApplicationEvent", selector: key) { reinforcement in
             
                 DopeLog.debug("Found application mapping with params:\(reinforcement as AnyObject)")
@@ -78,7 +78,7 @@ public class CodelessAPI : NSObject {
                     let reinforcementType = reinforcement["primitive"] as? String
                 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        prepareShowReward: do {
+                        prepareShowReinforcement: do {
                             var view: UIView! = UIWindow.topWindow!
                             var location: CGPoint = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                             switch viewOption {
@@ -94,17 +94,17 @@ public class CodelessAPI : NSObject {
                                     view = v
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
-                                    DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reward for you.")
-                                    break prepareShowReward
+                                    DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reinforcement for you.")
+                                    break prepareShowReinforcement
                                 }
 
                             default:
-//                                DopeLog.debug("Oh no. Unknown reward type primitive. No reward for you.")
-//                                break prepareShowReward
+//                                DopeLog.debug("Oh no. Unknown reinforcement type primitive. No reinforcement for you.")
+//                                break prepareShowReinforcement
                                 break
                             }
                             DopeLog.debug("About to show application event reinforcement")
-                            showReward(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
+                            showReinforcement(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
                         }
                     }
 
@@ -155,7 +155,7 @@ public class CodelessAPI : NSObject {
                 
                 
                 
-                // display reward if reward is set for this event
+                // display reinforcement if reinforcement is set for this event
                 DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetName, selector: selectorName) { reinforcement in
                     
                     if let delay = reinforcement["Delay"] as? Double,
@@ -166,7 +166,7 @@ public class CodelessAPI : NSObject {
                         let reinforcementType = reinforcement["primitive"] as? String
                     {
                         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                            prepareShowReward: do {
+                            prepareShowReinforcement: do {
                                 let view: UIView
                                 var location: CGPoint
                                 switch viewOption {
@@ -187,8 +187,8 @@ public class CodelessAPI : NSObject {
                                         view = superview
                                         location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                     } else {
-                                        DopeLog.debug("Oh no. TouchView has no superview. No reward for you.")
-                                        break prepareShowReward
+                                        DopeLog.debug("Oh no. TouchView has no superview. No reinforcement for you.")
+                                        break prepareShowReinforcement
                                     }
                                     
                                 case "target":
@@ -201,16 +201,16 @@ public class CodelessAPI : NSObject {
                                         view = v
                                         location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                     } else {
-                                        DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reward for you.")
-                                        break prepareShowReward
+                                        DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reinforcement for you.")
+                                        break prepareShowReinforcement
                                     }
                                     
                                 default:
-                                    DopeLog.debug("Oh no. Unknown reward type primitive. No reward for you.")
-                                    break prepareShowReward
+                                    DopeLog.debug("Oh no. Unknown reinforcement type primitive. No reinforcement for you.")
+                                    break prepareShowReinforcement
                                 }
                                 
-                                showReward(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
+                                showReinforcement(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
                             }
                         }
                         
@@ -264,7 +264,7 @@ public class CodelessAPI : NSObject {
             let selectorName = NSStringFromSelector(selectorObj)
 //            print("sender:\(senderClassname) target:\(targetClassname) selector:\(selectorName)")
             
-            // display reward if reward is set for this event
+            // display reinforcement if reinforcement is set for this event
             DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
                 if let delay = reinforcement["Delay"] as? Double,
                     let viewOption = reinforcement["ViewOption"] as? String,
@@ -274,7 +274,7 @@ public class CodelessAPI : NSObject {
                     let reinforcementType = reinforcement["primitive"] as? String
                 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        prepareShowReward: do {
+                        prepareShowReinforcement: do {
                             let view: UIView
                             var location: CGPoint
                             switch viewOption {
@@ -295,8 +295,8 @@ public class CodelessAPI : NSObject {
                                     view = sv
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
-                                    DopeLog.debug("Oh no. Sender is not a UIView or has no view property. No reward for you.")
-                                    break prepareShowReward
+                                    DopeLog.debug("Oh no. Sender is not a UIView or has no view property. No reinforcement for you.")
+                                    break prepareShowReinforcement
                                 }
                                 
                             case "superview":
@@ -310,8 +310,8 @@ public class CodelessAPI : NSObject {
                                     view = ssv
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
-                                    DopeLog.debug("Oh no. Sender is not a UIView or has no superview. No reward for you.")
-                                    break prepareShowReward
+                                    DopeLog.debug("Oh no. Sender is not a UIView or has no superview. No reinforcement for you.")
+                                    break prepareShowReinforcement
                                 }
                                 
                             case "target":
@@ -334,20 +334,19 @@ public class CodelessAPI : NSObject {
                                     view = v
                                     location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
                                 } else {
-                                    DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reward for you.")
-                                    break prepareShowReward
+                                    DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reinforcement for you.")
+                                    break prepareShowReinforcement
                                 }
                                 
                             default:
-                                DopeLog.debug("Oh no. Unknown view type. No reward for you.")
-                                break prepareShowReward
+                                DopeLog.debug("Oh no. Unknown view type. No reinforcement for you.")
+                                break prepareShowReinforcement
                             }
                             
-                            showReward(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
+                            showReinforcement(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
                         }
                     }
                 }
-                
             }
             
             
@@ -395,7 +394,7 @@ public class CodelessAPI : NSObject {
         }
     }
     
-    fileprivate static func showReward(on view: UIView, at location: CGPoint, of type: String, withParameters reinforcement: [String: Any]) {
+    fileprivate static func showReinforcement(on view: UIView, at location: CGPoint, of type: String, withParameters reinforcement: [String: Any]) {
         switch type {
             
         case "Emojisplosion":
@@ -416,6 +415,7 @@ public class CodelessAPI : NSObject {
                 let velocity = reinforcement["Velocity"] as? CGFloat
             {
                 view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
+                return
             }
             
         case "Glow":
@@ -426,11 +426,13 @@ public class CodelessAPI : NSObject {
                 let radius = reinforcement["Radius"] as? CGFloat
             {
                 view.showGlow(duration: duration, color: UIColor.from(hex: color), alpha: alpha, radius: radius, count: count)
+                return
             }
             
         case "Sheen":
             if let duration = reinforcement["Duration"] as? Double {
                 view.showSheen(duration: duration)
+                return
             }
             
         case "Pulse":
@@ -440,6 +442,7 @@ public class CodelessAPI : NSObject {
                 let velocity = reinforcement["Velocity"] as? CGFloat,
                 let damping = reinforcement["Damping"] as? CGFloat {
                 view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping)
+                return
             }
             
         case "Shimmy":
@@ -449,10 +452,25 @@ public class CodelessAPI : NSObject {
                 view.showShimmy(count: count, duration: duration, translation: translation)
             }
             
+        case "Vibrate":
+            if let duration = reinforcement["Duration"] as? Double,
+                let vibrateCount = reinforcement["Count"] as? Int,
+                let vibrateTranslation = reinforcement["VibrateTranslation"] as? Int,
+                let vibrateSpeed = reinforcement["VibrateSpeed"] as? Float,
+                let scale = reinforcement["Scale"] as? CGFloat,
+                let scaleVelocity = reinforcement["ScaleVelocity"] as? CGFloat,
+                let scaleDamping = reinforcement["ScaleDamping"] as? CGFloat {
+                view.showVibrate(duration: duration, vibrateCount: vibrateCount, vibrateTranslation: vibrateTranslation, vibrateSpeed: vibrateSpeed, scale: scale, scaleVelocity: scaleVelocity, scaleDamping: scaleDamping)
+                return
+            }
+            
         default:
-            DopeLog.debug("Unknown reinforcement reward type:\(String(describing: reinforcement))")
-            // TODO: implement delegate callback for dev defined rewards
+            DopeLog.debug("Unknown reinforcement type:\(String(describing: reinforcement))")
+            return
+            // TODO: implement delegate callback for dev defined reinforcements
         }
+        
+        DopeLog.error("Invalid animation parameters for reinforcement type:\(String(describing: reinforcement))")
     }
     
     @objc
