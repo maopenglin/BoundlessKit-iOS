@@ -1,6 +1,6 @@
 //
-//  DLConfetti.swift
-//  To Do List
+//  UIView+DopamineConfetti.swift
+//  DopamineKit
 //
 //  Created by Akash Desai on 9/27/17.
 //  Copyright © 2017 DopamineLabs. All rights reserved.

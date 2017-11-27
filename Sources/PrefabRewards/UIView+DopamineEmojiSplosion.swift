@@ -1,6 +1,6 @@
 //
-//  StarburstTouch.swift
-//  To Do List
+//  UIView+DopamineEmojiSplosion.swift
+//  DopamineKit
 //
 //  Created by Akash Desai on 5/28/17.
 //  Copyright © 2017 DopamineLabs. All rights reserved.

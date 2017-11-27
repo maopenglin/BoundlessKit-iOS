@@ -1,6 +1,6 @@
 {
   "name": "DopamineKit",
-  "version": "6.0.0a",
+  "version": "6.0.0b",
   "summary": "A framework to use DopamineLabs machine learning API written in Swift 4",
   "homepage": "https://github.com/DopamineLabs/DopamineKit-iOS",
   "social_media_url": "https://twitter.com/usedopamine",
@@ -17,7 +17,7 @@
   },
   "source": {
     "git": "https://github.com/DopamineLabs/DopamineKit-iOS.git",
-    "tag": "6.0.0a"
+    "tag": "6.0.0b"
   },
   "source_files": "Sources/**/*",
   "resource_bundles": {

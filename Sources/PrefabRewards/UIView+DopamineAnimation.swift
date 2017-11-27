@@ -1,6 +1,6 @@
 //
-//  DLShake.swift
-//  To Do List
+//  UIView+UIView+DopamineAnimation.swift
+//  DopamineKit
 //
 //  Created by Akash Desai on 9/28/17.
 //  Copyright © 2017 DopamineLabs. All rights reserved.
@@ -12,7 +12,7 @@ import AudioToolbox
 
 public extension UIView {
     
-    func showShimmy(count:Int = 2, duration:TimeInterval = 5.0, translation:Int = 10, speed:Float = 3, completion: @escaping ()->Void = {}) {
+    public func showShimmy(count:Int = 2, duration:TimeInterval = 5.0, translation:Int = 10, speed:Float = 3, completion: @escaping ()->Void = {}) {
         
         let path = UIBezierPath()
         path.move(to: .zero)
@@ -32,7 +32,7 @@ public extension UIView {
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: animation)
     }
     
-    func rotate360Degrees(count: Float = 2, duration: CFTimeInterval = 1.0, completion: @escaping ()->Void = {}) {
+    public func rotate360Degrees(count: Float = 2, duration: CFTimeInterval = 1.0, completion: @escaping ()->Void = {}) {
         let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")
         rotateAnimation.repeatCount = count
         rotateAnimation.duration = duration/TimeInterval(rotateAnimation.repeatCount)
@@ -89,6 +89,71 @@ public extension UIView {
         }).start(view: self, animation: group)
     }
     
+    public func showGlow(duration: Double = 0.2, color: UIColor = UIColor(red: 153/256.0, green: 101/256.0, blue: 21/256.0, alpha: 0.8), alpha: CGFloat = 0.8, radius: CGFloat = 50, count: Float = 2) {
+        
+        UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
+        
+        self.layer.render(in: UIGraphicsGetCurrentContext()!)
+        color.setFill()
+        UIBezierPath(rect: CGRect(origin: .zero, size: self.bounds.size)).fill(with: .sourceAtop, alpha:1.0)
+        let image = UIGraphicsGetImageFromCurrentImageContext()!
+        
+        UIGraphicsEndImageContext()
+        
+        let glowView = UIImageView(image: image)
+        glowView.center = self.center
+        glowView.alpha = 0
+        glowView.layer.shadowColor = color.cgColor
+        glowView.layer.shadowOffset = .zero
+        glowView.layer.shadowRadius = radius
+        glowView.layer.shadowOpacity = 1.0
+        
+        let animation = CABasicAnimation(keyPath: "opacity")
+        animation.fromValue = 0
+        animation.toValue = alpha
+        animation.repeatCount = count
+        animation.duration = duration
+        //        animation.speed = 0.35
+        animation.autoreverses = true
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        
+        CoreAnimationDelegate(
+            willStart: { start in
+                self.superview!.insertSubview(glowView, aboveSubview:self)
+                start()
+        },
+            didStop: {
+                glowView.removeFromSuperview()
+        }
+            ).start(view: glowView, animation: animation)
+    }
+    
+    public func showSheen(duration: Double) {
+        guard let bundle = DopamineKit.frameworkBundle else {
+            return
+        }
+        let imageView = UIImageView(image: UIImage.init(named: "sheen", in: bundle, compatibleWith: nil))
+        
+        let height = self.frame.height
+        let width: CGFloat = height * 1.667
+        imageView.frame = CGRect(x: -width, y: 0, width: width, height: height)
+        
+        let animation = CABasicAnimation(keyPath: "transform.translation.x")
+        animation.duration = duration
+        //        animation.speed = 2.0
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        animation.byValue = self.frame.width + width
+        
+        CoreAnimationDelegate(
+            willStart: { start in
+                self.addSubview(imageView)
+                start()
+        },
+            didStop: {
+                imageView.removeFromSuperview()
+        }
+            ).start(view: imageView, animation: animation)
+    }
 }
 
 fileprivate class CoreAnimationDelegate : NSObject, CAAnimationDelegate {
@@ -120,4 +185,15 @@ fileprivate class CoreAnimationDelegate : NSObject, CAAnimationDelegate {
         }
     }
     
+}
+
+fileprivate extension DopamineKit {
+    fileprivate class var frameworkBundle: Bundle? {
+        if let bundleURL = Bundle(for: DopamineKit.classForCoder()).url(forResource: "DopamineKit", withExtension: "bundle") {
+            return Bundle(url: bundleURL)
+        } else {
+            DopeLog.debug("The DopamineKit framework bundle cannot be found")
+            return nil
+        }
+    }
 }
