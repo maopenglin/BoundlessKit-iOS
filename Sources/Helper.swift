@@ -77,18 +77,18 @@ public extension UserDefaults {
 ///
 public extension UIColor {
     static func from (hex: String, alpha: CGFloat = 1.0) -> UIColor {
-        var cString:String = hex.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines).uppercased()
+        var colorString:String = hex.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines).uppercased()
         
-        if (cString.hasPrefix("#")) {
-            cString.removeFirst()
+        if (colorString.hasPrefix("#")) {
+            colorString.removeFirst()
         }
         
-        if cString.characters.count != 6 {
+        if colorString.count != 6 {
             return UIColor.gray
         }
         
         var rgbValue:UInt32 = 0
-        Scanner(string: cString).scanHexInt32(&rgbValue)
+        Scanner(string: colorString).scanHexInt32(&rgbValue)
         
         return UIColor(
             red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
