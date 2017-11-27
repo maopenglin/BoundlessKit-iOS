@@ -135,7 +135,8 @@ public class CodelessAPI : NSObject {
     @objc
     public static func recordEvent(touch: UITouch) {
         DispatchQueue.global().async {
-            if let touchView = touch.view {
+            if let touchView = touch.view,
+                touch.phase == .began || touch.phase == .ended {
                 let senderClassname = NSStringFromClass(type(of: touch))
                 let targetName = touchView.getParentResponders().joined(separator: ",")
                 let selectorName: String
