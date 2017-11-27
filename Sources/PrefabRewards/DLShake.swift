@@ -55,7 +55,7 @@ public extension UIView {
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: pulse)
     }
     
-    public func showVibrate(animationDuration:TimeInterval = 1.0, vibrateCount:Int = 6, vibrateTranslation:Int = 20, vibrateSpeed:Float = 3, scale: CGFloat = 0.95, scaleVelocity: CGFloat = 5.0, scaleDamping: CGFloat = 8)  {
+    public func showVibrate(duration:TimeInterval = 1.0, vibrateCount:Int = 6, vibrateTranslation:Int = 20, vibrateSpeed:Float = 3, scale: CGFloat = 0.95, scaleVelocity: CGFloat = 5.0, scaleDamping: CGFloat = 8)  {
         
         let path = UIBezierPath()
         path.move(to: .zero)
@@ -67,7 +67,7 @@ public extension UIView {
         
         let vibrateAnimation = CAKeyframeAnimation(keyPath: "transform.translation.x")
         vibrateAnimation.repeatCount = 1
-        vibrateAnimation.duration = animationDuration
+        vibrateAnimation.duration = duration
         vibrateAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         vibrateAnimation.path = path.cgPath
         vibrateAnimation.speed = vibrateSpeed
@@ -83,7 +83,7 @@ public extension UIView {
         
         let group = CAAnimationGroup()
         group.animations = [vibrateAnimation, scaleAnimation]
-        group.duration = animationDuration
+        group.duration = duration
         CoreAnimationDelegate(didStart:{
             AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
         }).start(view: self, animation: group)
