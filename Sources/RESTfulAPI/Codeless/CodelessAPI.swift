@@ -478,9 +478,9 @@ public class CodelessAPI : NSObject {
                 case 208:
                     if let connectionID = response["connectionUUID"] as? String {
                         CodelessAPI.connectionID = connectionID
-                        DispatchQueue.main.async {
-                            CandyBar(title: "Connection Restored", subtitle: "DopamineKit Visualizer").show(duration: 1.2)
-                        }
+//                        DispatchQueue.main.async {
+//                            CandyBar(title: "Connection Restored", subtitle: "DopamineKit Visualizer").show(duration: 1.2)
+//                        }
                     }
                     
                 case 204:
