@@ -27,7 +27,7 @@
     if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
         [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didAppear",
                                                           @"classname": NSStringFromClass([self class]),
-                                                          @"time": [DopeTracking trackStartTimeFor:[self description]]
+                                                          @"time": [DopeTimer trackStartTimeFor:[self description]]
                                                           }];
     }
 }
@@ -39,7 +39,7 @@
     if ([[DopamineConfiguration current] applicationViews]) {
         [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didDisappear",
                                                           @"classname": NSStringFromClass([self class]),
-                                                          @"time": [DopeTracking timeTrackedFor:[self description]]
+                                                          @"time": [DopeTimer timeTrackedFor:[self description]]
                                                               }];
     }
 }

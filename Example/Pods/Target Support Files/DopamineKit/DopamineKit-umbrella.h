@@ -10,12 +10,12 @@
 #endif
 #endif
 
+#import "DopamineKit.h"
 #import "ASIdentifierManager+ASIdentifierManagerHelper.h"
 #import "SKPaymentTransactionObserver+Dopamine.h"
 #import "UIApplication+Dopamine.h"
 #import "UIApplicationDelegate+Dopamine.h"
 #import "UIViewController+Dopamine.h"
-#import "DopamineKit.h"
 #import "SwizzleHelper.h"
 
 FOUNDATION_EXPORT double DopamineKitVersionNumber;

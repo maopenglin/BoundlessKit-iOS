@@ -1,5 +1,5 @@
 //
-//  DopeTrackinig.swift
+//  DopeTimer.swift
 //  DopamineKit
 //
 //  Created by Akash Desai on 11/9/17.
@@ -8,9 +8,9 @@
 import Foundation
 
 
-@objc public class DopeTracking : NSObject {
+@objc public class DopeTimer : NSObject {
     
-    @objc fileprivate static var timeMarkers = NSMutableDictionary()
+    fileprivate static var timeMarkers = NSMutableDictionary()
     
     @objc public static func trackStartTime(for id: String) -> NSDictionary {
         let start = NSDate()
