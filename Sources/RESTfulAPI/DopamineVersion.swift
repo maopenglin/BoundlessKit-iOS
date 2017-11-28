@@ -36,7 +36,7 @@ public class DopamineVersion : UserDefaultsSingleton {
     public func updateVisualizerMappings(_ visualizerMappings: [String: Any]) {
         self.visualizerMappings = visualizerMappings
         UserDefaults.dopamine.archive(self)
-        print("New visualizer mappings:\(self.visualizerMappings as AnyObject)")
+//        print("New visualizer mappings:\(self.visualizerMappings as AnyObject)")
     }
     
     init(versionID: String?,
@@ -109,7 +109,7 @@ public class DopamineVersion : UserDefaultsSingleton {
                 DopeLog.error("Bad reinforcement parameters")
             }
         } else {
-//            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
+            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
 //            DopeLog.debug("Reinforcement mappings:\(self.mappings as AnyObject)")
 //            DopeLog.debug("Visualizer mappings:\(self.visualizerMappings as AnyObject)")
         }

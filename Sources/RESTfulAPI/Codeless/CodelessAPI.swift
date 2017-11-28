@@ -172,7 +172,9 @@ public class CodelessAPI : NSObject {
                                 switch viewOption {
                                 case "fixed":
                                     view = UIWindow.topWindow!
-                                    location = CGPoint(x: viewMarginX, y: viewMarginY)
+                                    let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
+                                    let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
+                                    location = CGPoint(x: xMargin, y: yMargin)
                                     
                                 case "touch":
                                     view = UIWindow.topWindow!
@@ -280,7 +282,9 @@ public class CodelessAPI : NSObject {
                             switch viewOption {
                             case "fixed":
                                 view = UIWindow.topWindow!
-                                location = CGPoint(x: viewMarginX, y: viewMarginY)
+                                let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
+                                let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
+                                location = CGPoint(x: xMargin, y: yMargin)
                                 
                             case "touch":
                                 view = UIWindow.topWindow!
@@ -398,80 +402,104 @@ public class CodelessAPI : NSObject {
         switch type {
             
         case "Emojisplosion":
-            if let content = reinforcement["Content"] as? String,
-                let xAcceleration = reinforcement["AccelX"] as? CGFloat,
-                let yAcceleration = reinforcement["AccelY"] as? CGFloat,
-                let bursts = reinforcement["Bursts"] as? Double,
-                let angle = reinforcement["EmissionAngle"] as? CGFloat,
-                let range = reinforcement["EmissionRange"] as? CGFloat,
-                let fadeout = reinforcement["FadeOut"] as? Float,
-                let lifetime = reinforcement["Lifetime"] as? Float,
-                let lifetimeRange = reinforcement["LifetimeRange"] as? Float,
-                let quantity = reinforcement["Quantity"] as? Float,
-                let scale = reinforcement["Scale"] as? CGFloat,
-                let scaleRange = reinforcement["ScaleRange"] as? CGFloat,
-                let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat,
-                let spin = reinforcement["Spin"] as? CGFloat,
-                let velocity = reinforcement["Velocity"] as? CGFloat
-            {
-                view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
-                return
-            }
+            guard let content = reinforcement["Content"] as? String else { DopeLog.error("❌ Bad param"); break }
+            guard let xAcceleration = reinforcement["AccelX"] as? CGFloat else { DopeLog.error("❌  Bad param"); break }
+            guard let yAcceleration = reinforcement["AccelY"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let bursts = reinforcement["Bursts"] as? Double  else { DopeLog.error("❌  Bad param"); break }
+            guard let angle = reinforcement["EmissionAngle"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let range = reinforcement["EmissionRange"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let fadeout = reinforcement["FadeOut"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let lifetime = reinforcement["Lifetime"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let lifetimeRange = reinforcement["LifetimeRange"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let quantity = reinforcement["Quantity"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let scale = reinforcement["Scale"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let scaleRange = reinforcement["ScaleRange"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let spin = reinforcement["Spin"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
+            return
+            
+        case "Gifsplosion":
+//            DispatchQueue.main.async {
+            guard let contentString = reinforcement["Content"] as? String  else { DopeLog.error("❌  Bad param"); break }
+            guard let contentData = Data(base64Encoded: contentString, options: Data.Base64DecodingOptions.ignoreUnknownCharacters)  else { DopeLog.error("❌  Bad param"); break }
+            guard let content = UIImage(data: contentData)  else { DopeLog.error("❌  Bad param"); break }
+            guard let xAcceleration = reinforcement["AccelX"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let yAcceleration = reinforcement["AccelY"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let bursts = reinforcement["Bursts"] as? Double  else { DopeLog.error("❌  Bad param"); break }
+            guard let angle = reinforcement["EmissionAngle"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let range = reinforcement["EmissionRange"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let fadeout = reinforcement["FadeOut"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let lifetime = reinforcement["Lifetime"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let lifetimeRange = reinforcement["LifetimeRange"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let quantity = reinforcement["Quantity"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let scale = reinforcement["Scale"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let scaleRange = reinforcement["ScaleRange"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let spin = reinforcement["Spin"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let backgroundColorString = reinforcement["BackgroundColor"] as? String  else { DopeLog.error("❌  Bad param"); break }
+            guard let backgroundAlpha = reinforcement["BackgroundAlpha"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            
+            view.showGifSplosion(at: location, content: content.cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, backgroundColor: UIColor.from(rgb: backgroundColorString), backgroundAlpha: backgroundAlpha)
+            
+            return
             
         case "Glow":
-            if let duration = reinforcement["Duration"] as? Double,
-                let color = reinforcement["Color"] as? String,
-                let alpha = reinforcement["Alpha"] as? CGFloat,
-                let count = reinforcement["Count"] as? Float,
-                let radius = reinforcement["Radius"] as? CGFloat
-            {
-                view.showGlow(duration: duration, color: UIColor.from(hex: color), alpha: alpha, radius: radius, count: count)
-                return
-            }
+            guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
+            guard let color = reinforcement["Color"] as? String  else { DopeLog.error("❌  Bad param"); break }
+            guard let alpha = reinforcement["Alpha"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let count = reinforcement["Count"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let radius = reinforcement["Radius"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            view.showGlow(duration: duration, color: UIColor.from(rgb: color), alpha: alpha, radius: radius, count: count)
+            return
+            
             
         case "Sheen":
-            if let duration = reinforcement["Duration"] as? Double {
-                view.showSheen(duration: duration)
-                return
-            }
+            guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
+            view.showSheen(duration: duration)
+            return
             
         case "Pulse":
-            if let count = reinforcement["Count"] as? Float,
-                let duration = reinforcement["Duration"] as? Double,
-                let scale = reinforcement["Scale"] as? CGFloat,
-                let velocity = reinforcement["Velocity"] as? CGFloat,
-                let damping = reinforcement["Damping"] as? CGFloat {
-                view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping)
-                return
-            }
+            guard let count = reinforcement["Count"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
+            guard let scale = reinforcement["Scale"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let damping = reinforcement["Damping"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping)
+            return
             
         case "Shimmy":
-            if let count = reinforcement["Count"] as? Int,
-                let duration = reinforcement["Duration"] as? Double,
-                let translation = reinforcement["Translation"] as? Int {
-                view.showShimmy(count: count, duration: duration, translation: translation)
-            }
+            guard let count = reinforcement["Count"] as? Int  else { DopeLog.error("❌  Bad param"); break }
+            guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
+            guard let translation = reinforcement["Translation"] as? Int  else { DopeLog.error("❌  Bad param"); break }
+            view.showShimmy(count: count, duration: duration, translation: translation)
+            return
+            
             
         case "Vibrate":
-            if let duration = reinforcement["Duration"] as? Double,
-                let vibrateCount = reinforcement["Count"] as? Int,
-                let vibrateTranslation = reinforcement["VibrateTranslation"] as? Int,
-                let vibrateSpeed = reinforcement["VibrateSpeed"] as? Float,
-                let scale = reinforcement["Scale"] as? CGFloat,
-                let scaleVelocity = reinforcement["ScaleVelocity"] as? CGFloat,
-                let scaleDamping = reinforcement["ScaleDamping"] as? CGFloat {
-                view.showVibrate(duration: duration, vibrateCount: vibrateCount, vibrateTranslation: vibrateTranslation, vibrateSpeed: vibrateSpeed, scale: scale, scaleVelocity: scaleVelocity, scaleDamping: scaleDamping)
-                return
-            }
+            guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
+            guard let vibrateCount = reinforcement["Count"] as? Int  else { DopeLog.error("❌  Bad param"); break }
+            guard let vibrateTranslation = reinforcement["VibrateTranslation"] as? Int  else { DopeLog.error("❌  Bad param"); break }
+            guard let vibrateSpeed = reinforcement["VibrateSpeed"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let scale = reinforcement["Scale"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let scaleVelocity = reinforcement["ScaleVelocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let scaleDamping = reinforcement["ScaleDamping"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            view.showVibrate(duration: duration, vibrateCount: vibrateCount, vibrateTranslation: vibrateTranslation, vibrateSpeed: vibrateSpeed, scale: scale, scaleVelocity: scaleVelocity, scaleDamping: scaleDamping)
+            return
+            
             
         default:
             DopeLog.debug("Unknown reinforcement type:\(String(describing: reinforcement))")
             return
             // TODO: implement delegate callback for dev defined reinforcements
         }
-        
-        DopeLog.error("Invalid animation parameters for reinforcement type:\(String(describing: reinforcement))")
-    }
+            
+            // function should have returned if successful
+            DopeLog.error("Invalid animation parameters for reinforcement type:\(String(describing: reinforcement))")
+            print("reinforcement objcect:\(reinforcement as AnyObject)")
+        }
     
     @objc
     private static func promptPairing() {
@@ -595,7 +623,7 @@ public class CodelessAPI : NSObject {
                                 return
                         }
                         responseDict = dict
-                        DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
+//                        DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
                         
                     } catch {
                         let message = "❌ Error reading \(type.path) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))
@@ -606,7 +634,7 @@ public class CodelessAPI : NSObject {
                 })
                 
                 // send request
-                DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
+//                DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
                 task.resume()
                 
             } catch {

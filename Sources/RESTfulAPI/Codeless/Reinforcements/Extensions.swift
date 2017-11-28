@@ -66,3 +66,4 @@ internal extension CGFloat {
         self = degrees.degreesToRadians()
     }
 }
+

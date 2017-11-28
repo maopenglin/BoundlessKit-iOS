@@ -50,7 +50,7 @@ class ViewController: UIViewController {
                     reinforcerType = CandyIcon.thumbsUp
                     title = "Awesome run!"
                     subtitle = "Either you run the day,\nOr the day runs you."
-                    backgroundColor = UIColor.from(hex:"#ff0000")
+                    backgroundColor = UIColor.from(rgb:"#ff0000")
                     visibilityDuration = 2.5
                     break
                 default:
@@ -66,12 +66,12 @@ class ViewController: UIViewController {
     }
     
     @objc func action2Performed(){
-//        // Tracking call is sent asynchronously
-////        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
-        locationManager.delegate = self
-        locationManager.requestAlwaysAuthorization()
+////        // Tracking call is sent asynchronously
+//////        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
+//        locationManager.delegate = self
+//        locationManager.requestAlwaysAuthorization()
         
-        UIApplication.shared.keyWindow!.showPulse()
+        UIApplication.shared.keyWindow!.showGifSplosion(at: view.center)
 
         DopamineKit.track("action2peformed")
 //        DopamineKit.reinforce("a2") { reinforcement in

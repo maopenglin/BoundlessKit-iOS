@@ -76,8 +76,8 @@ public extension UserDefaults {
 ///     The corresponding UIColor for valid hex strings, `UIColor.grayColor()` otherwise.
 ///
 public extension UIColor {
-    static func from (hex: String, alpha: CGFloat = 1.0) -> UIColor {
-        var colorString:String = hex.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines).uppercased()
+    static func from (rgb: String, alpha: CGFloat = 1.0) -> UIColor {
+        var colorString:String = rgb.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines).uppercased()
         
         if (colorString.hasPrefix("#")) {
             colorString.removeFirst()
@@ -97,6 +97,11 @@ public extension UIColor {
             alpha: alpha
         )
     }
+    
+//    var components: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)? {
+//        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+//        return getRed(&r, green: &g, blue: &b, alpha: &a) ? (r,g,b,a) : nil
+//    }
 }
 
 extension Array {

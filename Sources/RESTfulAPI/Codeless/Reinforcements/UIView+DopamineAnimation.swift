@@ -128,7 +128,7 @@ public extension UIView {
             ).start(view: glowView, animation: animation)
     }
     
-    public func showSheen(duration: Double) {
+    public func showSheen(duration: Double = 2.0) {
         guard let bundle = DopamineKit.frameworkBundle else {
             return
         }
