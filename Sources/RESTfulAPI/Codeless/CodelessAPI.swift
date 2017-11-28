@@ -421,10 +421,7 @@ public class CodelessAPI : NSObject {
             return
             
         case "Gifsplosion":
-//            DispatchQueue.main.async {
             guard let contentString = reinforcement["Content"] as? String  else { DopeLog.error("❌  Bad param"); break }
-            guard let contentData = Data(base64Encoded: contentString, options: Data.Base64DecodingOptions.ignoreUnknownCharacters)  else { DopeLog.error("❌  Bad param"); break }
-            guard let content = UIImage(data: contentData)  else { DopeLog.error("❌  Bad param"); break }
             guard let xAcceleration = reinforcement["AccelX"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let yAcceleration = reinforcement["AccelY"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let bursts = reinforcement["Bursts"] as? Double  else { DopeLog.error("❌  Bad param"); break }
@@ -442,8 +439,11 @@ public class CodelessAPI : NSObject {
             guard let backgroundColorString = reinforcement["BackgroundColor"] as? String  else { DopeLog.error("❌  Bad param"); break }
             guard let backgroundAlpha = reinforcement["BackgroundAlpha"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             
-            view.showGifSplosion(at: location, content: content.cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, backgroundColor: UIColor.from(rgb: backgroundColorString), backgroundAlpha: backgroundAlpha)
-            
+            DispatchQueue.main.async {
+                guard let contentData = Data(base64Encoded: contentString, options: Data.Base64DecodingOptions.ignoreUnknownCharacters)  else { DopeLog.error("❌  Bad param"); return }
+                guard let content = UIImage(data: contentData)  else { DopeLog.error("❌  Bad param"); return }
+                view.showGifSplosion(at: location, content: content.cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, backgroundColor: UIColor.from(rgb: backgroundColorString), backgroundAlpha: backgroundAlpha)
+            }
             return
             
         case "Glow":
@@ -491,15 +491,15 @@ public class CodelessAPI : NSObject {
             
             
         default:
+            // TODO: implement delegate callback for dev defined reinforcements
             DopeLog.debug("Unknown reinforcement type:\(String(describing: reinforcement))")
             return
-            // TODO: implement delegate callback for dev defined reinforcements
         }
-            
-            // function should have returned if successful
-            DopeLog.error("Invalid animation parameters for reinforcement type:\(String(describing: reinforcement))")
-            print("reinforcement objcect:\(reinforcement as AnyObject)")
-        }
+        
+        // function should have returned if successful
+        DopeLog.error("Invalid animation parameters for reinforcement type:\(String(describing: reinforcement))")
+        print("reinforcement objcect:\(reinforcement as AnyObject)")
+    }
     
     @objc
     private static func promptPairing() {
