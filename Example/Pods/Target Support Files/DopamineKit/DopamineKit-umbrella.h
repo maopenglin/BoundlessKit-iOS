@@ -15,6 +15,7 @@
 #import "SKPaymentTransactionObserver+Dopamine.h"
 #import "UIApplication+Dopamine.h"
 #import "UIApplicationDelegate+Dopamine.h"
+#import "UITableViewController+Dopamine.h"
 #import "UIViewController+Dopamine.h"
 #import "SwizzleHelper.h"
 

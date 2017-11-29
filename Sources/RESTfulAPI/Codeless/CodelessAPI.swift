@@ -429,22 +429,7 @@ public class CodelessAPI : NSObject {
             return
             
         case "Gifsplosion":
-            print("Doing gifsplosion")
-//            guard let contentString = reinforcement["Content"] as? String  else { DopeLog.error("❌  Bad param"); break }
-            
-//            if !ImageFlywheel.shared.images.keys.contains("a") {
-//                DispatchQueue.main.async {
-//                guard let contentString = reinforcement["Content"] as? String  else { DopeLog.error("❌  Bad param"); return }
-//                ImageFlywheel.shared.images["a"] = contentString.pngDecoded
-//                }
-//            }
-            
-//            guard let cgImage = DopamineVersion.current.imageMappings["a"] else {
-//                let content = reinforcement["Content"] as! String
-//                DopamineVersion.current.imageMappings["a"] = content.pngDecoded!.cgImage
-//                print("Made cgimage")
-//                return
-//            }
+            guard let contentString = reinforcement["Content"] as? String  else { DopeLog.error("❌  Bad param"); break }
             guard let xAcceleration = reinforcement["AccelX"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let yAcceleration = reinforcement["AccelY"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let bursts = reinforcement["Bursts"] as? Double  else { DopeLog.error("❌  Bad param"); break }
@@ -459,33 +444,9 @@ public class CodelessAPI : NSObject {
             guard let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let spin = reinforcement["Spin"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
-//            guard let backgroundColorString = reinforcement["BackgroundColor"] as? String  else { DopeLog.error("❌  Bad param"); break }
-//            guard let backgroundAlpha = reinforcement["BackgroundAlpha"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
-            
-//            DispatchQueue.main.async {
-            
-//                guard let cgImage = DopamineVersion.current.imageMappings["a"]?.cgImage else {
-//                    let content = reinforcement["Content"] as! String
-//
-//                    DopamineVersion.current.imageMappings["a"] = content.decodeAsPNG()!
-//
-////                    let url = URL.init(string: content)!
-////                    let data = try! Data.init(contentsOf: url)
-////                    let image = UIImage.init(data: data)
-////                    DopamineVersion.current.imageMappings["a"] = image?.cgImage
-//
-//                    print("Made cgimage")
-//                    return
-//                }
-                
-                if image == nil {
-                    let content = reinforcement["Content"] as! String
-                    print("Making cgimage...")
-                    image = content.decodeAsPNG()
-                }
-                
-                view.showEmojiSplosion(at: location, content: image?.cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
-//            }
+            guard let backgroundColorString = reinforcement["BackgroundColor"] as? String  else { DopeLog.error("❌  Bad param"); break }
+            guard let backgroundAlpha = reinforcement["BackgroundAlpha"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            view.showGifSplosion(at: location, contentString: contentString, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, backgroundColor: UIColor.from(rgb: backgroundColorString), backgroundAlpha: backgroundAlpha)
             return
             
         case "Glow":
@@ -496,7 +457,6 @@ public class CodelessAPI : NSObject {
             guard let radius = reinforcement["Radius"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             view.showGlow(duration: duration, color: UIColor.from(rgb: color), alpha: alpha, radius: radius, count: count)
             return
-            
             
         case "Sheen":
             guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
@@ -519,7 +479,6 @@ public class CodelessAPI : NSObject {
             view.showShimmy(count: count, duration: duration, translation: translation)
             return
             
-            
         case "Vibrate":
             guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
             guard let vibrateCount = reinforcement["Count"] as? Int  else { DopeLog.error("❌  Bad param"); break }
@@ -530,7 +489,6 @@ public class CodelessAPI : NSObject {
             guard let scaleDamping = reinforcement["ScaleDamping"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             view.showVibrate(duration: duration, vibrateCount: vibrateCount, vibrateTranslation: vibrateTranslation, vibrateSpeed: vibrateSpeed, scale: scale, scaleVelocity: scaleVelocity, scaleDamping: scaleDamping)
             return
-            
             
         default:
             // TODO: implement delegate callback for dev defined reinforcements

@@ -10,7 +10,9 @@ import Foundation
 @objc
 public class DopamineConfiguration : UserDefaultsSingleton  {
     
-    private static var _current: DopamineConfiguration? = { return UserDefaults.dopamine.unarchive() }()
+    public static var _temporary: DopamineConfiguration? = { return DopamineConfiguration.standard }()
+    
+    private static var _current: DopamineConfiguration? = { return UserDefaults.dopamine.unarchive() ?? DopamineConfiguration.standard }()
     {
         didSet {
             UserDefaults.dopamine.archive(_current)
@@ -18,14 +20,11 @@ public class DopamineConfiguration : UserDefaultsSingleton  {
     }
     @objc public static var current: DopamineConfiguration {
         get {
-            if let _ = _current {
-            } else {
-                _current = DopamineConfiguration.standard
-            }
-            
-            return _current!
+            if _temporary != nil { return _temporary! }
+            else { return _current! }
         }
         set {
+            if _temporary != nil { return }
             _current = newValue
         }
     }
@@ -158,7 +157,7 @@ public class DopamineConfiguration : UserDefaultsSingleton  {
     }
     
     // test config
-    static var standard: DopamineConfiguration {
+    static var standard: DopamineConfiguration = {
         
         var customEvents: [String: [String:String]] = [:]
         customEvents["UIButton-DopamineKit_Example.ViewController-action2Performed"] = ["sender":"UIButton",
@@ -189,8 +188,9 @@ public class DopamineConfiguration : UserDefaultsSingleton  {
         standardConfig["advertiserID"] = true
         standardConfig["consoleLoggingEnabled"] = true
         
+        
         return DopamineConfiguration.convert(from: standardConfig)!
-    }
+    }()
     
 }
 

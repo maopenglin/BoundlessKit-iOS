@@ -10,7 +10,69 @@ import Foundation
 import UIKit
 import AudioToolbox
 
+// call all these in main queue DispatchQueue.main
 public extension UIView {
+    
+    @objc public func showGrowObjc(completionHandler: @escaping () -> Void = {}) {
+        showGrow(completionHandler: completionHandler)
+    }
+    
+    public func showGrow(count: Int = 12, duration: TimeInterval = 0.5, scaleX: CGFloat = 0.96, scaleY: CGFloat = 1, completionHandler: @escaping () -> Void = {}) {
+        
+        
+        let scaleAnimation = CASpringAnimation(keyPath: "transform.scale")
+        scaleAnimation.repeatCount = Float(count)
+        scaleAnimation.duration = duration / TimeInterval(scaleAnimation.repeatCount)
+        scaleAnimation.fromValue = 1
+        scaleAnimation.toValue = scaleX
+        scaleAnimation.autoreverses = true
+        scaleAnimation.initialVelocity = 5
+        scaleAnimation.damping = 2
+//        let scaleAnimation = CABasicAnimation(keyPath: "transform.scale")
+//        scaleAnimation.repeatCount = Float(count)
+//        scaleAnimation.duration = duration
+//        scaleAnimation.fromValue = 1
+//        scaleAnimation.toValue = scaleX
+//        scaleAnimation.autoreverses = true
+
+        CoreAnimationDelegate(
+            didStart:{
+                print("here3")
+        }, didStop: {
+            completionHandler()
+        }).start(view: self, animation: scaleAnimation)
+        
+        // applause
+//        if count < 0 {
+//            DispatchQueue.main.async {
+//                self.transform = .identity
+//                self.layer.removeAllAnimations()
+//                print("here")
+//            }
+//            completionHandler()
+//            return
+//        }
+//
+//        UIView.animateKeyframes(withDuration: duration / TimeInterval(count),
+//                       delay: 0,
+//                       options: [],
+//                       animations: {
+//                        if count % 2 == 0 {
+//                        self.transform = CGAffineTransform.init(scaleX: scaleX, y: scaleY)
+//                        } else {
+//                        self.transform = CGAffineTransform.init(scaleX: 1, y: 1)
+//                        }
+//        },
+//                       completion:{ finished in
+//                        guard finished else { return }
+//                        self.showGrow(count: count - 1)
+//                        print("here1")
+//        }
+//        )
+//        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+////            self.animation
+//        }
+    }
     
     public func showShimmy(count:Int = 2, duration:TimeInterval = 5.0, translation:Int = 10, speed:Float = 3, completion: @escaping ()->Void = {}) {
         
@@ -82,11 +144,16 @@ public extension UIView {
         scaleAnimation.damping = scaleDamping
         
         let group = CAAnimationGroup()
+        let oldClipsToBounds = clipsToBounds
         group.animations = [vibrateAnimation, scaleAnimation]
         group.duration = duration
         CoreAnimationDelegate(didStart:{
-            AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
-        }).start(view: self, animation: group)
+//            AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+            self.layer.masksToBounds = false
+        }, didStop: {
+            self.clipsToBounds = oldClipsToBounds
+        }
+            ).start(view: self, animation: group)
     }
     
     public func showGlow(duration: Double = 0.2, color: UIColor = UIColor(red: 153/256.0, green: 101/256.0, blue: 21/256.0, alpha: 0.8), alpha: CGFloat = 0.8, radius: CGFloat = 50, count: Float = 2) {
@@ -101,7 +168,7 @@ public extension UIView {
         UIGraphicsEndImageContext()
         
         let glowView = UIImageView(image: image)
-        glowView.center = self.center
+        glowView.center = CGPoint(x: self.bounds.midX, y: self.bounds.midY)
         glowView.alpha = 0
         glowView.layer.shadowColor = color.cgColor
         glowView.layer.shadowOffset = .zero
@@ -119,7 +186,8 @@ public extension UIView {
         
         CoreAnimationDelegate(
             willStart: { start in
-                self.superview!.insertSubview(glowView, aboveSubview:self)
+//                self.superview!.insertSubview(glowView, aboveSubview:self)
+                self.insertSubview(glowView, aboveSubview: self)
                 start()
         },
             didStop: {
@@ -128,11 +196,25 @@ public extension UIView {
             ).start(view: glowView, animation: animation)
     }
     
-    public func showSheen(duration: Double = 2.0) {
+    public func showSheen(duration: Double = 2.0, color: UIColor? = nil) {
         guard let bundle = DopamineKit.frameworkBundle else {
             return
         }
-        let imageView = UIImageView(image: UIImage.init(named: "sheen", in: bundle, compatibleWith: nil))
+//        let image = UIImage(named: "sheen", in: bundle, compatibleWith: nil)
+        
+//        var image = UIImage(named: "sheen", in: bundle, compatibleWith: nil)
+//        if let color = color {
+//            image = image?.withRenderingMode(.alwaysTemplate)
+//            imageView.tintColor = color
+//        }
+        
+        var image = UIImage(named: "sheen", in: bundle, compatibleWith: nil)
+        if let color = color {
+            image = image?.tint(tintColor: color)
+        }
+        
+        
+        let imageView = UIImageView(image: image)
         
         let height = self.frame.height
         let width: CGFloat = height * 1.667

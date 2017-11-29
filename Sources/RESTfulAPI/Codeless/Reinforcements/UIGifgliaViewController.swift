@@ -8,42 +8,21 @@
 
 import Foundation
 
-fileprivate class GifViewControllerDelegate : UIViewController {
-    
-    var splosion: (UIView) -> Void
-    
-    init(splosion: @escaping (UIView) -> Void) {
-        self.splosion = splosion
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        splosion(UIWindow.topWindow!)
-    }
-}
-
 internal class UIGifgliaViewController: UIViewController {
 
-    var dimDuration = 0.25
+    var dimDuration = 0.05
     var autoDismissTimeout: Double
     var backgroundColor: UIColor
     var backgroundAlpha: CGFloat
-
-    /// The view controller layed over a dimmed UIGifgliaViewController
-    fileprivate let gifViewController: GifViewControllerDelegate
+    var splosion: () -> Void
 
     /// Convenience method to set auto close timeout
     ///
-    init(autoDismissTimeout: Double, backgroundColor: UIColor, backgroundAlpha: CGFloat, splosion: @escaping (UIView) -> Void) {
+    init(autoDismissTimeout: Double, backgroundColor: UIColor, backgroundAlpha: CGFloat, splosion: @escaping () -> Void) {
         self.autoDismissTimeout = autoDismissTimeout
         self.backgroundColor = backgroundColor
         self.backgroundAlpha = backgroundAlpha
-        self.gifViewController = GifViewControllerDelegate(splosion: splosion)
+        self.splosion = splosion
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -101,18 +80,19 @@ internal class UIGifgliaViewController: UIViewController {
     /// Presents the gifViewController modally
     ///
     func showGifView() {
-        gifViewController.modalPresentationStyle = .overFullScreen
-        gifViewController.modalTransitionStyle = .coverVertical
+//        gifViewController.modalPresentationStyle = .overFullScreen
+//        gifViewController.modalTransitionStyle = .coverVertical
         self.dim(.in, alpha: backgroundAlpha, duration: dimDuration)
-        self.present(self.gifViewController, animated: false)
+//        self.present(self.gifViewController, animated: false)
+        splosion()
     }
 
     /// Dismisses both the gifViewController and the UIGifgliaViewController
     ///
     func closeGifView() {
         DispatchQueue.main.async() {
-            self.gifViewController.modalTransitionStyle = .crossDissolve
-            self.dismiss(animated: true, completion: nil)
+//            self.gifViewController.modalTransitionStyle = .crossDissolve
+//            self.dismiss(animated: true, completion: nil)
             self.dim(.out, duration: self.dimDuration)
             self.presentingViewController?.dismiss(animated: true, completion: nil)
         }
