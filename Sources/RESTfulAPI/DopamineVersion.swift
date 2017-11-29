@@ -33,6 +33,7 @@ public class DopamineVersion : UserDefaultsSingleton {
     @objc public var versionID: String?
     @objc fileprivate var mappings: [String:Any]
     @objc internal fileprivate(set) var visualizerMappings: [String:Any]
+    @objc internal var imageMappings: [String: UIImage]
     public func updateVisualizerMappings(_ visualizerMappings: [String: Any]) {
         self.visualizerMappings = visualizerMappings
         UserDefaults.dopamine.archive(self)
@@ -45,19 +46,22 @@ public class DopamineVersion : UserDefaultsSingleton {
         self.versionID = versionID
         self.mappings = mappings
         self.visualizerMappings = visualizerMappings
+        self.imageMappings = [:]
         super.init()
     }
     
     required public convenience init?(coder aDecoder: NSCoder) {
         if let versionID = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? String?,
             let mappings = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.mappings)) as? [String:Any],
-            let visualizerMappings = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.visualizerMappings)) as? [String:Any] {
+            let visualizerMappings = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.visualizerMappings)) as? [String:Any],
+            let imageMappings = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.imageMappings)) as? [String:UIImage] {
             print("Found DopamineVersion saved in user defaults.")
             self.init(
                 versionID: versionID,
                 mappings: mappings,
                 visualizerMappings: visualizerMappings
             )
+            self.imageMappings = imageMappings
         } else {
             print("Invalid DopamineVersion saved to user defaults.")
             return nil
@@ -68,6 +72,7 @@ public class DopamineVersion : UserDefaultsSingleton {
         aCoder.encode(versionID, forKey: #keyPath(DopamineVersion.versionID))
         aCoder.encode(mappings, forKey: #keyPath(DopamineVersion.mappings))
         aCoder.encode(visualizerMappings, forKey: #keyPath(DopamineVersion.visualizerMappings))
+        aCoder.encode(imageMappings, forKey: #keyPath(DopamineVersion.imageMappings))
         print("Saved DopamineVersion to user defaults.")
     }
     

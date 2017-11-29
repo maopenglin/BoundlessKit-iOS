@@ -22,6 +22,9 @@ internal extension DopamineKit {
 internal extension UIWindow {
     class var topWindow: UIWindow? {
         get {
+            if let window = UIApplication.shared.keyWindow {
+                return window
+            }
             for window in UIApplication.shared.windows.reversed() {
                 if window.windowLevel == UIWindowLevelNormal && !window.isHidden && window.frame != CGRect.zero { return window }
             }
@@ -56,6 +59,25 @@ public extension String {
         return image!
     }
 }
+
+internal extension String {
+//    var data:          Data  { return Data(utf8) }
+//    var base64Encoded: Data  { return data.base64EncodedData() }
+//    var base64Decoded: Data? { return Data(base64Encoded: self, options: Data.Base64DecodingOptions.ignoreUnknownCharacters) }
+//    var pngDecoded: UIImage? { print("test1"); return UIImage(data: base64Decoded!) }
+    
+    func decodeAsPNG() -> UIImage? {
+        if let data = Data(base64Encoded: self, options: Data.Base64DecodingOptions.ignoreUnknownCharacters) {
+            return UIImage(data: data)
+        } else {
+            return nil
+        }
+    }
+}
+
+//internal extension Data {
+//    var string: String? { return String(data: self, encoding: .utf8) }
+//}
 
 internal extension CGFloat {
     func degreesToRadians() -> CGFloat {

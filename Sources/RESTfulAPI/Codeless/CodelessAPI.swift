@@ -28,7 +28,7 @@ public class CodelessAPI : NSObject {
     @objc
     public static let shared = CodelessAPI()
     
-    static var connectionID: String?
+    static var connectionID: String? { didSet { DopeLog.debug("🔍 \(connectionID != nil ? "C" : "Disc")onnected to visualizer") } }
     private let tracesQueue = OperationQueue()
     
     private override init() {
@@ -113,6 +113,7 @@ public class CodelessAPI : NSObject {
             
             var payload = DopamineProperties.current.apiCredentials
             payload["customEvent"] = ["ApplicationEvent": key]
+            payload["actionID"] = key
             payload["senderImage"] = ""
             let submitPayload = {
                 // send event to visualizer if connected
@@ -227,6 +228,7 @@ public class CodelessAPI : NSObject {
                     payload["sender"] = senderClassname
                     payload["target"] = targetName
                     payload["selector"] = selectorName
+                    payload["actionID"] = [senderClassname, targetName, selectorName].joined(separator: "-")
                     payload["senderImage"] = ""
 //                    DispatchQueue.main.sync {
 //                    payload["senderImage"] = touchView.imageAsBase64EncodedString()
@@ -361,6 +363,7 @@ public class CodelessAPI : NSObject {
                 payload["sender"] = senderClassname
                 payload["target"] = targetClassname
                 payload["selector"] = selectorName
+                payload["actionID"] = [senderClassname, targetClassname, selectorName].joined(separator: "-")
                 DispatchQueue.main.sync {
                     if let view = senderInstance as? UIView,
                         let imageString = view.imageAsBase64EncodedString() {
@@ -383,7 +386,12 @@ public class CodelessAPI : NSObject {
         }
     }
     
+//    static var submitted = Set<String>()
     fileprivate static func submit(_ payload: [String: Any]) {
+//        guard !submitted.contains(payload["actionID"] as! String) else {
+//            return
+//        }
+//        submitted.insert(payload["actionID"] as! String)
         shared.send(call: .submit, with: payload){ response in
             if response["status"] as? Int != 200 {
                 CodelessAPI.connectionID = nil
@@ -421,7 +429,22 @@ public class CodelessAPI : NSObject {
             return
             
         case "Gifsplosion":
-            guard let contentString = reinforcement["Content"] as? String  else { DopeLog.error("❌  Bad param"); break }
+            print("Doing gifsplosion")
+//            guard let contentString = reinforcement["Content"] as? String  else { DopeLog.error("❌  Bad param"); break }
+            
+//            if !ImageFlywheel.shared.images.keys.contains("a") {
+//                DispatchQueue.main.async {
+//                guard let contentString = reinforcement["Content"] as? String  else { DopeLog.error("❌  Bad param"); return }
+//                ImageFlywheel.shared.images["a"] = contentString.pngDecoded
+//                }
+//            }
+            
+//            guard let cgImage = DopamineVersion.current.imageMappings["a"] else {
+//                let content = reinforcement["Content"] as! String
+//                DopamineVersion.current.imageMappings["a"] = content.pngDecoded!.cgImage
+//                print("Made cgimage")
+//                return
+//            }
             guard let xAcceleration = reinforcement["AccelX"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let yAcceleration = reinforcement["AccelY"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let bursts = reinforcement["Bursts"] as? Double  else { DopeLog.error("❌  Bad param"); break }
@@ -436,14 +459,33 @@ public class CodelessAPI : NSObject {
             guard let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let spin = reinforcement["Spin"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
-            guard let backgroundColorString = reinforcement["BackgroundColor"] as? String  else { DopeLog.error("❌  Bad param"); break }
-            guard let backgroundAlpha = reinforcement["BackgroundAlpha"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+//            guard let backgroundColorString = reinforcement["BackgroundColor"] as? String  else { DopeLog.error("❌  Bad param"); break }
+//            guard let backgroundAlpha = reinforcement["BackgroundAlpha"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             
-            DispatchQueue.main.async {
-                guard let contentData = Data(base64Encoded: contentString, options: Data.Base64DecodingOptions.ignoreUnknownCharacters)  else { DopeLog.error("❌  Bad param"); return }
-                guard let content = UIImage(data: contentData)  else { DopeLog.error("❌  Bad param"); return }
-                view.showGifSplosion(at: location, content: content.cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, backgroundColor: UIColor.from(rgb: backgroundColorString), backgroundAlpha: backgroundAlpha)
-            }
+//            DispatchQueue.main.async {
+            
+//                guard let cgImage = DopamineVersion.current.imageMappings["a"]?.cgImage else {
+//                    let content = reinforcement["Content"] as! String
+//
+//                    DopamineVersion.current.imageMappings["a"] = content.decodeAsPNG()!
+//
+////                    let url = URL.init(string: content)!
+////                    let data = try! Data.init(contentsOf: url)
+////                    let image = UIImage.init(data: data)
+////                    DopamineVersion.current.imageMappings["a"] = image?.cgImage
+//
+//                    print("Made cgimage")
+//                    return
+//                }
+                
+                if image == nil {
+                    let content = reinforcement["Content"] as! String
+                    print("Making cgimage...")
+                    image = content.decodeAsPNG()
+                }
+                
+                view.showEmojiSplosion(at: location, content: image?.cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
+//            }
             return
             
         case "Glow":
@@ -524,6 +566,7 @@ public class CodelessAPI : NSObject {
                 case 208:
                     if let connectionID = response["connectionUUID"] as? String {
                         CodelessAPI.connectionID = connectionID
+                        print("Reconnected")
 //                        DispatchQueue.main.async {
 //                            CandyBar(title: "Connection Restored", subtitle: "DopamineKit Visualizer").show(duration: 1.2)
 //                        }
@@ -533,6 +576,7 @@ public class CodelessAPI : NSObject {
                     if DopamineVersion.current.visualizerMappings.count != 0 {
                         DopamineVersion.current.updateVisualizerMappings([:])
                     }
+                    break
                     
                 case 500:
                     break
