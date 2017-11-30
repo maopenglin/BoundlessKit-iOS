@@ -110,31 +110,6 @@ public class DopamineVersion : UserDefaultsSingleton {
                 DopeLog.error("Bad reinforcement parameters")
             }
         } else {
-//            let tempMappings: [String: [String:Any]] = [
-//                "UITouch-UIView,UITableViewCellContentView,DopamineDemo.MessageCellView,UITableViewWrapperView,UITableView,UIView,DopamineDemo.MessageTableViewController,DopamineDemo.ViewController,UITransitionView,UIWindow,UIApplication,DopamineDemo.AppDelegate-ended":[
-//                    "actionID":"UITouch-UIView,UITableViewCellContentView,DopamineDemo.MessageCellView,UITableViewWrapperView,UITableView,UIView,DopamineDemo.MessageTableViewController,DopamineDemo.ViewController,UITransitionView,UIWindow,UIApplication,DopamineDemo.AppDelegate-ended",
-//                    "codeless":[
-//                        "reinforcements":[[
-//                            "Duration":2.0,
-//                            "Count":6,
-//                            "Translation":10,
-//                            "VibrateSpeed":2,
-//                            "Scale":0.96,
-//                            "ScaleVelocity":20,
-//                            "ScaleDamping":10
-//                        ]]
-//                    ]
-//                ]
-//            ]
-//            if let reinforcementParameters = tempMappings[actionID] {
-//                DopeLog.debug("Found visualizer reinforcement for <\(actionID)>")
-//                guard let codeless = reinforcementParameters["codeless"] as? [String: Any] else { DopeLog.error("Bad param"); return}
-//                guard let reinforcements = codeless["reinforcements"] as? [[String:Any]] else { DopeLog.error("Bad param"); return}
-//                guard let  randomReinforcement = reinforcements.selectRandom()  else { DopeLog.error("Bad param"); return}
-//                completion(randomReinforcement)
-//                return
-//
-//            }
             DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
 //            DopeLog.debug("Reinforcement mappings:\(self.mappings as AnyObject)")
 //            DopeLog.debug("Visualizer mappings:\(self.visualizerMappings as AnyObject)")
