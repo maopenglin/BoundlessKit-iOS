@@ -29,7 +29,9 @@ public extension UIView {
                                 range: CGFloat = 0,
                                 spin: CGFloat = 0,
                                 backgroundColor: UIColor = .black,
-                                backgroundAlpha: CGFloat = 0.7
+                                backgroundAlpha: CGFloat = 0.7,
+                                hapticFeedback: Bool = true,
+                                systemSound: UInt32 = 1009
         ) {
         if let content = contentString.base64DecodedImage?.cgImage {
             
@@ -38,10 +40,10 @@ public extension UIView {
                 DispatchQueue.main.async {
                     let vc = UIGifgliaViewController(autoDismissTimeout: bursts * Double(lifetime), backgroundColor: backgroundColor, backgroundAlpha: backgroundAlpha) { }
                     UIApplication.shared.keyWindow?.rootViewController?.present(vc, animated: false)
-                    self.showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin)
+                    self.showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin, hapticFeedback: hapticFeedback, systemSound: systemSound)
                 }
             } else {
-                self.showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin)
+                self.showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin, hapticFeedback: hapticFeedback, systemSound: systemSound)
             }
         }
     }
@@ -62,12 +64,14 @@ public extension UIView {
                                   angle: CGFloat = -90,
                                   range: CGFloat = 0,
                                   spin: CGFloat = 0,
+                                  hapticFeedback: Bool = true,
+                                  systemSound: UInt32 = 1009,
                                   completion: (() -> Void)? = nil
         ) {
-        showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin, completion: completion)
+        showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
     }
     
-    public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, lifetimeRange: Float, fadeout: Float, birthRate: Float, birthCycles: Double, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat, completion: (() -> Void)? = nil) {
+    public func showEmojiSplosion(at location: CGPoint, content: CGImage?, scale: CGFloat, scaleSpeed: CGFloat, scaleRange: CGFloat, lifetime: Float, lifetimeRange: Float, fadeout: Float, birthRate: Float, birthCycles: Double, velocity: CGFloat, xAcceleration: CGFloat, yAcceleration: CGFloat, angle: CGFloat, range: CGFloat, spin: CGFloat, hapticFeedback: Bool = true, systemSound: UInt32 = 1009, completion: (() -> Void)? = nil) {
         guard let content = content else {
             DopeLog.debug("❌ received nil image content!")
             return
@@ -106,6 +110,8 @@ public extension UIView {
             emitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(emitter)
             DopeLog.debug("💥 Emojisplosion on <\(NSStringFromClass(type(of: self)))> at <\(location)>!")
+            DopeAudio.playSound(systemSound)
+            DopeAudio.playVibrate(hapticFeedback)
             DispatchQueue.main.asyncAfter(deadline: .now() + birthCycles) {
                 emitter.birthRate = 0
                 completion?()

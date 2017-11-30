@@ -399,9 +399,11 @@ public class CodelessAPI : NSObject {
             guard let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let spin = reinforcement["Spin"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let hapticFeedback = reinforcement["HapticFeedback"] as? Bool  else { DopeLog.error("❌  Bad param"); break }
+            guard let systemSound = reinforcement["SystemSound"] as? UInt32  else { DopeLog.error("❌  Bad param"); break }
             let image = content.decode().image().cgImage
             for (view, location) in viewAndLocation {
-                view.showEmojiSplosion(at: location, content: image, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
+                view.showEmojiSplosion(at: location, content: image, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, hapticFeedback: hapticFeedback, systemSound: systemSound)
             }
             return
             
@@ -423,8 +425,10 @@ public class CodelessAPI : NSObject {
             guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let backgroundColorString = reinforcement["BackgroundColor"] as? String  else { DopeLog.error("❌  Bad param"); break }
             guard let backgroundAlpha = reinforcement["BackgroundAlpha"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let hapticFeedback = reinforcement["HapticFeedback"] as? Bool  else { DopeLog.error("❌  Bad param"); break }
+            guard let systemSound = reinforcement["SystemSound"] as? UInt32  else { DopeLog.error("❌  Bad param"); break }
             for (view, location) in viewAndLocation {
-                view.showGifSplosion(at: location, contentString: contentString, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, backgroundColor: UIColor.from(rgb: backgroundColorString), backgroundAlpha: backgroundAlpha)
+                view.showGifSplosion(at: location, contentString: contentString, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, backgroundColor: UIColor.from(rgb: backgroundColorString), backgroundAlpha: backgroundAlpha, hapticFeedback: hapticFeedback, systemSound: systemSound)
             }
             return
             
@@ -434,16 +438,20 @@ public class CodelessAPI : NSObject {
             guard let alpha = reinforcement["Alpha"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let count = reinforcement["Count"] as? Float  else { DopeLog.error("❌  Bad param"); break }
             guard let radius = reinforcement["Radius"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let hapticFeedback = reinforcement["HapticFeedback"] as? Bool  else { DopeLog.error("❌  Bad param"); break }
+            guard let systemSound = reinforcement["SystemSound"] as? UInt32  else { DopeLog.error("❌  Bad param"); break }
             let color = UIColor.from(rgb: colorString)
             for (view, _) in viewAndLocation {
-                view.showGlow(duration: duration, color: color, alpha: alpha, radius: radius, count: count)
+                view.showGlow(duration: duration, color: color, alpha: alpha, radius: radius, count: count, hapticFeedback: hapticFeedback, systemSound: systemSound)
             }
             return
             
         case "Sheen":
             guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
+            guard let hapticFeedback = reinforcement["HapticFeedback"] as? Bool  else { DopeLog.error("❌  Bad param"); break }
+            guard let systemSound = reinforcement["SystemSound"] as? UInt32  else { DopeLog.error("❌  Bad param"); break }
             for (view, _) in viewAndLocation {
-                view.showSheen(duration: duration)
+                view.showSheen(duration: duration, hapticFeedback: hapticFeedback, systemSound: systemSound)
             }
             return
             
@@ -453,8 +461,10 @@ public class CodelessAPI : NSObject {
             guard let scale = reinforcement["Scale"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let damping = reinforcement["Damping"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let hapticFeedback = reinforcement["HapticFeedback"] as? Bool  else { DopeLog.error("❌  Bad param"); break }
+            guard let systemSound = reinforcement["SystemSound"] as? UInt32  else { DopeLog.error("❌  Bad param"); break }
             for (view, _) in viewAndLocation {
-                view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping)
+                view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping, hapticFeedback: hapticFeedback, systemSound: systemSound)
             }
             return
             
@@ -462,21 +472,27 @@ public class CodelessAPI : NSObject {
             guard let count = reinforcement["Count"] as? Int  else { DopeLog.error("❌  Bad param"); break }
             guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
             guard let translation = reinforcement["Translation"] as? Int  else { DopeLog.error("❌  Bad param"); break }
+            guard let hapticFeedback = reinforcement["HapticFeedback"] as? Bool  else { DopeLog.error("❌  Bad param"); break }
+            guard let systemSound = reinforcement["SystemSound"] as? UInt32  else { DopeLog.error("❌  Bad param"); break }
             for (view, _) in viewAndLocation {
-                view.showShimmy(count: count, duration: duration, translation: translation)
+                view.showShimmy(count: count, duration: duration, translation: translation, hapticFeedback: hapticFeedback, systemSound: systemSound)
             }
             return
             
         case "Vibrate":
-            guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
-            guard let vibrateCount = reinforcement["Count"] as? Int  else { DopeLog.error("❌  Bad param"); break }
-            guard let vibrateTranslation = reinforcement["Translation"] as? Int  else { DopeLog.error("❌  Bad param"); break }
-            guard let vibrateSpeed = reinforcement["Speed"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let vibrateDuration = reinforcement["VibrateDuration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
+            guard let vibrateCount = reinforcement["VibrateCount"] as? Int  else { DopeLog.error("❌  Bad param"); break }
+            guard let vibrateTranslation = reinforcement["VibrateTranslation"] as? Int  else { DopeLog.error("❌  Bad param"); break }
+            guard let vibrateSpeed = reinforcement["VibrateSpeed"] as? Float  else { DopeLog.error("❌  Bad param"); break }
             guard let scale = reinforcement["Scale"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let scaleDuration = reinforcement["ScaleDuration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
+            guard let scaleCount = reinforcement["ScaleCount"] as? Float  else { DopeLog.error("❌  Bad param"); break }
             guard let scaleVelocity = reinforcement["ScaleVelocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let scaleDamping = reinforcement["ScaleDamping"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
+            guard let hapticFeedback = reinforcement["HapticFeedback"] as? Bool  else { DopeLog.error("❌  Bad param"); break }
+            guard let systemSound = reinforcement["SystemSound"] as? UInt32  else { DopeLog.error("❌  Bad param"); break }
             for (view, _) in viewAndLocation {
-                view.showVibrate(vibrateCount: vibrateCount, vibrateDuration: duration, vibrateTranslation: vibrateTranslation, vibrateSpeed: vibrateSpeed, scale: scale, scaleCount: 1, scaleDuration: 0.3, scaleVelocity: scaleVelocity, scaleDamping: scaleDamping)
+                view.showVibrate(vibrateCount: vibrateCount, vibrateDuration: vibrateDuration, vibrateTranslation: vibrateTranslation, vibrateSpeed: vibrateSpeed, scale: scale, scaleCount: scaleCount, scaleDuration: scaleDuration, scaleVelocity: scaleVelocity, scaleDamping: scaleDamping, hapticFeedback: hapticFeedback, systemSound: systemSound)
             }
             return
             

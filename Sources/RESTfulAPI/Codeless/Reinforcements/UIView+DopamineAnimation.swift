@@ -14,7 +14,7 @@ import AVFoundation
 // call all these in main queue DispatchQueue.main
 public extension UIView {
     
-    public func showShimmy(count:Int = 2, duration:TimeInterval = 5.0, translation:Int = 10, speed:Float = 3, completion: @escaping ()->Void = {}) {
+    public func showShimmy(count:Int = 2, duration:TimeInterval = 5.0, translation:Int = 10, speed:Float = 3, hapticFeedback: Bool = true, systemSound: UInt32 = 1009, completion: @escaping ()->Void = {}) {
         
         let path = UIBezierPath()
         path.move(to: .zero)
@@ -31,10 +31,14 @@ public extension UIView {
         animation.path = path.cgPath
         animation.speed = speed
         
-        CoreAnimationDelegate(didStop: completion).start(view: self, animation: animation)
+        CoreAnimationDelegate(didStart:{
+            DopeAudio.playSound(systemSound)
+            DopeAudio.playVibrate(hapticFeedback)
+        },
+                              didStop: completion).start(view: self, animation: animation)
     }
     
-    public func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, completion: @escaping ()->Void = {}) {
+    public func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, hapticFeedback: Bool = true, systemSound: UInt32 = 1009, completion: @escaping ()->Void = {}) {
         
         let pulse = CASpringAnimation(keyPath: "transform.scale")
         pulse.repeatCount = count
@@ -91,17 +95,22 @@ public extension UIView {
             ).start(view: self, animation: group)
     }
     
-    public func rotate360Degrees(count: Float = 2, duration: CFTimeInterval = 1.0, completion: @escaping ()->Void = {}) {
+    public func rotate360Degrees(count: Float = 2, duration: CFTimeInterval = 1.0, hapticFeedback: Bool = true, systemSound: UInt32 = 1009, completion: @escaping ()->Void = {}) {
         let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")
         rotateAnimation.repeatCount = count
         rotateAnimation.duration = duration/TimeInterval(rotateAnimation.repeatCount)
         rotateAnimation.fromValue = 0.0
         rotateAnimation.toValue = 2.0 * CGFloat.pi
         
-        CoreAnimationDelegate(didStop: completion).start(view: self, animation: rotateAnimation)
+        CoreAnimationDelegate(
+            didStart:{
+                DopeAudio.playSound(systemSound)
+                DopeAudio.playVibrate(hapticFeedback)
+        },
+            didStop: completion).start(view: self, animation: rotateAnimation)
     }
     
-    public func showGlow(duration: Double = 0.2, color: UIColor = UIColor(red: 153/256.0, green: 101/256.0, blue: 21/256.0, alpha: 0.8), alpha: CGFloat = 0.8, radius: CGFloat = 50, count: Float = 2) {
+    public func showGlow(duration: Double = 0.2, color: UIColor = UIColor(red: 153/256.0, green: 101/256.0, blue: 21/256.0, alpha: 0.8), alpha: CGFloat = 0.8, radius: CGFloat = 50, count: Float = 2, hapticFeedback: Bool = true, systemSound: UInt32 = 1009) {
         
         UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
         
@@ -134,13 +143,17 @@ public extension UIView {
                 self.insertSubview(glowView, aboveSubview: self)
                 start()
         },
+            didStart:{
+                DopeAudio.playSound(systemSound)
+                DopeAudio.playVibrate(hapticFeedback)
+        },
             didStop: {
                 glowView.removeFromSuperview()
         }
             ).start(view: glowView, animation: animation)
     }
     
-    public func showSheen(duration: Double = 2.0, color: UIColor? = nil) {
+    public func showSheen(duration: Double = 2.0, color: UIColor? = nil, hapticFeedback: Bool = true, systemSound: UInt32 = 1009) {
         guard let bundle = DopamineKit.frameworkBundle else {
             return
         }
@@ -167,6 +180,10 @@ public extension UIView {
             willStart: { start in
                 self.addSubview(imageView)
                 start()
+        },
+            didStart:{
+                DopeAudio.playSound(systemSound)
+                DopeAudio.playVibrate(hapticFeedback)
         },
             didStop: {
                 imageView.removeFromSuperview()
