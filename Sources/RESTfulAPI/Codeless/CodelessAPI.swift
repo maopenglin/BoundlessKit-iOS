@@ -42,7 +42,7 @@ public class CodelessAPI : NSObject {
         payload["inProduction"] = DopamineProperties.current.inProduction
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
         payload["currentConfig"] = DopamineConfiguration.current.configID ?? "nil"
-        payload["initialBoot"] = (Helper.initialBoot == nil)
+        payload["initialBoot"] = (UserDefaults.initialBootDate == nil)
         shared.send(call: .boot, with: payload){ response in
             if let status = response["status"] as? Int {
                 if status == 205 {
@@ -134,27 +134,17 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
+    public static var lastTouchLocationInUIWindow: CGPoint = CGPoint.zero
+    
+    @objc
     public static func recordEvent(touch: UITouch) {
         DispatchQueue.global().async {
             if let touchView = touch.view,
-                touch.phase == .began || touch.phase == .ended {
+                touch.phase == .ended {
+                
                 let senderClassname = NSStringFromClass(type(of: touch))
                 let targetName = touchView.getParentResponders().joined(separator: ",")
-                let selectorName: String
-                switch touch.phase {
-                case .began:
-                    selectorName = "began"
-                case .moved:
-                    selectorName = "moved"
-                case .stationary:
-                    selectorName = "stationary"
-                case .ended:
-                    selectorName = "ended"
-                case .cancelled:
-                    selectorName = "cancelled"
-                }
-                
-                
+                let selectorName = "ended"
                 
                 // display reinforcement if reinforcement is set for this event
                 DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetName, selector: selectorName) { reinforcement in

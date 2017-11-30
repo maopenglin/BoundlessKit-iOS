@@ -23,7 +23,7 @@
     UITouch* touch = event.allTouches.anyObject;
     if (touch != nil) {
         CGPoint local = [touch locationInView:[touch view]];
-        Helper.lastTouchLocationInUIWindow = [[touch view] convertPoint:local toView:nil];
+        CodelessAPI.lastTouchLocationInUIWindow = [[touch view] convertPoint:local toView:nil];
         [CodelessAPI recordEventWithTouch:touch];
     }
 
