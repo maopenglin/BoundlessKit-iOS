@@ -47,7 +47,7 @@ public extension UIView {
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: pulse)
     }
     
-    public func showVibrate(vibrateCount:Int = 6, vibrateDuration:TimeInterval = 1.0, vibrateTranslation:Int = 20, vibrateSpeed:Float = 3, scale:CGFloat = 1, scaleCount:Float = 2, scaleDuration:TimeInterval = 0.3, scaleVelocity:CGFloat = 5.0, scaleDamping:CGFloat = 8, hapticFeedback: Bool = true, systemSound: UInt32 = 1009)  {
+    public func showVibrate(vibrateCount:Int = 6, vibrateDuration:TimeInterval = 1.0, vibrateTranslation:Int = 10, vibrateSpeed:Float = 3, scale:CGFloat = 0.8, scaleCount:Float = 1, scaleDuration:TimeInterval = 0.3, scaleVelocity:CGFloat = 20, scaleDamping:CGFloat = 10, hapticFeedback: Bool = true, systemSound: UInt32 = 1009)  {
         
         let path = UIBezierPath()
         path.move(to: .zero)
