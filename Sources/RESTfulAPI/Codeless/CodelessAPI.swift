@@ -45,6 +45,7 @@ public class CodelessAPI : NSObject {
         payload["initialBoot"] = (UserDefaults.initialBootDate == nil)
         shared.send(call: .boot, with: payload){ response in
             if let status = response["status"] as? Int {
+                DopeLog.debug("Codeless Boot:\(response as AnyObject)")
                 if status == 205 {
                     if let configDict = response["config"] as? [String: Any],
                         let config = DopamineConfiguration.convert(from: configDict) {
@@ -68,44 +69,41 @@ public class CodelessAPI : NSObject {
             DopamineVersion.current.codelessReinforcementFor(sender: "customEvent", target: "ApplicationEvent", selector: key) { reinforcement in
             
                 DopeLog.debug("Found application mapping with params:\(reinforcement as AnyObject)")
-                if let delay = reinforcement["Delay"] as? Double,
-                    let viewOption = reinforcement["ViewOption"] as? String,
-                    let viewCustom = reinforcement["ViewCustom"] as? String,
-                    let viewMarginX = reinforcement["ViewMarginX"] as? CGFloat,
-                    let viewMarginY = reinforcement["ViewMarginY"] as? CGFloat,
-                    let reinforcementType = reinforcement["primitive"] as? String
-                {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        prepareShowReinforcement: do {
-                            let view: UIView!
-                            let location: CGPoint
+                guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("❌ Bad param"); return }
+                guard let viewOption = reinforcement["ViewOption"] as? String else { DopeLog.error("❌ Bad param"); return }
+                guard let viewCustom = reinforcement["ViewCustom"] as? String else { DopeLog.error("❌ Bad param"); return }
+                guard let viewMarginX = reinforcement["ViewMarginX"] as? CGFloat else { DopeLog.error("❌ Bad param"); return }
+                guard let viewMarginY = reinforcement["ViewMarginY"] as? CGFloat else { DopeLog.error("❌ Bad param"); return }
+                guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("❌ Bad param"); return }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    prepareShowReinforcement: do {
+                        let viewsAndLocations: [(UIView, CGPoint)]
+                        
+                        switch viewOption {
+                        case "fixed":
+                            let view = UIWindow.topWindow!
+                            let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
+                            let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
+                            viewsAndLocations = [(view, CGPoint(x: xMargin, y: yMargin))]
                             
-                            switch viewOption {
-                            case "fixed":
-                                view = UIWindow.topWindow!
-                                let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
-                                let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
-                                location = CGPoint(x: xMargin, y: yMargin)
-
-                            case "custom":
-                                if viewCustom != "",
-                                    let v = UIView.get(parse: viewCustom) {
-                                    view = v
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else {
-                                    DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reinforcement for you.")
-                                    break prepareShowReinforcement
-                                }
-
-                            default:
-//                                DopeLog.debug("Oh no. Unknown reinforcement type primitive. No reinforcement for you.")
+                        case "custom":
+                            if viewCustom != "" {
+                                viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
+                                    return CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                })
+                            } else {
+                                DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reinforcement for you.")
                                 break prepareShowReinforcement
                             }
-//                            DopeLog.debug("About to show application event reinforcement")
-                            showReinforcement(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
+                            
+                        default:
+//                            DopeLog.debug("Oh no. Unknown reinforcement type primitive. No reinforcement for you.")
+                            break prepareShowReinforcement
                         }
+//                        DopeLog.debug("About to show application event reinforcement")
+                        showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
                     }
-
                 }
             }
             
@@ -147,65 +145,61 @@ public class CodelessAPI : NSObject {
                 // display reinforcement if reinforcement is set for this event
                 DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetName, selector: selectorName) { reinforcement in
                     
-                    if let delay = reinforcement["Delay"] as? Double,
-                        let viewOption = reinforcement["ViewOption"] as? String,
-                        let viewCustom = reinforcement["ViewCustom"] as? String,
-                        let viewMarginX = reinforcement["ViewMarginX"] as? CGFloat,
-                        let viewMarginY = reinforcement["ViewMarginY"] as? CGFloat,
-                        let reinforcementType = reinforcement["primitive"] as? String
-                    {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                            prepareShowReinforcement: do {
-                                let view: UIView
-                                var location: CGPoint
-                                switch viewOption {
-                                case "fixed":
-                                    view = UIWindow.topWindow!
-                                    let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
-                                    let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
-                                    location = CGPoint(x: xMargin, y: yMargin)
-                                    
-                                case "touch":
-                                    view = UIWindow.topWindow!
-                                    location = Helper.lastTouchLocationInUIWindow
-                                    
-                                case "sender":
-                                    view = UIWindow.topWindow!
-                                    location = Helper.lastTouchLocationInUIWindow
-                                    
-                                case "superview":
-                                    if let superview = touchView.superview {
-                                        view = superview
-                                        location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                    } else {
-                                        DopeLog.debug("Oh no. TouchView has no superview. No reinforcement for you.")
-                                        break prepareShowReinforcement
-                                    }
-                                    
-                                case "target":
-                                    view = touchView
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                    
-                                case "custom":
-                                    if viewCustom != "",
-                                        let v = UIView.get(parse: viewCustom) {
-                                        view = v
-                                        location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                    } else {
-                                        DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reinforcement for you.")
-                                        break prepareShowReinforcement
-                                    }
-                                    
-                                default:
-                                    DopeLog.debug("Oh no. Unknown reinforcement type primitive. No reinforcement for you.")
+                    guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("❌ Bad param"); return }
+                    guard let viewOption = reinforcement["ViewOption"] as? String else { DopeLog.error("❌ Bad param"); return }
+                    guard let viewCustom = reinforcement["ViewCustom"] as? String else { DopeLog.error("❌ Bad param"); return }
+                    guard let viewMarginX = reinforcement["ViewMarginX"] as? CGFloat else { DopeLog.error("❌ Bad param"); return }
+                    guard let viewMarginY = reinforcement["ViewMarginY"] as? CGFloat else { DopeLog.error("❌ Bad param"); return }
+                    guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("❌ Bad param"); return }
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                        prepareShowReinforcement: do {
+                            let viewsAndLocations: [(UIView, CGPoint)]
+                            
+                            switch viewOption {
+                            case "fixed":
+                                let view = UIWindow.topWindow!
+                                let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
+                                let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
+                                viewsAndLocations = [(view, CGPoint(x: xMargin, y: yMargin))]
+                                
+                            case "touch":
+                                viewsAndLocations = [(UIWindow.topWindow!, Helper.lastTouchLocationInUIWindow)]
+                                
+                            case "sender":
+                                viewsAndLocations = [(UIWindow.topWindow!, Helper.lastTouchLocationInUIWindow)]
+                                
+                            case "superview":
+                                if let superview = touchView.superview {
+                                    viewsAndLocations = [(superview, CGPoint(x: superview.bounds.width / 2, y: superview.bounds.height / 2))]
+                                } else {
+                                    DopeLog.debug("Oh no. TouchView has no superview. No reinforcement for you.")
                                     break prepareShowReinforcement
                                 }
                                 
-                                showReinforcement(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
+                            case "target":
+                                viewsAndLocations = [(touchView, CGPoint(x: touchView.bounds.width / 2, y: touchView.bounds.height / 2))]
+                                
+                            case "custom":
+                                if viewCustom != "" {
+                                    viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
+                                        return CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                    })
+                                } else {
+                                    DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reinforcement for you.")
+                                    break prepareShowReinforcement
+                                }
+                                
+                            default:
+                                DopeLog.debug("Oh no. Unknown reinforcement type primitive. No reinforcement for you.")
+                                break prepareShowReinforcement
                             }
+                            
+                            showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
                         }
-                        
                     }
+                    
+                    
                 }
                 
                 
@@ -258,87 +252,79 @@ public class CodelessAPI : NSObject {
             
             // display reinforcement if reinforcement is set for this event
             DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
-                if let delay = reinforcement["Delay"] as? Double,
-                    let viewOption = reinforcement["ViewOption"] as? String,
-                    let viewCustom = reinforcement["ViewCustom"] as? String,
-                    let viewMarginX = reinforcement["ViewMarginX"] as? CGFloat,
-                    let viewMarginY = reinforcement["ViewMarginY"] as? CGFloat,
-                    let reinforcementType = reinforcement["primitive"] as? String
-                {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        prepareShowReinforcement: do {
-                            let view: UIView
-                            var location: CGPoint
-                            switch viewOption {
-                            case "fixed":
-                                view = UIWindow.topWindow!
-                                let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
-                                let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
-                                location = CGPoint(x: xMargin, y: yMargin)
-                                
-                            case "touch":
-                                view = UIWindow.topWindow!
-                                location = Helper.lastTouchLocationInUIWindow
-                                
-                            case "sender":
-                                if let senderInstance = senderInstance as? UIView {
-                                    view = senderInstance
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else if senderInstance.responds(to: NSSelectorFromString("view")),
-                                    let sv = senderInstance.value(forKey: "view") as? UIView {
-                                    view = sv
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else {
-                                    DopeLog.debug("Oh no. Sender is not a UIView or has no view property. No reinforcement for you.")
-                                    break prepareShowReinforcement
-                                }
-                                
-                            case "superview":
-                                if let senderInstance = senderInstance as? UIView,
-                                    let superview = senderInstance.superview {
-                                    view = superview
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else if senderInstance.responds(to: NSSelectorFromString("view")),
-                                    let sv = senderInstance.value(forKey: "view") as? UIView,
-                                    let ssv = sv.superview {
-                                    view = ssv
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else {
-                                    DopeLog.debug("Oh no. Sender is not a UIView or has no superview. No reinforcement for you.")
-                                    break prepareShowReinforcement
-                                }
-                                
-                            case "target":
-                                if let targetInstance = targetInstance as? UIView {
-                                    view = targetInstance
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else if targetInstance.responds(to: NSSelectorFromString("view")),
-                                    let tv = targetInstance.value(forKey: "view") as? UIView {
-                                    view = tv
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else {
-                                    DopeLog.debug("Oh no. Target is not a UIView and has no view property. Doing touch")
-                                    view = UIWindow.topWindow!
-                                    location = Helper.lastTouchLocationInUIWindow
-                                }
-                                
-                            case "custom":
-                                if viewCustom != "",
-                                    let v = UIView.get(parse: viewCustom) {
-                                    view = v
-                                    location = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                } else {
-                                    DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reinforcement for you.")
-                                    break prepareShowReinforcement
-                                }
-                                
-                            default:
-                                DopeLog.debug("Oh no. Unknown view type. No reinforcement for you.")
+                
+                guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("❌ Bad param"); return }
+                guard let viewOption = reinforcement["ViewOption"] as? String else { DopeLog.error("❌ Bad param"); return }
+                guard let viewCustom = reinforcement["ViewCustom"] as? String else { DopeLog.error("❌ Bad param"); return }
+                guard let viewMarginX = reinforcement["ViewMarginX"] as? CGFloat else { DopeLog.error("❌ Bad param"); return }
+                guard let viewMarginY = reinforcement["ViewMarginY"] as? CGFloat else { DopeLog.error("❌ Bad param"); return }
+                guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("❌ Bad param"); return }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    prepareShowReinforcement: do {
+                        let viewsAndLocations: [(UIView, CGPoint)]
+                        
+                        switch viewOption {
+                        case "fixed":
+                            let view = UIWindow.topWindow!
+                            let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
+                            let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
+                            viewsAndLocations = [(view, CGPoint(x: xMargin, y: yMargin))]
+                            
+                        case "touch":
+                            viewsAndLocations = [(UIWindow.topWindow!, Helper.lastTouchLocationInUIWindow)]
+                            
+                        case "sender":
+                            if let view = senderInstance as? UIView {
+                                viewsAndLocations = [(view, CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2))]
+                            } else if senderInstance.responds(to: NSSelectorFromString("view")),
+                                let view = senderInstance.value(forKey: "view") as? UIView {
+                                viewsAndLocations = [(view, CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2))]
+                            } else {
+                                DopeLog.debug("Oh no. Sender is not a UIView or has no view property. No reinforcement for you.")
                                 break prepareShowReinforcement
                             }
                             
-                            showReinforcement(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
+                        case "superview":
+                            if let senderInstance = senderInstance as? UIView,
+                                let superview = senderInstance.superview {
+                                viewsAndLocations = [(superview, CGPoint(x: superview.bounds.width / 2, y: superview.bounds.height / 2))]
+                            } else if senderInstance.responds(to: NSSelectorFromString("view")),
+                                let view = senderInstance.value(forKey: "view") as? UIView,
+                                let superview = view.superview {
+                                viewsAndLocations = [(superview, CGPoint(x: superview.bounds.width / 2, y: superview.bounds.height / 2))]
+                            } else {
+                                DopeLog.debug("Oh no. Sender is not a UIView or has no superview. No reinforcement for you.")
+                                break prepareShowReinforcement
+                            }
+                            
+                        case "target":
+                            if let view = targetInstance as? UIView {
+                                viewsAndLocations = [(view, CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2))]
+                            } else if targetInstance.responds(to: NSSelectorFromString("view")),
+                                let view = targetInstance.value(forKey: "view") as? UIView {
+                                viewsAndLocations = [(view, CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2))]
+                            } else {
+                                DopeLog.debug("Oh no. Target is not a UIView and has no view property. Doing touch")
+                                viewsAndLocations = [(UIWindow.topWindow!, Helper.lastTouchLocationInUIWindow)]
+                            }
+                            
+                        case "custom":
+                            if viewCustom != "" {
+                                viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
+                                    return CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                                })
+                            } else {
+                                DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reinforcement for you.")
+                                break prepareShowReinforcement
+                            }
+                            
+                        default:
+                            DopeLog.debug("Oh no. Unknown view type. No reinforcement for you.")
+                            break prepareShowReinforcement
                         }
+                        
+                        showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
                     }
                 }
             }
@@ -394,7 +380,7 @@ public class CodelessAPI : NSObject {
         }
     }
     
-    fileprivate static func showReinforcement(on view: UIView, at location: CGPoint, of type: String, withParameters reinforcement: [String: Any]) {
+    fileprivate static func showReinforcement(on viewAndLocation: [(UIView, CGPoint)], of type: String, withParameters reinforcement: [String: Any]) {
         switch type {
             
         case "Emojisplosion":
@@ -413,7 +399,10 @@ public class CodelessAPI : NSObject {
             guard let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let spin = reinforcement["Spin"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
-            view.showEmojiSplosion(at: location, content: content.decode().image().cgImage, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
+            let image = content.decode().image().cgImage
+            for (view, location) in viewAndLocation {
+                view.showEmojiSplosion(at: location, content: image, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, birthRate: quantity, birthCycles: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin)
+            }
             return
             
         case "Gifsplosion":
@@ -434,21 +423,28 @@ public class CodelessAPI : NSObject {
             guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let backgroundColorString = reinforcement["BackgroundColor"] as? String  else { DopeLog.error("❌  Bad param"); break }
             guard let backgroundAlpha = reinforcement["BackgroundAlpha"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
-            view.showGifSplosion(at: location, contentString: contentString, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, backgroundColor: UIColor.from(rgb: backgroundColorString), backgroundAlpha: backgroundAlpha)
+            for (view, location) in viewAndLocation {
+                view.showGifSplosion(at: location, contentString: contentString, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, backgroundColor: UIColor.from(rgb: backgroundColorString), backgroundAlpha: backgroundAlpha)
+            }
             return
             
         case "Glow":
             guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
-            guard let color = reinforcement["Color"] as? String  else { DopeLog.error("❌  Bad param"); break }
+            guard let colorString = reinforcement["Color"] as? String  else { DopeLog.error("❌  Bad param"); break }
             guard let alpha = reinforcement["Alpha"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let count = reinforcement["Count"] as? Float  else { DopeLog.error("❌  Bad param"); break }
             guard let radius = reinforcement["Radius"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
-            view.showGlow(duration: duration, color: UIColor.from(rgb: color), alpha: alpha, radius: radius, count: count)
+            let color = UIColor.from(rgb: colorString)
+            for (view, _) in viewAndLocation {
+                view.showGlow(duration: duration, color: color, alpha: alpha, radius: radius, count: count)
+            }
             return
             
         case "Sheen":
             guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
-            view.showSheen(duration: duration)
+            for (view, _) in viewAndLocation {
+                view.showSheen(duration: duration)
+            }
             return
             
         case "Pulse":
@@ -457,25 +453,31 @@ public class CodelessAPI : NSObject {
             guard let scale = reinforcement["Scale"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let damping = reinforcement["Damping"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
-            view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping)
+            for (view, _) in viewAndLocation {
+                view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping)
+            }
             return
             
         case "Shimmy":
             guard let count = reinforcement["Count"] as? Int  else { DopeLog.error("❌  Bad param"); break }
             guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
             guard let translation = reinforcement["Translation"] as? Int  else { DopeLog.error("❌  Bad param"); break }
-            view.showShimmy(count: count, duration: duration, translation: translation)
+            for (view, _) in viewAndLocation {
+                view.showShimmy(count: count, duration: duration, translation: translation)
+            }
             return
             
         case "Vibrate":
             guard let duration = reinforcement["Duration"] as? Double  else { DopeLog.error("❌  Bad param"); break }
             guard let vibrateCount = reinforcement["Count"] as? Int  else { DopeLog.error("❌  Bad param"); break }
-            guard let vibrateTranslation = reinforcement["VibrateTranslation"] as? Int  else { DopeLog.error("❌  Bad param"); break }
-            guard let vibrateSpeed = reinforcement["VibrateSpeed"] as? Float  else { DopeLog.error("❌  Bad param"); break }
+            guard let vibrateTranslation = reinforcement["Translation"] as? Int  else { DopeLog.error("❌  Bad param"); break }
+            guard let vibrateSpeed = reinforcement["Speed"] as? Float  else { DopeLog.error("❌  Bad param"); break }
             guard let scale = reinforcement["Scale"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let scaleVelocity = reinforcement["ScaleVelocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let scaleDamping = reinforcement["ScaleDamping"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
-            view.showVibrate(vibrateCount: vibrateCount, vibrateDuration: duration, vibrateTranslation: vibrateTranslation, vibrateSpeed: vibrateSpeed, scale: scale, scaleCount: 1, scaleDuration: 0.3, scaleVelocity: scaleVelocity, scaleDamping: scaleDamping)
+            for (view, _) in viewAndLocation {
+                view.showVibrate(vibrateCount: vibrateCount, vibrateDuration: duration, vibrateTranslation: vibrateTranslation, vibrateSpeed: vibrateSpeed, scale: scale, scaleCount: 1, scaleDuration: 0.3, scaleVelocity: scaleVelocity, scaleDamping: scaleDamping)
+            }
             return
             
         default:
@@ -613,7 +615,7 @@ public class CodelessAPI : NSObject {
                                 return
                         }
                         responseDict = dict
-//                        DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
+                        DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
                         
                     } catch {
                         let message = "❌ Error reading \(type.path) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))
@@ -624,7 +626,7 @@ public class CodelessAPI : NSObject {
                 })
                 
                 // send request
-//                DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
+                DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
                 task.resume()
                 
             } catch {
@@ -695,27 +697,47 @@ fileprivate extension UIView {
         return views
     }
     
-    static func get(parse viewCustom: String) -> UIView? {
+    static func find(_ viewCustom: String, _ locationFunction: (UIView) -> CGPoint ) -> [(UIView, CGPoint)] {
+        var values: [(UIView, CGPoint)] = []
+        for view in find(viewCustom) {
+            values.append((view, locationFunction(view)))
+        }
+        return values
+    }
+    
+    static func find(_ viewCustom: String) -> [UIView] {
         let viewCustomParams = viewCustom.components(separatedBy: "$")
         let classname: String
-        let index: Int
-        if viewCustomParams.count == 2,
-            let i = Int(viewCustomParams[1]) {
+        let index: Int?
+        if viewCustomParams.count == 2 {
             classname = viewCustomParams[0]
-            index = i
+            index = Int(viewCustomParams[1])
         } else if viewCustomParams.count == 1 {
             classname = viewCustomParams[0]
-            index = 0
+            index = nil
         } else {
-            DopeLog.error("Too many params for customView. Should be in the format \"ViewClassname$0\"")
-            return nil
+            DopeLog.error("Invalid params for customView. Should be in the format \"ViewClassname$0\"")
+            return []
         }
         let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: classname)
-        if index <= possibleViews.count-1 {
-            return possibleViews[index]
-        } else {
-            return nil
+        
+        if let index = index {
+            if index >= 0 {
+                if index < possibleViews.count {
+                    return [possibleViews[index]]
+                } else if let view = possibleViews.last {
+                    return [view]
+                }
+            } else { // negative index counts backwards
+                if -index <= possibleViews.count {
+                    return [possibleViews[possibleViews.count + index]]
+                } else if let view = possibleViews.first {
+                    return [view]
+                }
+            }
         }
+        
+        return possibleViews
     }
 }
 

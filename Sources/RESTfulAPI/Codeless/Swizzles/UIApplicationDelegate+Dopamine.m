@@ -53,7 +53,7 @@ static NSArray* delegateSubclasses = nil;
 
 - (BOOL) swizzled_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [CodelessAPI recordApplicationEventWithKey:@"appLaunch"];
-    NSLog(@"Hello");
+    
     if ([self respondsToSelector:@selector(swizzled_application:didFinishLaunchingWithOptions:)]) {
         return [self swizzled_application:application didFinishLaunchingWithOptions:launchOptions];
     } else {
