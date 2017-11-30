@@ -23,8 +23,6 @@ open class DopamineKit : NSObject {
     @objc public static let shared: DopamineKit = DopamineKit()
     public static let syncCoordinator = SyncCoordinator.shared
     
-//    public static var UIManager: DLUIManager = DLUIManager.main
-    
     private override init() {
         super.init()
     }

@@ -64,8 +64,6 @@ public class CodelessAPI : NSObject {
     public static func recordApplicationEvent(key: String) {
         DispatchQueue.global().async {
             
-//            if let mappings = DopamineVersion.current.mappingsForAppEvent(key){
-            
             // display reinforcement if reinforcement is set for this event
             DopamineVersion.current.codelessReinforcementFor(sender: "customEvent", target: "ApplicationEvent", selector: key) { reinforcement in
             
@@ -79,11 +77,12 @@ public class CodelessAPI : NSObject {
                 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                         prepareShowReinforcement: do {
-                            var view: UIView! = UIWindow.topWindow!
-                            var location: CGPoint = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                            let view: UIView!
+                            let location: CGPoint
+                            
                             switch viewOption {
                             case "fixed":
-//                                view = UIWindow.topWindow!
+                                view = UIWindow.topWindow!
                                 let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
                                 let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
                                 location = CGPoint(x: xMargin, y: yMargin)
@@ -100,10 +99,9 @@ public class CodelessAPI : NSObject {
 
                             default:
 //                                DopeLog.debug("Oh no. Unknown reinforcement type primitive. No reinforcement for you.")
-//                                break prepareShowReinforcement
-                                break
+                                break prepareShowReinforcement
                             }
-                            DopeLog.debug("About to show application event reinforcement")
+//                            DopeLog.debug("About to show application event reinforcement")
                             showReinforcement(on: view, at: location, of: reinforcementType, withParameters: reinforcement)
                         }
                     }
@@ -477,7 +475,7 @@ public class CodelessAPI : NSObject {
             guard let scale = reinforcement["Scale"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let scaleVelocity = reinforcement["ScaleVelocity"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
             guard let scaleDamping = reinforcement["ScaleDamping"] as? CGFloat  else { DopeLog.error("❌  Bad param"); break }
-            view.showVibrate(duration: duration, vibrateCount: vibrateCount, vibrateTranslation: vibrateTranslation, vibrateSpeed: vibrateSpeed, scale: scale, scaleVelocity: scaleVelocity, scaleDamping: scaleDamping)
+            view.showVibrate(vibrateCount: vibrateCount, vibrateDuration: duration, vibrateTranslation: vibrateTranslation, vibrateSpeed: vibrateSpeed, scale: scale, scaleCount: 1, scaleDuration: 0.3, scaleVelocity: scaleVelocity, scaleDamping: scaleDamping)
             return
             
         default:

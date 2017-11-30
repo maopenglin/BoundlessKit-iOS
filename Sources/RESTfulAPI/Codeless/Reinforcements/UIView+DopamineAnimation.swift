@@ -47,42 +47,44 @@ public extension UIView {
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: pulse)
     }
     
-    public func showVibrate(duration:TimeInterval = 1.0, vibrateCount:Int = 6, vibrateTranslation:Int = 20, vibrateSpeed:Float = 3, scale: CGFloat = 0.95, scaleVelocity: CGFloat = 5.0, scaleDamping: CGFloat = 8)  {
+    public func showVibrate(vibrateCount:Int = 6, vibrateDuration:TimeInterval = 1.0, vibrateTranslation:Int = 20, vibrateSpeed:Float = 3, scale:CGFloat = 1, scaleCount:Float = 2, scaleDuration:TimeInterval = 0.3, scaleVelocity:CGFloat = 5.0, scaleDamping:CGFloat = 8, hapticFeedback: Bool = true, systemSound: UInt32 = 1009)  {
         
         let path = UIBezierPath()
         path.move(to: .zero)
-        for _ in 1...vibrateCount {
-            path.addLine(to: CGPoint(x: vibrateTranslation, y: 0))
-            path.addLine(to: CGPoint(x: -vibrateTranslation, y: 0))
+        if vibrateCount >= 1 {
+            for _ in 1...vibrateCount {
+                path.addLine(to: CGPoint(x: vibrateTranslation, y: 0))
+                path.addLine(to: CGPoint(x: -vibrateTranslation, y: 0))
+            }
         }
         path.close()
         
         let vibrateAnimation = CAKeyframeAnimation(keyPath: "transform.translation.x")
         vibrateAnimation.repeatCount = 1
-        vibrateAnimation.duration = duration / TimeInterval(vibrateAnimation.repeatCount)
+        vibrateAnimation.duration = vibrateDuration / TimeInterval(vibrateAnimation.repeatCount)
         vibrateAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         vibrateAnimation.path = path.cgPath
         vibrateAnimation.speed = vibrateSpeed
         
         let scaleAnimation = CASpringAnimation(keyPath: "transform.scale")
-        scaleAnimation.repeatCount = 0
-        scaleAnimation.duration = 0.3
-        scaleAnimation.fromValue = 1
-        scaleAnimation.toValue = scale
+        scaleAnimation.repeatCount = scaleCount > 0 ? scaleCount : 1
+        scaleAnimation.duration = scaleDuration / TimeInterval(scaleAnimation.repeatCount)
+        scaleAnimation.toValue = scaleCount > 0 ? scale : 1
         scaleAnimation.autoreverses = true
         scaleAnimation.initialVelocity = scaleVelocity
         scaleAnimation.damping = scaleDamping
         
         let group = CAAnimationGroup()
         group.animations = [vibrateAnimation, scaleAnimation]
-        group.duration = duration
+        group.duration = max(vibrateDuration, scaleDuration)
         let oldClipsToBounds = clipsToBounds
         
         CoreAnimationDelegate(willStart:{startAnimation in
             self.layer.masksToBounds = false
             startAnimation()
         }, didStart:{
-            DopeAudio.playSound(1009)
+            DopeAudio.playSound(systemSound)
+            DopeAudio.playVibrate(hapticFeedback)
         }, didStop: {
             self.clipsToBounds = oldClipsToBounds
         }
@@ -129,7 +131,6 @@ public extension UIView {
         
         CoreAnimationDelegate(
             willStart: { start in
-//                self.superview!.insertSubview(glowView, aboveSubview:self)
                 self.insertSubview(glowView, aboveSubview: self)
                 start()
         },
@@ -143,13 +144,6 @@ public extension UIView {
         guard let bundle = DopamineKit.frameworkBundle else {
             return
         }
-//        let image = UIImage(named: "sheen", in: bundle, compatibleWith: nil)
-        
-//        var image = UIImage(named: "sheen", in: bundle, compatibleWith: nil)
-//        if let color = color {
-//            image = image?.withRenderingMode(.alwaysTemplate)
-//            imageView.tintColor = color
-//        }
         
         var image = UIImage(named: "sheen", in: bundle, compatibleWith: nil)
         if let color = color {

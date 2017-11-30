@@ -21,7 +21,8 @@ internal class DopeAudio : NSObject {
     fileprivate static let vibrateQueue = SingleOperationQueue()
     fileprivate static let vibrateSoundID = SystemSoundID(kSystemSoundID_Vibrate)
     
-    static func playVibrate() {
+    static func playVibrate(_ bool: Bool = true) {
+        if !bool { return }
         soundQueue.addOperation {
             AudioServicesPlayAlertSound(vibrateSoundID)
         }
@@ -52,37 +53,3 @@ class SingleOperationQueue : OperationQueue {
     }
     
 }
-
-//static var nextSound: SystemSoundID {
-//    get {
-//        //            let sound = systemSounds[systemSoundMarker % systemSounds.count]
-//        systemSoundMarker = systemSoundMarker + 1
-//        if systemSoundMarker == 1037 {
-//            systemSoundMarker = 1050
-//        }
-//        if systemSoundMarker == 1058 {
-//            systemSoundMarker = 1070
-//        }
-//        if systemSoundMarker == 1076 {
-//            systemSoundMarker = 1100
-//        }
-//        if systemSoundMarker == 1119 {
-//            systemSoundMarker = 1150
-//        }
-//        if systemSoundMarker == 1155 {
-//            systemSoundMarker = 1200
-//        }
-//        if systemSoundMarker == 1212 {
-//            systemSoundMarker = 1254
-//        }
-//        if systemSoundMarker == 1260 {
-//            systemSoundMarker = 1300
-//        }
-//        if systemSoundMarker == 1351 {
-//            systemSoundMarker = 4095
-//        }
-//        print(systemSoundMarker)
-//        return SystemSoundID(systemSoundMarker)
-//    }
-//}
-

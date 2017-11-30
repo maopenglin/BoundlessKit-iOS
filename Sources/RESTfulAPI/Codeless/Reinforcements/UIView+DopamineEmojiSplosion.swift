@@ -36,15 +36,9 @@ public extension UIView {
             if backgroundAlpha > 0 {
                 
                 DispatchQueue.main.async {
-                    let vc = UIGifgliaViewController(autoDismissTimeout: bursts * Double(lifetime), backgroundColor: backgroundColor, backgroundAlpha: backgroundAlpha) {
-                        
-                    }
+                    let vc = UIGifgliaViewController(autoDismissTimeout: bursts * Double(lifetime), backgroundColor: backgroundColor, backgroundAlpha: backgroundAlpha) { }
                     UIApplication.shared.keyWindow?.rootViewController?.present(vc, animated: false)
                     self.showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin)
-//                    UIApplication.shared.keyWindow?.rootViewController?.present(vc, animated: true, completion: {
-//                        vc.gifViewController.view.showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin)
-//                    })
-                    
                 }
             } else {
                 self.showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, birthRate:quantity, birthCycles:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin)
