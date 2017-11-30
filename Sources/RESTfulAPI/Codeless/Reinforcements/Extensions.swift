@@ -7,15 +7,6 @@
 
 import Foundation
 
-//@objc
-//public extension UITableViewController {
-//    @objc public func shrinkAllRows(for selectedRow: NSIndexPath, completion: @escaping () -> Void) {
-//        for row in 0...tableView.numberOfRows(inSection: selectedRow.section) {
-//            tableView.cellForRow(at: IndexPath.init(row: row, section: selectedRow.section))?.showGrow(scaleX: 0.8, scaleY: 0.6, completionHandler: completion)
-//        }
-//    }
-//}
-
 extension UIImage {
     
     // colorize image with given tint color
@@ -127,7 +118,7 @@ internal extension CGImage {
 public extension String {
     func image(font:UIFont = .systemFont(ofSize: 24)) -> UIImage {
         let size = (self as NSString).size(withAttributes: [NSAttributedStringKey.font: font])
-        UIGraphicsBeginImageContextWithOptions(size, false, 0);
+        UIGraphicsBeginImageContextWithOptions(size, false, 0)
         (self as NSString).draw(at: .zero, withAttributes: [NSAttributedStringKey.font: font])
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()

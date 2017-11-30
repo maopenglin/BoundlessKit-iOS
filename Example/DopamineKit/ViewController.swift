@@ -71,7 +71,6 @@ class ViewController: UIViewController {
 //        locationManager.delegate = self
 //        locationManager.requestAlwaysAuthorization()
         
-        UIApplication.shared.keyWindow!.showGifSplosion(at: view.center)
 
         DopamineKit.track("action2peformed")
 //        DopamineKit.reinforce("a2") { reinforcement in

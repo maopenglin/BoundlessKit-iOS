@@ -9,70 +9,10 @@
 import Foundation
 import UIKit
 import AudioToolbox
+import AVFoundation
 
 // call all these in main queue DispatchQueue.main
 public extension UIView {
-    
-    @objc public func showGrowObjc(completionHandler: @escaping () -> Void = {}) {
-        showGrow(completionHandler: completionHandler)
-    }
-    
-    public func showGrow(count: Int = 12, duration: TimeInterval = 0.5, scaleX: CGFloat = 0.96, scaleY: CGFloat = 1, completionHandler: @escaping () -> Void = {}) {
-        
-        
-        let scaleAnimation = CASpringAnimation(keyPath: "transform.scale")
-        scaleAnimation.repeatCount = Float(count)
-        scaleAnimation.duration = duration / TimeInterval(scaleAnimation.repeatCount)
-        scaleAnimation.fromValue = 1
-        scaleAnimation.toValue = scaleX
-        scaleAnimation.autoreverses = true
-        scaleAnimation.initialVelocity = 5
-        scaleAnimation.damping = 2
-//        let scaleAnimation = CABasicAnimation(keyPath: "transform.scale")
-//        scaleAnimation.repeatCount = Float(count)
-//        scaleAnimation.duration = duration
-//        scaleAnimation.fromValue = 1
-//        scaleAnimation.toValue = scaleX
-//        scaleAnimation.autoreverses = true
-
-        CoreAnimationDelegate(
-            didStart:{
-                print("here3")
-        }, didStop: {
-            completionHandler()
-        }).start(view: self, animation: scaleAnimation)
-        
-        // applause
-//        if count < 0 {
-//            DispatchQueue.main.async {
-//                self.transform = .identity
-//                self.layer.removeAllAnimations()
-//                print("here")
-//            }
-//            completionHandler()
-//            return
-//        }
-//
-//        UIView.animateKeyframes(withDuration: duration / TimeInterval(count),
-//                       delay: 0,
-//                       options: [],
-//                       animations: {
-//                        if count % 2 == 0 {
-//                        self.transform = CGAffineTransform.init(scaleX: scaleX, y: scaleY)
-//                        } else {
-//                        self.transform = CGAffineTransform.init(scaleX: 1, y: 1)
-//                        }
-//        },
-//                       completion:{ finished in
-//                        guard finished else { return }
-//                        self.showGrow(count: count - 1)
-//                        print("here1")
-//        }
-//        )
-//        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-////            self.animation
-//        }
-    }
     
     public func showShimmy(count:Int = 2, duration:TimeInterval = 5.0, translation:Int = 10, speed:Float = 3, completion: @escaping ()->Void = {}) {
         
@@ -92,16 +32,6 @@ public extension UIView {
         animation.speed = speed
         
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: animation)
-    }
-    
-    public func rotate360Degrees(count: Float = 2, duration: CFTimeInterval = 1.0, completion: @escaping ()->Void = {}) {
-        let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")
-        rotateAnimation.repeatCount = count
-        rotateAnimation.duration = duration/TimeInterval(rotateAnimation.repeatCount)
-        rotateAnimation.fromValue = 0.0
-        rotateAnimation.toValue = 2.0 * CGFloat.pi
-        
-        CoreAnimationDelegate(didStop: completion).start(view: self, animation: rotateAnimation)
     }
     
     public func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, completion: @escaping ()->Void = {}) {
@@ -129,7 +59,7 @@ public extension UIView {
         
         let vibrateAnimation = CAKeyframeAnimation(keyPath: "transform.translation.x")
         vibrateAnimation.repeatCount = 1
-        vibrateAnimation.duration = duration
+        vibrateAnimation.duration = duration / TimeInterval(vibrateAnimation.repeatCount)
         vibrateAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         vibrateAnimation.path = path.cgPath
         vibrateAnimation.speed = vibrateSpeed
@@ -144,16 +74,29 @@ public extension UIView {
         scaleAnimation.damping = scaleDamping
         
         let group = CAAnimationGroup()
-        let oldClipsToBounds = clipsToBounds
         group.animations = [vibrateAnimation, scaleAnimation]
         group.duration = duration
-        CoreAnimationDelegate(didStart:{
-//            AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+        let oldClipsToBounds = clipsToBounds
+        
+        CoreAnimationDelegate(willStart:{startAnimation in
             self.layer.masksToBounds = false
+            startAnimation()
+        }, didStart:{
+            DopeAudio.playSound(1009)
         }, didStop: {
             self.clipsToBounds = oldClipsToBounds
         }
             ).start(view: self, animation: group)
+    }
+    
+    public func rotate360Degrees(count: Float = 2, duration: CFTimeInterval = 1.0, completion: @escaping ()->Void = {}) {
+        let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")
+        rotateAnimation.repeatCount = count
+        rotateAnimation.duration = duration/TimeInterval(rotateAnimation.repeatCount)
+        rotateAnimation.fromValue = 0.0
+        rotateAnimation.toValue = 2.0 * CGFloat.pi
+        
+        CoreAnimationDelegate(didStop: completion).start(view: self, animation: rotateAnimation)
     }
     
     public func showGlow(duration: Double = 0.2, color: UIColor = UIColor(red: 153/256.0, green: 101/256.0, blue: 21/256.0, alpha: 0.8), alpha: CGFloat = 0.8, radius: CGFloat = 50, count: Float = 2) {
