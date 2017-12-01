@@ -10,23 +10,13 @@ import Foundation
 @objc
 public class DopamineVersion : UserDefaultsSingleton {
     
-    private static var _current: DopamineVersion? =  { return UserDefaults.dopamine.unarchive() }()
-    {
+    @objc
+    public static var current: DopamineVersion! = {
+        return UserDefaults.dopamine.unarchive() ?? DopamineVersion.standard
+        }()
+        {
         didSet {
-            UserDefaults.dopamine.archive(_current)
-        }
-    }
-    public static var current: DopamineVersion {
-        get {
-            if let _ = _current {
-            } else {
-                _current = DopamineVersion.standard
-            }
-            
-            return _current!
-        }
-        set {
-            _current = newValue
+            UserDefaults.dopamine.archive(current)
         }
     }
     
@@ -41,12 +31,18 @@ public class DopamineVersion : UserDefaultsSingleton {
     }
     
     init(versionID: String?,
-         mappings: [String:Any],
-         visualizerMappings: [String: Any]) {
+         mappings: [String:Any] = [:],
+         visualizerMappings: [String: Any] = [:]) {
         self.versionID = versionID
         self.mappings = mappings
         self.visualizerMappings = visualizerMappings
         super.init()
+    }
+    
+    static func initStandard(with versionID: String?) -> DopamineVersion {
+        let standard = DopamineVersion.standard
+        standard.versionID = versionID
+        return standard
     }
     
     required public convenience init?(coder aDecoder: NSCoder) {
@@ -73,7 +69,7 @@ public class DopamineVersion : UserDefaultsSingleton {
     }
     
     static var standard: DopamineVersion {
-        return DopamineVersion(versionID: nil, mappings: [:], visualizerMappings: [:])
+        return DopamineVersion(versionID: nil)
     }
     
     public func codelessReinforcementFor(sender: String, target: String, selector: String, completion: @escaping ([String:Any]) -> ()) {

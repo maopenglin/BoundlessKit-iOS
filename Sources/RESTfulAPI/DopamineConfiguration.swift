@@ -10,22 +10,13 @@ import Foundation
 @objc
 public class DopamineConfiguration : UserDefaultsSingleton  {
     
-    public static var _temporary: DopamineConfiguration? = { return DopamineConfiguration.standard }()
-    
-    private static var _current: DopamineConfiguration? = { return UserDefaults.dopamine.unarchive() ?? DopamineConfiguration.standard }()
-    {
+    @objc
+    public static var current: DopamineConfiguration! = {
+        return UserDefaults.dopamine.unarchive() ?? DopamineConfiguration.standard
+        }()
+        {
         didSet {
-            UserDefaults.dopamine.archive(_current)
-        }
-    }
-    @objc public static var current: DopamineConfiguration {
-        get {
-            if _temporary != nil { return _temporary! }
-            else { return _current! }
-        }
-        set {
-            if _temporary != nil { return }
-            _current = newValue
+            UserDefaults.dopamine.archive(current)
         }
     }
     

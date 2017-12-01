@@ -9,30 +9,20 @@ import Foundation
 
 internal class DopamineProperties : UserDefaultsSingleton {
     
-    private static var _current: DopamineProperties? = { return UserDefaults.dopamine.unarchive() }()
-    {
-        didSet {
-            UserDefaults.dopamine.archive(_current)
-        }
-    }
-    static var current: DopamineProperties {
-        get {
-            if let _ = _current {
-            } else if
-                let propertiesDictionary = DopamineKit.testCredentials,
-                let properties = DopamineProperties.convert(from: propertiesDictionary) {
-                _current = properties
-            } else {
+    @objc
+    static var current: DopamineProperties! = {
+        return UserDefaults.dopamine.unarchive() ??
+            DopamineProperties.convert(from: DopamineKit.testCredentials) ??
+            {
                 let propertiesFile = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist")!
                 let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as! [String: Any]
                 let properties = DopamineProperties.convert(from: propertiesDictionary)!
-                _current = properties
-            }
-            
-            return _current!
-        }
-        set {
-            _current = newValue
+                return properties
+            }()
+        }()
+        {
+        didSet {
+            UserDefaults.dopamine.archive(current)
         }
     }
     
@@ -54,8 +44,8 @@ internal class DopamineProperties : UserDefaultsSingleton {
         self.developmentSecret = developmentSecret
         self.productionSecret = productionSecret
         super.init()
-        self.version = DopamineVersion(versionID: versionID, mappings: [:], visualizerMappings: [:])
-        self.configuration = DopamineConfiguration.initStandard(with: configID)
+        _ = DopamineVersion.initStandard(with: versionID)
+        _ = DopamineConfiguration.initStandard(with: configID)
     }
     
     init(appID: String, inProduction: Bool, developmentSecret: String, productionSecret: String) {
@@ -133,7 +123,8 @@ internal class DopamineProperties : UserDefaultsSingleton {
 }
 
 extension DopamineProperties {
-    static func convert(from propertiesDictionary: [String: Any]) -> DopamineProperties? {
+    static func convert(from propertiesDictionary: [String: Any]?) -> DopamineProperties? {
+        guard let propertiesDictionary = propertiesDictionary else { return nil }
         if let appID = propertiesDictionary["appID"] as? String,
             let inProduction = propertiesDictionary["inProduction"] as? Bool,
             let productionSecret = propertiesDictionary["productionSecret"] as? String,
