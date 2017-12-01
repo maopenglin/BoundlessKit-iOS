@@ -12,16 +12,16 @@ open class UserDefaultsSingleton : NSObject, NSCoding {
     open func encode(with aCoder: NSCoder) {}
     public required init?(coder aDecoder: NSCoder) {}
     
-    static func defaultsKey() -> String {
+    static var defaultsKey: String {
         return NSStringFromClass(self)
     }
 }
 
 internal extension UserDefaults {
     
-    internal static var initialBootDate: Date? {
+    static var initialBootDate: Date? {
         get {
-            let defaultsKey = "DopamineKit.isInitialBoot"
+            let defaultsKey = "initialBootDate"
             let date = UserDefaults.dopamine.object(forKey: defaultsKey) as? Date
             defer { if date == nil { UserDefaults.dopamine.set(Date(), forKey: defaultsKey) } }
             return date
@@ -34,27 +34,27 @@ internal extension UserDefaults {
         }
     }
     
-    func archive(_ value: Any?, forKey key: String) {
+    func archive(_ value: NSCoding?, forKey key: String) {
         if let value = value {
-            self.setValue(NSKeyedArchiver.archivedData(withRootObject: value), forKey: key)
+            self.set(NSKeyedArchiver.archivedData(withRootObject: value), forKey: key)
         } else {
-            self.setValue(value, forKey: key)
+            self.set(value, forKey: key)
         }
     }
     
     func archive<T:UserDefaultsSingleton>(_ value: T?) {
-        archive(value, forKey: T.defaultsKey())
+        archive(value, forKey: T.defaultsKey)
     }
     
     func unarchive<T>(key: String) -> T? {
-        if let data = self.value(forKey: key) as? Data,
+        if let data = self.object(forKey: key) as? Data,
             let t = NSKeyedUnarchiver.unarchiveObject(with: data) as? T {
             return t
         } else { return nil }
     }
     
     func unarchive<T:UserDefaultsSingleton>() -> T? {
-        return unarchive(key: T.defaultsKey())
+        return unarchive(key: T.defaultsKey)
     }
     
 }
