@@ -44,8 +44,8 @@ internal class DopamineProperties : UserDefaultsSingleton {
         self.developmentSecret = developmentSecret
         self.productionSecret = productionSecret
         super.init()
-        _ = DopamineVersion.initStandard(with: versionID)
-        _ = DopamineConfiguration.initStandard(with: configID)
+        version = DopamineVersion.initStandard(with: versionID)
+        configuration = DopamineConfiguration.initStandard(with: configID)
     }
     
     init(appID: String, inProduction: Bool, developmentSecret: String, productionSecret: String) {
