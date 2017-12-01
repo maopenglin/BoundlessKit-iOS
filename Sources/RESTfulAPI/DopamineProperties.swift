@@ -10,7 +10,7 @@ import Foundation
 internal class DopamineProperties : UserDefaultsSingleton {
     
     @objc
-    static var current: DopamineProperties! = {
+    static var current: DopamineProperties = {
         return DopamineProperties.convert(from: DopamineKit.testCredentials) ??
             UserDefaults.dopamine.unarchive() ??
             {

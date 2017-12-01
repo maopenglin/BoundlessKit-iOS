@@ -11,7 +11,7 @@ import Foundation
 public class DopamineVersion : UserDefaultsSingleton {
     
     @objc
-    public static var current: DopamineVersion! = {
+    public static var current: DopamineVersion = {
         return UserDefaults.dopamine.unarchive() ?? DopamineVersion.standard
         }()
         {
