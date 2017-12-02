@@ -11,7 +11,7 @@ import Foundation
 @objc
 public class Helper: NSObject {
     
-    @objc public static var lastTouchLocationInUIWindow: CGPoint = CGPoint.zero
+    
     
 }
 

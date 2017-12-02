@@ -10,5 +10,62 @@ import Foundation
 
 internal class ApplicationEvent : NSObject {
     
+    let name: String
     
+    init(name: String) {
+        self.name = name
+    }
+    
+    func attemptReinforcement() {
+        let senderClassname = "customEvent"
+        let targetName = "ApplicationEvent"
+        let selectorName = name
+        
+        DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetName, selector: selectorName)  { reinforcement in
+            guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
+            guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                if let viewsAndLocations = self.reinforcementViews(options: reinforcement) {
+                    EventReinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
+                }
+            }
+            
+        }
+    }
+    
+    private func reinforcementViews(options: [String: Any]) -> [(UIView, CGPoint)]? {
+        
+        guard let viewOption = options["ViewOption"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
+        guard let viewCustom = options["ViewCustom"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
+        guard let viewMarginX = options["ViewMarginX"] as? CGFloat else { DopeLog.error("Missing parameter", visual: true); return nil }
+        guard let viewMarginY = options["ViewMarginY"] as? CGFloat else { DopeLog.error("Missing parameter", visual: true); return nil }
+        
+        let viewsAndLocations: [(UIView, CGPoint)]?
+        
+        switch viewOption {
+        case "fixed":
+            let view = UIWindow.topWindow!
+            viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            
+        case "touch":
+            viewsAndLocations = [(UIWindow.topWindow!, UIWindow.lastTouchPoint.withMargins(marginX: viewMarginX, marginY: viewMarginY))]
+            
+        case "custom":
+            guard viewCustom != "" else {
+                DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                return nil
+            }
+            
+            viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
+                return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
+            })
+            
+        default:
+            DopeLog.error("Unsupported ViewOption <\(viewOption)> for ApplicationEvent", visual: true)
+            return nil
+        }
+        
+        return viewsAndLocations
+    }
 }

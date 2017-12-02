@@ -28,7 +28,7 @@ public class CodelessAPI : NSObject {
     @objc
     public static let shared = CodelessAPI()
     
-    static var connectionID: String? { didSet { DopeLog.debug("🔍 \(connectionID != nil ? "C" : "Disc")onnected to visualizer") } }
+    private static var connectionID: String? { didSet { DopeLog.debug("🔍 \(connectionID != nil ? "C" : "Disc")onnected to visualizer") } }
     private let tracesQueue = OperationQueue()
     
     private override init() {
@@ -45,7 +45,6 @@ public class CodelessAPI : NSObject {
         payload["initialBoot"] = (UserDefaults.initialBootDate == nil)
         shared.send(call: .boot, with: payload){ response in
             if let status = response["status"] as? Int {
-                DopeLog.debug("Codeless Boot:\(response as AnyObject)")
                 if status == 205 {
                     if let configDict = response["config"] as? [String: Any],
                         let config = DopamineConfiguration.convert(from: configDict) {
@@ -62,92 +61,81 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
-    public static func recordApplicationEvent(key: String) {
-        DispatchQueue.global().async {
-            
-            // display reinforcement if reinforcement is set for this event
-            DopamineVersion.current.codelessReinforcementFor(sender: "customEvent", target: "ApplicationEvent", selector: key) { reinforcement in
-            
-                DopeLog.debug("Found application mapping with params:\(reinforcement as AnyObject)")
-                guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
-                guard let viewOption = reinforcement["ViewOption"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
-                guard let viewCustom = reinforcement["ViewCustom"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
-                guard let viewMarginX = reinforcement["ViewMarginX"] as? CGFloat else { DopeLog.error("Missing parameter", visual: true); return }
-                guard let viewMarginY = reinforcement["ViewMarginY"] as? CGFloat else { DopeLog.error("Missing parameter", visual: true); return }
-                guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                    prepareShowReinforcement: do {
-                        let viewsAndLocations: [(UIView, CGPoint)]
-                        
-                        switch viewOption {
-                        case "fixed":
-                            let view = UIWindow.topWindow!
-                            let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
-                            let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
-                            viewsAndLocations = [(view, CGPoint(x: xMargin, y: yMargin))]
-                            
-                        case "custom":
-                            if viewCustom != "" {
-                                viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
-                                    return CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
-                                })
-                            } else {
-                                DopeLog.debug("Oh no. No CustomView <\(viewCustom)> exists. No reinforcement for you.")
-                                break prepareShowReinforcement
-                            }
-                            
-                        default:
-//                            DopeLog.debug("Oh no. Unknown reinforcement type primitive. No reinforcement for you.")
-                            break prepareShowReinforcement
-                        }
-//                        DopeLog.debug("About to show application event reinforcement")
-                        EventReinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
+    private static func promptPairing() {
+        var payload = DopamineProperties.current.apiCredentials
+        payload["deviceName"] = UIDevice.current.name
+        
+        shared.send(call: .identify, with: payload){ response in
+            if let status = response["status"] as? Int {
+                switch status {
+                case 202:
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+                        promptPairing()
                     }
+                    break
+                    
+                case 200:
+                    if let adminName = response["adminName"] as? String,
+                        let connectionID = response["connectionUUID"] as? String {
+                        
+                        let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
+                        
+                        pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
+                            var payload = DopamineProperties.current.apiCredentials
+                            payload["deviceName"] = UIDevice.current.name
+                            payload["connectionUUID"] = connectionID
+                            shared.send(call: .accept, with: payload) {response in
+                                if response["status"] as? Int == 200 {
+                                    CodelessAPI.connectionID = connectionID
+                                }
+                            }
+                        }))
+                        
+                        pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
+                            
+                        }))
+                        
+                        UIWindow.presentTopLevelAlert(alertController: pairingAlert)
+                    }
+                    
+                case 208:
+                    print("Attempting to reconnect to visualizer...")
+                    if let connectionID = response["connectionUUID"] as? String {
+                        CodelessAPI.connectionID = connectionID
+                        //                        DispatchQueue.main.async {
+                        //                            CandyBar(title: "Connection Restored", subtitle: "DopamineKit Visualizer").show(duration: 1.2)
+                        //                        }
+                    }
+                    
+                case 204:
+                    if DopamineVersion.current.visualizerMappings.count != 0 {
+                        DopamineVersion.current.updateVisualizerMappings([:])
+                    }
+                    break
+                    
+                case 500:
+                    break
+                    
+                default:
+                    break
                 }
             }
-            
-            var payload = DopamineProperties.current.apiCredentials
-            payload["customEvent"] = ["ApplicationEvent": key]
-            payload["actionID"] = key
-            payload["senderImage"] = ""
-            let submitPayload = {
-                // send event to visualizer if connected
-                if let connectionID = connectionID {
-                    payload["connectionUUID"] = connectionID
-                    submit(payload)
-                }
-            }
-            if key == "appLaunch" {
-                DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
-                    submitPayload()
-                }
-            } else {
-                submitPayload()
-            }
-            
         }
     }
     
     @objc
-    public static var lastTouchLocationInUIWindow: CGPoint = CGPoint.zero
-    
-    @objc
     public static func recordEvent(touch: UITouch) {
         DispatchQueue.global().async {
-            if let touchView = touch.view,
+            if let view = touch.view,
                 touch.phase == .ended {
                 
                 touch.attemptReinforcement()
                 
-                // send event to visualizer if connected
-                if let connectionID = connectionID {
+                submit { payload in
                     let senderClassname = NSStringFromClass(type(of: touch))
-                    let targetName = touchView.getParentResponders().joined(separator: ",")
+                    let targetName = view.getParentResponders().joined(separator: ",")
                     let selectorName = "ended"
                     
-                    var payload = DopamineProperties.current.apiCredentials
-                    payload["connectionUUID"] = connectionID
                     payload["sender"] = senderClassname
                     payload["target"] = targetName
                     payload["selector"] = selectorName
@@ -155,9 +143,7 @@ public class CodelessAPI : NSObject {
                     payload["senderImage"] = ""
                     payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                     payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
-                    submit(payload)
                 }
-                
             }
         }
     }
@@ -171,10 +157,7 @@ public class CodelessAPI : NSObject {
             
             application.attemptReinforcement(senderInstance: senderInstance, targetInstance: targetInstance, selectorObj: selectorObj)
             
-            // send event to visualizer if connected
-            if let connectionID = connectionID {
-                var payload = DopamineProperties.current.apiCredentials
-                payload["connectionUUID"] = connectionID
+            submit { payload in
                 payload["sender"] = senderClassname
                 payload["target"] = targetClassname
                 payload["selector"] = selectorName
@@ -196,99 +179,44 @@ public class CodelessAPI : NSObject {
                         payload["senderImage"] = ""
                     }
                 }
-                submit(payload)
-            }
-        }
-    }
-    
-//    static var submitted = Set<String>()
-    fileprivate static func submit(_ payload: [String: Any]) {
-//        guard !submitted.contains(payload["actionID"] as! String) else {
-//            return
-//        }
-//        submitted.insert(payload["actionID"] as! String)
-        shared.send(call: .submit, with: payload){ response in
-            if response["status"] as? Int != 200 {
-                CodelessAPI.connectionID = nil
-                DopamineVersion.current.updateVisualizerMappings([:])
-            } else if shared.tracesQueue.operationCount <= 1 {
-                if let visualizerMappings = response["mappings"] as? [String:Any] {
-                    DopamineVersion.current.updateVisualizerMappings(visualizerMappings)
-                } else {
-                    DopeLog.debug("Invalid mappings")
-                }
             }
         }
     }
     
     @objc
-    private static func promptPairing() {
-        var payload = DopamineProperties.current.apiCredentials
-        payload["deviceName"] = UIDevice.current.name
+    public static func recordApplicationEvent(name: String) {
+//        DispatchQueue.global().async {
+        ApplicationEvent(name: name).attemptReinforcement()
         
-        shared.send(call: .identify, with: payload){ response in
-            if let status = response["status"] as? Int {
-                switch status {
-                case 202:
-                    DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
-                        promptPairing()
+        submit { payload in
+            payload["customEvent"] = ["ApplicationEvent": name]
+            payload["actionID"] = name
+            payload["senderImage"] = ""
+        }
+//        }
+    }
+    
+    
+    fileprivate static func submit(payloadModifier: (inout [String: Any]) -> Void) {
+        if let connectionID = connectionID {
+            var payload = DopamineProperties.current.apiCredentials
+            payload["connectionUUID"] = connectionID
+            payloadModifier(&payload)
+            
+            shared.send(call: .submit, with: payload){ response in
+                if response["status"] as? Int != 200 {
+                    CodelessAPI.connectionID = nil
+                    DopamineVersion.current.updateVisualizerMappings([:])
+                } else if shared.tracesQueue.operationCount <= 1 {
+                    if let visualizerMappings = response["mappings"] as? [String:Any] {
+                        DopamineVersion.current.updateVisualizerMappings(visualizerMappings)
+                    } else {
+                        DopeLog.error("Invalid visualizer mappings", visual: true)
                     }
-                    break
-                    
-                case 200:
-                    if let adminName = response["adminName"] as? String,
-                        let connectionID = response["connectionUUID"] as? String {
-                        presentPairingAlert(from: adminName, connectionID: connectionID)
-                    }
-                    
-                case 208:
-                    print("Attempting to reconnect to visualizer...")
-                    if let connectionID = response["connectionUUID"] as? String {
-                        CodelessAPI.connectionID = connectionID
-//                        DispatchQueue.main.async {
-//                            CandyBar(title: "Connection Restored", subtitle: "DopamineKit Visualizer").show(duration: 1.2)
-//                        }
-                    }
-                    
-                case 204:
-                    if DopamineVersion.current.visualizerMappings.count != 0 {
-                        DopamineVersion.current.updateVisualizerMappings([:])
-                    }
-                    break
-                    
-                case 500:
-                    break
-                    
-                default:
-                    break
                 }
             }
         }
     }
-    
-    private static func presentPairingAlert(from adminName: String, connectionID: String) {
-        
-        let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
-        
-        pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
-            var payload = DopamineProperties.current.apiCredentials
-            payload["deviceName"] = UIDevice.current.name
-            payload["connectionUUID"] = connectionID
-            shared.send(call: .accept, with: payload) {response in
-                if response["status"] as? Int == 200 {
-                    CodelessAPI.connectionID = connectionID
-                }
-            }
-        }))
-        
-        pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
-            
-        }))
-        
-        UIWindow.presentTopLevelAlert(alertController: pairingAlert)
-        
-    }
-    
     
     /// This function sends a request to the CodelessAPI
     ///
@@ -307,7 +235,6 @@ public class CodelessAPI : NSObject {
             return
         }
         tracesQueue.addOperation {
-//            DopeLog.debugLog("Preparing \(type.pathExtenstion) api call to \(url.absoluteString)...")
             do {
                 var request = URLRequest(url: url)
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -345,14 +272,12 @@ public class CodelessAPI : NSObject {
                                 return
                         }
                         responseDict = dict
-                        DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
-                        
                     } catch {
-                        let message = "❌ Error reading \(type.path) response data: " + String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription))
-                        DopeLog.debug(message)
+                        DopeLog.debug("❌ Error reading \(type.path) response data: \(String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription)))")
                         return
                     }
                     
+                    DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
                 })
                 
                 // send request

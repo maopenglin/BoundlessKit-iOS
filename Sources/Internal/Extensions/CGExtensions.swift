@@ -32,3 +32,9 @@ internal extension CGFloat {
         self = degrees.degreesToRadians()
     }
 }
+
+internal extension CGPoint {
+    func withMargins(marginX: CGFloat, marginY: CGFloat) -> CGPoint {
+        return CGPoint(x: x + marginX, y: y + marginY)
+    }
+}

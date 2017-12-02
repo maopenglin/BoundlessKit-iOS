@@ -10,6 +10,8 @@ import Foundation
 
 internal class EventReinforcement : NSObject {
     
+    static var lastTouchLocationInUIWindow: CGPoint = CGPoint.zero
+    
     static func showReinforcement(on viewAndLocation: [(UIView, CGPoint)], of type: String, withParameters reinforcement: [String: Any]) {
         switch type {
             

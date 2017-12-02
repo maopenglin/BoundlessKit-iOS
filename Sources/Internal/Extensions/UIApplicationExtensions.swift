@@ -28,7 +28,7 @@ internal extension UIApplication {
         }
     }
     
-    func reinforcementViews(senderInstance: AnyObject, targetInstance: AnyObject, options: [String: Any]) -> [(UIView, CGPoint)]? {
+    private func reinforcementViews(senderInstance: AnyObject, targetInstance: AnyObject, options: [String: Any]) -> [(UIView, CGPoint)]? {
         
         guard let viewOption = options["ViewOption"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
         guard let viewCustom = options["ViewCustom"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
@@ -40,19 +40,17 @@ internal extension UIApplication {
         switch viewOption {
         case "fixed":
             let view = UIWindow.topWindow!
-            let xMargin = viewMarginX <= 1.0 && viewMarginX > 0 ? viewMarginX * view.bounds.width : viewMarginX
-            let yMargin = viewMarginY <= 1.0 && viewMarginY > 0 ? viewMarginY * view.bounds.height : viewMarginY
-            viewsAndLocations = [(view, CGPoint(x: xMargin, y: yMargin))]
+            viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             
         case "touch":
-            viewsAndLocations = [(UIWindow.topWindow!, Helper.lastTouchLocationInUIWindow)]
+            viewsAndLocations = [(UIWindow.topWindow!, UIWindow.lastTouchPoint.withMargins(marginX: viewMarginX, marginY: viewMarginY))]
             
         case "sender":
             if let view = senderInstance as? UIView {
-                viewsAndLocations = [(view, CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2))]
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             } else if senderInstance.responds(to: NSSelectorFromString("view")),
                 let view = senderInstance.value(forKey: "view") as? UIView {
-                viewsAndLocations = [(view, CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2))]
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             }
             DopeLog.error("Could not find sender view", visual: true)
             return nil
@@ -60,21 +58,21 @@ internal extension UIApplication {
         case "superview":
             if let senderInstance = senderInstance as? UIView,
                 let superview = senderInstance.superview {
-                viewsAndLocations = [(superview, CGPoint(x: superview.bounds.width / 2, y: superview.bounds.height / 2))]
+                viewsAndLocations = [(superview, superview.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             } else if senderInstance.responds(to: NSSelectorFromString("view")),
                 let view = senderInstance.value(forKey: "view") as? UIView,
                 let superview = view.superview {
-                viewsAndLocations = [(superview, CGPoint(x: superview.bounds.width / 2, y: superview.bounds.height / 2))]
+                viewsAndLocations = [(superview, superview.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             }
             DopeLog.error("Could not find superview", visual: true)
             return nil
             
         case "target":
             if let view = targetInstance as? UIView {
-                viewsAndLocations = [(view, CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2))]
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             } else if targetInstance.responds(to: NSSelectorFromString("view")),
                 let view = targetInstance.value(forKey: "view") as? UIView {
-                viewsAndLocations = [(view, CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2))]
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             }
             DopeLog.error("Could not find target view", visual: true)
             return nil
@@ -83,7 +81,7 @@ internal extension UIApplication {
         case "custom":
             if viewCustom != "" {
                 viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
-                    return CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+                    return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
                 })
             }
             DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)

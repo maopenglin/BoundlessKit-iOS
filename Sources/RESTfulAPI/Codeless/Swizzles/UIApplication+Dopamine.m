@@ -22,8 +22,6 @@
 -(void) swizzled_sendEvent: (UIEvent *) event {
     UITouch* touch = event.allTouches.anyObject;
     if (touch != nil) {
-        CGPoint local = [touch locationInView:[touch view]];
-        CodelessAPI.lastTouchLocationInUIWindow = [[touch view] convertPoint:local toView:nil];
         [CodelessAPI recordEventWithTouch:touch];
     }
 

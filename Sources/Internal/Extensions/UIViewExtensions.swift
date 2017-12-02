@@ -79,3 +79,24 @@ internal extension UIView {
         return possibleViews
     }
 }
+
+internal extension UIView {
+    func pointWithMargins(x marginX: CGFloat,y marginY: CGFloat) -> CGPoint {
+        let x: CGFloat
+        let y: CGFloat
+        
+        if 0 < marginX && marginX <= 1 {
+            x = marginX * bounds.width
+        } else {
+            x = marginX
+        }
+        
+        if 0 < marginY && marginY <= 1 {
+            y = marginY * bounds.height
+        } else {
+            y = marginY
+        }
+        
+        return CGPoint(x: x, y: y)
+    }
+}
