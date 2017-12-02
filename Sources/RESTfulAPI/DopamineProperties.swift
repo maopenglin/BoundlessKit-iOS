@@ -64,6 +64,7 @@ internal class DopamineProperties : UserDefaultsSingleton {
         aCoder.encode(inProduction, forKey: #keyPath(DopamineProperties.inProduction))
         aCoder.encode(developmentSecret, forKey: #keyPath(DopamineProperties.developmentSecret))
         aCoder.encode(productionSecret, forKey: #keyPath(DopamineProperties.productionSecret))
+        print("Saved DopamineProperties to user defaults.")
     }
     
     required convenience init?(coder aDecoder: NSCoder) {

@@ -60,12 +60,19 @@ import Foundation
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    @objc public static func error(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
+    @objc public static func error(_ message: String, visual: Bool = false,  filePath: String = #file, function: String =  #function, line: Int = #line) {
         var functionSignature:String = function
         if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
             functionSignature.replaceSubrange(parameterNames, with: "()")
         }
         let fileName = NSString(string: filePath).lastPathComponent
-        Swift.print("[\(fileName):\(line):\(functionSignature)] - \(message)")
+        Swift.print("❌ \(message)\n\t@\t[\(fileName):\(line):\(functionSignature)])")
+        
+        if visual && !DopamineProperties.current.inProduction {
+            DispatchQueue.main.async {
+                CandyBar.init(title: message, subtitle: "🚫\(fileName):\(line)", image: "☠️".image(), position: .top
+                    , backgroundColor: UIColor.darkGray.withAlphaComponent(0.7)).show(duration: 3)
+            }
+        }
     }
 }
