@@ -1,5 +1,5 @@
 //
-//  UserDefaults+Dopamine.swift
+//  UserDefaultsExtensions.swift
 //  DopamineKit
 //
 //  Created by Akash Desai on 11/29/17.
@@ -19,6 +19,12 @@ open class UserDefaultsSingleton : NSObject, NSCoding {
 
 internal extension UserDefaults {
     
+    static var dopamine: UserDefaults {
+        get {
+            return UserDefaults(suiteName: "com.usedopamine.dopaminekit") ?? UserDefaults.standard
+        }
+    }
+    
     static var initialBootDate: Date? {
         get {
             let defaultsKey = "initialBootDate"
@@ -27,11 +33,12 @@ internal extension UserDefaults {
             return date
         }
     }
+}
+
+internal extension UserDefaults {
     
-    static var dopamine: UserDefaults {
-        get {
-            return UserDefaults(suiteName: "com.usedopamine.dopaminekit") ?? UserDefaults.standard
-        }
+    func archive<T:UserDefaultsSingleton>(_ value: T?) {
+        archive(value, forKey: T.defaultsKey)
     }
     
     func archive(_ value: NSCoding?, forKey key: String) {
@@ -42,8 +49,8 @@ internal extension UserDefaults {
         }
     }
     
-    func archive<T:UserDefaultsSingleton>(_ value: T?) {
-        archive(value, forKey: T.defaultsKey)
+    func unarchive<T:UserDefaultsSingleton>() -> T? {
+        return unarchive(key: T.defaultsKey)
     }
     
     func unarchive<T>(key: String) -> T? {
@@ -51,10 +58,6 @@ internal extension UserDefaults {
             let t = NSKeyedUnarchiver.unarchiveObject(with: data) as? T {
             return t
         } else { return nil }
-    }
-    
-    func unarchive<T:UserDefaultsSingleton>() -> T? {
-        return unarchive(key: T.defaultsKey)
     }
     
 }

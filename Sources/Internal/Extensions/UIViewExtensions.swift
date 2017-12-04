@@ -6,20 +6,16 @@
 //
 
 import Foundation
+
 internal extension UIView {
-    func imageAsBase64EncodedString() -> String? {
+    
+    func snapshotImage() -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(bounds.size, false, 0)
         drawHierarchy(in: self.bounds, afterScreenUpdates: true)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        if let image = image,
-            let imageString = image.base64EncodedPNGString() {
-            return imageString
-        } else {
-            NSLog("Could not create snapshot of UIView...")
-            return nil
-        }
+        return image
     }
     
     func getSubviewsWithClassname(classname: String) -> [UIView] {

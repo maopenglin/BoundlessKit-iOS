@@ -17,10 +17,9 @@ public class CodelessAPI : NSObject {
         case identify, accept, submit, boot
         var path:String{ switch self{
         case .identify: return "https://dashboard-api.usedopamine.com/codeless/pair/customer/identity/"
+        case .boot: return "https://api.usedopamine.com/v5/app/boot"
         case .accept: return "https://dashboard-api.usedopamine.com/codeless/pair/customer/accept/"
         case .submit: return "https://dashboard-api.usedopamine.com/codeless/visualizer/customer/submit/"
-        case .boot: return "https://api.usedopamine.com/v5/app/boot"
-//        case .boot: return "http://10.0.1.158/v5/app/boot:8008"
             }
         }
     }
@@ -28,12 +27,21 @@ public class CodelessAPI : NSObject {
     @objc
     public static let shared = CodelessAPI()
     
-    private static var connectionID: String? { didSet { DopeLog.debug("🔍 \(connectionID != nil ? "C" : "Disc")onnected to visualizer") } }
-    private let tracesQueue = OperationQueue()
+    private static var connectionID: String? {
+        willSet {
+            if connectionID != newValue {
+                DopeLog.debug("🔍 \(newValue != nil ? "C" : "Disc")onnected to visualizer")
+            }
+        }
+        didSet {
+            if connectionID == nil && DopamineVersion.current.visualizerMappings.count != 0 {
+                DopamineVersion.current.set(visualizer: [:])
+            }
+        }
+    }
     
     private override init() {
         super.init()
-        tracesQueue.maxConcurrentOperationCount = 1
     }
     
     @objc
@@ -100,17 +108,10 @@ public class CodelessAPI : NSObject {
                     
                 case 208:
                     print("Attempting to reconnect to visualizer...")
-                    if let connectionID = response["connectionUUID"] as? String {
-                        CodelessAPI.connectionID = connectionID
-                        //                        DispatchQueue.main.async {
-                        //                            CandyBar(title: "Connection Restored", subtitle: "DopamineKit Visualizer").show(duration: 1.2)
-                        //                        }
-                    }
+                    CodelessAPI.connectionID = response["connectionUUID"] as? String
                     
                 case 204:
-                    if DopamineVersion.current.visualizerMappings.count != 0 {
-                        DopamineVersion.current.updateVisualizerMappings([:])
-                    }
+                    CodelessAPI.connectionID = nil
                     break
                     
                 case 500:
@@ -164,7 +165,7 @@ public class CodelessAPI : NSObject {
                 payload["actionID"] = [senderClassname, targetClassname, selectorName].joined(separator: "-")
                 DispatchQueue.main.sync {
                     if let view = senderInstance as? UIView,
-                        let imageString = view.imageAsBase64EncodedString() {
+                        let imageString = view.snapshotImage()?.base64EncodedPNGString() {
                         payload["senderImage"] = imageString
                     } else if let barItem = senderInstance as? UIBarItem,
                         let image = barItem.image,
@@ -172,7 +173,7 @@ public class CodelessAPI : NSObject {
                         payload["senderImage"] = imageString
                     } else if senderInstance.responds(to: NSSelectorFromString("view")),
                         let sv = senderInstance.value(forKey: "view") as? UIView,
-                        let imageString = sv.imageAsBase64EncodedString() {
+                        let imageString = sv.snapshotImage()?.base64EncodedPNGString() {
                         payload["senderImage"] = imageString
                     } else {
                         NSLog("Cannot create image, please message team@usedopamine.com to add support for visualizer snapshots of class type:<\(type(of: senderInstance))>!")
@@ -197,6 +198,11 @@ public class CodelessAPI : NSObject {
     }
     
     
+    fileprivate var submitQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
     fileprivate static func submit(payloadModifier: (inout [String: Any]) -> Void) {
         if let connectionID = connectionID {
             var payload = DopamineProperties.current.apiCredentials
@@ -206,13 +212,10 @@ public class CodelessAPI : NSObject {
             shared.send(call: .submit, with: payload){ response in
                 if response["status"] as? Int != 200 {
                     CodelessAPI.connectionID = nil
-                    DopamineVersion.current.updateVisualizerMappings([:])
-                } else if shared.tracesQueue.operationCount <= 1 {
-                    if let visualizerMappings = response["mappings"] as? [String:Any] {
-                        DopamineVersion.current.updateVisualizerMappings(visualizerMappings)
-                    } else {
-                        DopeLog.error("Invalid visualizer mappings", visual: true)
-                    }
+                } else if let visualizerMappings = response["mappings"] as? [String:Any] {
+                    DopamineVersion.current.set(visualizer: visualizerMappings)
+                } else {
+                    DopeLog.debug("No visualizer mappings found")
                 }
             }
         }
@@ -234,7 +237,7 @@ public class CodelessAPI : NSObject {
             DopeLog.debug("Invalid url <\(type.path)>")
             return
         }
-        tracesQueue.addOperation {
+        submitQueue.addOperation {
             do {
                 var request = URLRequest(url: url)
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")

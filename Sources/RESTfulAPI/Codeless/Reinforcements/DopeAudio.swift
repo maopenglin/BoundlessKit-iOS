@@ -35,8 +35,8 @@ class SingleOperationQueue : OperationQueue {
     
     var delay: UInt32
     
-    override init() {
-        delay = 2
+    init(delay: UInt32 = 2) {
+        self.delay = delay
         super.init()
         
         maxConcurrentOperationCount = 1
