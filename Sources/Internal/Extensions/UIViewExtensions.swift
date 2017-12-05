@@ -54,7 +54,14 @@ internal extension UIView {
             DopeLog.error("Invalid params for customView. Should be in the format \"ViewClassname$0\"")
             return []
         }
-        let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: classname)
+//        let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: classname)
+        
+        var possibleViews: [UIView] = []
+        for window in UIApplication.shared.windows {
+            for view in window.getSubviewsWithClassname(classname: classname) {
+                possibleViews.append(view)
+            }
+        }
         
         if let index = index {
             if index >= 0 {

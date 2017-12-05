@@ -10,21 +10,16 @@ import AudioToolbox
 
 internal class DopeAudio : NSObject {
     
-    fileprivate static let soundQueue = SingleOperationQueue()
+    fileprivate static let audioQueue = SingleOperationQueue()
     
-    static func playSound(_ systemSoundID: SystemSoundID = 1009) {
-        soundQueue.addOperation {
-            AudioServicesPlaySystemSound(systemSoundID)
-        }
-    }
-    
-    fileprivate static let vibrateQueue = SingleOperationQueue()
-    fileprivate static let vibrateSoundID = SystemSoundID(kSystemSoundID_Vibrate)
-    
-    static func playVibrate(_ bool: Bool = true) {
-        if !bool { return }
-        soundQueue.addOperation {
-            AudioServicesPlayAlertSound(vibrateSoundID)
+    static func play(_ systemSoundID: SystemSoundID = 0 , vibrate: Bool = false) {
+        audioQueue.addOperation {
+            if systemSoundID != 0 {
+                AudioServicesPlaySystemSound(systemSoundID)
+            }
+            if vibrate {
+                AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+            }
         }
     }
     

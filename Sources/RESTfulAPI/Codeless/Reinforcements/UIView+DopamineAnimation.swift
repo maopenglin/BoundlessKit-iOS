@@ -31,11 +31,10 @@ public extension UIView {
         animation.path = path.cgPath
         animation.speed = speed
         
-        CoreAnimationDelegate(didStart:{
-            DopeAudio.playSound(systemSound)
-            DopeAudio.playVibrate(hapticFeedback)
-        },
-                              didStop: completion).start(view: self, animation: animation)
+        CoreAnimationDelegate(
+            didStart:{
+                DopeAudio.play(systemSound, vibrate: hapticFeedback)
+        }, didStop: completion).start(view: self, animation: animation)
     }
     
     public func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, hapticFeedback: Bool = true, systemSound: UInt32 = 1009, completion: @escaping ()->Void = {}) {
@@ -87,8 +86,7 @@ public extension UIView {
             self.layer.masksToBounds = false
             startAnimation()
         }, didStart:{
-            DopeAudio.playSound(systemSound)
-            DopeAudio.playVibrate(hapticFeedback)
+            DopeAudio.play(systemSound, vibrate: hapticFeedback)
         }, didStop: {
             self.clipsToBounds = oldClipsToBounds
         }
@@ -104,8 +102,7 @@ public extension UIView {
         
         CoreAnimationDelegate(
             didStart:{
-                DopeAudio.playSound(systemSound)
-                DopeAudio.playVibrate(hapticFeedback)
+                DopeAudio.play(systemSound, vibrate: hapticFeedback)
         },
             didStop: completion).start(view: self, animation: rotateAnimation)
     }
@@ -144,8 +141,7 @@ public extension UIView {
                 start()
         },
             didStart:{
-                DopeAudio.playSound(systemSound)
-                DopeAudio.playVibrate(hapticFeedback)
+                DopeAudio.play(systemSound, vibrate: hapticFeedback)
         },
             didStop: {
                 glowView.removeFromSuperview()
@@ -182,8 +178,7 @@ public extension UIView {
                 start()
         },
             didStart:{
-                DopeAudio.playSound(systemSound)
-                DopeAudio.playVibrate(hapticFeedback)
+                DopeAudio.play(systemSound, vibrate: hapticFeedback)
         },
             didStop: {
                 imageView.removeFromSuperview()

@@ -185,37 +185,46 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
-    public static func recordApplicationEvent(name: String) {
+    public static func recordAppEvent(name: String) {
 //        DispatchQueue.global().async {
-        ApplicationEvent(name: name).attemptReinforcement()
+        let appEvent: CustomCodelessEvent = CustomCodelessEvent(target: "AppEvent", action: name)
+        appEvent.attemptReinforcement()
         
         submit { payload in
-            payload["customEvent"] = ["ApplicationEvent": name]
-            payload["actionID"] = name
+            payload["customEvent"] = [appEvent.target : appEvent.action]
+            payload["actionID"] = appEvent.action
             payload["senderImage"] = ""
         }
 //        }
     }
     
     
-    fileprivate var submitQueue: OperationQueue = {
+    fileprivate static var submitQueue: OperationQueue = {
         let queue = OperationQueue()
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
     fileprivate static func submit(payloadModifier: (inout [String: Any]) -> Void) {
-        if let connectionID = connectionID {
+        if let _ = connectionID {
             var payload = DopamineProperties.current.apiCredentials
-            payload["connectionUUID"] = connectionID
             payloadModifier(&payload)
             
-            shared.send(call: .submit, with: payload){ response in
-                if response["status"] as? Int != 200 {
-                    CodelessAPI.connectionID = nil
-                } else if let visualizerMappings = response["mappings"] as? [String:Any] {
-                    DopamineVersion.current.set(visualizer: visualizerMappings)
-                } else {
-                    DopeLog.debug("No visualizer mappings found")
+            submitQueue.addOperation {
+                if let connectionID = self.connectionID {
+                    payload["connectionUUID"] = connectionID
+                    
+                    submitQueue.isSuspended = true
+                    shared.send(call: .submit, with: payload){ response in
+                        defer { submitQueue.isSuspended = false }
+                        
+                        if response["status"] as? Int != 200 {
+                            CodelessAPI.connectionID = nil
+                        } else if let visualizerMappings = response["mappings"] as? [String:Any] {
+                            DopamineVersion.current.set(visualizer: visualizerMappings)
+                        } else {
+                            DopeLog.debug("No visualizer mappings found")
+                        }
+                    }
                 }
             }
         }
@@ -237,62 +246,60 @@ public class CodelessAPI : NSObject {
             DopeLog.debug("Invalid url <\(type.path)>")
             return
         }
-        submitQueue.addOperation {
-            do {
-                var request = URLRequest(url: url)
-                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.httpMethod = "POST"
-                request.timeoutInterval = timeout
-                let jsonPayload = try JSONSerialization.data(withJSONObject: payload, options: JSONSerialization.WritingOptions())
-                request.httpBody = jsonPayload
-                
-                let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
-                let task = URLSession.shared.dataTask(with: request, completionHandler: { responseData, responseURL, error in
-                    var responseDict: [String : Any] = [:]
-                    defer { completion(responseDict) }
-                    
-                    if responseURL == nil {
-                        DopeLog.debug("❌ invalid response:\(String(describing: error?.localizedDescription))")
-                        responseDict["error"] = error?.localizedDescription
-                        return
-                    }
-                    
-                    if let responseData = responseData,
-                        responseData.isEmpty {
-                        DopeLog.debug("✅\(type.path) call got empty response.")
-                        return
-                    }
-                    
-                    do {
-                        // turn the response into a json object
-                        guard let data = responseData,
-                            let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-                            else {
-                                let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
-                                let message = "❌ Error reading \(type.path) response data, not a dictionary: \(json)"
-                                DopeLog.debug(message)
-                                Telemetry.storeException(className: "JSONSerialization", message: message)
-                                return
-                        }
-                        responseDict = dict
-                    } catch {
-                        DopeLog.debug("❌ Error reading \(type.path) response data: \(String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription)))")
-                        return
-                    }
-                    
-                    DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
-                })
-                
-                // send request
-                DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
-                task.resume()
-                
-            } catch {
-                let message = "Error sending \(type.path) api call with payload:(\(payload as AnyObject))"
-                DopeLog.debug(message)
-                Telemetry.storeException(className: "JSONSerialization", message: message)
-            }
+        
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        request.timeoutInterval = timeout
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: payload, options: JSONSerialization.WritingOptions())
+        } catch {
+            let message = "Error sending \(type.path) api call with payload:(\(payload as AnyObject))"
+            DopeLog.debug(message)
+            Telemetry.storeException(className: "JSONSerialization", message: message)
         }
+        
+        let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
+        let task = URLSession.shared.dataTask(with: request, completionHandler: { responseData, responseURL, error in
+            var responseDict: [String : Any] = [:]
+            defer { completion(responseDict) }
+            
+            if responseURL == nil {
+                DopeLog.debug("❌ invalid response:\(String(describing: error?.localizedDescription))")
+                responseDict["error"] = error?.localizedDescription
+                return
+            }
+            
+            if let responseData = responseData,
+                responseData.isEmpty {
+                DopeLog.debug("✅\(type.path) call got empty response.")
+                return
+            }
+            
+            do {
+                // turn the response into a json object
+                guard let data = responseData,
+                    let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+                    else {
+                        let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
+                        let message = "❌ Error reading \(type.path) response data, not a dictionary: \(json)"
+                        DopeLog.debug(message)
+                        Telemetry.storeException(className: "JSONSerialization", message: message)
+                        return
+                }
+                responseDict = dict
+            } catch {
+                DopeLog.debug("❌ Error reading \(type.path) response data: \(String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription)))")
+                return
+            }
+            
+            DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
+        })
+        
+        // send request
+        DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
+        task.resume()
+        
     }
 }
 

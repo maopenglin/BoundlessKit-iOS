@@ -1,5 +1,5 @@
 //
-//  ApplicationEvent.swift
+//  CustomCodelessEvent.swift
 //  DopamineKit
 //
 //  Created by Akash Desai on 11/27/17.
@@ -8,20 +8,20 @@
 import Foundation
 
 
-internal class ApplicationEvent : NSObject {
+internal class CustomCodelessEvent : NSObject {
     
-    let name: String
+    let sender: String = "customEvent"
+    let target: String
+    let action: String
     
-    init(name: String) {
-        self.name = name
+    init(target: String, action: String) {
+        self.target = target
+        self.action = action
     }
     
     func attemptReinforcement() {
-        let senderClassname = "customEvent"
-        let targetName = "ApplicationEvent"
-        let selectorName = name
         
-        DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetName, selector: selectorName)  { reinforcement in
+        DopamineVersion.current.codelessReinforcementFor(sender: sender, target: target, selector: action)  { reinforcement in
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
             
@@ -52,14 +52,14 @@ internal class ApplicationEvent : NSObject {
             viewsAndLocations = [(UIWindow.topWindow!, UIWindow.lastTouchPoint.withMargins(marginX: viewMarginX, marginY: viewMarginY))]
             
         case "custom":
-            guard viewCustom != "" else {
-                DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
-                return nil
-            }
-            
             viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
                 return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
             })
+            
+            if viewsAndLocations?.count == 0 {
+                DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                return nil
+            }
             
         default:
             DopeLog.error("Unsupported ViewOption <\(viewOption)> for ApplicationEvent", visual: true)

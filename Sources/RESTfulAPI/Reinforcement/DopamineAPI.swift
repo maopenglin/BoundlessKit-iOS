@@ -130,87 +130,83 @@ public class DopamineAPI : NSObject{
             return
         }
         
-        DopeLog.debug("Preparing \(type) api call to \(url.absoluteString)...")
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        request.timeoutInterval = timeout
         do {
-            var request = URLRequest(url: url)
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpMethod = "POST"
-            request.timeoutInterval = timeout
-            let jsonPayload = try JSONSerialization.data(withJSONObject: payload, options: JSONSerialization.WritingOptions())
-//            DopeLog.debugLog("sending raw payload:\(jsonPayload.debugDescription)")   // hex 16 chars
-            request.httpBody = jsonPayload
+            request.httpBody = try JSONSerialization.data(withJSONObject: payload, options: JSONSerialization.WritingOptions())
+        } catch {
+            let message = "Error sending \(type.path) api call with payload:(\(payload as AnyObject))"
+            DopeLog.debug(message)
+            Telemetry.storeException(className: "JSONSerialization", message: message)
+        }
+        let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
+        let task = session.dataTask(with: request, completionHandler: { responseData, responseURL, error in
+            var responseDict: [String : Any] = [:]
+            defer { completion(responseDict) }
             
-            let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
-            let task = session.dataTask(with: request, completionHandler: { responseData, responseURL, error in
-                var responseDict: [String : Any] = [:]
-                defer { completion(responseDict) }
-                
-                if responseURL == nil {
-                    DopeLog.debug("❌ invalid response:\(String(describing: error?.localizedDescription))")
-                    responseDict["error"] = error?.localizedDescription
-                    switch type {
-                    case .track:
-                        Telemetry.setResponseForTrackSync(-1, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                    case .report:
-                        Telemetry.setResponseForReportSync(-1, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                    case .refresh:
-                        if let actionID = payload["actionID"] as? String {
-                            Telemetry.setResponseForCartridgeSync(forAction: actionID, -1, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                        }
-                    case .telemetry:
-                        break
+            if responseURL == nil {
+                DopeLog.debug("❌ invalid response:\(String(describing: error?.localizedDescription))")
+                responseDict["error"] = error?.localizedDescription
+                switch type {
+                case .track:
+                    Telemetry.setResponseForTrackSync(-1, error: error?.localizedDescription, whichStartedAt: callStartTime)
+                case .report:
+                    Telemetry.setResponseForReportSync(-1, error: error?.localizedDescription, whichStartedAt: callStartTime)
+                case .refresh:
+                    if let actionID = payload["actionID"] as? String {
+                        Telemetry.setResponseForCartridgeSync(forAction: actionID, -1, error: error?.localizedDescription, whichStartedAt: callStartTime)
                     }
-                    return
+                case .telemetry:
+                    break
                 }
-                
-                do {
-                    // turn the response into a json object
-                    guard let data = responseData,
-                          let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
+                return
+            }
+            
+            do {
+                // turn the response into a json object
+                guard let data = responseData,
+                    let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
                     else {
                         let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
                         let message = "❌ Error reading \(type.path) response data, not a dictionary: \(json)"
                         DopeLog.debug(message)
                         Telemetry.storeException(className: "JSONSerialization", message: message)
                         return
+                }
+                responseDict = dict
+                DopeLog.debug("✅\(type.path) call got response:\(responseDict.debugDescription)")
+                var statusCode: Int = -2
+                if let responseStatusCode = responseDict["status"] as? Int {
+                    statusCode = responseStatusCode
+                }
+                switch type {
+                case .track:
+                    Telemetry.setResponseForTrackSync(statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
+                case .report:
+                    Telemetry.setResponseForReportSync(statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
+                case .refresh:
+                    if let actionID = payload["actionID"] as? String {
+                        Telemetry.setResponseForCartridgeSync(forAction: actionID, statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
                     }
-                    responseDict = dict
-                    DopeLog.debug("✅\(type.path) call got response:\(responseDict.debugDescription)")
-                    var statusCode: Int = -2
-                    if let responseStatusCode = responseDict["status"] as? Int {
-                        statusCode = responseStatusCode
-                    }
-                    switch type {
-                    case .track:
-                        Telemetry.setResponseForTrackSync(statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                    case .report:
-                        Telemetry.setResponseForReportSync(statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                    case .refresh:
-                        if let actionID = payload["actionID"] as? String {
-                            Telemetry.setResponseForCartridgeSync(forAction: actionID, statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                        }
-                    case .telemetry:
-                        break
-                    }
-                    
-                } catch {
-                    let message = "❌ Error reading \(type.path) response data: \(responseData.debugDescription)"
-                    DopeLog.debug(message)
-                    Telemetry.storeException(className: "JSONSerialization", message: message)
-                    return
+                case .telemetry:
+                    break
                 }
                 
-            })
+            } catch {
+                let message = "❌ Error reading \(type.path) response data: \(responseData.debugDescription)"
+                DopeLog.debug(message)
+                Telemetry.storeException(className: "JSONSerialization", message: message)
+                return
+            }
             
-            // send request
-            DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
-            task.resume()
-            
-        } catch {
-            let message = "Error sending \(type.path) api call with payload:(\(payload as AnyObject))"
-            DopeLog.debug(message)
-            Telemetry.storeException(className: "JSONSerialization", message: message)
-        }
+        })
+        
+        // send request
+        DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
+        task.resume()
+        
     }
     
 }

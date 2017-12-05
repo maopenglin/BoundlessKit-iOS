@@ -52,7 +52,7 @@ static NSArray* delegateSubclasses = nil;
 // Application State Swizzles
 
 - (BOOL) swizzled_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [CodelessAPI recordApplicationEventWithName:@"appLaunch"];
+    [CodelessAPI recordAppEventWithName:@"appLaunch"];
     
     if ([self respondsToSelector:@selector(swizzled_application:didFinishLaunchingWithOptions:)]) {
         return [self swizzled_application:application didFinishLaunchingWithOptions:launchOptions];
@@ -62,7 +62,7 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (void) swizzled_applicationWillTerminate:(UIApplication *)application {
-    [CodelessAPI recordApplicationEventWithName:@"appTerminate"];
+    [CodelessAPI recordAppEventWithName:@"appTerminate"];
     NSLog(@"Bye");
     if ([self respondsToSelector:@selector(swizzled_applicationWillTerminate:)]) {
         [self swizzled_applicationWillTerminate:application];
@@ -74,7 +74,7 @@ static NSArray* delegateSubclasses = nil;
         [self swizzled_applicationDidBecomeActive:application];
     
     [CodelessAPI boot];
-    [CodelessAPI recordApplicationEventWithName:@"appActive"];
+    [CodelessAPI recordAppEventWithName:@"appActive"];
     
     if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"didBecomeActive",
@@ -86,7 +86,7 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (void) swizzled_applicationWillResignActive:(UIApplication*)application {
-    [CodelessAPI recordApplicationEventWithName:@"appInactive"];
+    [CodelessAPI recordAppEventWithName:@"appInactive"];
     
     if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"willResignActive",

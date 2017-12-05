@@ -51,9 +51,13 @@ internal extension UIApplication {
             } else if senderInstance.responds(to: NSSelectorFromString("view")),
                 let view = senderInstance.value(forKey: "view") as? UIView {
                 viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else if senderInstance.responds(to: NSSelectorFromString("imageView")),
+                let view = senderInstance.value(forKey: "imageView") as? UIImageView {
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else {
+                DopeLog.error("Could not find sender view for \(type(of: senderInstance))", visual: true)
+                return nil
             }
-            DopeLog.error("Could not find sender view", visual: true)
-            return nil
             
         case "superview":
             if let senderInstance = senderInstance as? UIView,
@@ -63,9 +67,10 @@ internal extension UIApplication {
                 let view = senderInstance.value(forKey: "view") as? UIView,
                 let superview = view.superview {
                 viewsAndLocations = [(superview, superview.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else {
+                DopeLog.error("Could not find superview", visual: true)
+                return nil
             }
-            DopeLog.error("Could not find superview", visual: true)
-            return nil
             
         case "target":
             if let view = targetInstance as? UIView {
@@ -73,19 +78,21 @@ internal extension UIApplication {
             } else if targetInstance.responds(to: NSSelectorFromString("view")),
                 let view = targetInstance.value(forKey: "view") as? UIView {
                 viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else {
+                DopeLog.error("Could not find target view", visual: true)
+                return nil
             }
-            DopeLog.error("Could not find target view", visual: true)
-            return nil
             
             
         case "custom":
-            if viewCustom != "" {
-                viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
-                    return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
-                })
+            viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
+                return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
+            })
+            
+            if viewsAndLocations?.count == 0 {
+                DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                return nil
             }
-            DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
-            return nil
             
         default:
             DopeLog.error("Unknown ViewOption <\(viewOption)>", visual: true)

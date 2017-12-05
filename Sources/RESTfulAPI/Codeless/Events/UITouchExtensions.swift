@@ -69,16 +69,15 @@ internal extension UITouch {
             
             viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             
-            
         case "custom":
-            guard viewCustom != "" else {
-                DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
-                return nil
-            }
-            
             viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
                 return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
             })
+            
+            if viewsAndLocations?.count == 0 {
+                DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                return nil
+            }
             
         default:
             DopeLog.error("Unknown ViewOption <\(viewOption)>", visual: true)

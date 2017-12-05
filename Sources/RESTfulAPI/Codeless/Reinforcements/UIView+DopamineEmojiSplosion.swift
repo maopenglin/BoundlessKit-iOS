@@ -110,8 +110,7 @@ public extension UIView {
             emitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(emitter)
             DopeLog.debug("💥 Emojisplosion on <\(NSStringFromClass(type(of: self)))> at <\(location)>!")
-            DopeAudio.playSound(systemSound)
-            DopeAudio.playVibrate(hapticFeedback)
+            DopeAudio.play(systemSound, vibrate: hapticFeedback)
             DispatchQueue.main.asyncAfter(deadline: .now() + birthCycles) {
                 emitter.birthRate = 0
                 completion?()
