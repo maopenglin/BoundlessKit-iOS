@@ -87,13 +87,13 @@ internal class Telemetry {
     ///     - report: The Report object to snapshot its triggers.
     ///     - cartridges: The cartridges dictionary to snapshot its triggers
     ///
-    static func startRecordingSync(cause: String, track: Track, report: Report, cartridges: [String: Cartridge]) {
+    static func startRecordingSync(cause: String) {
         queue.async {
             var cartridgeTriggers: [String: [String: Any]] = [:]
-            for (actionID, cartridge) in cartridges {
+            for (actionID, cartridge) in Cartridge.cartridgeSyncers {
                 cartridgeTriggers[actionID] = cartridge.toJSONType()
             }
-            currentSyncOverview = SyncOverview.init(cause: cause, trackTriggers: track.toJSONType(), reportTriggers: report.toJSONType(), cartridgeTriggers: cartridgeTriggers)
+            currentSyncOverview = SyncOverview.init(cause: cause, trackTriggers: Track.current.toJSONType(), reportTriggers: Report.current.toJSONType(), cartridgeTriggers: cartridgeTriggers)
         }
     }
     

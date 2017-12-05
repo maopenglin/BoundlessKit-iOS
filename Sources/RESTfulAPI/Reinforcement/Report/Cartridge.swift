@@ -44,6 +44,7 @@ internal class Cartridge : NSObject, NSCoding {
         cartridgeSyncers[actionID] = cartridge
         saveCartridgeActionIDsSet()
         if cartridge.isTriggered() {
+            Telemetry.startRecordingSync(cause: "Syncing newly created cartridge")
             cartridge.sync()
         }
         return cartridge

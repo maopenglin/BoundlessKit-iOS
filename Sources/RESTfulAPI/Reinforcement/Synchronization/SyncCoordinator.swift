@@ -90,7 +90,7 @@ public class SyncCoordinator {
                 }
                 DopeLog.debug("Synchinig because \(syncCause)")
                 
-                Telemetry.startRecordingSync(cause: syncCause, track: Track.current, report: Report.current, cartridges: Cartridge.cartridgeSyncers)
+                Telemetry.startRecordingSync(cause: syncCause)
                 var goodProgress = true
                 
                 Track.current.sync() { status in
