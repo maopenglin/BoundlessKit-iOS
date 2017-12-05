@@ -190,11 +190,24 @@ public class CodelessAPI : NSObject {
             let appEvent = CustomCodelessEvent(target: "AppEvent", action: name)
             appEvent.attemptReinforcement()
             
-            submit { payload in
-                payload["customEvent"] = [appEvent.target : appEvent.action]
-                payload["actionID"] = appEvent.action
-                payload["senderImage"] = ""
+            let submitEvent = {
+                submit { payload in
+                    payload["customEvent"] = [appEvent.target : appEvent.action]
+                    payload["actionID"] = appEvent.action
+                    payload["senderImage"] = ""
+                }
             }
+            
+            if name != "appLaunch" {
+                submitEvent()
+            } else {
+                if connectionID != nil {
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+                        submitEvent()
+                    }
+                }
+            }
+            
         }
     }
     
