@@ -58,14 +58,14 @@ public class DopamineVersion : UserDefaultsSingleton {
         if let versionID = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? String?,
             let mappings = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.mappings)) as? [String:Any],
             let visualizerMappings = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.visualizerMappings)) as? [String:Any] {
-            DopeLog.debug("Found DopamineVersion saved in user defaults.")
+//            DopeLog.debug("Found DopamineVersion saved in user defaults.")
             self.init(
                 versionID: versionID,
                 mappings: mappings,
                 visualizerMappings: visualizerMappings
             )
         } else {
-            DopeLog.debug("Invalid DopamineVersion saved to user defaults.")
+//            DopeLog.debug("Invalid DopamineVersion saved to user defaults.")
             return nil
         }
     }
@@ -74,7 +74,7 @@ public class DopamineVersion : UserDefaultsSingleton {
         aCoder.encode(versionID, forKey: #keyPath(DopamineVersion.versionID))
         aCoder.encode(mappings, forKey: #keyPath(DopamineVersion.mappings))
         aCoder.encode(visualizerMappings, forKey: #keyPath(DopamineVersion.visualizerMappings))
-        DopeLog.debug("Saved DopamineVersion to user defaults.")
+//        DopeLog.debug("Saved DopamineVersion to user defaults.")
     }
     
     static var standard: DopamineVersion {
@@ -115,7 +115,7 @@ public class DopamineVersion : UserDefaultsSingleton {
                 DopeLog.error("Bad reinforcement parameters")
             }
         } else {
-            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
+//            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
 //            DopeLog.debug("Reinforcement mappings:\(self.mappings as AnyObject)")
 //            DopeLog.debug("Visualizer mappings:\(self.visualizerMappings as AnyObject)")
         }

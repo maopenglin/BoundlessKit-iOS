@@ -165,7 +165,6 @@ public class DopamineAPI : NSObject{
             }
             
             do {
-                // turn the response into a json object
                 guard let data = responseData,
                     let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
                     else {
@@ -176,24 +175,6 @@ public class DopamineAPI : NSObject{
                         return
                 }
                 responseDict = dict
-                DopeLog.debug("✅\(type.path) call got response:\(responseDict.debugDescription)")
-                var statusCode: Int = -2
-                if let responseStatusCode = responseDict["status"] as? Int {
-                    statusCode = responseStatusCode
-                }
-                switch type {
-                case .track:
-                    Telemetry.setResponseForTrackSync(statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                case .report:
-                    Telemetry.setResponseForReportSync(statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                case .refresh:
-                    if let actionID = payload["actionID"] as? String {
-                        Telemetry.setResponseForCartridgeSync(forAction: actionID, statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                    }
-                case .telemetry:
-                    break
-                }
-                
             } catch {
                 let message = "❌ Error reading \(type.path) response data: \(responseData.debugDescription)"
                 DopeLog.debug(message)
@@ -201,10 +182,28 @@ public class DopamineAPI : NSObject{
                 return
             }
             
+            var statusCode: Int = -2
+            if let responseStatusCode = responseDict["status"] as? Int {
+                statusCode = responseStatusCode
+            }
+            switch type {
+            case .track:
+                Telemetry.setResponseForTrackSync(statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
+            case .report:
+                Telemetry.setResponseForReportSync(statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
+            case .refresh:
+                if let actionID = payload["actionID"] as? String {
+                    Telemetry.setResponseForCartridgeSync(forAction: actionID, statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
+                }
+            case .telemetry:
+                break
+            }
+            
+//            DopeLog.debug("✅\(type.path) call got response:\(responseDict.debugDescription)")
         })
         
         // send request
-        DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
+//        DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
         task.resume()
         
     }

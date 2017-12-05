@@ -101,7 +101,7 @@ public class DopamineConfiguration : UserDefaultsSingleton  {
         aCoder.encode(integrationMethod, forKey: #keyPath(DopamineConfiguration.integrationMethod))
         aCoder.encode(advertiserID, forKey: #keyPath(DopamineConfiguration.advertiserID))
         aCoder.encode(consoleLoggingEnabled, forKey: #keyPath(DopamineConfiguration.consoleLoggingEnabled))
-        DopeLog.debug("Saved DopamineConfiguration to user defaults.")
+//        DopeLog.debug("Saved DopamineConfiguration to user defaults.")
     }
     
     required public convenience init?(coder aDecoder: NSCoder) {

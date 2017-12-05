@@ -38,7 +38,7 @@ import Foundation
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    @objc public static func debug(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
+    @objc public static func debug(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
         #if DEBUG
             guard DopamineConfiguration.current.consoleLoggingEnabled else {
                 return

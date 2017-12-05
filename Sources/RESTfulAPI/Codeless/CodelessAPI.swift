@@ -296,11 +296,11 @@ public class CodelessAPI : NSObject {
                 return
             }
             
-            DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
+//            DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
         })
         
         // send request
-        DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
+//        DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
         task.resume()
         
     }

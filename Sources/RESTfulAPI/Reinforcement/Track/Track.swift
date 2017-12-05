@@ -48,7 +48,6 @@ internal class Track : UserDefaultsSingleton {
         self.timerStartedAt = timerStartedAt
         self.timerExpiresIn = timerExpiresIn
         super.init()
-        operationQueue.maxConcurrentOperationCount = 1
     }
     
     /// Decodes a saved track from NSUserDefaults
@@ -59,7 +58,7 @@ internal class Track : UserDefaultsSingleton {
                       timerStartedAt: aDecoder.decodeInt64(forKey: #keyPath(Track.timerStartedAt)),
                       timerExpiresIn: aDecoder.decodeInt64(forKey: #keyPath(Track.timerExpiresIn))
             )
-            DopeLog.debug("Decoded track with trackedActions:\(trackedActions.count) sizeToSync:\(DopamineConfiguration.current.trackBatchSize) timerStartsAt:\(timerStartedAt) timerExpiresIn:\(timerExpiresIn)")
+//            DopeLog.debug("Decoded track with trackedActions:\(trackedActions.count) sizeToSync:\(DopamineConfiguration.current.trackBatchSize) timerStartsAt:\(timerStartedAt) timerExpiresIn:\(timerExpiresIn)")
         } else {
             return nil
         }
@@ -133,7 +132,11 @@ internal class Track : UserDefaultsSingleton {
     ///     - action: The action to be stored.
     ///
     let dispatchGroup = DispatchGroup()
-    let operationQueue = OperationQueue()
+    var operationQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
     func add(_ action: DopeAction) {
         guard DopamineVersion.current.versionID != nil else {
             return
@@ -149,7 +152,7 @@ internal class Track : UserDefaultsSingleton {
                         if self.operationQueue.operationCount == 1 {
                             Track._current = self
                         }
-                        DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
+//                        DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
                     }
                 }
             } else {
@@ -157,7 +160,7 @@ internal class Track : UserDefaultsSingleton {
                 if self.operationQueue.operationCount == 1 {
                     Track._current = self
                 }
-                DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
+//                DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
             }
         }
     }
@@ -174,27 +177,24 @@ internal class Track : UserDefaultsSingleton {
                 return
             }
             self.syncInProgress = true
-            DopeLog.debug("Track sync in progress...")
-//            self.trackedActionsQueue.waitUntilAllOperationsAreFinished()
-//            self.trackedActionsQueue.isSuspended = true
+//            DopeLog.debug("Track sync in progress...")
             let syncFinished = {
                 self.syncInProgress = false
-//                self.trackedActionsQueue.isSuspended = false
             }
             
             if self.trackedActions.count == 0 {
                 defer { syncFinished() }
-                DopeLog.debug("No tracked actions to sync.")
+//                DopeLog.debug("No tracked actions to sync.")
                 completion(0)
                 self.updateTriggers()
                 return
             } else {
-                DopeLog.debug("Sending \(self.trackedActions.count) tracked actions...")
+//                DopeLog.debug("Sending \(self.trackedActions.count) tracked actions...")
                 DopamineAPI.track(self.trackedActions) { response in
                     defer { syncFinished() }
                     if let status = response["status"] as? Int {
                         if status == 200 {
-                            DopeLog.debug("Sent \(self.trackedActions.count) tracked actions!")
+//                            DopeLog.debug("Sent \(self.trackedActions.count) tracked actions!")
                             self.trackedActions.removeAll()
                             self.updateTriggers()
                         }

@@ -109,14 +109,14 @@ public extension UIView {
             
             emitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(emitter)
-            DopeLog.debug("💥 Emojisplosion on <\(NSStringFromClass(type(of: self)))> at <\(location)>!")
+//            DopeLog.debug("💥 Emojisplosion on <\(NSStringFromClass(type(of: self)))> at <\(location)>!")
             DopeAudio.play(systemSound, vibrate: hapticFeedback)
             DispatchQueue.main.asyncAfter(deadline: .now() + birthCycles) {
                 emitter.birthRate = 0
                 completion?()
                 DispatchQueue.main.asyncAfter(deadline: .now() + Double(lifetime + lifetimeRange + 0.2)) {
                     emitter.removeFromSuperlayer()
-                    DopeLog.debug("💥 Emojisplosion done")
+//                    DopeLog.debug("💥 Emojisplosion done")
                 }
             }
         }

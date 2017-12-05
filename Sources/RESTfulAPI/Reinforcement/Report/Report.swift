@@ -69,7 +69,7 @@ internal class Report : UserDefaultsSingleton {
                       timerStartsAt: aDecoder.decodeInt64(forKey: #keyPath(Report.timerStartedAt)),
                       timerExpiresIn: aDecoder.decodeInt64(forKey: #keyPath(Report.timerExpiresIn))
             )
-            DopeLog.debug("Decoded report with versionID:\(versionID ?? "nil") reportedActions:\(reportedActions.count) sizeToSync:\(DopamineConfiguration.current.reportBatchSize) timerStartsAt:\(timerStartedAt) timerExpiresIn:\(timerExpiresIn)")
+//            DopeLog.debug("Decoded report with versionID:\(versionID ?? "nil") reportedActions:\(reportedActions.count) sizeToSync:\(DopamineConfiguration.current.reportBatchSize) timerStartsAt:\(timerStartedAt) timerExpiresIn:\(timerExpiresIn)")
         } else {
             return nil
         }
@@ -157,11 +157,11 @@ internal class Report : UserDefaultsSingleton {
             
             if self.reportedActions.count == 0 {
                 defer { self.syncInProgress = false }
-                DopeLog.debug("No reported actions to sync.")
+//                DopeLog.debug("No reported actions to sync.")
                 completion(0)
                 self.updateTriggers()
             } else {
-                DopeLog.debug("Sending \(self.reportedActions.count) reported actions...")
+//                DopeLog.debug("Sending \(self.reportedActions.count) reported actions...")
                 DopamineAPI.report(self.reportedActions, completion: { response in
                     defer { self.syncInProgress = false }
                     if let status = response["status"] as? Int {
