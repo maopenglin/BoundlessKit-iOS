@@ -8,6 +8,7 @@
 
 import UIKit
 import DopamineKit
+import CoreLocation
 
 class ViewController: UIViewController {
     
@@ -15,7 +16,7 @@ class ViewController: UIViewController {
     
     @objc func action1Performed(){
         // Reinforce the action to make it sticky!!
-        DopamineKit.reinforce("action1", metaData: ["key":"value"], completion: {
+        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
             reinforcement in
                 // Update UI to display reinforcement decision on screen for learning purposes
                 self.responseLabel.text = reinforcement
@@ -49,7 +50,7 @@ class ViewController: UIViewController {
                     reinforcerType = CandyIcon.thumbsUp
                     title = "Awesome run!"
                     subtitle = "Either you run the day,\nOr the day runs you."
-                    backgroundColor = UIColor.from(hex:"#ff0000")
+                    backgroundColor = UIColor.from(rgb:"#ff0000")
                     visibilityDuration = 2.5
                     break
                 default:
@@ -65,11 +66,31 @@ class ViewController: UIViewController {
     }
     
     @objc func action2Performed(){
-        // Tracking call is sent asynchronously
-        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
+////        // Tracking call is sent asynchronously
+//////        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
+//        locationManager.delegate = self
+//        locationManager.requestAlwaysAuthorization()
+        
+
+        DopamineKit.track("action2peformed")
+//        DopamineKit.reinforce("a2") { reinforcement in
+//            // Update UI to display reinforcement decision on screen for learning purposes
+//            self.responseLabel.text = reinforcement
+//            self.flash(self.responseLabel)
+//        }
+//        view.showConfetti()
+//        let view = UIView(frame: UIScreen.main.bounds)
+        
+//        DispatchQueue.main.async {
+////            DLUIManager.main.show(false)
+//            DLWindow.shared.view.showConfetti {
+//                print("done")
+////                DLUIManager.main.hide()
+//            }
+//        }
     }
     
-    
+    var locationManager = CLLocationManager()
     
     
     ///////////////////////////////////////
@@ -82,24 +103,18 @@ class ViewController: UIViewController {
     @objc var action1Button:UIButton!
     @objc var trackedActionButton:UIButton!
     
-    let testQueue = OperationQueue()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
-        DopamineKit.syncCoordinator.performSync()
         
-//        testQueue.isSuspended = true
-//        for _ in 1...100 {
-//            testQueue.addOperation {
-//                DopamineKit.track("test") {_ in}
-//            }
+//        DispatchQueue.concurrentPerform(iterations: 100) { count in
+//            DopamineKit.track("testingActionConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
 //        }
-//        testQueue.isSuspended = false
         
-//        DispatchQueue.global().asyncAfter(deadline: .now()) {
-//            CandyBar(title: "title", subtitle: "Subtitle").show(duration: 3.0)
-//        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
     }
     
     @objc func loadBasicUI(){
@@ -155,3 +170,6 @@ class ViewController: UIViewController {
     
 }
 
+extension ViewController : CLLocationManagerDelegate {
+    
+}

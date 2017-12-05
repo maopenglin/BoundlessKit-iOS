@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 @objc
 open class DopamineKit : NSObject {
@@ -19,7 +20,7 @@ open class DopamineKit : NSObject {
     ///
     @objc public static var developmentIdentity:String?
     
-    @objc public static let sharedInstance: DopamineKit = DopamineKit()
+    @objc public static let shared: DopamineKit = DopamineKit()
     public static let syncCoordinator = SyncCoordinator.shared
     
     private override init() {
@@ -35,11 +36,14 @@ open class DopamineKit : NSObject {
     ///                  Defaults to `nil`.
     ///
     @objc open static func track(_ actionID: String, metaData: [String: Any]? = nil) {
+        guard DopamineConfiguration.current.trackingEnabled else {
+            return
+        }
         // store the action to be synced
         DispatchQueue.global(qos: .background).async {
             let action = DopeAction(actionID: actionID, metaData:metaData)
-            syncCoordinator.store(trackedAction: action)
-//            debugLog("tracked:\(actionID) with metadata:\(String(describing: metaData))")
+            syncCoordinator.store(track: action)
+//            DopeLog.debug("tracked:\(actionID) with metadata:\(String(describing: metaData))")
         }
     }
     
@@ -53,34 +57,20 @@ open class DopamineKit : NSObject {
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
     @objc open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, completion: @escaping (String) -> ()) {
+        guard DopamineConfiguration.current.reinforcementEnabled else {
+            completion(Cartridge.defaultReinforcementDecision)
+            return
+        }
+        
         let action = DopeAction(actionID: actionID, metaData: metaData)
-        action.reinforcementDecision = syncCoordinator.retrieveReinforcementDecisionFor(actionID: action.actionID)
+        action.reinforcementDecision = syncCoordinator.retrieve(cartridgeFor: action.actionID).remove()
         
         DispatchQueue.main.async(execute: {
             completion(action.reinforcementDecision!)
         })
         
         // store the action to be synced
-        syncCoordinator.store(reportedAction: action)
+        syncCoordinator.store(report: action)
     }
     
-    /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
-    ///
-    /// - parameters:
-    ///     - message: The debug message.
-    ///     - filePath: Used to get filename of bug. Do not use this parameter. Defaults to #file.
-    ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
-    ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
-    ///
-    @objc public static func debugLog(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
-        #if DEBUG
-            var functionSignature:String = function
-            if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
-                functionSignature.replaceSubrange(parameterNames, with: "()")
-            }
-            let fileName = NSString(string: filePath).lastPathComponent
-            print("[\(fileName):\(line):\(functionSignature)] - \(message)")
-        #endif
-    }
-
 }
