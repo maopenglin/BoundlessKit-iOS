@@ -64,14 +64,14 @@ internal class DopamineProperties : UserDefaultsSingleton {
         aCoder.encode(inProduction, forKey: #keyPath(DopamineProperties.inProduction))
         aCoder.encode(developmentSecret, forKey: #keyPath(DopamineProperties.developmentSecret))
         aCoder.encode(productionSecret, forKey: #keyPath(DopamineProperties.productionSecret))
-        print("Saved DopamineProperties to user defaults.")
+        DopeLog.debug("Saved DopamineProperties to user defaults.")
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
         if let appID = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.appID)) as? String,
             let developmentSecret = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.developmentSecret)) as? String,
             let productionSecret = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.productionSecret)) as? String {
-            print("Found DopamineProperties saved in user defaults.")
+            DopeLog.debug("Found DopamineProperties saved in user defaults.")
             self.init(
                 appID: appID,
                 inProduction: aDecoder.decodeBool(forKey: #keyPath(DopamineProperties.inProduction)),
@@ -79,7 +79,7 @@ internal class DopamineProperties : UserDefaultsSingleton {
                 productionSecret: productionSecret
             )
         } else {
-            print("Invalid DopamineProperties saved to user defaults.")
+            DopeLog.debug("Invalid DopamineProperties saved to user defaults.")
             return nil
         }
     }

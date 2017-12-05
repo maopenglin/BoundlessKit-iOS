@@ -101,7 +101,7 @@ public class DopamineConfiguration : UserDefaultsSingleton  {
         aCoder.encode(integrationMethod, forKey: #keyPath(DopamineConfiguration.integrationMethod))
         aCoder.encode(advertiserID, forKey: #keyPath(DopamineConfiguration.advertiserID))
         aCoder.encode(consoleLoggingEnabled, forKey: #keyPath(DopamineConfiguration.consoleLoggingEnabled))
-        print("Saved DopamineConfiguration to user defaults.")
+        DopeLog.debug("Saved DopamineConfiguration to user defaults.")
     }
     
     required public convenience init?(coder aDecoder: NSCoder) {
@@ -122,7 +122,6 @@ public class DopamineConfiguration : UserDefaultsSingleton  {
 //            let advertiserID = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.advertiserID)) as? Bool,
 //            let consoleLoggingEnabled = aDecoder.decodeObject(forKey: #keyPath(DopamineConfiguration.consoleLoggingEnabled)) as? Bool
         {
-            print("Found DopamineConfiguration saved in user defaults.")
             self.init(
                 configID: configID,
                 reinforcementEnabled: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.reinforcementEnabled)),
@@ -142,7 +141,6 @@ public class DopamineConfiguration : UserDefaultsSingleton  {
                 consoleLoggingEnabled: aDecoder.decodeBool(forKey: #keyPath(DopamineConfiguration.consoleLoggingEnabled))
             )
         } else {
-            print("Invalid DopamineConfiguration saved to user defaults.")
             return nil
         }
     }
@@ -225,7 +223,7 @@ extension DopamineConfiguration {
                 consoleLoggingEnabled: consoleLoggingEnabled
             )
         } else {
-            DopeLog.error("could not convert Config dictionary")
+            print("could not convert Dopamine Configuration dictionary")
             return nil
         }
     }
