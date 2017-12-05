@@ -66,12 +66,17 @@ public class CodelessAPI : NSObject {
                     }
                 }
             }
-            if !DopamineProperties.current.inProduction { promptPairing() }
+            
+            promptPairing()
         }
     }
     
     @objc
     private static func promptPairing() {
+        guard !DopamineProperties.current.inProduction else {
+            return
+        }
+        
         var payload = DopamineProperties.current.apiCredentials
         payload["deviceName"] = UIDevice.current.name
         
