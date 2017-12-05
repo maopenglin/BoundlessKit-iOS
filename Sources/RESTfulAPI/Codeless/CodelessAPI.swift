@@ -97,6 +97,12 @@ public class CodelessAPI : NSObject {
                             shared.send(call: .accept, with: payload) {response in
                                 if response["status"] as? Int == 200 {
                                     CodelessAPI.connectionID = connectionID
+                                    
+                                    for event in CustomCodelessEvent.appEvents {
+                                        submit { payload in
+                                            event.modify(payload: &payload)
+                                        }
+                                    }
                                 }
                             }
                         }))
@@ -189,25 +195,6 @@ public class CodelessAPI : NSObject {
         DispatchQueue.global().async {
             let appEvent = CustomCodelessEvent(target: "AppEvent", action: name)
             appEvent.attemptReinforcement()
-            
-            let submitEvent = {
-                submit { payload in
-                    payload["customEvent"] = [appEvent.target : appEvent.action]
-                    payload["actionID"] = appEvent.action
-                    payload["senderImage"] = ""
-                }
-            }
-            
-            if name != "appLaunch" {
-                submitEvent()
-            } else {
-                if connectionID != nil {
-                    DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
-                        submitEvent()
-                    }
-                }
-            }
-            
         }
     }
     

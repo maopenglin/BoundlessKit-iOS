@@ -10,6 +10,12 @@ import Foundation
 
 internal class CustomCodelessEvent : NSObject {
     
+    static let appLaunch = CustomCodelessEvent(target: "AppEvent", action: "appLaunch")
+    static let appTerminate = CustomCodelessEvent(target: "AppEvent", action: "appTerminate")
+    static let appActive = CustomCodelessEvent(target: "AppEvent", action: "appActive")
+    static let appInactive = CustomCodelessEvent(target: "AppEvent", action: "appInactive")
+    static let appEvents = [appLaunch, appTerminate, appActive, appInactive]
+    
     let sender: String = "customEvent"
     let target: String
     let action: String
@@ -32,6 +38,12 @@ internal class CustomCodelessEvent : NSObject {
             }
             
         }
+    }
+    
+    func modify(payload: inout [String: Any]) {
+        payload["customEvent"] = [target: action]
+        payload["actionID"] = [action]
+        payload["senderImage"] = ""
     }
     
     private func reinforcementViews(options: [String: Any]) -> [(UIView, CGPoint)]? {
