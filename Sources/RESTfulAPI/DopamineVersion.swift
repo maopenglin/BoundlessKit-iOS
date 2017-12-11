@@ -127,9 +127,9 @@ public class DopamineVersion : UserDefaultsSingleton {
 
 public extension DopamineVersion {
     public static func convert(from versionDictionary: [String: Any]) -> DopamineVersion? {
-        if let versionID = versionDictionary["versionID"] as? String?,
-            let mappings = versionDictionary["mappings"] as? [String:Any] {
-            return DopamineVersion.init(versionID: versionID, mappings: mappings, visualizerMappings: versionDictionary["visualizerMappings"] as? [String:Any] ?? [:])
-        } else { return nil }
+        guard let versionID = versionDictionary["versionID"] as? String? else { DopeLog.debug("Bad parameter"); return nil }
+        guard let mappings = versionDictionary["mappings"] as? [String:Any] else { DopeLog.debug("Bad parameter"); return nil }
+        
+        return DopamineVersion.init(versionID: versionID, mappings: mappings, visualizerMappings: versionDictionary["visualizerMappings"] as? [String:Any] ?? [:])
     }
 }

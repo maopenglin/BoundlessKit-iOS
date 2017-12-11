@@ -120,17 +120,17 @@ There are additional parameters for the `track()` and `reinforce()` functions th
 
 ========
 
-####Tracking Calls
+#### Tracking Calls
 
 A tracking call should be used to record and communicate to DopamineAPI that a particular action has been performed by the user, each of these calls will be used to improve the reinforcement model used for the particular user. The tracking call itself is asynchronous and non-blocking, and returns a status code (200 for success, other for errors) which can be ignored for the most part. Failed tracking calls will not return errors, but will be noted in the NSLog.
 
-######General syntax
+###### General syntax
 
 ```
 Dopamine.track(actionID, metaData)
 ```
 
-######Parameters:
+###### Parameters:
 
  - `actionID: String` - is a unique name for the action that the user has performed
 
@@ -138,17 +138,17 @@ Dopamine.track(actionID, metaData)
 
 ========
 
-####Reinforcement Calls
+#### Reinforcement Calls
 
 A reinforcement call should be used when the user has performed a particular action that you wish to become a 'habit', the reinforcement call will return the name of the feedback function that should be called to inform, delight or congratulate the user. The names of the reinforcement functions, the feedback functions and their respective pairings must be configured by contacting us.
 
-######General syntax
+###### General syntax
 
 ```
 Dopamine.reinforce(actionID, metaData, completion)
 ```
 
-######Parameters:
+###### Parameters:
 
  - `actionID: String` - is a unique name for the action that the user has performed
 
@@ -163,7 +163,7 @@ For more information on using closures, see Apple's [documentation](https://deve
 
 ========
 
-####DopamineProperties.plist
+#### DopamineProperties.plist
 `DopamineProperties.plist` _must_ be contained within your app's _main bundle_ by default, or the location can be configured by setting `DopamineAPI.testCredentialPath`. This property list contains configuration variables needed to make valid calls to the API:
 
  - `appID: String` - uniquely identifies your app

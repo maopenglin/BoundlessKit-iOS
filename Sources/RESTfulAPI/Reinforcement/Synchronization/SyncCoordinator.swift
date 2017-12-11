@@ -88,7 +88,7 @@ public class SyncCoordinator {
                 } else {
                     syncCause = "Track needs to sync."
                 }
-                DopeLog.debug("Synchinig because \(syncCause)")
+                DopeLog.debug("Syncing because \(syncCause)")
                 
                 Telemetry.startRecordingSync(cause: syncCause)
                 var goodProgress = true

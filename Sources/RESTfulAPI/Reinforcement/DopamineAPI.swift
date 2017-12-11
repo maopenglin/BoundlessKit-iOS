@@ -12,6 +12,8 @@ import AdSupport
 @objc
 public class DopamineAPI : NSObject{
     
+    public static var logCalls = true
+    
     /// Valid API actions appeneded to the DopamineAPI URL
     ///
     internal enum CallType{
@@ -199,11 +201,11 @@ public class DopamineAPI : NSObject{
                 break
             }
             
-//            DopeLog.debug("✅\(type.path) call got response:\(responseDict.debugDescription)")
+            if DopamineAPI.logCalls { DopeLog.debug("✅\(type.path) call got response:\(responseDict.debugDescription)") }
         })
         
         // send request
-//        DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
+        if DopamineAPI.logCalls { DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)") }
         task.resume()
         
     }
