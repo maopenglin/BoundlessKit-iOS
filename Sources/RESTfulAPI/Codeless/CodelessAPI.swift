@@ -11,6 +11,8 @@ import Foundation
 @objc
 public class CodelessAPI : NSObject {
     
+    public static var logCalls = false
+    
     /// Valid API actions appeneded to the CodelessAPI URL
     ///
     internal enum CallType{
@@ -296,11 +298,11 @@ public class CodelessAPI : NSObject {
                 return
             }
             
-//            DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)")
+            if CodelessAPI.logCalls { DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)") }
         })
         
         // send request
-//        DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)")
+        if CodelessAPI.logCalls { DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)") }
         task.resume()
         
     }

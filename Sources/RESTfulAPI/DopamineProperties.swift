@@ -127,18 +127,18 @@ internal class DopamineProperties : UserDefaultsSingleton {
 extension DopamineProperties {
     static func convert(from propertiesDictionary: [String: Any]?) -> DopamineProperties? {
         guard let propertiesDictionary = propertiesDictionary else { return nil }
-        if let appID = propertiesDictionary["appID"] as? String,
-            let inProduction = propertiesDictionary["inProduction"] as? Bool,
-            let productionSecret = propertiesDictionary["productionSecret"] as? String,
-            let developmentSecret = propertiesDictionary["developmentSecret"] as? String {
-            return DopamineProperties.init(
-                appID: appID,
-                versionID: propertiesDictionary["versionID"] as? String,
-                configID: propertiesDictionary["configID"] as? String,
-                inProduction: inProduction,
-                developmentSecret: developmentSecret,
-                productionSecret: productionSecret
-            )
-        } else { return nil }
+        guard let appID = propertiesDictionary["appID"] as? String else { DopeLog.debug("Bad parameter"); return nil }
+        guard let inProduction = propertiesDictionary["inProduction"] as? Bool else { DopeLog.debug("Bad parameter"); return nil }
+        guard let productionSecret = propertiesDictionary["productionSecret"] as? String else { DopeLog.debug("Bad parameter"); return nil }
+        guard let developmentSecret = propertiesDictionary["developmentSecret"] as? String else { DopeLog.debug("Bad parameter"); return nil }
+        
+        return DopamineProperties.init(
+            appID: appID,
+            versionID: propertiesDictionary["versionID"] as? String,
+            configID: propertiesDictionary["configID"] as? String,
+            inProduction: inProduction,
+            developmentSecret: developmentSecret,
+            productionSecret: productionSecret
+        )
     }
 }

@@ -39,7 +39,6 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     }
     
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        DopeLog.debug("CLAuthorizationStatus:\(status.rawValue)")
         if status == .authorizedAlways || status == .authorizedWhenInUse {
             canGetLocation = true
         } else {
@@ -48,8 +47,6 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        DopeLog.debug("getLocation got location:\(locations.last?.description ?? "nil")")
-        
         locationManager?.stopUpdatingLocation()
         expiresAt = Date().addingTimeInterval(timeAccuracy)
         if let location = locations.last {
@@ -88,13 +85,11 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
             self.queue.isSuspended = true
             
             DispatchQueue.main.async {
-                DopeLog.debug("Updating location...")
                 self.locationManager?.startUpdatingLocation()
             }
             // If no location after 3 seconds unsuspend the queue
             DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
                 if self.queue.isSuspended {
-                    DopeLog.debug("Location update timed out")
                     self.queue.isSuspended = false
                 }
             }

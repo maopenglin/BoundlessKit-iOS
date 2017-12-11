@@ -185,47 +185,43 @@ public class DopamineConfiguration : UserDefaultsSingleton  {
 
 extension DopamineConfiguration {
     static func convert(from configDictionary: [String: Any]) -> DopamineConfiguration? {
-        if let configID = configDictionary["configID"] as? String?,
-            let reinforcementEnabled = configDictionary["reinforcementEnabled"] as? Bool,
-            let triggerEnabled = configDictionary["triggerEnabled"] as? Bool,
-            let trackingEnabled = configDictionary["trackingEnabled"] as? Bool,
-            let trackingCapabilities = configDictionary["trackingCapabilities"] as? [String: Any],
-            let applicationState = trackingCapabilities["applicationState"] as? Bool,
-            let applicationViews = trackingCapabilities["applicationViews"] as? Bool,
-            let customViews = trackingCapabilities["customViews"] as? [String: Any],
-            let customEvents = trackingCapabilities["customEvents"] as? [String: Any],
-            let notificationObservations = trackingCapabilities["notificationObservations"] as? Bool,
-            let storekitObservations = trackingCapabilities["storekitObservations"] as? Bool,
-            let locationObservations = trackingCapabilities["locationObservations"] as? Bool,
-            let batchSize = configDictionary["batchSize"] as? [String: Any],
-            let trackBatchSize = batchSize["track"] as? Int,
-            let reportBatchSize = batchSize["report"] as? Int,
-            let integrationMethod = configDictionary["integrationMethod"] as? String,
-            let advertiserID = configDictionary["advertiserID"] as? Bool,
-            let consoleLoggingEnabled = configDictionary["consoleLoggingEnabled"] as? Bool
-        {
-            return DopamineConfiguration.init(
-                configID: configID,
-                reinforcementEnabled: reinforcementEnabled,
-                triggerEnabled: triggerEnabled,
-                trackingEnabled: trackingEnabled,
-                applicationState: applicationState,
-                applicationViews: applicationViews,
-                customViews: customViews,
-                customEvents: customEvents,
-                notificationObservations: notificationObservations,
-                storekitObservations: storekitObservations,
-                locationObservations: locationObservations,
-                trackBatchSize: trackBatchSize,
-                reportBatchSize: reportBatchSize,
-                integrationMethod: integrationMethod,
-                advertiserID: advertiserID,
-                consoleLoggingEnabled: consoleLoggingEnabled
-            )
-        } else {
-            print("could not convert Dopamine Configuration dictionary")
-            return nil
-        }
+        guard let configID = configDictionary["configID"] as? String? else { DopeLog.debug("Bad parameter"); return nil }
+        guard let reinforcementEnabled = configDictionary["reinforcementEnabled"] as? Bool else { DopeLog.debug("Bad parameter"); return nil }
+        guard let triggerEnabled = configDictionary["triggerEnabled"] as? Bool else { DopeLog.debug("Bad parameter"); return nil }
+        guard let trackingEnabled = configDictionary["trackingEnabled"] as? Bool else { DopeLog.debug("Bad parameter"); return nil }
+        guard let trackingCapabilities = configDictionary["trackingCapabilities"] as? [String: Any] else { DopeLog.debug("Bad parameter"); return nil }
+        guard let applicationState = trackingCapabilities["applicationState"] as? Bool else { DopeLog.debug("Bad parameter"); return nil }
+        guard let applicationViews = trackingCapabilities["applicationViews"] as? Bool else { DopeLog.debug("Bad parameter"); return nil }
+        guard let customViews = trackingCapabilities["customViews"] as? [String: Any] else { DopeLog.debug("Bad parameter"); return nil }
+        guard let customEvents = trackingCapabilities["customEvents"] as? [String: Any] else { DopeLog.debug("Bad parameter"); return nil }
+        guard let notificationObservations = trackingCapabilities["notificationObservations"] as? Bool else { DopeLog.debug("Bad parameter"); return nil }
+        guard let storekitObservations = trackingCapabilities["storekitObservations"] as? Bool else { DopeLog.debug("Bad parameter"); return nil }
+        guard let locationObservations = trackingCapabilities["locationObservations"] as? Bool else { DopeLog.debug("Bad parameter"); return nil }
+        guard let batchSize = configDictionary["batchSize"] as? [String: Any] else { DopeLog.debug("Bad parameter"); return nil }
+        guard let trackBatchSize = batchSize["track"] as? Int else { DopeLog.debug("Bad parameter"); return nil }
+        guard let reportBatchSize = batchSize["report"] as? Int else { DopeLog.debug("Bad parameter"); return nil }
+        guard let integrationMethod = configDictionary["integrationMethod"] as? String else { DopeLog.debug("Bad parameter"); return nil }
+        guard let advertiserID = configDictionary["advertiserID"] as? Bool else { DopeLog.debug("Bad parameter"); return nil }
+        guard let consoleLoggingEnabled = configDictionary["consoleLoggingEnabled"] as? Bool else { DopeLog.debug("Bad parameter"); return nil }
+        
+        return DopamineConfiguration.init(
+            configID: configID,
+            reinforcementEnabled: reinforcementEnabled,
+            triggerEnabled: triggerEnabled,
+            trackingEnabled: trackingEnabled,
+            applicationState: applicationState,
+            applicationViews: applicationViews,
+            customViews: customViews,
+            customEvents: customEvents,
+            notificationObservations: notificationObservations,
+            storekitObservations: storekitObservations,
+            locationObservations: locationObservations,
+            trackBatchSize: trackBatchSize,
+            reportBatchSize: reportBatchSize,
+            integrationMethod: integrationMethod,
+            advertiserID: advertiserID,
+            consoleLoggingEnabled: consoleLoggingEnabled
+        )
     }
 }
 
