@@ -11,7 +11,7 @@ import Foundation
 @objc
 public class CodelessAPI : NSObject {
     
-    public static var logCalls = true
+    public static var logCalls = false
     
     /// Valid API actions appeneded to the CodelessAPI URL
     ///
