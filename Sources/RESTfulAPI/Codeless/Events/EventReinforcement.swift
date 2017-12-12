@@ -61,9 +61,29 @@ import Foundation
 ////    }
 //}
 
-class EventReinforcement : NSObject {
+extension NSObject {
+    @objc dynamic func swizzled_test() {
+        print("Success")
+    }
+}
+
+public class EventReinforcement : NSObject {
     
     static var registeredActions: [String: String] = ["Space.ContainerViewController":"presentChickletListViewController"]
+    
+    public static var test: String = {
+        let swizzling: (AnyClass, Selector, Selector) -> () = { forClass, originalSelector, swizzledSelector in
+            let originalMethod = class_getInstanceMethod(forClass, originalSelector)
+            let swizzledMethod = class_getInstanceMethod(NSObject.self, swizzledSelector)
+            method_exchangeImplementations(originalMethod!, swizzledMethod!)
+        }
+        
+        let originalSelector = NSSelectorFromString("presentChickletListViewController")
+        let swizzledSelector = #selector(swizzled_test)
+        swizzling(NSClassFromString("Space.ContainerViewController")!.self, originalSelector, swizzledSelector)
+        print("Swizzerp")
+        return ""
+    }()
     
     
     internal static var lastTouchLocationInUIWindow: CGPoint = CGPoint.zero
