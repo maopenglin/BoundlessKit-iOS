@@ -111,13 +111,6 @@ extension CustomClassMethod {
 }
 
 extension CustomClassMethod {
-    convenience init?(targetInstance: NSObject) {
-        let target = NSStringFromClass(type(of: targetInstance))
-        guard let action = CustomClassMethod.registeredMethods[target] else { DopeLog.error("No method found"); return nil }
-        
-        self.init(target: target, action: action)
-    }
-    
     convenience init?(actionID: String) {
         let components:[String] = actionID.components(separatedBy: "-")
         guard components.count == 3,
@@ -127,6 +120,13 @@ extension CustomClassMethod {
         self.init(target: components[1], action: components[2])
     }
     
+    convenience init?(targetInstance: NSObject) {
+        let target = NSStringFromClass(type(of: targetInstance))
+        guard let action = CustomClassMethod.registeredMethods[target] else { DopeLog.error("No method found"); return nil }
+        
+        self.init(target: target, action: action)
+    }
+    
     convenience init(target: Any, action: Selector) {
         self.init(target: NSStringFromClass(type(of: target) as! AnyClass), action: NSStringFromSelector(action))
     }
@@ -134,8 +134,9 @@ extension CustomClassMethod {
 
 extension CustomClassMethod {
     fileprivate static func swizzle(originalClass: AnyClass, originalSelector: Selector, swizzledClass: AnyClass, swizzledSelector: Selector) {
-        let originalMethod = class_getInstanceMethod(originalClass, originalSelector)
-        let swizzledMethod = class_getInstanceMethod(swizzledClass, swizzledSelector)
-        method_exchangeImplementations(originalMethod!, swizzledMethod!)
+        guard let originalMethod = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
+        guard let swizzledMethod = class_getInstanceMethod(swizzledClass, swizzledSelector) else { DopeLog.error("class_getInstanceMethod(\"\(swizzledClass), \(swizzledSelector)\") failed"); return }
+        
+        method_exchangeImplementations(originalMethod, swizzledMethod)
     }
 }

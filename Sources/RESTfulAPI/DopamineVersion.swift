@@ -24,7 +24,7 @@ public class DopamineVersion : UserDefaultsSingleton {
     @objc fileprivate var mappings: [String:Any]
     @objc internal fileprivate(set) var visualizerMappings: [String:Any]
     
-    fileprivate let updateQueue = SingleOperationQueue(delay: 1)
+    fileprivate let updateQueue = SingleOperationQueue()
     public func update(visualizer mappings: [String: Any]?) {
         updateQueue.addOperation {
             if let mappings = mappings {

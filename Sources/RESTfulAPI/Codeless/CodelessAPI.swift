@@ -29,14 +29,19 @@ public class CodelessAPI : NSObject {
     @objc
     public static let shared = CodelessAPI()
     
-    private static var stashSubmits = true
-    private static var connectionID: String? {
-        willSet {
-            if connectionID != newValue {
-                DopeLog.debug("🔍 \(newValue != nil ? "C" : "Disc")onnected to visualizer")
+    private static var stashSubmits = true {
+        didSet {
+            if !stashSubmits {
+                submitQueue.cancelAllOperations()
             }
         }
+    }
+    private static var connectionID: String? {
         didSet {
+            if connectionID != oldValue {
+                DopeLog.debug("🔍 \(connectionID != nil ? "C" : "Disc")onnected to visualizer")
+            }
+            
             if connectionID == nil {
                 DopamineVersion.current.update(visualizer: nil)
             } else if submitQueue.isSuspended {
@@ -51,8 +56,6 @@ public class CodelessAPI : NSObject {
     
     @objc
     public static func boot() {
-        _ = CustomClassMethod.registerMethods
-        
         var payload = DopamineProperties.current.apiCredentials
         payload["inProduction"] = DopamineProperties.current.inProduction
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
@@ -72,6 +75,7 @@ public class CodelessAPI : NSObject {
                 }
             }
             
+            _ = CustomClassMethod.registerMethods
             promptPairing()
         }
     }
