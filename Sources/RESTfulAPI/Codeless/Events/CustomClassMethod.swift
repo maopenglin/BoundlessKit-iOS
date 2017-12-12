@@ -7,13 +7,6 @@
 
 import Foundation
 
-extension NSObject {
-    @objc func reinforceMethod() {
-        reinforceMethod()
-        
-        CustomClassMethod(targetInstance: self)?.attemptReinforcement()
-    }
-}
 
 internal class CustomClassMethod : NSObject {
     
@@ -46,11 +39,9 @@ internal class CustomClassMethod : NSObject {
         
         guard CustomClassMethod.registeredMethods[target] == nil else { return }
         
-        CustomClassMethod.swizzle(
+        NSObject.swizzleReinforceableMethod(
             originalClass: originalClass,
-            originalSelector: NSSelectorFromString(action),
-            swizzledClass: NSObject.self,
-            swizzledSelector: #selector(reinforceMethod)
+            originalSelector: NSSelectorFromString(action)
         )
         
         CustomClassMethod.registeredMethods[target] = action
@@ -132,11 +123,38 @@ extension CustomClassMethod {
     }
 }
 
-extension CustomClassMethod {
-    fileprivate static func swizzle(originalClass: AnyClass, originalSelector: Selector, swizzledClass: AnyClass, swizzledSelector: Selector) {
+extension NSObject {
+    fileprivate class func swizzle(originalClass: AnyClass, originalSelector: Selector, swizzledClass: AnyClass, swizzledSelector: Selector) {
         guard let originalMethod = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
         guard let swizzledMethod = class_getInstanceMethod(swizzledClass, swizzledSelector) else { DopeLog.error("class_getInstanceMethod(\"\(swizzledClass), \(swizzledSelector)\") failed"); return }
         
         method_exchangeImplementations(originalMethod, swizzledMethod)
+    }
+    
+    fileprivate class func swizzleReinforceableMethod(originalClass: AnyClass, originalSelector: Selector) {
+        guard originalClass.isSubclass(of: NSObject.self) else { DopeLog.debug("Not a NSObject"); return }
+        guard let originalMethod = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
+        guard let swizzledMethodNoParams = class_getInstanceMethod(NSObject.self, #selector(reinforceMethod)) else { DopeLog.error("failed"); return }
+        
+        self.swizzle(
+            originalClass: originalClass.self,
+            originalSelector: originalSelector,
+            swizzledClass: NSObject.self,
+            swizzledSelector: method_getNumberOfArguments(originalMethod) == method_getNumberOfArguments(swizzledMethodNoParams) ? #selector(reinforceMethod) : #selector(reinforceMethod2(_:))
+        )
+        
+        print("Swizzerped")
+    }
+    
+    @objc func reinforceMethod() {
+        reinforceMethod()
+        
+        CustomClassMethod(targetInstance: self)?.attemptReinforcement()
+    }
+    
+    @objc func reinforceMethod2(_ sender: UITapGestureRecognizer) {
+        reinforceMethod2(sender)
+        
+        CustomClassMethod(targetInstance: self)?.attemptReinforcement()
     }
 }
