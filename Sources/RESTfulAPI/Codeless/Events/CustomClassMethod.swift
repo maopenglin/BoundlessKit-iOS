@@ -140,10 +140,10 @@ extension NSObject {
             originalClass: originalClass.self,
             originalSelector: originalSelector,
             swizzledClass: NSObject.self,
-            swizzledSelector: method_getNumberOfArguments(originalMethod) == method_getNumberOfArguments(swizzledMethodNoParams) ? #selector(reinforceMethod) : #selector(reinforceMethod2(_:))
+            swizzledSelector: method_getNumberOfArguments(originalMethod) == method_getNumberOfArguments(swizzledMethodNoParams) ? #selector(reinforceMethod) : #selector(reinforceMethodWithTap(_:))
         )
         
-        print("Swizzerped")
+        print("Swizzerped num args:\(method_getNumberOfArguments(originalMethod))")
     }
     
     @objc func reinforceMethod() {
@@ -152,8 +152,8 @@ extension NSObject {
         CustomClassMethod(targetInstance: self)?.attemptReinforcement()
     }
     
-    @objc func reinforceMethod2(_ sender: UITapGestureRecognizer) {
-        reinforceMethod2(sender)
+    @objc func reinforceMethodWithTap(_ sender: UITapGestureRecognizer) {
+        reinforceMethodWithTap(sender)
         
         CustomClassMethod(targetInstance: self)?.attemptReinforcement()
     }
