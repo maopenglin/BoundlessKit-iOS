@@ -62,8 +62,17 @@ import Foundation
 //}
 
 extension NSObject {
-    @objc dynamic func swizzled_test() {
+    @objc func swizzled_test() {
         print("Success")
+        swizzled_test()
+        
+        
+//        let target = NSStringFromClass(type(of: self))
+//        let action = EventReinforcement.registeredActions[target]
+//
+//        DopeLog.debug("performing orignal action")
+//
+//        self.perform(NSSelectorFromString(action!))
     }
 }
 
@@ -71,7 +80,7 @@ public class EventReinforcement : NSObject {
     
     static var registeredActions: [String: String] = ["Space.ContainerViewController":"presentChickletListViewController"]
     
-    public static var test: String = {
+    public static let registerActions: Void = {
         let swizzling: (AnyClass, Selector, Selector) -> () = { forClass, originalSelector, swizzledSelector in
             let originalMethod = class_getInstanceMethod(forClass, originalSelector)
             let swizzledMethod = class_getInstanceMethod(NSObject.self, swizzledSelector)
@@ -82,7 +91,6 @@ public class EventReinforcement : NSObject {
         let swizzledSelector = #selector(swizzled_test)
         swizzling(NSClassFromString("Space.ContainerViewController")!.self, originalSelector, swizzledSelector)
         print("Swizzerp")
-        return ""
     }()
     
     

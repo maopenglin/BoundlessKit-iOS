@@ -25,6 +25,7 @@ open class DopamineKit : NSObject {
     
     private override init() {
         super.init()
+        print("heeheh")
     }
     
     /// This function sends an asynchronous tracking call for the specified action

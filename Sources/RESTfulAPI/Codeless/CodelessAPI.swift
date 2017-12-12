@@ -50,6 +50,8 @@ public class CodelessAPI : NSObject {
     
     @objc
     public static func boot() {
+        _ = EventReinforcement.registerActions
+        
         var payload = DopamineProperties.current.apiCredentials
         payload["inProduction"] = DopamineProperties.current.inProduction
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
