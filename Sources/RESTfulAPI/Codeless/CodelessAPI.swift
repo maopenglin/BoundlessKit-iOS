@@ -11,7 +11,7 @@ import Foundation
 @objc
 public class CodelessAPI : NSObject {
     
-    public static var logCalls = false
+    public static var logCalls = true
     
     /// Valid API actions appeneded to the CodelessAPI URL
     ///
@@ -29,6 +29,7 @@ public class CodelessAPI : NSObject {
     @objc
     public static let shared = CodelessAPI()
     
+    private static var stashSubmits = true
     private static var connectionID: String? {
         willSet {
             if connectionID != newValue {
@@ -50,7 +51,7 @@ public class CodelessAPI : NSObject {
     
     @objc
     public static func boot() {
-        _ = EventReinforcement.registerActions
+        _ = CustomClassMethod.registerMethods
         
         var payload = DopamineProperties.current.apiCredentials
         payload["inProduction"] = DopamineProperties.current.inProduction
@@ -128,8 +129,10 @@ public class CodelessAPI : NSObject {
                     
                 case 204:
                     CodelessAPI.connectionID = nil
+                    stashSubmits = false
                     
                 case 500:
+                    stashSubmits = false
                     break
                     
                 default:
@@ -207,6 +210,23 @@ public class CodelessAPI : NSObject {
         }
     }
     
+    @objc
+    public static func submitTapAction(target: Any, action: Selector) {
+        DispatchQueue.global().async {
+            let tapAction = CustomClassMethod(target: target, action: action)
+            
+            submit { payload in
+                payload["sender"] = tapAction.sender
+                payload["target"] = tapAction.target
+                payload["selector"] = tapAction.action
+                payload["actionID"] = [tapAction.sender, tapAction.target, tapAction.action].joined(separator: "-")
+                payload["senderImage"] = ""
+                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
+                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+            }
+        }
+    }
+    
     
     fileprivate static var submitQueue: OperationQueue = {
         let queue = OperationQueue()
@@ -215,7 +235,7 @@ public class CodelessAPI : NSObject {
         return queue
     }()
     fileprivate static func submit(payloadModifier: (inout [String: Any]) -> Void) {
-        if connectionID != nil {
+        if stashSubmits {
             var payload = DopamineProperties.current.apiCredentials
             payloadModifier(&payload)
             

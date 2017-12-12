@@ -11,36 +11,32 @@
 //public extension NSObject {
 //    
 //    @objc
-//    func reinforceAction() {
-//        let sender = "CustomClass"
-//        let target = NSStringFromClass(type(of: self))
-//        let action = NSSelectorFromString(EventReinforcement.shared.registeredActions[target]!)
-//        
-//        perform(action)
+//    func reinforceFunction() {
+//        reinforceFunction()
 //        
 //        
 //        
-////        if let view = self.view,
-////            self.phase == .ended {
-////            
-////            UIWindow.lastTouchPoint = view.convert(self.location(in: view), to: nil)
-////            
-////            let senderClassname = NSStringFromClass(Swift.type(of: self))
-////            let targetName = view.getParentResponders().joined(separator: ",")
-////            let selectorName = "ended"
-////            
-////            DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetName, selector: selectorName)  { reinforcement in
-////                guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
-////                guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
-////                
-////                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-////                    if let viewsAndLocations = self.reinforcementViews(options: reinforcement) {
-////                        EventReinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
-////                    }
-////                }
-////                
-////            }
-////        }
+//        if let view = self.view,
+//            self.phase == .ended {
+//
+//            UIWindow.lastTouchPoint = view.convert(self.location(in: view), to: nil)
+//
+//            let senderClassname = NSStringFromClass(Swift.type(of: self))
+//            let targetName = view.getParentResponders().joined(separator: ",")
+//            let selectorName = "ended"
+//
+//            DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetName, selector: selectorName)  { reinforcement in
+//                guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
+//                guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
+//
+//                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+//                    if let viewsAndLocations = self.reinforcementViews(options: reinforcement) {
+//                        EventReinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
+//                    }
+//                }
+//
+//            }
+//        }
 //    }
 //}
 //
@@ -54,51 +50,39 @@
 //        guard let viewMarginY = options["ViewMarginY"] as? CGFloat else { DopeLog.error("Missing parameter", visual: true); return nil }
 //        
 //        let viewsAndLocations: [(UIView, CGPoint)]?
-//        = nil
 //        
-////        switch viewOption {
-////        case "fixed":
-////            let view = UIWindow.topWindow!
-////            viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
-////
-////        case "touch":
-////            viewsAndLocations = [(UIWindow.topWindow!, UIWindow.lastTouchPoint.withMargins(marginX: viewMarginX, marginY: viewMarginY))]
-////
-////        case "sender":
-////            viewsAndLocations = [(UIWindow.topWindow!, UIWindow.lastTouchPoint.withMargins(marginX: viewMarginX, marginY: viewMarginY))]
-////
-////        case "superview":
-////            guard let superview = view?.superview else {
-////                DopeLog.error("Could not find superview", visual: true)
-////                return nil
-////            }
-////
-////            viewsAndLocations = [(superview, superview.pointWithMargins(x: viewMarginX, y: viewMarginY))]
-////
-////        case "target":
-////            guard let view = view else {
-////                DopeLog.error("Could not find target view", visual: true)
-////                return nil
-////            }
-////
-////            viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
-////
-////        case "custom":
-////            viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
-////                return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
-////            })
-////
-////            if viewsAndLocations?.count == 0 {
-////                DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
-////                return nil
-////            }
-////
-////        default:
-////            DopeLog.error("Unknown ViewOption <\(viewOption)>", visual: true)
-////            return nil
-////        }
+//        switch viewOption {
+//        case "fixed":
+//            let view = UIWindow.topWindow!
+//            viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+//
+//        case "touch":
+//            viewsAndLocations = [(UIWindow.topWindow!, UIWindow.lastTouchPoint.withMargins(marginX: viewMarginX, marginY: viewMarginY))]
+//
+//        case "target":
+//            guard let view = self as? UIView else {
+//                DopeLog.error("Could not find target view", visual: true)
+//                return nil
+//            }
+//
+//            viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+//
+//        case "custom":
+//            viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
+//                return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
+//            })
+//
+//            if viewsAndLocations?.count == 0 {
+//                DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+//                return nil
+//            }
+//
+//        default:
+//            DopeLog.error("Unknown ViewOption <\(viewOption)>", visual: true)
+//            return nil
+//        }
 //        
 //        return viewsAndLocations
 //    }
 //}
-
+//
