@@ -21,26 +21,6 @@ internal class CustomClassMethod : NSObject {
     let target: String
     let action: String
     
-    convenience init?(targetInstance: NSObject) {
-        let target = NSStringFromClass(type(of: targetInstance))
-        guard let action = CustomClassMethod.registeredMethods[target] else { DopeLog.error("No method found"); return nil }
-        
-        self.init(target: target, action: action)
-    }
-    
-    convenience init?(actionID: String) {
-        let components:[String] = actionID.components(separatedBy: "-")
-        guard components.count == 3,
-            components[0] == "customClassMethod"
-            else { return nil }
-        
-        self.init(target: components[1], action: components[2])
-    }
-    
-    convenience init(target: Any, action: Selector) {
-        self.init(target: NSStringFromClass(type(of: target) as! AnyClass), action: NSStringFromSelector(action))
-    }
-    
     init(target: String, action: String) {
         self.target = target
         self.action = action
@@ -49,23 +29,14 @@ internal class CustomClassMethod : NSObject {
     fileprivate static var registeredMethods: [String:String] = [:]
     
     public static let registerMethods: Void = {
-        
         for actionID in DopamineVersion.current.actionIDs {
-            if let classMethod = CustomClassMethod(actionID: actionID) {
-                classMethod.registerMethod()
-                print("Swizzerp")
-            }
+            CustomClassMethod(actionID: actionID)?.registerMethod()
         }
-        
     }()
     
     public static func registerVisualizerMethods() {
-        
         for actionID in DopamineVersion.current.visualizerActionIDs {
-            if let classMethod = CustomClassMethod(actionID: actionID) {
-                classMethod.registerMethod()
-                print("Swizzerp")
-            }
+            CustomClassMethod(actionID: actionID)?.registerMethod()
         }
     }
     
@@ -83,19 +54,11 @@ internal class CustomClassMethod : NSObject {
         )
         
         CustomClassMethod.registeredMethods[target] = action
-        print("Swizzerp")
     }
     
 }
 
 extension CustomClassMethod {
-    
-    func modify(payload: inout [String: Any]) {
-        payload["customEvent"] = [target: action]
-        payload["actionID"] = [action]
-        payload["senderImage"] = ""
-    }
-    
     func attemptReinforcement() {
         
         DopamineVersion.current.codelessReinforcementFor(sender: sender, target: target, selector: action)  { reinforcement in
@@ -144,6 +107,28 @@ extension CustomClassMethod {
         }
         
         return viewsAndLocations
+    }
+}
+
+extension CustomClassMethod {
+    convenience init?(targetInstance: NSObject) {
+        let target = NSStringFromClass(type(of: targetInstance))
+        guard let action = CustomClassMethod.registeredMethods[target] else { DopeLog.error("No method found"); return nil }
+        
+        self.init(target: target, action: action)
+    }
+    
+    convenience init?(actionID: String) {
+        let components:[String] = actionID.components(separatedBy: "-")
+        guard components.count == 3,
+            components[0] == "customClassMethod"
+            else { return nil }
+        
+        self.init(target: components[1], action: components[2])
+    }
+    
+    convenience init(target: Any, action: Selector) {
+        self.init(target: NSStringFromClass(type(of: target) as! AnyClass), action: NSStringFromSelector(action))
     }
 }
 

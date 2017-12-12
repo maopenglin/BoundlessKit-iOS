@@ -33,8 +33,10 @@
         // Swizzle - UIViewController
         [DopamineViewController swizzleSelectors];
         
+        #if DEBUG
         // Swizzle - UITapGestureRecognizer
         [DopamineGestureRecognizer swizzleSelectors];
+        #endif
         
         // Swizzle - SKPaymentTransactionObserver
         [DopaminePaymentTransactionObserver swizzleSelectors];
