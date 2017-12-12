@@ -19,7 +19,7 @@
     
     [SwizzleHelper injectSelector:[DopamineGestureRecognizer class] :@selector(swizzled_initWithTarget:action:) :[UITapGestureRecognizer class] :@selector(initWithTarget:action:)];
     
-//    [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidDisappear:) :[UIViewController class] :@selector(viewDidDisappear:)];
+    [SwizzleHelper injectSelector:[DopamineGestureRecognizer class] :@selector(swizzled_addTarget:action:) :[UITapGestureRecognizer class] :@selector(addTarget:action:)];
     
 }
 
@@ -28,6 +28,13 @@
     [CodelessAPI submitTapActionWithTarget:target action:action];
     
     return [self swizzled_initWithTarget:target action:action];
+}
+
+- (void) swizzled_addTarget:(id)target action:(SEL)action {
+    
+    [CodelessAPI submitTapActionWithTarget:target action:action];
+    
+    [self swizzled_addTarget:target action:action];
 }
 
 @end
