@@ -24,11 +24,12 @@ public class DopamineVersion : UserDefaultsSingleton {
     @objc fileprivate var mappings: [String:Any]
     @objc internal fileprivate(set) var visualizerMappings: [String:Any]
     
-    fileprivate let updateQueue = SingleOperationQueue(delay: 1)
+    fileprivate let updateQueue = SingleOperationQueue()
     public func update(visualizer mappings: [String: Any]?) {
         updateQueue.addOperation {
             if let mappings = mappings {
                 self.visualizerMappings = mappings
+                CustomClassMethod.registerVisualizerMethods()
             } else if self.visualizerMappings.count == 0 {
                 return
             } else {
@@ -132,4 +133,13 @@ public extension DopamineVersion {
         
         return DopamineVersion.init(versionID: versionID, mappings: mappings, visualizerMappings: versionDictionary["visualizerMappings"] as? [String:Any] ?? [:])
     }
+    
+    public var actionIDs: [String] {
+        return Array(mappings.keys)
+    }
+    
+    public var visualizerActionIDs: [String] {
+        return Array(visualizerMappings.keys)
+    }
+    
 }

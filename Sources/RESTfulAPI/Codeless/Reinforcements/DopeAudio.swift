@@ -30,7 +30,7 @@ class SingleOperationQueue : OperationQueue {
     
     var delay: UInt32
     
-    init(delay: UInt32 = 2) {
+    init(delay: UInt32 = 1) {
         self.delay = delay
         super.init()
         

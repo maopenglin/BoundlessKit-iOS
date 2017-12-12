@@ -25,6 +25,15 @@ internal class CustomCodelessEvent : NSObject {
         self.action = action
     }
     
+    func modify(payload: inout [String: Any]) {
+        payload["customEvent"] = [target: action]
+        payload["actionID"] = [action]
+        payload["senderImage"] = ""
+    }
+    
+}
+
+internal extension CustomCodelessEvent {
     func attemptReinforcement() {
         
         DopamineVersion.current.codelessReinforcementFor(sender: sender, target: target, selector: action)  { reinforcement in
@@ -38,12 +47,6 @@ internal class CustomCodelessEvent : NSObject {
             }
             
         }
-    }
-    
-    func modify(payload: inout [String: Any]) {
-        payload["customEvent"] = [target: action]
-        payload["actionID"] = [action]
-        payload["senderImage"] = ""
     }
     
     private func reinforcementViews(options: [String: Any]) -> [(UIView, CGPoint)]? {

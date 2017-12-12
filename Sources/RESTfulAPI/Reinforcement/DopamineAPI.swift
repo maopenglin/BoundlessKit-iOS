@@ -12,7 +12,7 @@ import AdSupport
 @objc
 public class DopamineAPI : NSObject{
     
-    public static var logCalls = false
+    public static var logCalls = true
     
     /// Valid API actions appeneded to the DopamineAPI URL
     ///

@@ -9,9 +9,9 @@ import Foundation
 
 public extension String {
     func image(font:UIFont = .systemFont(ofSize: 24)) -> UIImage {
-        let size = (self as NSString).size(withAttributes: [NSAttributedStringKey.font: font])
+        let size = self.size(withAttributes: [NSAttributedStringKey.font: font])
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
-        (self as NSString).draw(at: .zero, withAttributes: [NSAttributedStringKey.font: font])
+        self.draw(at: .zero, withAttributes: [NSAttributedStringKey.font: font])
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image!
