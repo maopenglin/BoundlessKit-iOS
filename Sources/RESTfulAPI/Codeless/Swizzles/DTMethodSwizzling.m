@@ -12,6 +12,7 @@
 
 #import <DopamineKit/DopamineKit-Swift.h>
 #import <SwizzleHelper.h>
+#import <NSObject+Dopamine.h>
 #import <UIApplicationDelegate+Dopamine.h>
 #import <UIApplication+Dopamine.h>
 #import <UIViewController+Dopamine.h>
@@ -22,6 +23,8 @@
 + (void) load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+//        // Swizzle - NSObject
+//        [DopamineObject swizzleSelectors];
         
         // Swizzle - UIApplication
         [DopamineApp swizzleSelectors];
@@ -34,6 +37,7 @@
         
         // Swizzle - SKPaymentTransactionObserver
         [DopaminePaymentTransactionObserver swizzleSelectors];
+        
         
     });
 }

@@ -7,12 +7,68 @@
 
 import Foundation
 
+//@objc public class ReinforcedAction : NSObject {
+//    let target: Any
+//    let action: Selector
+//
+//    init(target: Any, action: Selector) {
+//        self.target = target
+//        self.action = action
+//        super.init()
+//    }
+//
+//    @objc
+//    public static func create(target: Any, action: Selector) {
+//        let instance = ReinforcedAction(target: target, action: action)
+//
+////        EventReinforcement.registeredActions[NSStringFromClass(type(of: target) as! AnyClass)] = instance
+//    }
+//}
 
-internal class EventReinforcement : NSObject {
+//@objc
+//public class DopeObject : NSObject {
+//    
+//    static var registeredActions: [String: String] = ["Space.ContainerViewController":"presentChickletListViewController"]
+//    
+//    static var test: String = {
+//        let target = "Space.ContainerViewController"
+//        let action = "presentChickletListViewController"
+//        
+////        if NSClassFromString(target)!.instancesRespond(to: NSSelectorFromString(action)) {
+////        if NSClassFromString(target) != nil {
+////            print("Righto");
+////        } else {
+////            print("Wrongo");
+////        }
+//        
+////        SwizzleHelper.injectSelector(NSClassFromString(target), NSSelectorFromString(action), DopeObject.self, #selector(performReinforcement))
+//        
+//        registeredActions[target] = action
+//        
+//        DopeLog.debug("Swizzled object")
+//        
+//        return ""
+//    }()
+//    
+//    
+////    @objc public func performReinforcement() {
+////        let target = NSStringFromClass(type(of: self))
+////        let action = DopeObject.registeredActions[target]
+////        
+////        DopeLog.debug("performing orignal action")
+////        
+////        self.perform(NSSelectorFromString(action!))
+////    }
+//}
+
+class EventReinforcement : NSObject {
     
-    static var lastTouchLocationInUIWindow: CGPoint = CGPoint.zero
+    static var registeredActions: [String: String] = ["Space.ContainerViewController":"presentChickletListViewController"]
     
-    static func showReinforcement(on viewAndLocation: [(UIView, CGPoint)], of type: String, withParameters reinforcement: [String: Any]) {
+    
+    internal static var lastTouchLocationInUIWindow: CGPoint = CGPoint.zero
+    
+    internal static func showReinforcement(on viewAndLocation: [(UIView, CGPoint)], of type: String, withParameters reinforcement: [String: Any]) {
         switch type {
             
         case "Emojisplosion":
