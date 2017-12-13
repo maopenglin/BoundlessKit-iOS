@@ -15,7 +15,7 @@
 #import <UIApplicationDelegate+Dopamine.h>
 #import <UIApplication+Dopamine.h>
 #import <UIViewController+Dopamine.h>
-#import <UIGestureRecognizer+Dopamine.h>
+#import <UITapGestureRecognizer+Dopamine.h>
 #import <SKPaymentTransactionObserver+Dopamine.h>
 
 @implementation UIApplication (Dopamine)
@@ -33,10 +33,8 @@
         // Swizzle - UIViewController
         [DopamineViewController swizzleSelectors];
         
-        #if DEBUG
         // Swizzle - UITapGestureRecognizer
-        [DopamineGestureRecognizer swizzleSelectors];
-        #endif
+        [DopamineTapGestureRecognizer swizzleSelectors];
         
         // Swizzle - SKPaymentTransactionObserver
         [DopaminePaymentTransactionObserver swizzleSelectors];

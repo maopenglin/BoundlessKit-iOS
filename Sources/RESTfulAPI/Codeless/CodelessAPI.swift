@@ -217,16 +217,16 @@ public class CodelessAPI : NSObject {
     @objc
     public static func submitTapAction(target: Any, action: Selector) {
         DispatchQueue.global().async {
-            let tapAction = CustomClassMethod(target: target, action: action)
-            
-            submit { payload in
-                payload["sender"] = tapAction.sender
-                payload["target"] = tapAction.target
-                payload["selector"] = tapAction.action
-                payload["actionID"] = [tapAction.sender, tapAction.target, tapAction.action].joined(separator: "-")
-                payload["senderImage"] = ""
-                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+            if let tapAction = CustomClassMethod(target: target, action: action) {
+                submit { payload in
+                    payload["sender"] = tapAction.sender
+                    payload["target"] = tapAction.target
+                    payload["selector"] = tapAction.action
+                    payload["actionID"] = [tapAction.sender, tapAction.target, tapAction.action].joined(separator: "-")
+                    payload["senderImage"] = ""
+                    payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
+                    payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+                }
             }
         }
     }

@@ -1,25 +1,26 @@
 //
-//  UIGestureRecognizer+Dopamine.m
+//  UITapGestureRecognizer+Dopamine.m
 //  Pods
 //
 //  Created by Akash Desai on 12/11/17.
 //
 //
 
-#import <UIGestureRecognizer+Dopamine.h>
+#import <UITapGestureRecognizer+Dopamine.h>
 
 #import <DopamineKit/DopamineKit-swift.h>
 #import <SwizzleHelper.h>
 
 #import <objc/runtime.h>
 
-@implementation DopamineGestureRecognizer
+@implementation DopamineTapGestureRecognizer
 
 + (void) swizzleSelectors {
     
-    [SwizzleHelper injectSelector:[DopamineGestureRecognizer class] :@selector(swizzled_initWithTarget:action:) :[UITapGestureRecognizer class] :@selector(initWithTarget:action:)];
-    
-    [SwizzleHelper injectSelector:[DopamineGestureRecognizer class] :@selector(swizzled_addTarget:action:) :[UITapGestureRecognizer class] :@selector(addTarget:action:)];
+#if DEBUG
+    [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_initWithTarget:action:) :[UITapGestureRecognizer class] :@selector(initWithTarget:action:)];
+    [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_addTarget:action:) :[UITapGestureRecognizer class] :@selector(addTarget:action:)];
+#endif
     
 }
 
@@ -34,6 +35,7 @@
     
     [CodelessAPI submitTapActionWithTarget:target action:action];
     
+    if ([self respondsToSelector:@selector(swizzled_addTarget:action:)])
     [self swizzled_addTarget:target action:action];
 }
 
