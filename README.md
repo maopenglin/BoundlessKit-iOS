@@ -32,7 +32,9 @@ A simple "To Do List" iOS App is included in the [DopamineKit-iOS-HelloWorld rep
     
 ## Using DopamineKit
 
-  Import DopamineKit into your code
+### Import DopamineKit
+
+  Import DopamineKit into your code where the _action_ callback lives
 
   ```swift
   // Swift
