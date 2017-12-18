@@ -15,22 +15,24 @@ Learn more at [http://usedopamine.com](http://usedopamine.com)
 
 A simple "To Do List" iOS App is included in the [DopamineKit-iOS-HelloWorld repo](https://github.com/DopamineLabs/DopamineKit-iOS-HelloWorld) to demonstrate how DopamineKit may be used in your code.
 
-## Set up DopamineKit
+## Setting Up DopamineKit
 
   1. First make sure you have a __DopamineProperties.plist__ file, which includes your API key and other credentials.
 
   2. Go to your project's `App Target` > `Build Phases` > `Copy Bundle Resources`, and then drag and drop in __DopamineProperties.plist__ with the "Copy items if needed" box checked.  
 
-  3. Add the following line to your [CocoaPod Podfile](https://cocoapods.org/)
+  3. Add the following line to your [CocoaPod Podfile](https://cocoapods.org/). Also if it is not already added, add [`use_frameworks!`](https://blog.cocoapods.org/CocoaPods-0.36/) to the top of the Podfile.
 
 	```
 	pod 'DopamineKit'
 	```
 
   ![Workspace snapshot](readme/TestApp_with_DopamineKit_and_DopamineProperties.png)
-    *By step 3 your project should have the highlighted items shown in the image above*
+    *By Step 3, a properly set up project will have the highlighted items shown in the image above*
     
-  4. Import DopamineKit into your code
+## Using DopamineKit
+
+  Import DopamineKit into your code
 
   ```swift
   // Swift
@@ -42,10 +44,10 @@ A simple "To Do List" iOS App is included in the [DopamineKit-iOS-HelloWorld rep
   #import <DopamineKit/DopamineKit-Swift.h>
   ```
   
-  5. Start using Dopamine! The main features of DopamineKit are the `reinforce()` and `track()` functions. These should be added as a response to any of the _actions_ to be reinforced or tracked.
+  Time to start using Dopamine! The main features of DopamineKit are the `reinforce()` and `track()` functions. These should be added as a response to any of the _actions_ to be reinforced or tracked.
   
 
-###### DopamineKit.reinforce()
+### DopamineKit.reinforce()
 
   -  For example, when a user marks a task as completed in a "To Do List" app or finishes a workout in a "Fitness" app, you should call `reinforce()`.
 
@@ -92,7 +94,7 @@ A simple "To Do List" iOS App is included in the [DopamineKit-iOS-HelloWorld rep
   
   ```
   
-###### DopamineKit.track()
+### DopamineKit.track()
 
   - The `track()` function is used to track other user actions. Using `track()` calls gives Dopamine a better understanding of user behavior, and will make your optimization and analytics better. 
   - Continuing the example, you could use the `track()` function to record `applicationDidBecomeActive()` in the  "To Do List" app, or  record `userCheckedDietHistory()` in the "Fitness" app.
