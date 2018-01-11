@@ -7,7 +7,7 @@
 //
 
 import UIKit
-//import DopamineKit
+import DopamineKit
 import CoreLocation
 
 class ViewController: UIViewController {
@@ -72,7 +72,7 @@ class ViewController: UIViewController {
 //        locationManager.requestAlwaysAuthorization()
         
 
-//        DopamineKit.track("action2peformed")
+        DopamineKit.track("action2peformed")
 //        DopamineKit.reinforce("a2") { reinforcement in
 //            // Update UI to display reinforcement decision on screen for learning purposes
 //            self.responseLabel.text = reinforcement

@@ -12,10 +12,6 @@ public class SyncCoordinator {
     
     internal static let shared = SyncCoordinator()
     
-    private var syncInProgress = false
-    
-    fileprivate let trackedActionsQueue = DispatchQueue(label: "TrackedActionsQueue")
-    
     /// Initializer for SyncCoordinator performs a sync
     ///
     private init() { }
@@ -59,14 +55,9 @@ public class SyncCoordinator {
     /// Checks which syncers have been triggered, and syncs them in an order
     /// that allows time for the DopamineAPI to generate cartridges
     ///
+    fileprivate var syncOperationQueue = SingleOperationQueue(delay: 5, delayBefore: true, qualityOfService: .userInitiated)
     public func performSync() {
-        guard !self.syncInProgress else {
-            return
-        }
-        self.syncInProgress = true
-        DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).asyncAfter(deadline: .now() + 5) {
-            defer { self.syncInProgress = false }
-            
+        syncOperationQueue.addOperation {
             // since a cartridge might be triggered during the sleep time,
             // lazily check which are triggered
             var someCartridgeToSync: Cartridge?
