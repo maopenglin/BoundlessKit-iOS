@@ -152,7 +152,7 @@ internal class Track : UserDefaultsSingleton {
                         if self.operationQueue.operationCount == 1 {
                             Track._current = self
                         }
-                        DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
+                        // DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
                     }
                 }
             } else {
@@ -160,7 +160,7 @@ internal class Track : UserDefaultsSingleton {
                 if self.operationQueue.operationCount == 1 {
                     Track._current = self
                 }
-                DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
+                // DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
             }
         }
     }

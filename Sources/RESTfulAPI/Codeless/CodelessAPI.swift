@@ -11,7 +11,7 @@ import Foundation
 @objc
 public class CodelessAPI : NSObject {
     
-    public static var logCalls = true
+    public static var logCalls = false
     
     /// Valid API actions appeneded to the CodelessAPI URL
     ///
@@ -325,11 +325,13 @@ public class CodelessAPI : NSObject {
                 return
             }
             
-            if CodelessAPI.logCalls { DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)") }
+            DopeLog.debug("✅\(type.path) call")
+            if CodelessAPI.logCalls { DopeLog.debug("got response:\(responseDict as AnyObject)") }
         })
         
         // send request
-        if CodelessAPI.logCalls { DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)") }
+        DopeLog.debug("Sending \(type.path) api call")
+        if CodelessAPI.logCalls { DopeLog.debug("with payload: \(payload as AnyObject)") }
         task.resume()
         
     }
