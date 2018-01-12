@@ -10,10 +10,15 @@ import Foundation
 internal extension UITouch {
     
     func attemptReinforcement() {
+        guard DopamineConfiguration.current.integrationMethod == "codeless" else {
+            return
+        }
+        
         if let view = self.view,
             self.phase == .ended {
-            
-            UIWindow.lastTouchPoint = view.convert(self.location(in: view), to: nil)
+            DispatchQueue.main.async {
+                UIWindow.lastTouchPoint = view.convert(self.location(in: view), to: nil)
+            }
             
             let senderClassname = NSStringFromClass(Swift.type(of: self))
             let targetName = view.getParentResponders().joined(separator: ",")

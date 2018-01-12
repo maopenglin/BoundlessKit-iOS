@@ -57,9 +57,7 @@ class SingleOperationQueue : OperationQueue {
             guard self.operationCount == 1 else { return }
             
             if self.delayBefore {
-                print("sleeping...")
                 sleep(self.delay)
-                print("slept")
             }
             
             block()

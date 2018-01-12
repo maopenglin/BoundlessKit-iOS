@@ -87,6 +87,9 @@ public class DopamineVersion : UserDefaultsSingleton {
     }
     
     public func codelessReinforcementFor(actionID: String, completion: @escaping([String:Any]) -> Void) {
+        guard DopamineConfiguration.current.integrationMethod == "codeless" else {
+            return
+        }
         if let reinforcementParameters = visualizerMappings[actionID] as? [String: Any] {
             DopeLog.debug("Found visualizer reinforcement for <\(actionID)>")
             if let codeless = reinforcementParameters["codeless"] as? [String: Any],

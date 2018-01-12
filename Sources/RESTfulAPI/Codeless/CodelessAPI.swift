@@ -75,14 +75,17 @@ public class CodelessAPI : NSObject {
                 }
             }
             
-            _ = CustomClassMethod.registerMethods
+            if DopamineConfiguration.current.integrationMethod == "codeless" {
+                _ = CustomClassMethod.registerMethods
+            }
             promptPairing()
         }
     }
     
     @objc
     private static func promptPairing() {
-        guard !DopamineProperties.current.inProduction else {
+        guard !DopamineProperties.current.inProduction || DopamineConfiguration.current.integrationMethod != "codeless" else {
+            stashSubmits = false
             return
         }
         
