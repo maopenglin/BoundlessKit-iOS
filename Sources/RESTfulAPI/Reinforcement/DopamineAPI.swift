@@ -12,7 +12,7 @@ import AdSupport
 @objc
 public class DopamineAPI : NSObject{
     
-    public static var logCalls = true
+    public static var logCalls = false
     
     /// Valid API actions appeneded to the DopamineAPI URL
     ///
@@ -201,11 +201,13 @@ public class DopamineAPI : NSObject{
                 break
             }
             
-            if DopamineAPI.logCalls { DopeLog.debug("✅\(type.path) call got response:\(responseDict.debugDescription)") }
+            DopeLog.debug("✅\(type.path) call")
+            if DopamineAPI.logCalls { DopeLog.debug("got response:\(responseDict.debugDescription)") }
         })
         
         // send request
-        if DopamineAPI.logCalls { DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)") }
+        DopeLog.debug("Sending \(type.path) api call")
+        if DopamineAPI.logCalls { DopeLog.debug("with payload: \(payload as AnyObject)") }
         task.resume()
         
     }

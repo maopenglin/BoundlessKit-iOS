@@ -11,7 +11,7 @@ import Foundation
 @objc
 public class CodelessAPI : NSObject {
     
-    public static var logCalls = true
+    public static var logCalls = false
     
     /// Valid API actions appeneded to the CodelessAPI URL
     ///
@@ -75,14 +75,17 @@ public class CodelessAPI : NSObject {
                 }
             }
             
-            _ = CustomClassMethod.registerMethods
+            if DopamineConfiguration.current.integrationMethod == "codeless" {
+                _ = CustomClassMethod.registerMethods
+            }
             promptPairing()
         }
     }
     
     @objc
     private static func promptPairing() {
-        guard !DopamineProperties.current.inProduction else {
+        guard !DopamineProperties.current.inProduction || DopamineConfiguration.current.integrationMethod != "codeless" else {
+            stashSubmits = false
             return
         }
         
@@ -216,9 +219,7 @@ public class CodelessAPI : NSObject {
     
     @objc
     public static func submitTapAction(target: Any, action: Selector) {
-        DispatchQueue.global().async {
-            let tapAction = CustomClassMethod(target: target, action: action)
-            
+        if let tapAction = CustomClassMethod(target: target, action: action) {
             submit { payload in
                 payload["sender"] = tapAction.sender
                 payload["target"] = tapAction.target
@@ -324,11 +325,13 @@ public class CodelessAPI : NSObject {
                 return
             }
             
-            if CodelessAPI.logCalls { DopeLog.debug("✅\(type.path) call got response:\(responseDict as AnyObject)") }
+            DopeLog.debug("✅\(type.path) call")
+            if CodelessAPI.logCalls { DopeLog.debug("got response:\(responseDict as AnyObject)") }
         })
         
         // send request
-        if CodelessAPI.logCalls { DopeLog.debug("Sending \(type.path) api call with payload: \(payload as AnyObject)") }
+        DopeLog.debug("Sending \(type.path) api call")
+        if CodelessAPI.logCalls { DopeLog.debug("with payload: \(payload as AnyObject)") }
         task.resume()
         
     }

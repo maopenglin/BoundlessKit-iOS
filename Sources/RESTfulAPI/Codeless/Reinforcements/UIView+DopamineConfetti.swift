@@ -25,11 +25,11 @@ public extension UIView {
      */
     public func showConfetti(duration:Double = 0,
                       size:CGSize = CGSize(width: 9, height: 6),
-                      shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle],
+                      shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle, .spiral],
                       colors:[UIColor] = [UIColor.from(rgb: "4d81fb", alpha: 0.8), UIColor.from(rgb: "4ac4fb", alpha: 0.8), UIColor.from(rgb: "9243f9", alpha: 0.8), UIColor.from(rgb: "fdc33b", alpha: 0.8), UIColor.from(rgb: "f7332f", alpha: 0.8)],
                       completion: @escaping ()->Void = {}) {
         self.confettiBurst(duration: 0.8, size: size, shapes: shapes, colors: colors) {
-            self.confettiShower(duration: duration, size: size, shapes: [.rectangle, .rectangle, .circle, .rectangle, .rectangle, .circle], colors: colors, completion: completion)
+            self.confettiShower(duration: duration, size: size, shapes: shapes, colors: colors, completion: completion)
         }
     }
     

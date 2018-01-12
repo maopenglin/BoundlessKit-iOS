@@ -35,7 +35,6 @@ internal class CustomCodelessEvent : NSObject {
 
 internal extension CustomCodelessEvent {
     func attemptReinforcement() {
-        
         DopamineVersion.current.codelessReinforcementFor(sender: sender, target: target, selector: action)  { reinforcement in
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }

@@ -42,8 +42,9 @@
         Method orgMeth = class_getInstanceMethod(originalClass, orignalSelector);
         method_exchangeImplementations(orgMeth, newMeth);
     }
-    else
+    else {
         class_addMethod(originalClass, orignalSelector, imp, methodTypeEncoding);
+    }
     
     return existing;
 }

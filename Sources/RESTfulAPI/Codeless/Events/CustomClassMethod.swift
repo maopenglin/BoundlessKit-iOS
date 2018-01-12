@@ -34,8 +34,14 @@ internal class CustomClassMethod : NSObject {
     }
     
     fileprivate func registerMethod() {
-        guard let originalClass = NSClassFromString(target).self
-            else { DopeLog.error("Invalid class <\(target)>"); return}
+        guard DopamineConfiguration.current.integrationMethod == "codeless" else {
+            DopeLog.debug("Codeless integration mode disabled")
+            return
+        }
+        guard let originalClass = NSClassFromString(target).self else {
+                DopeLog.error("Invalid class <\(target)>")
+                return
+        }
         
         guard CustomClassMethod.registeredMethods[target] == nil else { return }
         
@@ -51,7 +57,6 @@ internal class CustomClassMethod : NSObject {
 
 extension CustomClassMethod {
     func attemptReinforcement() {
-        
         DopamineVersion.current.codelessReinforcementFor(sender: sender, target: target, selector: action)  { reinforcement in
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
@@ -118,8 +123,13 @@ extension CustomClassMethod {
         self.init(target: target, action: action)
     }
     
-    convenience init(target: Any, action: Selector) {
-        self.init(target: NSStringFromClass(type(of: target) as! AnyClass), action: NSStringFromSelector(action))
+    convenience init?(target: Any?, action: Selector?) {
+        if let target = type(of: target) as? AnyClass,
+            let action = action {
+            self.init(target: NSStringFromClass(target), action: NSStringFromSelector(action))
+        } else {
+            return nil
+        }
     }
 }
 
@@ -143,7 +153,7 @@ extension NSObject {
             swizzledSelector: method_getNumberOfArguments(originalMethod) == method_getNumberOfArguments(swizzledMethodNoParams) ? #selector(reinforceMethod) : #selector(reinforceMethodWithTap(_:))
         )
         
-        print("Swizzerped num args:\(method_getNumberOfArguments(originalMethod))")
+//        print("Swizzerped num args:\(method_getNumberOfArguments(originalMethod))")
     }
     
     @objc func reinforceMethod() {
