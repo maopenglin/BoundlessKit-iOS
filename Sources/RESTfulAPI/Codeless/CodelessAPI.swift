@@ -218,8 +218,8 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
-    public static func submitTapAction(target: Any, action: Selector) {
-        if let tapAction = CustomClassMethod(target: target, action: action) {
+    public static func submitTapAction(target: String?, action: String?) {
+        if let tapAction = CustomClassMethod(targetName: target, actionName: action) {
             submit { payload in
                 payload["sender"] = tapAction.sender
                 payload["target"] = tapAction.target

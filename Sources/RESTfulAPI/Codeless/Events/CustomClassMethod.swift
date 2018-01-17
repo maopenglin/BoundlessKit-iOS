@@ -123,10 +123,10 @@ extension CustomClassMethod {
         self.init(target: target, action: action)
     }
     
-    convenience init?(target: Any?, action: Selector?) {
-        if let target = type(of: target) as? AnyClass,
-            let action = action {
-            self.init(target: NSStringFromClass(target), action: NSStringFromSelector(action))
+    convenience init?(targetName: String?, actionName: String?) {
+        if let targetName = targetName,
+            let actionName = actionName {
+            self.init(target: targetName, action: actionName)
         } else {
             return nil
         }
