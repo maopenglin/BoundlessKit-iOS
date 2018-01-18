@@ -88,6 +88,7 @@ internal class CustomClassMethod : NSObject {
             originalSelector: originalSelector
         )
         
+        DopeLog.debug("Swizzled class:\(target) method:\(action)")
         CustomClassMethod.registeredMethods[target] = action
     }
     
@@ -176,10 +177,7 @@ extension NSObject {
             swizzledClass: NSObject.self,
             swizzledSelector: swizzledSelector
             
-//            method_getArgumentType(<#T##m: Method##Method#>, <#T##index: UInt32##UInt32#>, <#T##dst: UnsafeMutablePointer<Int8>?##UnsafeMutablePointer<Int8>?#>, <#T##dst_len: Int##Int#>)
         )
-        
-//        print("Swizzerped num args:\(method_getNumberOfArguments(originalMethod))")
     }
     
     @objc func reinforceMethodWithoutParams() {

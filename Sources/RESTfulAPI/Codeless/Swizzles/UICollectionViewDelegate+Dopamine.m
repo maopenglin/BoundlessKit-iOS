@@ -18,11 +18,7 @@
 
 + (void) swizzleSelectors {
     
-#if DEBUG
-    
     [SwizzleHelper injectSelector:[DopamineCollectionViewDelegate class] :@selector(swizzled_setDelegate:) :[UICollectionView class] :@selector(setDelegate:)];
-    
-#endif
     
 }
 

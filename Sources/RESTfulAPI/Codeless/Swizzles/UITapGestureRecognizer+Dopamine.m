@@ -17,10 +17,8 @@
 
 + (void) swizzleSelectors {
     
-#if DEBUG
     [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_initWithTarget:action:) :[UITapGestureRecognizer class] :@selector(initWithTarget:action:)];
     [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_addTarget:action:) :[UITapGestureRecognizer class] :@selector(addTarget:action:)];
-#endif
     
 }
 
