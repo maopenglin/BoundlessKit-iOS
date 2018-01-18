@@ -10,13 +10,45 @@ import Foundation
 
 internal class CustomClassMethod : NSObject {
     
-    let sender: String = "customClassMethod"
+    enum SwizzleType : String {
+        case
+        noParam = "noParamAction",
+        tapActionWithSender = "tapInitWithTarget",
+        collectionDidSelect = "collectionDidSelect"
+    }
+    
+    let sender: String
     let target: String
     let action: String
     
-    init(target: String, action: String) {
+    init(sender: String, target: String, action: String) {
+        self.sender = sender
         self.target = target
         self.action = action
+    }
+    
+    convenience init?(actionID: String) {
+        let components:[String] = actionID.components(separatedBy: "-")
+        guard components.count == 3
+            else { return nil }
+        
+        self.init(sender: components[0], target: components[1], action: components[2])
+    }
+    
+    convenience init?(senderType: SwizzleType, targetInstance: NSObject) {
+        let target = NSStringFromClass(type(of: targetInstance))
+        guard let action = CustomClassMethod.registeredMethods[target] else { DopeLog.error("No method found"); return nil }
+        
+        self.init(sender: senderType.rawValue, target: target, action: action)
+    }
+    
+    convenience init?(swizzleType: SwizzleType, targetName: String?, actionName: String?) {
+        if let targetName = targetName,
+            let actionName = actionName {
+            self.init(sender: swizzleType.rawValue, target: targetName, action: actionName)
+        } else {
+            return nil
+        }
     }
     
     fileprivate static var registeredMethods: [String:String] = [:]
@@ -39,15 +71,21 @@ internal class CustomClassMethod : NSObject {
             return
         }
         guard let originalClass = NSClassFromString(target).self else {
-                DopeLog.error("Invalid class <\(target)>")
-                return
+            DopeLog.error("Invalid class <\(target)>")
+            return
         }
+        let originalSelector = NSSelectorFromString(action)
+//        guard originalSelector != Selector() else {
+//            DopeLog.error("Invalid action selector <\(action)>")
+//            return
+//        }
         
         guard CustomClassMethod.registeredMethods[target] == nil else { return }
         
         NSObject.swizzleReinforceableMethod(
+            swizzleType: sender,
             originalClass: originalClass,
-            originalSelector: NSSelectorFromString(action)
+            originalSelector: originalSelector
         )
         
         CustomClassMethod.registeredMethods[target] = action
@@ -106,33 +144,6 @@ extension CustomClassMethod {
     }
 }
 
-extension CustomClassMethod {
-    convenience init?(actionID: String) {
-        let components:[String] = actionID.components(separatedBy: "-")
-        guard components.count == 3,
-            components[0] == "customClassMethod"
-            else { return nil }
-        
-        self.init(target: components[1], action: components[2])
-    }
-    
-    convenience init?(targetInstance: NSObject) {
-        let target = NSStringFromClass(type(of: targetInstance))
-        guard let action = CustomClassMethod.registeredMethods[target] else { DopeLog.error("No method found"); return nil }
-        
-        self.init(target: target, action: action)
-    }
-    
-    convenience init?(targetName: String?, actionName: String?) {
-        if let targetName = targetName,
-            let actionName = actionName {
-            self.init(target: targetName, action: actionName)
-        } else {
-            return nil
-        }
-    }
-}
-
 extension NSObject {
     fileprivate class func swizzle(originalClass: AnyClass, originalSelector: Selector, swizzledClass: AnyClass, swizzledSelector: Selector) {
         guard let originalMethod = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
@@ -141,30 +152,51 @@ extension NSObject {
         method_exchangeImplementations(originalMethod, swizzledMethod)
     }
     
-    fileprivate class func swizzleReinforceableMethod(originalClass: AnyClass, originalSelector: Selector) {
+    fileprivate class func swizzleReinforceableMethod(swizzleType: String, originalClass: AnyClass, originalSelector: Selector) {
         guard originalClass.isSubclass(of: NSObject.self) else { DopeLog.debug("Not a NSObject"); return }
-        guard let originalMethod = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
-        guard let swizzledMethodNoParams = class_getInstanceMethod(NSObject.self, #selector(reinforceMethod)) else { DopeLog.error("failed"); return }
+        guard let _ = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
+        
+        
+        var swizzledSelector: Selector
+        if (swizzleType == CustomClassMethod.SwizzleType.noParam.rawValue) {
+            swizzledSelector = #selector(reinforceMethodWithoutParams)
+        } else if (swizzleType == CustomClassMethod.SwizzleType.tapActionWithSender.rawValue) {
+            swizzledSelector = #selector(reinforceMethodTapWithSender(_:))
+        } else if (swizzleType == CustomClassMethod.SwizzleType.collectionDidSelect.rawValue) {
+            swizzledSelector = #selector(reinforceCollectionSelection(_:didSelectItemAt:))
+        } else {
+            DopeLog.error("Unknown Swizzle Type")
+            return
+        }
+        
         
         self.swizzle(
             originalClass: originalClass.self,
             originalSelector: originalSelector,
             swizzledClass: NSObject.self,
-            swizzledSelector: method_getNumberOfArguments(originalMethod) == method_getNumberOfArguments(swizzledMethodNoParams) ? #selector(reinforceMethod) : #selector(reinforceMethodWithTap(_:))
+            swizzledSelector: swizzledSelector
+            
+//            method_getArgumentType(<#T##m: Method##Method#>, <#T##index: UInt32##UInt32#>, <#T##dst: UnsafeMutablePointer<Int8>?##UnsafeMutablePointer<Int8>?#>, <#T##dst_len: Int##Int#>)
         )
         
 //        print("Swizzerped num args:\(method_getNumberOfArguments(originalMethod))")
     }
     
-    @objc func reinforceMethod() {
-        reinforceMethod()
+    @objc func reinforceMethodWithoutParams() {
+        reinforceMethodWithoutParams()
         
-        CustomClassMethod(targetInstance: self)?.attemptReinforcement()
+        CustomClassMethod(senderType: .noParam, targetInstance: self)?.attemptReinforcement()
     }
     
-    @objc func reinforceMethodWithTap(_ sender: UITapGestureRecognizer) {
-        reinforceMethodWithTap(sender)
+    @objc func reinforceMethodTapWithSender(_ sender: UITapGestureRecognizer) {
+        reinforceMethodTapWithSender(sender)
         
-        CustomClassMethod(targetInstance: self)?.attemptReinforcement()
+        CustomClassMethod(senderType: .tapActionWithSender, targetInstance: self)?.attemptReinforcement()
+    }
+    
+    @objc func reinforceCollectionSelection(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        reinforceCollectionSelection(collectionView, didSelectItemAt: indexPath)
+        
+        CustomClassMethod(senderType: .collectionDidSelect, targetInstance: self)?.attemptReinforcement()
     }
 }

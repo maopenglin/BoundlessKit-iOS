@@ -16,6 +16,7 @@
 #import "SwizzleHelper.h"
 #import "UIApplication+Dopamine.h"
 #import "UIApplicationDelegate+Dopamine.h"
+#import "UICollectionViewDelegate+Dopamine.h"
 #import "UITapGestureRecognizer+Dopamine.h"
 #import "UIViewController+Dopamine.h"
 
