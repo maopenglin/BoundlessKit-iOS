@@ -17,6 +17,7 @@
 #import <UIViewController+Dopamine.h>
 #import <UITapGestureRecognizer+Dopamine.h>
 #import <SKPaymentTransactionObserver+Dopamine.h>
+#import <UICollectionViewDelegate+Dopamine.h>
 
 @implementation UIApplication (Dopamine)
 
@@ -38,6 +39,9 @@
         
         // Swizzle - SKPaymentTransactionObserver
         [DopaminePaymentTransactionObserver swizzleSelectors];
+        
+        // Swizzle - UICollectionViewController
+        [DopamineCollectionViewDelegate swizzleSelectors];
         
     });
 }

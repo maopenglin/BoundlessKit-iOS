@@ -17,23 +17,23 @@
 
 + (void) swizzleSelectors {
     
-#if DEBUG
     [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_initWithTarget:action:) :[UITapGestureRecognizer class] :@selector(initWithTarget:action:)];
     [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_addTarget:action:) :[UITapGestureRecognizer class] :@selector(addTarget:action:)];
-#endif
     
 }
 
 - (instancetype) swizzled_initWithTarget:(id)target action:(SEL)action {
-    
-    [CodelessAPI submitTapActionWithTarget:target action:action];
+    if (target && action) {
+        [CodelessAPI submitTapActionWithTarget:NSStringFromClass([target class]) action:NSStringFromSelector(action)];
+    }
     
     return [self swizzled_initWithTarget:target action:action];
 }
 
 - (void) swizzled_addTarget:(id)target action:(SEL)action {
-    
-    [CodelessAPI submitTapActionWithTarget:target action:action];
+    if (target && action) {
+        [CodelessAPI submitTapActionWithTarget:NSStringFromClass([target class]) action:NSStringFromSelector(action)];
+    }
     
     if ([self respondsToSelector:@selector(swizzled_addTarget:action:)])
     [self swizzled_addTarget:target action:action];

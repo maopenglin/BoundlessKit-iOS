@@ -9,7 +9,7 @@
 	<key>productionSecret</key>
 	<string>20af24a85fa00938a5247709fed395c31c89b142</string>
 	<key>inProduction</key>
-	<true/>
+	<false/>
 	<key>versionID</key>
 	<string>rams1</string>
 </dict>
