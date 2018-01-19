@@ -14,7 +14,8 @@ internal class CustomClassMethod : NSObject {
         case
         noParam = "noParamAction",
         tapActionWithSender = "tapInitWithTarget",
-        collectionDidSelect = "collectionDidSelect"
+        collectionDidSelect = "collectionDidSelect",
+        viewControllerDidAppear = "viewControllerDidAppear"
     }
     
     let sender: String
@@ -105,11 +106,23 @@ extension CustomClassMethod {
                     EventReinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
                 }
             }
-            
         }
     }
     
-    private func reinforcementViews(options: [String: Any]) -> [(UIView, CGPoint)]? {
+    func attemptViewControllerReinforcement(vc: UIViewController) {
+        DopamineVersion.current.codelessReinforcementFor(sender: sender, target: target, selector: action)  { reinforcement in
+            guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
+            guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                if let viewsAndLocations = self.reinforcementViews(viewController: vc, options: reinforcement) {
+                    EventReinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
+                }
+            }
+        }
+    }
+    
+    private func reinforcementViews(viewController: UIViewController? = nil, options: [String: Any]) -> [(UIView, CGPoint)]? {
         
         guard let viewOption = options["ViewOption"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
         guard let viewCustom = options["ViewCustom"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
@@ -133,6 +146,14 @@ extension CustomClassMethod {
             
             if viewsAndLocations?.count == 0 {
                 DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                return nil
+            }
+            
+        case "target":
+            if let view = viewController?.view {
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else {
+                DopeLog.error("Could not find viewController view", visual: true)
                 return nil
             }
             

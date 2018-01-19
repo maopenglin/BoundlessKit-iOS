@@ -24,6 +24,8 @@
     if ([self respondsToSelector:@selector(swizzled_viewDidAppear:)])
         [self swizzled_viewDidAppear:animated];
     
+    [CodelessAPI submitViewControllerDidAppearWithVc: self target:NSStringFromClass([self class]) action:NSStringFromSelector(@selector(viewDidAppear:))];
+    
     if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
         [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didAppear",
                                                           @"classname": NSStringFromClass([self class]),
