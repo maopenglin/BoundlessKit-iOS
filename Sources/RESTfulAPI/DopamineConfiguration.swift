@@ -148,15 +148,6 @@ public class DopamineConfiguration : UserDefaultsSingleton  {
     // test config
     static var standard: DopamineConfiguration = {
         
-        var customEvents: [String: [String:String]] = [:]
-        customEvents["UIButton-DopamineKit_Example.ViewController-action2Performed"] = ["sender":"UIButton",
-                             "target":"DopamineKit_Example.ViewController",
-                             "selector":"action2Performed"]
-        
-        let customViews = ["DopamineKit_Example.ViewController": "DopamineKit_Example.ViewController",
-                           "LayerPlayer.ClassListViewController": "LayerPlayer.ClassListViewController"
-                           ]
-        
         var standardConfig: [String: Any] = [:]
         standardConfig["configID"] = nil
         standardConfig["reinforcementEnabled"] = true
@@ -164,10 +155,8 @@ public class DopamineConfiguration : UserDefaultsSingleton  {
         standardConfig["trackingEnabled"] = true
         standardConfig["trackingCapabilities"] = ["applicationState": true,
                                                   "applicationViews": true,
-                                                  "customViews": customViews,
-//                                                  "customViews": [String: Any](),
-//                                                  "customEvents": [String: Any](),
-                                                  "customEvents": customEvents,
+                                                  "customViews": [String: Any](),
+                                                  "customEvents": [String: Any](),
                                                   "notificationObservations": false,
                                                   "storekitObservations": false,
                                                   "locationObservations": true
