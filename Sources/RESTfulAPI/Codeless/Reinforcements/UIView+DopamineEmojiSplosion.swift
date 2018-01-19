@@ -33,6 +33,12 @@ public extension UIView {
                                 hapticFeedback: Bool = true,
                                 systemSound: UInt32 = 1009
         ) {
+        if (contentString == "confetti") {
+            DispatchQueue.main.async {
+                self.showConfetti(duration: Double(lifetime))
+            }
+            return
+        }
         if let content = contentString.base64DecodedImage?.cgImage {
             
             if backgroundAlpha > 0 {
