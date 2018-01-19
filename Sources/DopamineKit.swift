@@ -18,7 +18,7 @@ open class DopamineKit : NSObject {
     
     /// A modifiable identity used for running tests
     ///
-    @objc public static func setDevelopmentIdentity(_ id:String?, completion: @escaping (String?) -> ()) {
+    @objc public static func setDevelopmentId(_ id:String?, completion: @escaping (String?) -> ()) {
         if DopamineKit.developmentIdentity != id {
             DopamineKit.developmentIdentity = id
             DopamineProperties.resetIdentity(completion: completion)
@@ -28,7 +28,7 @@ open class DopamineKit : NSObject {
     
     /// An optional identity used for production
     ///
-    @objc public static func setProductionIdentity(_ id:String?, completion: @escaping (String?) -> ()) {
+    @objc public static func setProductionId(_ id:String?, completion: @escaping (String?) -> ()) {
         if DopamineKit.productionIdentity != id {
             DopamineKit.productionIdentity = id
             DopamineProperties.resetIdentity(completion: completion)
