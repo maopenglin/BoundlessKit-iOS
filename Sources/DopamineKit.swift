@@ -18,23 +18,23 @@ open class DopamineKit : NSObject {
     
     /// A modifiable identity used for running tests
     ///
-    @objc public static var developmentIdentity:String? {
-        didSet {
-            if oldValue != developmentIdentity {
-                DopamineProperties.resetIdentity()
-            }
+    @objc public static func setDevelopmentIdentity(_ id:String?, completion: @escaping (String?) -> ()) {
+        if DopamineKit.developmentIdentity != id {
+            DopamineKit.developmentIdentity = id
+            DopamineProperties.resetIdentity(completion: completion)
         }
     }
+    @objc internal static var developmentIdentity:String?
     
     /// An optional identity used for production
     ///
-    @objc public static var productionIdentity:String? {
-        didSet {
-            if oldValue != productionIdentity {
-                DopamineProperties.resetIdentity()
-            }
+    @objc public static func setProductionIdentity(_ id:String?, completion: @escaping (String?) -> ()) {
+        if DopamineKit.productionIdentity != id {
+            DopamineKit.productionIdentity = id
+            DopamineProperties.resetIdentity(completion: completion)
         }
     }
+    @objc internal static var productionIdentity:String?
     
     @objc public static let shared: DopamineKit = DopamineKit()
     public static let syncCoordinator = SyncCoordinator.shared

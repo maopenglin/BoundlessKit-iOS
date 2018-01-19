@@ -102,11 +102,13 @@ internal class DopamineProperties : UserDefaultsSingleton {
     
     /// Computes a primary identity for the user
     ///
-    internal static func resetIdentity() {
+    internal static func resetIdentity(completion: @escaping (String?) -> () = {_ in}) {
         _primaryIdentity = nil
         DopamineConfiguration.current = DopamineConfiguration.standard
         DopamineVersion.current = DopamineVersion.standard
-        CodelessAPI.boot()
+        CodelessAPI.boot() {
+            completion(_primaryIdentity)
+        }
     }
     private static var _primaryIdentity: String?
     private var primaryIdentity:String {
