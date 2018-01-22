@@ -11,7 +11,7 @@ import Foundation
 @objc
 public class CodelessAPI : NSObject {
     
-    public static var logCalls = true
+    public static var logCalls = false
     
     /// Valid API actions appeneded to the CodelessAPI URL
     ///
@@ -55,7 +55,7 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
-    public static func boot() {
+    public static func boot(completion: @escaping () -> () = {}) {
         var payload = DopamineProperties.current.apiCredentials
         payload["inProduction"] = DopamineProperties.current.inProduction
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
@@ -75,9 +75,12 @@ public class CodelessAPI : NSObject {
                 }
             }
             
+            completion()
+            
             if DopamineConfiguration.current.integrationMethod == "codeless" {
                 _ = CustomClassMethod.registerMethods
             }
+            
             promptPairing()
         }
     }

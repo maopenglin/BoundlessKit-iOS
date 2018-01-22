@@ -186,6 +186,8 @@ extension NSObject {
             swizzledSelector = #selector(reinforceMethodTapWithSender(_:))
         } else if (swizzleType == CustomClassMethod.SwizzleType.collectionDidSelect.rawValue) {
             swizzledSelector = #selector(reinforceCollectionSelection(_:didSelectItemAt:))
+        } else if (swizzleType == CustomClassMethod.SwizzleType.viewControllerDidAppear.rawValue) {
+            return
         } else {
             DopeLog.error("Unknown Swizzle Type")
             return

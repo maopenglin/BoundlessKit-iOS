@@ -102,26 +102,51 @@ internal class DopamineProperties : UserDefaultsSingleton {
     
     /// Computes a primary identity for the user
     ///
-    private lazy var primaryIdentity:String = {
-        #if DEBUG
-            if let tid = DopamineKit.developmentIdentity {
-                DopeLog.debug("Testing with primaryIdentity:(\(tid))")
-                return tid
-            }
-        #endif
-        if DopamineConfiguration.current.advertiserID,
-            let aid = ASIdentifierManager.shared().adId()?.uuidString,
-            aid != "00000000-0000-0000-0000-000000000000" {
-//            DopeLog.debug("ASIdentifierManager primaryIdentity:(\(aid))")
-            return aid
-        } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
-//            DopeLog.debug("identifierForVendor primaryIdentity:(\(vid))")
-            return vid
-        } else {
-//            DopeLog.debug("IDUnavailable for primaryIdentity")
-            return "IDUnavailable"
+    internal static func resetIdentity(completion: @escaping (String?) -> () = {_ in}) {
+        _primaryIdentity = nil
+        DopamineConfiguration.current = DopamineConfiguration.standard
+        DopamineVersion.current = DopamineVersion.standard
+        CodelessAPI.boot() {
+            completion(_primaryIdentity)
         }
-    }()
+    }
+    private static var _primaryIdentity: String?
+    private var primaryIdentity:String {
+        get {
+            if DopamineProperties._primaryIdentity == nil {
+                #if DEBUG
+                    if let did = DopamineKit.developmentIdentity {
+                        DopeLog.debug("set developmentID for primaryIdentity:(\(did))")
+                        DopamineProperties._primaryIdentity = did.isValidIdentity ? did : nil
+                    }
+                #else
+                    if let pid = DopamineKit.productionIdentity {
+                        DopeLog.debug("set productionID for primaryIdentity:(\(pid))")
+                        DopamineProperties._primaryIdentity = pid.isValidIdentity ? pid : nil
+                    }
+                #endif
+            }
+            
+            if DopamineProperties._primaryIdentity == nil {
+                if DopamineConfiguration.current.advertiserID,
+                    let aid = ASIdentifierManager.shared().adId()?.uuidString,
+                    aid != "00000000-0000-0000-0000-000000000000" {
+                    DopeLog.debug("set ASIdentifierManager for primaryIdentity:(\(aid))")
+                    DopamineProperties._primaryIdentity = aid
+                } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
+                    DopeLog.debug("set identifierForVendor for primaryIdentity:(\(vid))")
+                    DopamineProperties._primaryIdentity = vid
+                }
+            }
+            
+            if let _primaryIdentity = DopamineProperties._primaryIdentity {
+                return _primaryIdentity
+            } else {
+                // DopeLog.debug("set IDUnavailable for primaryIdentity")
+                return "IDUnavailable"
+            }
+        }
+    }
 }
 
 extension DopamineProperties {

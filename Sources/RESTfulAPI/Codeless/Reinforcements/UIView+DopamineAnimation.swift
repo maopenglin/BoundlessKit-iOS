@@ -162,8 +162,8 @@ public extension UIView {
         
         let imageView = UIImageView(image: image)
         
-        let height = self.frame.height
-        let width: CGFloat = height * 1.667
+        let height = self.frame.height * 1.1
+        let width: CGFloat =  height * 1.667
         imageView.frame = CGRect(x: -width, y: 0, width: width, height: height)
         
         let animation = CABasicAnimation(keyPath: "transform.translation.x")

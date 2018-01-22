@@ -27,8 +27,11 @@ public extension UIView {
                       size:CGSize = CGSize(width: 9, height: 6),
                       shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle, .spiral],
                       colors:[UIColor] = [UIColor.from(rgb: "4d81fb", alpha: 0.8), UIColor.from(rgb: "4ac4fb", alpha: 0.8), UIColor.from(rgb: "9243f9", alpha: 0.8), UIColor.from(rgb: "fdc33b", alpha: 0.8), UIColor.from(rgb: "f7332f", alpha: 0.8)],
+                      hapticFeedback: Bool = false,
+                      systemSound: UInt32 = 0,
                       completion: @escaping ()->Void = {}) {
         self.confettiBurst(duration: 0.8, size: size, shapes: shapes, colors: colors) {
+            DopeAudio.play(systemSound, vibrate: hapticFeedback)
             self.confettiShower(duration: duration, size: size, shapes: shapes, colors: colors, completion: completion)
         }
     }

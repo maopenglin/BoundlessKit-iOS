@@ -35,3 +35,9 @@ internal extension String {
         return nil
     }
 }
+
+internal extension String {
+    var isValidIdentity: Bool {
+        return !isEmpty && count <= 36 && range(of: "[^a-zA-Z0-9\\-]", options: .regularExpression) == nil
+    }
+}

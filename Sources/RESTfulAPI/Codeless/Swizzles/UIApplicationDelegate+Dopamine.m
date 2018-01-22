@@ -73,7 +73,7 @@ static NSArray* delegateSubclasses = nil;
     if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
         [self swizzled_applicationDidBecomeActive:application];
     
-    [CodelessAPI boot];
+    [CodelessAPI bootWithCompletion:^{}];
     [CodelessAPI recordAppEventWithName:@"appActive"];
     
     if ([[DopamineConfiguration current] applicationState]) {
