@@ -14,6 +14,15 @@ public class EventReinforcement : NSObject {
     internal static func showReinforcement(on viewAndLocation: [(UIView, CGPoint)], of type: String, withParameters reinforcement: [String: Any]) {
         switch type {
             
+        case "Confetti":
+            guard let duration = reinforcement["Duration"] as? Double else { DopeLog.error("Missing parameter", visual: true); break }
+            guard let hapticFeedback = reinforcement["HapticFeedback"] as? Bool  else { DopeLog.error("Missing parameter", visual: true); break }
+            guard let systemSound = reinforcement["SystemSound"] as? UInt32  else { DopeLog.error("Missing parameter", visual: true); break }
+            for (view, _) in viewAndLocation {
+                view.showConfetti(duration: duration, hapticFeedback: hapticFeedback, systemSound: systemSound)
+            }
+            return
+            
         case "Emojisplosion":
             guard let content = reinforcement["Content"] as? String else { DopeLog.error("Missing parameter", visual: true); break }
             guard let xAcceleration = reinforcement["AccelX"] as? CGFloat else { DopeLog.error("Missing parameter", visual: true); break }
