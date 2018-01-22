@@ -69,12 +69,15 @@ public extension UIView {
             /* Start showing the confetti */
             confettiEmitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(confettiEmitter)
+            self.setNeedsLayout()
             completion()
             
             /* Remove the burst effect */
-            DispatchQueue.main.asyncAfter(deadline: .now() + duration / 4) {
-                for cell in confettiEmitter.emitterCells! {
-                    cell.setValuesForBurstPhase2()
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2) {
+                if let cells = confettiEmitter.emitterCells {
+                    for cell in cells {
+                        cell.setValuesForBurstPhase2()
+                    }
                 }
                 
                 /* Remove the confetti emitter */
@@ -130,6 +133,7 @@ public extension UIView {
             /* Start showing the confetti */
             confettiEmitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(confettiEmitter)
+            self.setNeedsLayout()
             
             /* Remove the confetti emitter */
             DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
