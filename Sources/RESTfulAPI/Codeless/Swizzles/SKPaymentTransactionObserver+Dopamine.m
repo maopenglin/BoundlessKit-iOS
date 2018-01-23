@@ -42,7 +42,7 @@ static NSArray* observerSubclasses = nil;
 
 - (void)swizzled_paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray<SKPaymentTransaction *> *)transactions {
     
-    if ([[DopamineConfiguration current] storekitObservations]) {
+    if (transactions && [[DopamineConfiguration current] storekitObservations]) {
         for (SKPaymentTransaction* transaction in transactions) {
             NSString* stateName;
             switch (transaction.transactionState) {

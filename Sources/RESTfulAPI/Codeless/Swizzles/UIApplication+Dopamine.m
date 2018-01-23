@@ -20,9 +20,11 @@
 }
 
 -(void) swizzled_sendEvent: (UIEvent *) event {
-    UITouch* touch = event.allTouches.anyObject;
-    if (touch != nil) {
-        [CodelessAPI recordEventWithTouch:touch];
+    if (event) {
+        UITouch* touch = event.allTouches.anyObject;
+        if (touch != nil) {
+            [CodelessAPI recordEventWithTouch:touch];
+        }
     }
 
     if ([self respondsToSelector:@selector(swizzled_sendEvent:)])
@@ -30,19 +32,21 @@
 }
 
 - (BOOL)swizzled_sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event {
-    NSString *selectorName = NSStringFromSelector(action);
     
-    // Sometimes this method proxies through to its internal method. We want to ignore those calls.
-    if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
+    if (action && target && sender) {
+        NSString *selectorName = NSStringFromSelector(action);
         
-        [CodelessAPI recordActionWithApplication:self senderInstance:sender targetInstance:target selectorObj:action];
-        
-        if ([[[DopamineConfiguration current] customEvents] objectForKey:[@[NSStringFromClass([sender class]), NSStringFromClass([target class]), selectorName] componentsJoinedByString:@"-"]]) {
-            [DopamineKit track:@"UIApplication" metaData:@{@"tag": @"sendAction",
-                                                           @"sender": NSStringFromClass([sender class]),
-                                                           @"target": NSStringFromClass([target class]),
-                                                           @"selector": selectorName}
-             ];
+        // Sometimes this method proxies through to its internal method. We want to ignore those calls.
+        if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
+            [CodelessAPI recordActionWithApplication:self senderInstance:sender targetInstance:target selectorObj:action];
+            
+            if ([[[DopamineConfiguration current] customEvents] objectForKey:[@[NSStringFromClass([sender class]), NSStringFromClass([target class]), selectorName] componentsJoinedByString:@"-"]]) {
+                [DopamineKit track:@"UIApplication" metaData:@{@"tag": @"sendAction",
+                                                               @"sender": NSStringFromClass([sender class]),
+                                                               @"target": NSStringFromClass([target class]),
+                                                               @"selector": selectorName}
+                 ];
+            }
         }
     }
     
