@@ -41,3 +41,26 @@ internal extension UIWindow {
         }
     }
 }
+
+internal extension UIWindow {
+    func viewControllerStack() -> [UIViewController] {
+        var accumulator = [UIViewController]()
+        
+        var vc = rootViewController
+        while(vc != nil) {
+            accumulator.append(vc!)
+            if let tabController = vc as? UITabBarController {
+                vc = tabController.selectedViewController
+            } else if let navController = vc as? UINavigationController {
+                if navController.viewControllers.isEmpty == false {
+                    accumulator.append(contentsOf: navController.viewControllers)
+                    accumulator.removeLast()
+                }
+                vc = navController.topViewController
+            } else {
+                vc = vc?.presentedViewController
+            }
+        }
+        return accumulator
+    }
+}
