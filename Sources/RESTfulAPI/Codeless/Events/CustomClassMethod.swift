@@ -200,7 +200,7 @@ extension NSObject {
         } else if (swizzleType == CustomClassMethod.SwizzleType.viewControllerDidAppear.rawValue) {
             return
         } else {
-            DopeLog.error("Unknown Swizzle Type")
+            DopeLog.error("Unknown Swizzle Type: \(swizzleType)")
             return
         }
         
