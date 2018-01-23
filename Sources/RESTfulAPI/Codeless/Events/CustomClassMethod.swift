@@ -15,7 +15,8 @@ internal class CustomClassMethod : NSObject {
         noParam = "noParamAction",
         tapActionWithSender = "tapInitWithTarget",
         collectionDidSelect = "collectionDidSelect",
-        viewControllerDidAppear = "viewControllerDidAppear"
+        viewControllerDidAppear = "viewControllerDidAppear",
+        viewControllerDidDisappear = "viewControllerDidDisappear"
     }
     
     let sender: String
@@ -154,6 +155,16 @@ extension CustomClassMethod {
                 viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             } else {
                 DopeLog.error("Could not find viewController view", visual: true)
+                return nil
+            }
+            
+        case "superview":
+            if let vc = viewController,
+                let parentVC = vc.presentingViewController,
+                let view = parentVC.view {
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else {
+                DopeLog.error("Could not find viewController parent view", visual: true)
                 return nil
             }
             
