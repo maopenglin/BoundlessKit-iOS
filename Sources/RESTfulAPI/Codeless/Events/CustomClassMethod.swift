@@ -90,7 +90,6 @@ internal class CustomClassMethod : NSObject {
             originalSelector: originalSelector
         )
         
-        DopeLog.debug("Swizzled class:\(target) method:\(action)")
         CustomClassMethod.registeredMethods["\(sender)-\(target)"] = action
     }
     
@@ -183,6 +182,8 @@ extension NSObject {
         guard let swizzledMethod = class_getInstanceMethod(swizzledClass, swizzledSelector) else { DopeLog.error("class_getInstanceMethod(\"\(swizzledClass), \(swizzledSelector)\") failed"); return }
         
         method_exchangeImplementations(originalMethod, swizzledMethod)
+        
+        DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector)")
     }
     
     fileprivate class func swizzleReinforceableMethod(swizzleType: String, originalClass: AnyClass, originalSelector: Selector) {
@@ -198,6 +199,8 @@ extension NSObject {
         } else if (swizzleType == CustomClassMethod.SwizzleType.collectionDidSelect.rawValue) {
             swizzledSelector = #selector(reinforceCollectionSelection(_:didSelectItemAt:))
         } else if (swizzleType == CustomClassMethod.SwizzleType.viewControllerDidAppear.rawValue) {
+            return
+        } else if (swizzleType == CustomClassMethod.SwizzleType.viewControllerDidDisappear.rawValue) {
             return
         } else {
             DopeLog.error("Unknown Swizzle Type: \(swizzleType)")
