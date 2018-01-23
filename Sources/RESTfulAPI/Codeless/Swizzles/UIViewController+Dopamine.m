@@ -38,6 +38,8 @@
     if ([self respondsToSelector:@selector(swizzled_viewDidDisappear:)])
         [self swizzled_viewDidDisappear:animated];
     
+    [CodelessAPI submitViewControllerDidDisappearWithVc: self target:NSStringFromClass([self class]) action:NSStringFromSelector(@selector(viewDidDisappear:))];
+    
     if ([[DopamineConfiguration current] applicationViews]) {
         [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didDisappear",
                                                           @"classname": NSStringFromClass([self class]),

@@ -237,6 +237,22 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
+    public static func submitViewControllerDidDisappear(vc: UIViewController, target: String, action: String) {
+        if let customClassMethod = CustomClassMethod(swizzleType: .viewControllerDidDisappear, targetName: target, actionName: action) {
+            submit { payload in
+                payload["sender"] = customClassMethod.sender
+                payload["target"] = customClassMethod.target
+                payload["selector"] = customClassMethod.action
+                payload["actionID"] = [customClassMethod.sender, customClassMethod.target, customClassMethod.action].joined(separator: "-")
+                payload["senderImage"] = ""
+                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
+                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+            }
+            customClassMethod.attemptViewControllerReinforcement(vc: vc)
+        }
+    }
+    
+    @objc
     public static func submitTapAction(target: String, action: String) {
         if let tapAction = CustomClassMethod(swizzleType: ((action.contains(":")) ? .tapActionWithSender : .noParam), targetName: target, actionName: action) {
             submit { payload in

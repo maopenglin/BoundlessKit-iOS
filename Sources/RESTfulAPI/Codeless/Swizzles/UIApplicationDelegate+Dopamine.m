@@ -63,7 +63,7 @@ static NSArray* delegateSubclasses = nil;
 
 - (void) swizzled_applicationWillTerminate:(UIApplication *)application {
     [CodelessAPI recordAppEventWithName:@"appTerminate"];
-    NSLog(@"Bye");
+    
     if ([self respondsToSelector:@selector(swizzled_applicationWillTerminate:)]) {
         [self swizzled_applicationWillTerminate:application];
     }
