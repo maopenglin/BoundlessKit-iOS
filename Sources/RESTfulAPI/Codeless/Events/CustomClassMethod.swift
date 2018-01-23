@@ -39,7 +39,7 @@ internal class CustomClassMethod : NSObject {
     
     convenience init?(senderType: SwizzleType, targetInstance: NSObject) {
         let target = NSStringFromClass(type(of: targetInstance))
-        guard let action = CustomClassMethod.registeredMethods[target] else { DopeLog.error("No method found"); return nil }
+        guard let action = CustomClassMethod.registeredMethods["\(senderType.rawValue)-\(target)"] else { DopeLog.error("No method found for sender-target:\(senderType.rawValue)-\(target)"); return nil }
         
         self.init(sender: senderType.rawValue, target: target, action: action)
     }
@@ -82,7 +82,7 @@ internal class CustomClassMethod : NSObject {
 //            return
 //        }
         
-        guard CustomClassMethod.registeredMethods[target] == nil else { return }
+        guard CustomClassMethod.registeredMethods["\(sender)-\(target)"] == nil else { return }
         
         NSObject.swizzleReinforceableMethod(
             swizzleType: sender,
@@ -91,7 +91,7 @@ internal class CustomClassMethod : NSObject {
         )
         
         DopeLog.debug("Swizzled class:\(target) method:\(action)")
-        CustomClassMethod.registeredMethods[target] = action
+        CustomClassMethod.registeredMethods["\(sender)-\(target)"] = action
     }
     
 }
