@@ -17,14 +17,18 @@ open class UserDefaultsSingleton : NSObject, NSCoding {
     }
 }
 
-internal extension UserDefaults {
+@objc
+public extension UserDefaults {
     
+    @objc
     static var dopamine: UserDefaults {
         get {
             return UserDefaults(suiteName: "com.usedopamine.dopaminekit") ?? UserDefaults.standard
         }
     }
-    
+}
+
+internal extension UserDefaults {
     static var initialBootDate: Date? {
         get {
             let defaultsKey = "initialBootDate"

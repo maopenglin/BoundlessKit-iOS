@@ -16,8 +16,26 @@
 @implementation DopamineViewController
 
 + (void) swizzleSelectors {
-    [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidAppear:) :[UIViewController class] :@selector(viewDidAppear:)];
-    [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidDisappear:) :[UIViewController class] :@selector(viewDidDisappear:)];
+    
+    NSString *defaultsKey = [NSString stringWithFormat:@"disableSwizzlelFor%@", NSStringFromClass(self)];
+    BOOL shouldSwizzle = ![[NSUserDefaults dopamine] boolForKey: defaultsKey];
+    NSLog(@"Value for %@:%d", defaultsKey, !shouldSwizzle);
+    
+    static BOOL didSwizzle = false;
+    
+    if (shouldSwizzle) {
+        if (!didSwizzle) {
+            didSwizzle = true;
+            [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidAppear:) :[UIViewController class] :@selector(viewDidAppear:)];
+            [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidDisappear:) :[UIViewController class] :@selector(viewDidDisappear:)];
+        }
+    } else {
+        if (didSwizzle) {
+            didSwizzle = false;
+            [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidAppear:) :[UIViewController class] :@selector(viewDidAppear:)];
+            [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidDisappear:) :[UIViewController class] :@selector(viewDidDisappear:)];
+        }
+    }
 }
 
 - (void) swizzled_viewDidAppear:(BOOL)animated {
