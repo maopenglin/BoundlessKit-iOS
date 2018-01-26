@@ -40,7 +40,7 @@
     
     [CodelessAPI submitViewControllerDidDisappearWithVc: self target:NSStringFromClass([self class]) action:NSStringFromSelector(@selector(viewDidDisappear:))];
     
-    if ([[DopamineConfiguration current] applicationViews]) {
+    if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
         [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didDisappear",
                                                           @"classname": NSStringFromClass([self class]),
                                                           @"time": [DopeTimer timeTrackedFor:[self description]]
