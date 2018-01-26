@@ -15,6 +15,8 @@ class ViewController: UIViewController {
     @objc var someCounter: Float = 0
     
     @objc func action1Performed(){
+        print("Button 1 pushed")
+        DopamineAppDelegate.swizzleDelegateSelectors(UIApplication.shared.delegate!)
         // Reinforce the action to make it sticky!!
 //        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
 //            reinforcement in
@@ -66,13 +68,14 @@ class ViewController: UIViewController {
     }
     
     @objc func action2Performed(){
+        print("Button 2 pushed")
 ////        // Tracking call is sent asynchronously
 //////        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
 //        locationManager.delegate = self
 //        locationManager.requestAlwaysAuthorization()
         
 
-        DopamineKit.track("action2peformed")
+//        DopamineKit.track("action2peformed")
 //        DopamineKit.reinforce("a2") { reinforcement in
 //            // Update UI to display reinforcement decision on screen for learning purposes
 //            self.responseLabel.text = reinforcement
@@ -143,6 +146,7 @@ class ViewController: UIViewController {
         action1Button.titleLabel?.textAlignment = NSTextAlignment.center
         action1Button.backgroundColor = UIColor.init(red: 51/255.0, green: 153/255.0, blue: 51/255.0, alpha: 1.0)
         action1Button.addTarget(self, action: #selector(ViewController.action1Performed), for: UIControlEvents.touchUpInside)
+        action1Button.showsTouchWhenHighlighted = true
         self.view.addSubview(action1Button)
         
         // Button to represent some user action to Track
@@ -154,6 +158,7 @@ class ViewController: UIViewController {
         trackedActionButton.titleLabel?.textAlignment = NSTextAlignment.center
         trackedActionButton.backgroundColor = UIColor.init(red: 204/255.0, green: 51/255.0, blue: 51/255.0, alpha: 1.0)
         trackedActionButton.addTarget(self, action: #selector(ViewController.action2Performed), for: UIControlEvents.touchUpInside)
+        trackedActionButton.showsTouchWhenHighlighted = true
         self.view.addSubview(trackedActionButton)
     }
     

@@ -18,24 +18,7 @@
     [SwizzleHelper injectSelector:[DopamineAppDelegate class] :@selector(swizzled_setDelegate:) :[UIApplication class] :@selector(setDelegate:)];
 }
 
-//+ (void) dopamineLoadedTagSelector {}
-
-static Class delegateClass = nil;
-
-// Store an array of all UIAppDelegate subclasses to iterate over in cases where UIAppDelegate swizzled methods are not overriden in main AppDelegate
-// But rather in one of the subclasses
-static NSArray* delegateSubclasses = nil;
-
-+ (Class) delegateClass {
-    return delegateClass;
-}
-
-- (void) swizzled_setDelegate:(id<UIApplicationDelegate>)delegate {
-    if (delegateClass) {
-        [self swizzled_setDelegate:delegate];
-        return;
-    }
-    
++ (void) swizzleDelegateSelectors:(id<UIApplicationDelegate>) delegate {
     Class swizzledClass = [DopamineAppDelegate class];
     delegateClass = [SwizzleHelper getClassWithProtocolInHierarchy:[delegate class] :@protocol(UIApplicationDelegate)];
     delegateSubclasses = [SwizzleHelper ClassGetSubclasses:delegateClass];
@@ -45,6 +28,21 @@ static NSArray* delegateSubclasses = nil;
     [SwizzleHelper injectToProperClass:@selector(swizzled_application:didFinishLaunchingWithOptions:) :@selector(application:didFinishLaunchingWithOptions:) :delegateSubclasses :swizzledClass :delegateClass];
     [SwizzleHelper injectToProperClass :@selector(swizzled_applicationDidBecomeActive:) :@selector(applicationDidBecomeActive:) :delegateSubclasses :swizzledClass :delegateClass ];
     [SwizzleHelper injectToProperClass :@selector(swizzled_applicationWillResignActive:) :@selector(applicationWillResignActive:) :delegateSubclasses :swizzledClass :delegateClass ];
+}
+
+static Class delegateClass = nil;
+
+// Store an array of all UIAppDelegate subclasses to iterate over in cases where UIAppDelegate swizzled methods are not overriden in main AppDelegate
+// But rather in one of the subclasses
+static NSArray* delegateSubclasses = nil;
+
+- (void) swizzled_setDelegate:(id<UIApplicationDelegate>)delegate {
+    if (delegateClass) {
+        [self swizzled_setDelegate:delegate];
+        return;
+    }
+    
+    [DopamineAppDelegate swizzleDelegateSelectors: delegate];
     
     [self swizzled_setDelegate:delegate];
 }

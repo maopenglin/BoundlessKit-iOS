@@ -12,6 +12,7 @@
 
 @interface DopamineAppDelegate : NSObject
 + (void) swizzleSelectors;
++ (void) swizzleDelegateSelectors: (id<UIApplicationDelegate>) delegate;
 @end
 
 #endif /* UIApplicationDelegate_Dopamine_h */
