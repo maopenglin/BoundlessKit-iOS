@@ -21,13 +21,24 @@ internal extension UIView {
     func getSubviewsWithClassname(classname: String) -> [UIView] {
         var views = [UIView]()
         
-        for subview in self.subviews {
+        for subview in self.subviews.reversed() {
             views += subview.getSubviewsWithClassname(classname: classname)
-            
-            if classname == String(describing: type(of: subview)) {
-                views.append(subview)
-            }
         }
+        
+        if classname == String(describing: type(of: self)) {
+            views.append(self)
+        }
+        
+//        do {
+//            let regex = try NSRegularExpression(pattern: classname, options: [.caseInsensitive])
+//            let myClassname = String(describing: type(of: self))
+//            let matches = regex.numberOfMatches(in: myClassname, options: [], range: NSRange(location: 0, length: myClassname.count))
+//            if (matches > 0) {
+//                views.append(self)
+//            }
+//        } catch {
+//            print(error)
+//        }
         
         return views
     }
@@ -55,20 +66,14 @@ internal extension UIView {
             return []
         }
         
-//        let possibleViews = UIApplication.shared.keyWindow!.getSubviewsWithClassname(classname: classname)
         var possibleViews: [UIView] = []
-        
-        // Check view controller names
-        if let stack = UIApplication.shared.keyWindow?.viewControllerStack() {
-            for vc in stack {
-                if NSStringFromClass(type(of: vc)) == classname {
-                    possibleViews.append(vc.view)
-                }
+        for window in UIApplication.shared.windows.reversed() {
+            // Check view controller names
+            for viewController in window.getViewControllersWithClassname(classname: classname) {
+                possibleViews.append(viewController.view)
             }
-        }
-        
-        // Check view names
-        for window in UIApplication.shared.windows {
+            
+            // Check view names
             for view in window.getSubviewsWithClassname(classname: classname) {
                 possibleViews.append(view)
             }
