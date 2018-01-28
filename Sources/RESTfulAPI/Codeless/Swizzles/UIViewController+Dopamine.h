@@ -11,7 +11,7 @@
 
 @interface DopamineViewController : UIViewController
 
-+ (void) swizzleSelectors;
++ (void) swizzleSelectors: (BOOL)enable;
 
 @end
 

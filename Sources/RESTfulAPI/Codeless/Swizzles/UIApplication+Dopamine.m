@@ -14,9 +14,16 @@
 
 @implementation DopamineApp
 
-+ (void) swizzleSelectors {
-    [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendEvent:) :[UIApplication class] :@selector(sendEvent:)];
-    [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendAction:to:from:forEvent:) :[UIApplication class] :@selector(sendAction:to:from:forEvent:)];
++ (void) swizzleSelectors: (BOOL) enable {
+    @synchronized(self) {
+        static BOOL didSwizzle = false;
+        if (enable ^ didSwizzle) {
+            didSwizzle = !didSwizzle;
+            
+            [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendEvent:) :[UIApplication class] :@selector(sendEvent:)];
+            [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendAction:to:from:forEvent:) :[UIApplication class] :@selector(sendAction:to:from:forEvent:)];
+        }
+    }
 }
 
 -(void) swizzled_sendEvent: (UIEvent *) event {

@@ -13,7 +13,7 @@
 #import <StoreKit/StoreKit.h>
 
 @interface DopaminePaymentTransactionObserver : NSObject
-+ (void) swizzleSelectors;
++ (void) swizzleSelectors: (BOOL)enable;
 @end
 
 #endif /* SKPaymentTransactionObserver_Dopamine_h */

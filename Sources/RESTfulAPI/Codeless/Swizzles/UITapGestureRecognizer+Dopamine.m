@@ -15,10 +15,16 @@
 
 @implementation DopamineTapGestureRecognizer
 
-+ (void) swizzleSelectors {
-    
-    [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_initWithTarget:action:) :[UITapGestureRecognizer class] :@selector(initWithTarget:action:)];
-    [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_addTarget:action:) :[UITapGestureRecognizer class] :@selector(addTarget:action:)];
++ (void) swizzleSelectors: (BOOL) enable {
+    @synchronized(self) {
+        static BOOL didSwizzle = false;
+        if (enable ^ didSwizzle) {
+            didSwizzle = !didSwizzle;
+            
+            [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_initWithTarget:action:) :[UITapGestureRecognizer class] :@selector(initWithTarget:action:)];
+            [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_addTarget:action:) :[UITapGestureRecognizer class] :@selector(addTarget:action:)];
+        }
+    }
     
 }
 

@@ -12,6 +12,7 @@
 
 #import "DopamineKit.h"
 #import "ASIdentifierManager+ASIdentifierManagerHelper.h"
+#import "DTMethodSwizzling.h"
 #import "SKPaymentTransactionObserver+Dopamine.h"
 #import "SwizzleHelper.h"
 #import "UIApplication+Dopamine.h"

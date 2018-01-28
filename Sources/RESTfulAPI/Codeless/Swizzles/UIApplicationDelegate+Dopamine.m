@@ -14,35 +14,47 @@
 
 @implementation DopamineAppDelegate
 
-+ (void) swizzleSelectors {
-    [SwizzleHelper injectSelector:[DopamineAppDelegate class] :@selector(swizzled_setDelegate:) :[UIApplication class] :@selector(setDelegate:)];
++ (void) swizzleSelectors: (BOOL) enable {
+    @synchronized(self) {
+        static BOOL didSwizzle = false;
+        if (enable ^ didSwizzle) {
+            didSwizzle = !didSwizzle;
+            [SwizzleHelper injectSelector:[DopamineAppDelegate class] :@selector(swizzled_setDelegate:) :[UIApplication class] :@selector(setDelegate:)];
+        }
+    }
+    [self swizzleDelegateClass:enable];
 }
 
-+ (void) swizzleDelegateSelectors:(id<UIApplicationDelegate>) delegate {
-    Class swizzledClass = [DopamineAppDelegate class];
-    delegateClass = [SwizzleHelper getClassWithProtocolInHierarchy:[delegate class] :@protocol(UIApplicationDelegate)];
-    delegateSubclasses = [SwizzleHelper ClassGetSubclasses:delegateClass];
-    
-    // Application state
-    //
-    [SwizzleHelper injectToProperClass:@selector(swizzled_application:didFinishLaunchingWithOptions:) :@selector(application:didFinishLaunchingWithOptions:) :delegateSubclasses :swizzledClass :delegateClass];
-    [SwizzleHelper injectToProperClass :@selector(swizzled_applicationDidBecomeActive:) :@selector(applicationDidBecomeActive:) :delegateSubclasses :swizzledClass :delegateClass ];
-    [SwizzleHelper injectToProperClass :@selector(swizzled_applicationWillResignActive:) :@selector(applicationWillResignActive:) :delegateSubclasses :swizzledClass :delegateClass ];
-}
 
 static Class delegateClass = nil;
-
-// Store an array of all UIAppDelegate subclasses to iterate over in cases where UIAppDelegate swizzled methods are not overriden in main AppDelegate
-// But rather in one of the subclasses
 static NSArray* delegateSubclasses = nil;
-
-- (void) swizzled_setDelegate:(id<UIApplicationDelegate>)delegate {
-    if (delegateClass) {
-        [self swizzled_setDelegate:delegate];
++ (void) swizzleDelegateClass:(BOOL) enable {
+    if (delegateClass == nil) {
         return;
     }
     
-    [DopamineAppDelegate swizzleDelegateSelectors: delegate];
+    @synchronized(self) {
+        static BOOL didSwizzleDelegate = false;
+        if (enable ^ didSwizzleDelegate) {
+            didSwizzleDelegate = !didSwizzleDelegate;
+            
+            // Application state
+            //
+            Class swizzledClass = [DopamineAppDelegate class];
+            [SwizzleHelper injectToProperClass:@selector(swizzled_application:didFinishLaunchingWithOptions:) :@selector(application:didFinishLaunchingWithOptions:) :delegateSubclasses :swizzledClass :delegateClass];
+            [SwizzleHelper injectToProperClass :@selector(swizzled_applicationDidBecomeActive:) :@selector(applicationDidBecomeActive:) :delegateSubclasses :swizzledClass :delegateClass ];
+            [SwizzleHelper injectToProperClass :@selector(swizzled_applicationWillResignActive:) :@selector(applicationWillResignActive:) :delegateSubclasses :swizzledClass :delegateClass ];
+        }
+    }
+}
+
+- (void) swizzled_setDelegate:(id<UIApplicationDelegate>)delegate {
+    
+    if (delegateClass == nil) {
+        delegateClass = [SwizzleHelper getClassWithProtocolInHierarchy:[delegate class] :@protocol(UIApplicationDelegate)];
+        delegateSubclasses = [SwizzleHelper ClassGetSubclasses:delegateClass];
+        [DopamineAppDelegate swizzleDelegateClass:true];
+    }
     
     [self swizzled_setDelegate:delegate];
 }

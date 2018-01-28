@@ -14,28 +14,41 @@
 
 @implementation DopaminePaymentTransactionObserver
 
-+ (void) swizzleSelectors {
-    [SwizzleHelper injectSelector:[DopaminePaymentTransactionObserver class] :@selector(swizzled_addTransactionObserver:) :[SKPaymentQueue class] :@selector(addTransactionObserver:)];
++ (void) swizzleSelectors: (BOOL) enable {
+    @synchronized(self) {
+        static BOOL didSwizzle = false;
+        if (enable ^ didSwizzle) {
+            didSwizzle = !didSwizzle;
+            [SwizzleHelper injectSelector:[DopaminePaymentTransactionObserver class] :@selector(swizzled_addTransactionObserver:) :[SKPaymentQueue class] :@selector(addTransactionObserver:)];
+        }
+    }
+    
+    [DopaminePaymentTransactionObserver swizzleObserverClass:enable];
 }
 
 static Class observerClass = nil;
 static NSArray* observerSubclasses = nil;
 
-+ (Class) observerClass {
-    return observerClass;
-}
-
-- (void)swizzled_addTransactionObserver:(id<SKPaymentTransactionObserver>)observer {
-    if (observerClass) {
-        [self swizzled_addTransactionObserver:observer];
++ (void) swizzleObserverClass: (BOOL) enable {
+    if (observerClass == nil) {
         return;
     }
     
-    Class swizzledClass = [DopaminePaymentTransactionObserver class];
-    observerClass = [SwizzleHelper getClassWithProtocolInHierarchy:[observer class] :@protocol(SKPaymentTransactionObserver)];
-    observerSubclasses = [SwizzleHelper ClassGetSubclasses:observerClass];
-    
-    [SwizzleHelper injectToProperClass:@selector(swizzled_paymentQueue:updatedTransactions:) :@selector(paymentQueue:updatedTransactions:) :observerSubclasses :swizzledClass :observerClass];
+    @synchronized(self) {
+        static BOOL didSwizzleObserver = false;
+        if (enable ^ didSwizzleObserver) {
+            didSwizzleObserver = !didSwizzleObserver;
+            [SwizzleHelper injectToProperClass:@selector(swizzled_paymentQueue:updatedTransactions:) :@selector(paymentQueue:updatedTransactions:) :observerSubclasses :[DopaminePaymentTransactionObserver self] :observerClass];
+        }
+    }
+}
+
+- (void)swizzled_addTransactionObserver:(id<SKPaymentTransactionObserver>)observer {
+    if (observerClass == nil) {
+        observerClass = [SwizzleHelper getClassWithProtocolInHierarchy:[observer class] :@protocol(SKPaymentTransactionObserver)];
+        observerSubclasses = [SwizzleHelper ClassGetSubclasses:observerClass];
+        [DopaminePaymentTransactionObserver swizzleObserverClass: true];
+    }
     
     [self swizzled_addTransactionObserver:observer];
 }

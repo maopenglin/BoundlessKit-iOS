@@ -6,6 +6,8 @@
 //
 //
 
+#import <DTMethodSwizzling.h>
+
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
@@ -19,31 +21,38 @@
 #import <SKPaymentTransactionObserver+Dopamine.h>
 #import <UICollectionViewDelegate+Dopamine.h>
 
-@implementation UIApplication (Dopamine)
+@implementation DTMethodSwizzling
 
 + (void) load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        
-        // Swizzle - UIApplication
-        [DopamineApp swizzleSelectors];
-        
-        // Swizzle - UIApplicationDelegate
-        [DopamineAppDelegate swizzleSelectors];
-        
-        // Swizzle - UIViewController
-        [DopamineViewController swizzleSelectors];
-        
-        // Swizzle - UITapGestureRecognizer
-        [DopamineTapGestureRecognizer swizzleSelectors];
-        
-        // Swizzle - SKPaymentTransactionObserver
-        [DopaminePaymentTransactionObserver swizzleSelectors];
-        
-        // Swizzle - UICollectionViewController
-        [DopamineCollectionViewDelegate swizzleSelectors];
-        
+        [self swizzleSelectedMethods];
     });
+}
+
++ (void) swizzleSelectedMethods {
+    NSString *defaultsKey = [NSString stringWithFormat:@"disableSwizzlingForAll"];
+    BOOL shouldSwizzle = ![[NSUserDefaults dopamine] boolForKey: defaultsKey];
+    NSLog(@"Value for %@:%d", defaultsKey, !shouldSwizzle);
+    
+    // Swizzle - UIApplication
+    [DopamineApp swizzleSelectors: shouldSwizzle];
+    
+    // Swizzle - UIApplicationDelegate
+    [DopamineAppDelegate swizzleSelectors: shouldSwizzle];
+    
+    // Swizzle - UIViewController
+    [DopamineViewController swizzleSelectors: shouldSwizzle];
+    
+    // Swizzle - UITapGestureRecognizer
+    [DopamineTapGestureRecognizer swizzleSelectors: shouldSwizzle];
+    
+    // Swizzle - SKPaymentTransactionObserver
+    [DopaminePaymentTransactionObserver swizzleSelectors: shouldSwizzle];
+    
+    // Swizzle - UICollectionViewController
+    [DopamineCollectionViewDelegate swizzleSelectors: shouldSwizzle];
+    
 }
 
 @end

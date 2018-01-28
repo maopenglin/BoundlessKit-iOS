@@ -16,35 +16,42 @@
 
 @implementation DopamineCollectionViewDelegate
 
-+ (void) swizzleSelectors {
-    
-    [SwizzleHelper injectSelector:[DopamineCollectionViewDelegate class] :@selector(swizzled_setDelegate:) :[UICollectionView class] :@selector(setDelegate:)];
-    
++ (void) swizzleSelectors: (BOOL) enable {
+    @synchronized(self) {
+        static BOOL didSwizzle = false;
+        if (enable ^ didSwizzle) {
+            didSwizzle = !didSwizzle;
+            [SwizzleHelper injectSelector:[DopamineCollectionViewDelegate class] :@selector(swizzled_setDelegate:) :[UICollectionView class] :@selector(setDelegate:)];
+        }
+    }
+    [DopamineCollectionViewDelegate swizzleDelegateClass:enable];
 }
 
-//+ (void) dopamineLoadedTagSelector {}
 
 static Class delegateClass = nil;
-
-// Store an array of all UIAppDelegate subclasses to iterate over in cases where UIAppDelegate swizzled methods are not overriden in main AppDelegate
-// But rather in one of the subclasses
 static NSArray* delegateSubclasses = nil;
 
-+ (Class) delegateClass {
-    return delegateClass;
-}
-
-- (void) swizzled_setDelegate:(id<UICollectionViewDelegate>)delegate {
-    if (delegateClass) {
-        [self swizzled_setDelegate:delegate];
++ (void) swizzleDelegateClass:(BOOL) enable {
+    if (delegateClass == nil) {
         return;
     }
     
-    Class swizzledClass = [DopamineCollectionViewDelegate class];
-    delegateClass = [SwizzleHelper getClassWithProtocolInHierarchy:[delegate class] :@protocol(UICollectionViewDelegate)];
-    delegateSubclasses = [SwizzleHelper ClassGetSubclasses:delegateClass];
-    
-    [SwizzleHelper injectToProperClass:@selector(swizzled_collectionView:didSelectItemAtIndexPath:) :@selector(collectionView:didSelectItemAtIndexPath:) :delegateSubclasses :swizzledClass :delegateClass];
+    @synchronized(self) {
+        static BOOL didSwizzleDelegate = false;
+        if (enable ^ didSwizzleDelegate) {
+            didSwizzleDelegate = !didSwizzleDelegate;
+            
+            [SwizzleHelper injectToProperClass:@selector(swizzled_collectionView:didSelectItemAtIndexPath:) :@selector(collectionView:didSelectItemAtIndexPath:) :delegateSubclasses :[DopamineCollectionViewDelegate class] :delegateClass];
+        }
+    }
+}
+
+- (void) swizzled_setDelegate:(id<UICollectionViewDelegate>)delegate {
+    if (delegateClass == nil) {
+        delegateClass = [SwizzleHelper getClassWithProtocolInHierarchy:[delegate class] :@protocol(UICollectionViewDelegate)];
+        delegateSubclasses = [SwizzleHelper ClassGetSubclasses:delegateClass];
+        [DopamineCollectionViewDelegate swizzleDelegateClass:true];
+    }
     
     [self swizzled_setDelegate:delegate];
 }

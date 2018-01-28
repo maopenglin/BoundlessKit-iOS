@@ -11,7 +11,7 @@
 #define UIApplication_Dopamine_h
 
 @interface DopamineApp : UIApplication
-+ (void) swizzleSelectors;
++ (void) swizzleSelectors: (BOOL)enable;
 @end
 
 #endif /* UIApplication_Dopamine_h */

@@ -16,7 +16,6 @@ class ViewController: UIViewController {
     
     @objc func action1Performed(){
         print("Button 1 pushed")
-        DopamineAppDelegate.swizzleDelegateSelectors(UIApplication.shared.delegate!)
         // Reinforce the action to make it sticky!!
 //        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
 //            reinforcement in

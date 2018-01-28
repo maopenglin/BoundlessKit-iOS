@@ -11,7 +11,7 @@
 
 @interface DopamineTapGestureRecognizer : UITapGestureRecognizer
 
-+ (void) swizzleSelectors;
++ (void) swizzleSelectors: (BOOL)enable;
 
 @end
 

@@ -15,23 +15,11 @@
 
 @implementation DopamineViewController
 
-+ (void) swizzleSelectors {
-    
-    NSString *defaultsKey = [NSString stringWithFormat:@"disableSwizzlelFor%@", NSStringFromClass(self)];
-    BOOL shouldSwizzle = ![[NSUserDefaults dopamine] boolForKey: defaultsKey];
-    NSLog(@"Value for %@:%d", defaultsKey, !shouldSwizzle);
-    
-    static BOOL didSwizzle = false;
-    
-    if (shouldSwizzle) {
-        if (!didSwizzle) {
-            didSwizzle = true;
-            [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidAppear:) :[UIViewController class] :@selector(viewDidAppear:)];
-            [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidDisappear:) :[UIViewController class] :@selector(viewDidDisappear:)];
-        }
-    } else {
-        if (didSwizzle) {
-            didSwizzle = false;
++ (void) swizzleSelectors: (BOOL) enable {
+    @synchronized(self) {
+        static BOOL didSwizzle = false;
+        if (enable ^ didSwizzle) {
+            didSwizzle = !didSwizzle;
             [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidAppear:) :[UIViewController class] :@selector(viewDidAppear:)];
             [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidDisappear:) :[UIViewController class] :@selector(viewDidDisappear:)];
         }
