@@ -47,7 +47,7 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (void) swizzled_setDelegate:(id<UICollectionViewDelegate>)delegate {
-    if (delegateClass == nil) {
+    if (delegate && delegateClass == nil) {
         delegateClass = [SwizzleHelper getClassWithProtocolInHierarchy:[delegate class] :@protocol(UICollectionViewDelegate)];
         delegateSubclasses = [SwizzleHelper ClassGetSubclasses:delegateClass];
         [DopamineCollectionViewDelegate swizzleDelegateClass:true];

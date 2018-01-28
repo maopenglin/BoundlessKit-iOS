@@ -44,7 +44,7 @@ static NSArray* observerSubclasses = nil;
 }
 
 - (void)swizzled_addTransactionObserver:(id<SKPaymentTransactionObserver>)observer {
-    if (observerClass == nil) {
+    if (observer && observerClass == nil) {
         observerClass = [SwizzleHelper getClassWithProtocolInHierarchy:[observer class] :@protocol(SKPaymentTransactionObserver)];
         observerSubclasses = [SwizzleHelper ClassGetSubclasses:observerClass];
         [DopaminePaymentTransactionObserver swizzleObserverClass: true];

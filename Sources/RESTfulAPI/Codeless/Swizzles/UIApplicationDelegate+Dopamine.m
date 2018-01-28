@@ -49,8 +49,7 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (void) swizzled_setDelegate:(id<UIApplicationDelegate>)delegate {
-    
-    if (delegateClass == nil) {
+    if (delegate && delegateClass == nil) {
         delegateClass = [SwizzleHelper getClassWithProtocolInHierarchy:[delegate class] :@protocol(UIApplicationDelegate)];
         delegateSubclasses = [SwizzleHelper ClassGetSubclasses:delegateClass];
         [DopamineAppDelegate swizzleDelegateClass:true];
