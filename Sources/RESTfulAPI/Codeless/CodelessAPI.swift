@@ -221,8 +221,8 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
-    public static func submitViewControllerDidAppear(vc: UIViewController, target: String, action: String) {
-        if let customClassMethod = CustomClassMethod(swizzleType: .viewControllerDidAppear, targetName: target, actionName: action) {
+    public static func submitViewControllerDidAppear(target: UIViewController, action: String) {
+        if let customClassMethod = CustomClassMethod(swizzleType: .viewControllerDidAppear, targetName: NSStringFromClass(type(of: target)), actionName: action) {
             submit { payload in
                 payload["sender"] = customClassMethod.sender
                 payload["target"] = customClassMethod.target
@@ -232,13 +232,13 @@ public class CodelessAPI : NSObject {
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
             }
-            customClassMethod.attemptViewControllerReinforcement(vc: vc)
+            customClassMethod.attemptReinforcement(vc: target)
         }
     }
     
     @objc
-    public static func submitViewControllerDidDisappear(vc: UIViewController, target: String, action: String) {
-        if let customClassMethod = CustomClassMethod(swizzleType: .viewControllerDidDisappear, targetName: target, actionName: action) {
+    public static func submitViewControllerDidDisappear(target: UIViewController, action: String) {
+        if let customClassMethod = CustomClassMethod(swizzleType: .viewControllerDidDisappear, targetName: NSStringFromClass(type(of: target)), actionName: action) {
             submit { payload in
                 payload["sender"] = customClassMethod.sender
                 payload["target"] = customClassMethod.target
@@ -248,7 +248,7 @@ public class CodelessAPI : NSObject {
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
             }
-            customClassMethod.attemptViewControllerReinforcement(vc: vc)
+            customClassMethod.attemptReinforcement(vc: target)
         }
     }
     
@@ -279,6 +279,7 @@ public class CodelessAPI : NSObject {
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
             }
+            customClassMethod.attemptReinforcement()
         }
     }
     

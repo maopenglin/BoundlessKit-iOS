@@ -59,7 +59,9 @@ static NSArray* delegateSubclasses = nil;
 // Did Select Row
 
 - (void)swizzled_collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    [CodelessAPI submitCollectionViewDidSelectWithTarget:NSStringFromClass([self class]) action:NSStringFromSelector(@selector(collectionView:didSelectItemAtIndexPath:))];
+    if (self) {
+        [CodelessAPI submitCollectionViewDidSelectWithTarget:NSStringFromClass([self class]) action:NSStringFromSelector(@selector(collectionView:didSelectItemAtIndexPath:))];
+    }
     
     if ([self respondsToSelector:@selector(swizzled_collectionView:didSelectItemAtIndexPath:)]) {
         [self swizzled_collectionView:collectionView didSelectItemAtIndexPath:indexPath];

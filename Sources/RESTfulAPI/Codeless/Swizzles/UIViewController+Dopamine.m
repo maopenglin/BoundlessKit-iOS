@@ -30,7 +30,10 @@
     if ([self respondsToSelector:@selector(swizzled_viewDidAppear:)])
         [self swizzled_viewDidAppear:animated];
     
-    [CodelessAPI submitViewControllerDidAppearWithVc: self target:NSStringFromClass([self class]) action:NSStringFromSelector(@selector(viewDidAppear:))];
+    
+    if (self) {
+        [CodelessAPI submitViewControllerDidAppearWithTarget:self action:NSStringFromSelector(@selector(viewDidAppear:))];
+    }
     
     if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
         [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didAppear",
@@ -44,7 +47,9 @@
     if ([self respondsToSelector:@selector(swizzled_viewDidDisappear:)])
         [self swizzled_viewDidDisappear:animated];
     
-    [CodelessAPI submitViewControllerDidDisappearWithVc: self target:NSStringFromClass([self class]) action:NSStringFromSelector(@selector(viewDidDisappear:))];
+    if (self) {
+        [CodelessAPI submitViewControllerDidDisappearWithTarget:self action:NSStringFromSelector(@selector(viewDidDisappear:))];
+    }
     
     if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
         [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didDisappear",

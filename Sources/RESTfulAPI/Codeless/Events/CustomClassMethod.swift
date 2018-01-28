@@ -96,20 +96,8 @@ internal class CustomClassMethod : NSObject {
 }
 
 extension CustomClassMethod {
-    func attemptReinforcement() {
-        DopamineVersion.current.codelessReinforcementFor(sender: sender, target: target, selector: action)  { reinforcement in
-            guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
-            guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                if let viewsAndLocations = self.reinforcementViews(options: reinforcement) {
-                    EventReinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
-                }
-            }
-        }
-    }
     
-    func attemptViewControllerReinforcement(vc: UIViewController) {
+    func attemptReinforcement(vc: UIViewController? = nil) {
         DopamineVersion.current.codelessReinforcementFor(sender: sender, target: target, selector: action)  { reinforcement in
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
@@ -197,7 +185,7 @@ extension NSObject {
         } else if (swizzleType == CustomClassMethod.SwizzleType.tapActionWithSender.rawValue) {
             swizzledSelector = #selector(reinforceMethodTapWithSender(_:))
         } else if (swizzleType == CustomClassMethod.SwizzleType.collectionDidSelect.rawValue) {
-            swizzledSelector = #selector(reinforceCollectionSelection(_:didSelectItemAt:))
+            return
         } else if (swizzleType == CustomClassMethod.SwizzleType.viewControllerDidAppear.rawValue) {
             return
         } else if (swizzleType == CustomClassMethod.SwizzleType.viewControllerDidDisappear.rawValue) {
@@ -227,11 +215,5 @@ extension NSObject {
         reinforceMethodTapWithSender(sender)
         
         CustomClassMethod(senderType: .tapActionWithSender, targetInstance: self)?.attemptReinforcement()
-    }
-    
-    @objc func reinforceCollectionSelection(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        reinforceCollectionSelection(collectionView, didSelectItemAt: indexPath)
-        
-        CustomClassMethod(senderType: .collectionDidSelect, targetInstance: self)?.attemptReinforcement()
     }
 }
