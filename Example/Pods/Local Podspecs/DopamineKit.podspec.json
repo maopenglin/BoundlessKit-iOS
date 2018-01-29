@@ -1,6 +1,6 @@
 {
   "name": "DopamineKit",
-  "version": "5.2.11",
+  "version": "5.2.12",
   "summary": "A framework to use DopamineLabs reinforcement API written in Swift 4",
   "homepage": "https://github.com/DopamineLabs/DopamineKit-iOS",
   "social_media_url": "https://twitter.com/usedopamine",
@@ -17,7 +17,7 @@
   },
   "source": {
     "git": "https://github.com/DopamineLabs/DopamineKit-iOS.git",
-    "tag": "5.2.11"
+    "tag": "5.2.12"
   },
   "source_files": "Sources/**/*",
   "resource_bundles": {
