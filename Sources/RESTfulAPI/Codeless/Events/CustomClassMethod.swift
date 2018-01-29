@@ -31,17 +31,11 @@ internal class CustomClassMethod : NSObject {
     
     convenience init?(actionID: String) {
         let components:[String] = actionID.components(separatedBy: "-")
-        guard components.count == 3
-            else { return nil }
+        guard components.count == 3 else {
+            return nil
+        }
         
         self.init(sender: components[0], target: components[1], action: components[2])
-    }
-    
-    convenience init?(senderType: SwizzleType, targetInstance: NSObject) {
-        let target = NSStringFromClass(type(of: targetInstance))
-        guard let action = CustomClassMethod.registeredMethods["\(senderType.rawValue)-\(target)"] else { DopeLog.error("No method found for sender-target:\(senderType.rawValue)-\(target)"); return nil }
-        
-        self.init(sender: senderType.rawValue, target: target, action: action)
     }
     
     convenience init?(swizzleType: SwizzleType, targetName: String?, actionName: String?) {
@@ -53,6 +47,17 @@ internal class CustomClassMethod : NSObject {
         }
     }
     
+    convenience init?(registeredFor senderType: SwizzleType, targetInstance: NSObject){
+        let target = NSStringFromClass(type(of: targetInstance))
+        guard let action = CustomClassMethod.registeredMethods["\(senderType.rawValue)-\(target)"] else {
+            DopeLog.error("No method found for sender-target:\(senderType.rawValue)-\(target)")
+            return nil
+        }
+        
+        self.init(sender: senderType.rawValue, target: target, action: action)
+    }
+    
+    // [senderType-target: action]
     fileprivate static var registeredMethods: [String:String] = [:]
     
     public static let registerMethods: Void = {
@@ -76,13 +81,12 @@ internal class CustomClassMethod : NSObject {
             DopeLog.error("Invalid class <\(target)>")
             return
         }
-        let originalSelector = NSSelectorFromString(action)
-//        guard originalSelector != Selector() else {
-//            DopeLog.error("Invalid action selector <\(action)>")
-//            return
-//        }
+        guard CustomClassMethod.registeredMethods["\(sender)-\(target)"] == nil else {
+            DopeLog.debug("Reinforcement for sender-target:\(sender)-\(target) method:\(action) already registered.")
+            return
+        }
         
-        guard CustomClassMethod.registeredMethods["\(sender)-\(target)"] == nil else { return }
+        let originalSelector = NSSelectorFromString(action)
         
         NSObject.swizzleReinforceableMethod(
             swizzleType: sender,
@@ -165,15 +169,6 @@ extension CustomClassMethod {
 }
 
 extension NSObject {
-    fileprivate class func swizzle(originalClass: AnyClass, originalSelector: Selector, swizzledClass: AnyClass, swizzledSelector: Selector) {
-        guard let originalMethod = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
-        guard let swizzledMethod = class_getInstanceMethod(swizzledClass, swizzledSelector) else { DopeLog.error("class_getInstanceMethod(\"\(swizzledClass), \(swizzledSelector)\") failed"); return }
-        
-        method_exchangeImplementations(originalMethod, swizzledMethod)
-        
-        DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector)")
-    }
-    
     fileprivate class func swizzleReinforceableMethod(swizzleType: String, originalClass: AnyClass, originalSelector: Selector) {
         guard originalClass.isSubclass(of: NSObject.self) else { DopeLog.debug("Not a NSObject"); return }
         guard let _ = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
@@ -184,17 +179,10 @@ extension NSObject {
             swizzledSelector = #selector(reinforceMethodWithoutParams)
         } else if (swizzleType == CustomClassMethod.SwizzleType.tapActionWithSender.rawValue) {
             swizzledSelector = #selector(reinforceMethodTapWithSender(_:))
-        } else if (swizzleType == CustomClassMethod.SwizzleType.collectionDidSelect.rawValue) {
-            return
-        } else if (swizzleType == CustomClassMethod.SwizzleType.viewControllerDidAppear.rawValue) {
-            return
-        } else if (swizzleType == CustomClassMethod.SwizzleType.viewControllerDidDisappear.rawValue) {
-            return
         } else {
-            DopeLog.error("Unknown Swizzle Type: \(swizzleType)")
+            DopeLog.debug("Registered reinforcement class:\(originalClass) method:\(originalSelector)")
             return
         }
-        
         
         self.swizzle(
             originalClass: originalClass.self,
@@ -205,15 +193,24 @@ extension NSObject {
         )
     }
     
+    fileprivate class func swizzle(originalClass: AnyClass, originalSelector: Selector, swizzledClass: AnyClass, swizzledSelector: Selector) {
+        guard let originalMethod = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
+        guard let swizzledMethod = class_getInstanceMethod(swizzledClass, swizzledSelector) else { DopeLog.error("class_getInstanceMethod(\"\(swizzledClass), \(swizzledSelector)\") failed"); return }
+        
+        method_exchangeImplementations(originalMethod, swizzledMethod)
+        
+        DopeLog.debug("Registered reinforcement and swizzled class:\(originalClass) method:\(originalSelector)")
+    }
+    
     @objc func reinforceMethodWithoutParams() {
         reinforceMethodWithoutParams()
         
-        CustomClassMethod(senderType: .noParam, targetInstance: self)?.attemptReinforcement()
+        CustomClassMethod(registeredFor: .noParam, targetInstance: self)?.attemptReinforcement()
     }
     
     @objc func reinforceMethodTapWithSender(_ sender: UITapGestureRecognizer) {
         reinforceMethodTapWithSender(sender)
         
-        CustomClassMethod(senderType: .tapActionWithSender, targetInstance: self)?.attemptReinforcement()
+        CustomClassMethod(registeredFor: .tapActionWithSender, targetInstance: self)?.attemptReinforcement()
     }
 }
