@@ -210,7 +210,7 @@ public class CodelessAPI : NSObject {
     public static func submit(target: NSObject, selector: Selector) {
         if let selectorReinforcer = SelectorReinforcement(targetName: NSStringFromClass(type(of: target)), selector: selector) {
             
-            selectorReinforcer.attemptReinforcement(vc: target as? UIViewController)
+            selectorReinforcer.attemptReinforcement(targetInstance: target)
             
             DopeLog.debug("Submitting class method: \(selectorReinforcer.actionID)")
             submit { payload in

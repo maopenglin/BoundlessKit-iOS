@@ -57,7 +57,7 @@ open class SelectorReinforcement : NSObject {
     
     @objc
     public static func rFor(target: NSObject, action: Selector) {
-        SelectorReinforcement.init(selectorType: SelectorType.noParamAction, targetName: NSStringFromClass(type(of: target)), actionName: NSStringFromSelector(action))?.attemptReinforcement()
+        SelectorReinforcement.init(selectorType: SelectorType.noParamAction, targetName: NSStringFromClass(type(of: target)), actionName: NSStringFromSelector(action))?.attemptReinforcement(targetInstance: target)
     }
     fileprivate init(selectorType: String, target: String, action: String) {
         self.selectorType = selectorType
@@ -155,20 +155,20 @@ open class SelectorReinforcement : NSObject {
 
 extension SelectorReinforcement {
     
-    func attemptReinforcement(vc: UIViewController? = nil) {
+    func attemptReinforcement(targetInstance: NSObject) {
         DopamineVersion.current.codelessReinforcementFor(sender: selectorType, target: target, selector: action)  { reinforcement in
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                if let viewsAndLocations = self.reinforcementViews(viewController: vc, options: reinforcement) {
+                if let viewsAndLocations = self.reinforcementViews(targetInstance: targetInstance, options: reinforcement) {
                     Reinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
                 }
             }
         }
     }
     
-    private func reinforcementViews(viewController: UIViewController? = nil, options: [String: Any]) -> [(UIView, CGPoint)]? {
+    private func reinforcementViews(targetInstance: NSObject, options: [String: Any]) -> [(UIView, CGPoint)]? {
         
         guard let viewOption = options["ViewOption"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
         guard let viewCustom = options["ViewCustom"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
@@ -186,17 +186,40 @@ extension SelectorReinforcement {
             viewsAndLocations = [(UIWindow.topWindow!, UIWindow.lastTouchPoint.withMargins(marginX: viewMarginX, marginY: viewMarginY))]
             
         case "custom":
-            viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
-                return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
-            })
-            
-            if viewsAndLocations?.count == 0 {
-                DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
-                return nil
+            let parts = viewCustom.components(separatedBy: "-")
+            if parts.count == 2 {
+                let vcClass = parts[0]
+                let viewVarName = parts[1]
+                print("VCClass:\(vcClass) viewVarName:\(viewVarName)")
+                if vcClass == "self" {
+                    if let view = targetInstance.value(forKey: viewVarName) as? UIView {
+                        viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+                    } else {
+                        DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                        return nil
+                    }
+                } else if
+                    let keyWindow = UIApplication.shared.keyWindow,
+                    let vc = keyWindow.getViewControllersWithClassname(classname: vcClass).first,
+                    let view = vc.value(forKey: viewVarName) as? UIView {
+                    viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+                } else {
+                    DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                    return nil
+                }
+            } else {
+                viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
+                    return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
+                })
+                if viewsAndLocations?.count == 0 {
+                    DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                    return nil
+                }
             }
             
         case "target":
-            if let view = viewController?.view {
+            if let viewController = targetInstance as? UIViewController,
+                let view = viewController.view {
                 viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             } else {
                 DopeLog.error("Could not find viewController view", visual: true)
@@ -204,7 +227,7 @@ extension SelectorReinforcement {
             }
             
         case "superview":
-            if let vc = viewController,
+            if let vc = targetInstance as? UIViewController,
                 let parentVC = vc.presentingViewController,
                 let view = parentVC.view {
                 viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
@@ -230,30 +253,14 @@ extension NSObject {
         
         var swizzledSelector: Selector
         if (swizzleType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
-            swizzledSelector = #selector(DopamineAppDelegate.swizzleMethodWithoutParams)
+            swizzledSelector = #selector(DopamineObject.methodToReinforce)
         } else if (swizzleType == SelectorReinforcement.SelectorType.tapActionWithSender.rawValue) {
-            swizzledSelector = #selector(reinforceMethodTapWithSender(_:))
-//        } else if (swizzleType == SelectorReinforcement.SelectorType.unknown.rawValue) {
-//            DopeLog.error("Unknown selector reinforcement type for class:\(originalClass) method:\(originalSelector)")
-//            return
+            swizzledSelector = #selector(DopamineObject.methodWithSenderToReinforce(_:))
         } else {
             DopeLog.debug("Registered reinforcement class:\(originalClass) method:\(originalSelector)")
             return
         }
         
         SwizzleHelper.injectSelector(DopamineAppDelegate.self, swizzledSelector, originalClass.self, originalSelector)
-    }
-    
-//    @objc func reinforceMethodWithoutParams() {
-//        reinforceMethodWithoutParams()
-//
-////        SelectorReinforcement(registeredFor: .noParamAction, targetInstance: self)?.attemptReinforcement()
-////        SelectorReinforcement.init(selectorType: .noParamAction, targetName: NSStringFromClass(type(of: self)), actionName: )
-//    }
-//
-    @objc func reinforceMethodTapWithSender(_ sender: UITapGestureRecognizer) {
-        reinforceMethodTapWithSender(sender)
-
-//        SelectorReinforcement(registeredFor: .tapActionWithSender, targetInstance: self)?.attemptReinforcement()
     }
 }

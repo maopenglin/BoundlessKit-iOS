@@ -70,7 +70,7 @@ internal extension UIViewController {
             }
         }
         
-        if classname == String(describing: type(of: self)) {
+        if classname == NSStringFromClass(type(of: self)) {
             vcs.append(self)
         }
 

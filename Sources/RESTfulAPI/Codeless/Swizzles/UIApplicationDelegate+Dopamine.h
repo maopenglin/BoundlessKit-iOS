@@ -12,7 +12,6 @@
 
 @interface DopamineAppDelegate : NSObject
 + (void) swizzleSelectors: (BOOL)enable;
-- (void) swizzleMethodWithoutParams;
 @end
 
 #endif /* UIApplicationDelegate_Dopamine_h */
