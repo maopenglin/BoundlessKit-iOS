@@ -32,7 +32,7 @@
     
     
     if (self) {
-        [CodelessAPI submitViewControllerDidAppearWithTarget:self action:NSStringFromSelector(@selector(viewDidAppear:))];
+        [CodelessAPI submitWithTarget:self selector:@selector(viewDidAppear:)];
     }
     
     if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
@@ -48,7 +48,7 @@
         [self swizzled_viewDidDisappear:animated];
     
     if (self) {
-        [CodelessAPI submitViewControllerDidDisappearWithTarget:self action:NSStringFromSelector(@selector(viewDidDisappear:))];
+        [CodelessAPI submitWithTarget:self selector:@selector(viewDidDisappear:)];
     }
     
     if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {

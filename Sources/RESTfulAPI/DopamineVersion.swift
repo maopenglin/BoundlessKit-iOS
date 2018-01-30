@@ -29,7 +29,7 @@ public class DopamineVersion : UserDefaultsSingleton {
         updateQueue.addOperation {
             if let mappings = mappings {
                 self.visualizerMappings = mappings
-                CustomClassMethod.registerVisualizerMethods()
+                SelectorReinforcement.registerVisualizerMethods()
             } else if self.visualizerMappings.count == 0 {
                 return
             } else {

@@ -1,5 +1,5 @@
 //
-//  CustomClassMethod.swift
+//  SelectorReinforcement.swift
 //  DopamineKit
 //
 //  Created by Akash Desai on 12/12/17.
@@ -8,20 +8,52 @@
 import Foundation
 
 
-internal class CustomClassMethod : NSObject {
+internal class SelectorReinforcement : NSObject {
     
-    enum SwizzleType : String {
+    enum SelectorType : String {
         case
-        noParam = "noParamAction",
-        tapActionWithSender = "tapInitWithTarget",
-        collectionDidSelect = "collectionDidSelect",
+        unknown = "unknown",
+        appLaunch = "appLaunch",
+        appTerminate = "appTerminate",
+        appActive = "appActive",
+        appInactive = "appInactive",
         viewControllerDidAppear = "viewControllerDidAppear",
-        viewControllerDidDisappear = "viewControllerDidDisappear"
+        viewControllerDidDisappear = "viewControllerDidDisappear",
+        collectionDidSelect = "collectionDidSelect",
+        noParamAction = "noParamAction",
+        tapActionWithSender = "tapActionWithSender"
+        
+        init(from selector: Selector) {
+            if (selector == #selector(UIApplicationDelegate.application(_:didFinishLaunchingWithOptions:))) {
+                self = .appLaunch
+            } else if (selector == #selector(UIApplicationDelegate.applicationWillTerminate(_:))) {
+                self = .appTerminate
+            } else if (selector == #selector(UIApplicationDelegate.applicationDidBecomeActive(_:))) {
+                self = .appActive
+            } else if (selector == #selector(UIApplicationDelegate.applicationWillResignActive(_:))) {
+                self = .appInactive
+            } else if (selector == #selector(UIViewController.viewDidAppear(_:))) {
+                self = .viewControllerDidAppear
+            } else if (selector == #selector(UIViewController.viewDidDisappear(_:))) {
+                self = .viewControllerDidDisappear
+            } else if (selector == #selector(UICollectionViewDelegate.collectionView(_:didSelectItemAt:))) {
+                self = .collectionDidSelect
+            } else if (!NSStringFromSelector(selector).contains(":")) {
+                self = .noParamAction
+            } else {
+                self = .unknown
+            }
+        }
     }
     
     let sender: String
     let target: String
     let action: String
+    var actionID: String {
+        get {
+            return [sender, target, action].joined(separator: "-")
+        }
+    }
     
     init(sender: String, target: String, action: String) {
         self.sender = sender
@@ -38,7 +70,7 @@ internal class CustomClassMethod : NSObject {
         self.init(sender: components[0], target: components[1], action: components[2])
     }
     
-    convenience init?(swizzleType: SwizzleType, targetName: String?, actionName: String?) {
+    convenience init?(swizzleType: SelectorType, targetName: String?, actionName: String?) {
         if let targetName = targetName,
             let actionName = actionName {
             self.init(sender: swizzleType.rawValue, target: targetName, action: actionName)
@@ -47,9 +79,18 @@ internal class CustomClassMethod : NSObject {
         }
     }
     
-    convenience init?(registeredFor senderType: SwizzleType, targetInstance: NSObject){
+    convenience init?(targetName: String?, selector: Selector?) {
+        if let targetName = targetName,
+            let selector = selector {
+            self.init(sender: SelectorType(from: selector).rawValue, target: targetName, action: NSStringFromSelector(selector))
+        } else {
+            return nil
+        }
+    }
+    
+    convenience init?(registeredFor senderType: SelectorType, targetInstance: NSObject){
         let target = NSStringFromClass(type(of: targetInstance))
-        guard let action = CustomClassMethod.registeredMethods["\(senderType.rawValue)-\(target)"] else {
+        guard let action = SelectorReinforcement.registeredMethods["\(senderType.rawValue)-\(target)"] else {
             DopeLog.error("No method found for sender-target:\(senderType.rawValue)-\(target)")
             return nil
         }
@@ -62,13 +103,13 @@ internal class CustomClassMethod : NSObject {
     
     public static let registerMethods: Void = {
         for actionID in DopamineVersion.current.actionIDs {
-            CustomClassMethod(actionID: actionID)?.registerMethod()
+            SelectorReinforcement(actionID: actionID)?.registerMethod()
         }
     }()
     
     public static func registerVisualizerMethods() {
         for actionID in DopamineVersion.current.visualizerActionIDs {
-            CustomClassMethod(actionID: actionID)?.registerMethod()
+            SelectorReinforcement(actionID: actionID)?.registerMethod()
         }
     }
     
@@ -81,7 +122,7 @@ internal class CustomClassMethod : NSObject {
             DopeLog.error("Invalid class <\(target)>")
             return
         }
-        guard CustomClassMethod.registeredMethods["\(sender)-\(target)"] == nil else {
+        guard SelectorReinforcement.registeredMethods["\(sender)-\(target)"] == nil else {
             DopeLog.debug("Reinforcement for sender-target:\(sender)-\(target) method:\(action) already registered.")
             return
         }
@@ -94,12 +135,12 @@ internal class CustomClassMethod : NSObject {
             originalSelector: originalSelector
         )
         
-        CustomClassMethod.registeredMethods["\(sender)-\(target)"] = action
+        SelectorReinforcement.registeredMethods["\(sender)-\(target)"] = action
     }
     
 }
 
-extension CustomClassMethod {
+extension SelectorReinforcement {
     
     func attemptReinforcement(vc: UIViewController? = nil) {
         DopamineVersion.current.codelessReinforcementFor(sender: sender, target: target, selector: action)  { reinforcement in
@@ -108,7 +149,7 @@ extension CustomClassMethod {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 if let viewsAndLocations = self.reinforcementViews(viewController: vc, options: reinforcement) {
-                    EventReinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
+                    Reinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
                 }
             }
         }
@@ -175,10 +216,13 @@ extension NSObject {
         
         
         var swizzledSelector: Selector
-        if (swizzleType == CustomClassMethod.SwizzleType.noParam.rawValue) {
+        if (swizzleType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
             swizzledSelector = #selector(reinforceMethodWithoutParams)
-        } else if (swizzleType == CustomClassMethod.SwizzleType.tapActionWithSender.rawValue) {
+        } else if (swizzleType == SelectorReinforcement.SelectorType.tapActionWithSender.rawValue) {
             swizzledSelector = #selector(reinforceMethodTapWithSender(_:))
+        } else if (swizzleType == SelectorReinforcement.SelectorType.unknown.rawValue) {
+            DopeLog.error("Unknown selector reinforcement type for class:\(originalClass) method:\(originalSelector)")
+            return
         } else {
             DopeLog.debug("Registered reinforcement class:\(originalClass) method:\(originalSelector)")
             return
@@ -189,7 +233,6 @@ extension NSObject {
             originalSelector: originalSelector,
             swizzledClass: NSObject.self,
             swizzledSelector: swizzledSelector
-            
         )
     }
     
@@ -205,12 +248,12 @@ extension NSObject {
     @objc func reinforceMethodWithoutParams() {
         reinforceMethodWithoutParams()
         
-        CustomClassMethod(registeredFor: .noParam, targetInstance: self)?.attemptReinforcement()
+        SelectorReinforcement(registeredFor: .noParamAction, targetInstance: self)?.attemptReinforcement()
     }
     
     @objc func reinforceMethodTapWithSender(_ sender: UITapGestureRecognizer) {
         reinforceMethodTapWithSender(sender)
         
-        CustomClassMethod(registeredFor: .tapActionWithSender, targetInstance: self)?.attemptReinforcement()
+        SelectorReinforcement(registeredFor: .tapActionWithSender, targetInstance: self)?.attemptReinforcement()
     }
 }

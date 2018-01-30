@@ -30,7 +30,7 @@ internal extension UITouch {
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                     if let viewsAndLocations = self.reinforcementViews(options: reinforcement) {
-                        EventReinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
+                        Reinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
                     }
                 }
                 

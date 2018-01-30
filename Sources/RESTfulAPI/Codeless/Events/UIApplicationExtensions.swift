@@ -21,7 +21,7 @@ internal extension UIApplication {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 if let viewsAndLocations = self.reinforcementViews(senderInstance: senderInstance, targetInstance: targetInstance, options: reinforcement) {
-                    EventReinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
+                    Reinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
                 }
             }
             

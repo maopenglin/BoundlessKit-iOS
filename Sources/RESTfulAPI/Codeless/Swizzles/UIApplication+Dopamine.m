@@ -30,7 +30,7 @@
     if (event) {
         UITouch* touch = event.allTouches.anyObject;
         if (touch != nil) {
-            [CodelessAPI recordEventWithTouch:touch];
+            [CodelessAPI submitEventWithTouch:touch];
         }
     }
 
@@ -45,7 +45,7 @@
         
         // Sometimes this method proxies through to its internal method. We want to ignore those calls.
         if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
-            [CodelessAPI recordActionWithApplication:self senderInstance:sender targetInstance:target selectorObj:action];
+            [CodelessAPI submitActionWithApplication:self senderInstance:sender targetInstance:target selectorObj:action];
             
             if ([[[DopamineConfiguration current] customEvents] objectForKey:[@[NSStringFromClass([sender class]), NSStringFromClass([target class]), selectorName] componentsJoinedByString:@"-"]]) {
                 [DopamineKit track:@"UIApplication" metaData:@{@"tag": @"sendAction",

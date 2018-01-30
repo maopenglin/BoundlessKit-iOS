@@ -1,5 +1,5 @@
 //
-//  EventReinforcement.swift
+//  Reinforcement.swift
 //  DopamineKit
 //
 //  Created by Akash Desai on 12/1/17.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class EventReinforcement : NSObject {
+public class Reinforcement : NSObject {
     
     internal static var lastTouchLocationInUIWindow: CGPoint = CGPoint.zero
     

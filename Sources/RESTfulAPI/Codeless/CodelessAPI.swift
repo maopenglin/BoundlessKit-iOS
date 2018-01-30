@@ -11,7 +11,7 @@ import Foundation
 @objc
 public class CodelessAPI : NSObject {
     
-    public static var logCalls = false
+    public static var logCalls = true
     
     /// Valid API actions appeneded to the CodelessAPI URL
     ///
@@ -78,7 +78,7 @@ public class CodelessAPI : NSObject {
             completion()
             
             if DopamineConfiguration.current.integrationMethod == "codeless" {
-                _ = CustomClassMethod.registerMethods
+                _ = SelectorReinforcement.registerMethods
             }
             
             promptPairing()
@@ -117,12 +117,6 @@ public class CodelessAPI : NSObject {
                             shared.send(call: .accept, with: payload) {response in
                                 if response["status"] as? Int == 200 {
                                     CodelessAPI.connectionID = connectionID
-                                    
-                                    for event in CustomCodelessEvent.appEvents {
-                                        submit { payload in
-                                            event.modify(payload: &payload)
-                                        }
-                                    }
                                 }
                             }
                         }))
@@ -153,7 +147,7 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
-    public static func recordEvent(touch: UITouch) {
+    public static func submitEvent(touch: UITouch) {
         DispatchQueue.global().async {
             if let view = touch.view,
                 touch.phase == .ended {
@@ -178,7 +172,7 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
-    public static func recordAction(application: UIApplication, senderInstance: AnyObject, targetInstance: AnyObject, selectorObj: Selector) {
+    public static func submitAction(application: UIApplication, senderInstance: AnyObject, targetInstance: AnyObject, selectorObj: Selector) {
         DispatchQueue.global().async {
             let senderClassname = NSStringFromClass(type(of: senderInstance))
             let targetClassname = NSStringFromClass(type(of: targetInstance))
@@ -213,48 +207,27 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
-    public static func recordAppEvent(name: String) {
-        DispatchQueue.global().async {
-            let appEvent = CustomCodelessEvent(target: "AppEvent", action: name)
-            appEvent.attemptReinforcement()
-        }
-    }
-    
-    @objc
-    public static func submitViewControllerDidAppear(target: UIViewController, action: String) {
-        if let customClassMethod = CustomClassMethod(swizzleType: .viewControllerDidAppear, targetName: NSStringFromClass(type(of: target)), actionName: action) {
+    public static func submit(target: NSObject, selector: Selector) {
+        if let selectorReinforcer = SelectorReinforcement(targetName: NSStringFromClass(type(of: target)), selector: selector) {
+            
+            selectorReinforcer.attemptReinforcement(vc: target as? UIViewController)
+            
+            DopeLog.debug("Submitting class method: \(selectorReinforcer.actionID)")
             submit { payload in
-                payload["sender"] = customClassMethod.sender
-                payload["target"] = customClassMethod.target
-                payload["selector"] = customClassMethod.action
-                payload["actionID"] = [customClassMethod.sender, customClassMethod.target, customClassMethod.action].joined(separator: "-")
+                payload["sender"] = selectorReinforcer.sender
+                payload["target"] = selectorReinforcer.target
+                payload["selector"] = selectorReinforcer.action
+                payload["actionID"] = selectorReinforcer.actionID
                 payload["senderImage"] = ""
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
             }
-            customClassMethod.attemptReinforcement(vc: target)
-        }
-    }
-    
-    @objc
-    public static func submitViewControllerDidDisappear(target: UIViewController, action: String) {
-        if let customClassMethod = CustomClassMethod(swizzleType: .viewControllerDidDisappear, targetName: NSStringFromClass(type(of: target)), actionName: action) {
-            submit { payload in
-                payload["sender"] = customClassMethod.sender
-                payload["target"] = customClassMethod.target
-                payload["selector"] = customClassMethod.action
-                payload["actionID"] = [customClassMethod.sender, customClassMethod.target, customClassMethod.action].joined(separator: "-")
-                payload["senderImage"] = ""
-                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
-            }
-            customClassMethod.attemptReinforcement(vc: target)
         }
     }
     
     @objc
     public static func submitTapAction(target: String, action: String) {
-        if let tapAction = CustomClassMethod(swizzleType: ((action.contains(":")) ? .tapActionWithSender : .noParam), targetName: target, actionName: action) {
+        if let tapAction = SelectorReinforcement(swizzleType: ((action.contains(":")) ? .tapActionWithSender : .noParamAction), targetName: target, actionName: action) {
             submit { payload in
                 payload["sender"] = tapAction.sender
                 payload["target"] = tapAction.target
@@ -266,23 +239,6 @@ public class CodelessAPI : NSObject {
             }
         }
     }
-    
-    @objc
-    public static func submitCollectionViewDidSelect(target: String?, action: String?) {
-        if let customClassMethod = CustomClassMethod(swizzleType: .collectionDidSelect, targetName: target, actionName: action) {
-            submit { payload in
-                payload["sender"] = customClassMethod.sender
-                payload["target"] = customClassMethod.target
-                payload["selector"] = customClassMethod.action
-                payload["actionID"] = [customClassMethod.sender, customClassMethod.target, customClassMethod.action].joined(separator: "-")
-                payload["senderImage"] = ""
-                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
-            }
-            customClassMethod.attemptReinforcement()
-        }
-    }
-    
     
     fileprivate static var submitQueue: OperationQueue = {
         let queue = OperationQueue()
@@ -325,6 +281,7 @@ public class CodelessAPI : NSObject {
     ///     - completion: A closure with a JSON formatted dictionary.
     ///
     private func send(call type: CallType, with payload: [String:Any], timeout:TimeInterval = 3.0, completion: @escaping ([String: Any]) -> Void) {
+        
         guard let url = URL(string: type.path) else {
             DopeLog.debug("Invalid url <\(type.path)>")
             return
