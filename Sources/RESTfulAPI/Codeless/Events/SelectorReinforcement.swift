@@ -153,16 +153,38 @@ open class SelectorReinforcement : NSObject {
     
 }
 
+extension NSObject {
+    fileprivate class func swizzleReinforceableMethod(swizzleType: String, originalClass: AnyClass, originalSelector: Selector) {
+        guard originalClass.isSubclass(of: NSObject.self) else { DopeLog.debug("Not a NSObject"); return }
+        guard let _ = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
+        
+        
+        var swizzledSelector: Selector
+        if (swizzleType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
+            swizzledSelector = #selector(DopamineObject.methodToReinforce)
+        } else if (swizzleType == SelectorReinforcement.SelectorType.tapActionWithSender.rawValue) {
+            swizzledSelector = #selector(DopamineObject.methodWithSenderToReinforce(_:))
+        } else {
+            DopeLog.debug("Registered reinforcement class:\(originalClass) method:\(originalSelector)")
+            return
+        }
+        
+        SwizzleHelper.injectSelector(DopamineObject.self, swizzledSelector, originalClass.self, originalSelector)
+    }
+}
+
 extension SelectorReinforcement {
     
     func attemptReinforcement(targetInstance: NSObject) {
-        DopamineVersion.current.codelessReinforcementFor(sender: selectorType, target: target, selector: action)  { reinforcement in
-            guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
-            guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                if let viewsAndLocations = self.reinforcementViews(targetInstance: targetInstance, options: reinforcement) {
-                    Reinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
+        DispatchQueue.global().async {
+            DopamineVersion.current.codelessReinforcementFor(sender: self.selectorType, target: self.target, selector: self.action)  { reinforcement in
+                guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
+                guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    if let viewsAndLocations = self.reinforcementViews(targetInstance: targetInstance, options: reinforcement) {
+                        Reinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
+                    }
                 }
             }
         }
@@ -187,26 +209,35 @@ extension SelectorReinforcement {
             
         case "custom":
             let parts = viewCustom.components(separatedBy: "-")
-            if parts.count == 2 {
+            if parts.count > 0 {
                 let vcClass = parts[0]
-                let viewVarName = parts[1]
-                print("VCClass:\(vcClass) viewVarName:\(viewVarName)")
+                let parent: NSObject
                 if vcClass == "self" {
-                    if let view = targetInstance.value(forKey: viewVarName) as? UIView {
-                        viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
-                    } else {
-                        DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
-                        return nil
-                    }
+                    parent = targetInstance
                 } else if
                     let keyWindow = UIApplication.shared.keyWindow,
-                    let vc = keyWindow.getViewControllersWithClassname(classname: vcClass).first,
-                    let view = vc.value(forKey: viewVarName) as? UIView {
+                    let vc = keyWindow.getViewControllersWithClassname(classname: vcClass).first {
+                    parent = vc
+                } else {
+                    DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                    return nil
+                }
+                
+                let childPath = Array(parts[1...parts.count-1])
+                var child: NSObject?
+                for childName in childPath {
+                    child = parent.value(forKey: childName) as? NSObject
+                }
+                
+                if let view = child as? UIView {
                     viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
                 } else {
                     DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
                     return nil
                 }
+            
+            } else if viewCustom == "self", let view = targetInstance as? UIView {
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             } else {
                 viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
                     return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
@@ -242,25 +273,5 @@ extension SelectorReinforcement {
         }
         
         return viewsAndLocations
-    }
-}
-
-extension NSObject {
-    fileprivate class func swizzleReinforceableMethod(swizzleType: String, originalClass: AnyClass, originalSelector: Selector) {
-        guard originalClass.isSubclass(of: NSObject.self) else { DopeLog.debug("Not a NSObject"); return }
-        guard let _ = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
-        
-        
-        var swizzledSelector: Selector
-        if (swizzleType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
-            swizzledSelector = #selector(DopamineObject.methodToReinforce)
-        } else if (swizzleType == SelectorReinforcement.SelectorType.tapActionWithSender.rawValue) {
-            swizzledSelector = #selector(DopamineObject.methodWithSenderToReinforce(_:))
-        } else {
-            DopeLog.debug("Registered reinforcement class:\(originalClass) method:\(originalSelector)")
-            return
-        }
-        
-        SwizzleHelper.injectSelector(DopamineAppDelegate.self, swizzledSelector, originalClass.self, originalSelector)
     }
 }
