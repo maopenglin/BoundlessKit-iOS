@@ -78,7 +78,7 @@ public class CodelessAPI : NSObject {
             completion()
             
             if DopamineConfiguration.current.integrationMethod == "codeless" {
-                _ = SelectorReinforcement.registerMethods
+                SelectorReinforcement.registerMethods()
             }
             
             promptPairing()

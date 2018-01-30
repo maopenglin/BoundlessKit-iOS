@@ -96,11 +96,32 @@ open class SelectorReinforcement : NSObject {
         }
     }
     
-    public static let registerMethods: Void = {
+    public static func registerMethods() {
         for actionID in DopamineVersion.current.actionIDs {
             SelectorReinforcement(actionID: actionID)?.registerMethod()
         }
-    }()
+    }
+    
+    public static func registerNoParamMethod(classType: AnyClass, selector: Selector, reinforcement: [String: Any]) {
+        let newReinforcement = SelectorReinforcement(selectorType: SelectorType.noParamAction.rawValue, target: NSStringFromClass(classType), action: NSStringFromSelector(selector))
+//        let snap = DopamineVersion.current
+//        snap.visualizerMappings[newReinforcement.actionID] = reinforcement
+//        print("Snap: \(snap.visualizerMappings as AnyObject)")
+//        DopamineVersion.current = snap
+        
+        newReinforcement.registerMethod()
+    }
+    
+    public static func unregisterMethods() {
+        for actionID in DopamineVersion.current.actionIDs {
+            SelectorReinforcement(actionID: actionID)?.unregisterMethod()
+        }
+    }
+    public static func unregisterMethod(classType: AnyClass, selector: Selector) {
+        for actionID in DopamineVersion.current.actionIDs {
+            SelectorReinforcement(actionID: actionID)?.unregisterMethod()
+        }
+    }
     
     fileprivate static var registeredMethods: [String:[String]] = [:]
     fileprivate func registerMethod() {

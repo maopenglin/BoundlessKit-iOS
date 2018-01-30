@@ -117,6 +117,17 @@ class ViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+            SelectorReinforcement.unregisterMethods()
+            print("Unregistered")
+            DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+                SelectorReinforcement.registerMethods()
+                print("Registered")
+            }
+        }
+        
+//        SelectorReinforcement.registerNoParamMethod(classType: ViewController.self, selector: #selector(ViewController.action2Performed), reinforcement: ["test": ["Hello!"]])
     }
     
     @objc func loadBasicUI(){
