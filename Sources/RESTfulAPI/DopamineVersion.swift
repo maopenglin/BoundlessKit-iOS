@@ -119,7 +119,7 @@ public class DopamineVersion : UserDefaultsSingleton {
                 DopeLog.error("Bad reinforcement parameters")
             }
         } else {
-//            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
+            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
 //            DopeLog.debug("Reinforcement mappings:\(self.mappings as AnyObject)")
 //            DopeLog.debug("Visualizer mappings:\(self.visualizerMappings as AnyObject)")
         }

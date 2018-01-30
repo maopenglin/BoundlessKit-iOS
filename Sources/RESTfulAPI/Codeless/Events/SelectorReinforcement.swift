@@ -8,11 +8,11 @@
 import Foundation
 
 
-internal class SelectorReinforcement : NSObject {
+@objc
+open class SelectorReinforcement : NSObject {
     
     enum SelectorType : String {
         case
-        unknown = "unknown",
         appLaunch = "appLaunch",
         appTerminate = "appTerminate",
         appActive = "appActive",
@@ -20,10 +20,10 @@ internal class SelectorReinforcement : NSObject {
         viewControllerDidAppear = "viewControllerDidAppear",
         viewControllerDidDisappear = "viewControllerDidDisappear",
         collectionDidSelect = "collectionDidSelect",
-        noParamAction = "noParamAction",
-        tapActionWithSender = "tapActionWithSender"
+        tapActionWithSender = "tapActionWithSender",
+        noParamAction = "noParamAction"
         
-        init(from selector: Selector) {
+        init?(from selector: Selector) {
             if (selector == #selector(UIApplicationDelegate.application(_:didFinishLaunchingWithOptions:))) {
                 self = .appLaunch
             } else if (selector == #selector(UIApplicationDelegate.applicationWillTerminate(_:))) {
@@ -41,39 +41,44 @@ internal class SelectorReinforcement : NSObject {
             } else if (!NSStringFromSelector(selector).contains(":")) {
                 self = .noParamAction
             } else {
-                self = .unknown
+                return nil
             }
         }
     }
     
-    let sender: String
+    let selectorType: String
     let target: String
     let action: String
     var actionID: String {
         get {
-            return [sender, target, action].joined(separator: "-")
+            return [selectorType, target, action].joined(separator: "-")
         }
     }
     
-    init(sender: String, target: String, action: String) {
-        self.sender = sender
+    @objc
+    public static func rFor(target: NSObject, action: Selector) {
+        SelectorReinforcement.init(selectorType: SelectorType.noParamAction, targetName: NSStringFromClass(type(of: target)), actionName: NSStringFromSelector(action))?.attemptReinforcement()
+    }
+    fileprivate init(selectorType: String, target: String, action: String) {
+        self.selectorType = selectorType
         self.target = target
         self.action = action
     }
     
-    convenience init?(actionID: String) {
+    fileprivate convenience init?(actionID: String) {
         let components:[String] = actionID.components(separatedBy: "-")
         guard components.count == 3 else {
             return nil
         }
         
-        self.init(sender: components[0], target: components[1], action: components[2])
+        self.init(selectorType: components[0], target: components[1], action: components[2])
     }
     
-    convenience init?(swizzleType: SelectorType, targetName: String?, actionName: String?) {
+    convenience init?(selectorType: SelectorType?, targetName: String?, actionName: String?) {
         if let targetName = targetName,
-            let actionName = actionName {
-            self.init(sender: swizzleType.rawValue, target: targetName, action: actionName)
+            let actionName = actionName,
+            let selectorType = selectorType {
+            self.init(selectorType: selectorType.rawValue, target: targetName, action: actionName)
         } else {
             return nil
         }
@@ -81,25 +86,32 @@ internal class SelectorReinforcement : NSObject {
     
     convenience init?(targetName: String?, selector: Selector?) {
         if let targetName = targetName,
-            let selector = selector {
-            self.init(sender: SelectorType(from: selector).rawValue, target: targetName, action: NSStringFromSelector(selector))
+            let selector = selector,
+            let selectorType = SelectorType(from: selector) {
+            self.init(selectorType: selectorType.rawValue, target: targetName, action: NSStringFromSelector(selector))
         } else {
             return nil
         }
     }
     
-    convenience init?(registeredFor senderType: SelectorType, targetInstance: NSObject){
-        let target = NSStringFromClass(type(of: targetInstance))
-        guard let action = SelectorReinforcement.registeredMethods["\(senderType.rawValue)-\(target)"] else {
-            DopeLog.error("No method found for sender-target:\(senderType.rawValue)-\(target)")
-            return nil
-        }
-        
-        self.init(sender: senderType.rawValue, target: target, action: action)
-    }
+//    convenience init?(registeredFor selectorType: SelectorType, targetInstance: NSObject){
+//        let target = NSStringFromClass(type(of: targetInstance))
+////        guard let action = SelectorReinforcement.registeredMethods["\(senderType.rawValue)-\(target)"] else {
+////            DopeLog.error("No method found for selectorType-target:\(senderType.rawValue)-\(target)")
+////            return nil
+////        }
+//        guard let action = SelectorReinforcement.registeredMethods[target],
+//        let selectorType = action
+//        else {
+//            DopeLog.error("No method found for selectorType-target:\(senderType.rawValue)-\(target)")
+//            return nil
+//        }
+//
+//        self.init(selectorType: selectorType.rawValue, target: target, action: action)
+//    }
     
-    // [senderType-target: action]
-    fileprivate static var registeredMethods: [String:String] = [:]
+    // [target: [action:type]]
+    fileprivate static var registeredMethods: [String:[String:SelectorType]] = [:]
     
     public static let registerMethods: Void = {
         for actionID in DopamineVersion.current.actionIDs {
@@ -114,6 +126,7 @@ internal class SelectorReinforcement : NSObject {
     }
     
     fileprivate func registerMethod() {
+        DopeLog.debug("Attempting to register :\(self.actionID)")
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {
             DopeLog.debug("Codeless integration mode disabled")
             return
@@ -122,20 +135,20 @@ internal class SelectorReinforcement : NSObject {
             DopeLog.error("Invalid class <\(target)>")
             return
         }
-        guard SelectorReinforcement.registeredMethods["\(sender)-\(target)"] == nil else {
-            DopeLog.debug("Reinforcement for sender-target:\(sender)-\(target) method:\(action) already registered.")
-            return
-        }
+//        guard SelectorReinforcement.registeredMethods["\(selectorType)-\(target)"] == nil else {
+//            DopeLog.debug("Reinforcement for selectorType-target:\(selectorType)-\(target) method:\(action) already registered.")
+//            return
+//        }
         
         let originalSelector = NSSelectorFromString(action)
         
         NSObject.swizzleReinforceableMethod(
-            swizzleType: sender,
+            swizzleType: selectorType,
             originalClass: originalClass,
             originalSelector: originalSelector
         )
         
-        SelectorReinforcement.registeredMethods["\(sender)-\(target)"] = action
+//        SelectorReinforcement.registeredMethods["\(selectorType)-\(target)"] = [action: SelectorType(rawValue: selectorType)!]
     }
     
 }
@@ -143,7 +156,7 @@ internal class SelectorReinforcement : NSObject {
 extension SelectorReinforcement {
     
     func attemptReinforcement(vc: UIViewController? = nil) {
-        DopamineVersion.current.codelessReinforcementFor(sender: sender, target: target, selector: action)  { reinforcement in
+        DopamineVersion.current.codelessReinforcementFor(sender: selectorType, target: target, selector: action)  { reinforcement in
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
             
@@ -217,43 +230,30 @@ extension NSObject {
         
         var swizzledSelector: Selector
         if (swizzleType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
-            swizzledSelector = #selector(reinforceMethodWithoutParams)
+            swizzledSelector = #selector(DopamineAppDelegate.swizzleMethodWithoutParams)
         } else if (swizzleType == SelectorReinforcement.SelectorType.tapActionWithSender.rawValue) {
             swizzledSelector = #selector(reinforceMethodTapWithSender(_:))
-        } else if (swizzleType == SelectorReinforcement.SelectorType.unknown.rawValue) {
-            DopeLog.error("Unknown selector reinforcement type for class:\(originalClass) method:\(originalSelector)")
-            return
+//        } else if (swizzleType == SelectorReinforcement.SelectorType.unknown.rawValue) {
+//            DopeLog.error("Unknown selector reinforcement type for class:\(originalClass) method:\(originalSelector)")
+//            return
         } else {
             DopeLog.debug("Registered reinforcement class:\(originalClass) method:\(originalSelector)")
             return
         }
         
-        self.swizzle(
-            originalClass: originalClass.self,
-            originalSelector: originalSelector,
-            swizzledClass: NSObject.self,
-            swizzledSelector: swizzledSelector
-        )
+        SwizzleHelper.injectSelector(DopamineAppDelegate.self, swizzledSelector, originalClass.self, originalSelector)
     }
     
-    fileprivate class func swizzle(originalClass: AnyClass, originalSelector: Selector, swizzledClass: AnyClass, swizzledSelector: Selector) {
-        guard let originalMethod = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
-        guard let swizzledMethod = class_getInstanceMethod(swizzledClass, swizzledSelector) else { DopeLog.error("class_getInstanceMethod(\"\(swizzledClass), \(swizzledSelector)\") failed"); return }
-        
-        method_exchangeImplementations(originalMethod, swizzledMethod)
-        
-        DopeLog.debug("Registered reinforcement and swizzled class:\(originalClass) method:\(originalSelector)")
-    }
-    
-    @objc func reinforceMethodWithoutParams() {
-        reinforceMethodWithoutParams()
-        
-        SelectorReinforcement(registeredFor: .noParamAction, targetInstance: self)?.attemptReinforcement()
-    }
-    
+//    @objc func reinforceMethodWithoutParams() {
+//        reinforceMethodWithoutParams()
+//
+////        SelectorReinforcement(registeredFor: .noParamAction, targetInstance: self)?.attemptReinforcement()
+////        SelectorReinforcement.init(selectorType: .noParamAction, targetName: NSStringFromClass(type(of: self)), actionName: )
+//    }
+//
     @objc func reinforceMethodTapWithSender(_ sender: UITapGestureRecognizer) {
         reinforceMethodTapWithSender(sender)
-        
-        SelectorReinforcement(registeredFor: .tapActionWithSender, targetInstance: self)?.attemptReinforcement()
+
+//        SelectorReinforcement(registeredFor: .tapActionWithSender, targetInstance: self)?.attemptReinforcement()
     }
 }

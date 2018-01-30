@@ -109,4 +109,11 @@ static NSArray* delegateSubclasses = nil;
         [self swizzled_applicationWillResignActive:application];
 }
 
+
+- (void) swizzleMethodWithoutParams {
+    [SelectorReinforcement rForTarget:self action:_cmd];
+    NSLog(@"Got cmd:%@", NSStringFromSelector(_cmd));
+    [self swizzleMethodWithoutParams];
+}
+
 @end
