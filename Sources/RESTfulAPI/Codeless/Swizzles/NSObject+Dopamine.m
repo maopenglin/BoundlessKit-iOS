@@ -12,12 +12,12 @@
 @implementation DopamineObject
 
 - (void) methodToReinforce {
-    [SelectorReinforcement rForTarget:self action:_cmd];
+    [SelectorReinforcement attemptReinforcementWithTarget:self action:_cmd];
     [self methodToReinforce];
 }
 
 - (void) methodWithSenderToReinforce :(id)sender {
-    [SelectorReinforcement rForTarget:self action:_cmd];
+    [SelectorReinforcement attemptReinforcementWithTarget:self action:_cmd];
     [self methodWithSenderToReinforce :sender];
 }
 

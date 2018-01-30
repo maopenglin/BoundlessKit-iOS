@@ -55,10 +55,6 @@ open class SelectorReinforcement : NSObject {
         }
     }
     
-    @objc
-    public static func rFor(target: NSObject, action: Selector) {
-        SelectorReinforcement.init(selectorType: SelectorType.noParamAction, targetName: NSStringFromClass(type(of: target)), actionName: NSStringFromSelector(action))?.attemptReinforcement(targetInstance: target)
-    }
     fileprivate init(selectorType: String, target: String, action: String) {
         self.selectorType = selectorType
         self.target = target
@@ -94,24 +90,11 @@ open class SelectorReinforcement : NSObject {
         }
     }
     
-//    convenience init?(registeredFor selectorType: SelectorType, targetInstance: NSObject){
-//        let target = NSStringFromClass(type(of: targetInstance))
-////        guard let action = SelectorReinforcement.registeredMethods["\(senderType.rawValue)-\(target)"] else {
-////            DopeLog.error("No method found for selectorType-target:\(senderType.rawValue)-\(target)")
-////            return nil
-////        }
-//        guard let action = SelectorReinforcement.registeredMethods[target],
-//        let selectorType = action
-//        else {
-//            DopeLog.error("No method found for selectorType-target:\(senderType.rawValue)-\(target)")
-//            return nil
-//        }
-//
-//        self.init(selectorType: selectorType.rawValue, target: target, action: action)
-//    }
-    
-    // [target: [action:type]]
-    fileprivate static var registeredMethods: [String:[String:SelectorType]] = [:]
+    public static func registerVisualizerMethods() {
+        for actionID in DopamineVersion.current.visualizerActionIDs {
+            SelectorReinforcement(actionID: actionID)?.registerMethod()
+        }
+    }
     
     public static let registerMethods: Void = {
         for actionID in DopamineVersion.current.actionIDs {
@@ -119,12 +102,7 @@ open class SelectorReinforcement : NSObject {
         }
     }()
     
-    public static func registerVisualizerMethods() {
-        for actionID in DopamineVersion.current.visualizerActionIDs {
-            SelectorReinforcement(actionID: actionID)?.registerMethod()
-        }
-    }
-    
+    fileprivate static var registeredMethods: [String:[String]] = [:]
     fileprivate func registerMethod() {
         DopeLog.debug("Attempting to register :\(self.actionID)")
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {
@@ -135,10 +113,10 @@ open class SelectorReinforcement : NSObject {
             DopeLog.error("Invalid class <\(target)>")
             return
         }
-//        guard SelectorReinforcement.registeredMethods["\(selectorType)-\(target)"] == nil else {
-//            DopeLog.debug("Reinforcement for selectorType-target:\(selectorType)-\(target) method:\(action) already registered.")
-//            return
-//        }
+        guard SelectorReinforcement.registeredMethods[target] == nil || !SelectorReinforcement.registeredMethods[target]!.contains(action) else {
+            DopeLog.debug("Reinforcement for selectorType-target:\(selectorType)-\(target) method:\(action) already registered.")
+            return
+        }
         
         let originalSelector = NSSelectorFromString(action)
         
@@ -148,7 +126,36 @@ open class SelectorReinforcement : NSObject {
             originalSelector: originalSelector
         )
         
-//        SelectorReinforcement.registeredMethods["\(selectorType)-\(target)"] = [action: SelectorType(rawValue: selectorType)!]
+        var methods = SelectorReinforcement.registeredMethods[target] ?? []
+        methods.append(action)
+        SelectorReinforcement.registeredMethods[target] = methods
+    }
+    
+    fileprivate func unregisterMethod() {
+        guard DopamineConfiguration.current.integrationMethod == "codeless" else {
+            DopeLog.debug("Codeless integration mode disabled")
+            return
+        }
+        guard let originalClass = NSClassFromString(target).self else {
+            DopeLog.error("Invalid class <\(target)>")
+            return
+        }
+        guard var methods = SelectorReinforcement.registeredMethods[target],
+            let actionIndex = methods.index(of: action) else {
+            DopeLog.debug("Reinforcement for selectorType-target:\(selectorType)-\(target) method:\(action) not registered.")
+            return
+        }
+        
+        let originalSelector = NSSelectorFromString(action)
+        
+        NSObject.swizzleReinforceableMethod(
+            swizzleType: selectorType,
+            originalClass: originalClass,
+            originalSelector: originalSelector
+        )
+        
+        methods.remove(at: actionIndex)
+        SelectorReinforcement.registeredMethods[target] = methods
     }
     
 }
@@ -175,19 +182,23 @@ extension NSObject {
 
 extension SelectorReinforcement {
     
+    @objc
+    public static func attemptReinforcement(target: NSObject, action: Selector) {
+        SelectorReinforcement(selectorType: SelectorType.noParamAction, targetName: NSStringFromClass(type(of: target)), actionName: NSStringFromSelector(action))?.attemptReinforcement(targetInstance: target)
+    }
+    
     func attemptReinforcement(targetInstance: NSObject) {
-        DispatchQueue.global().async {
-            DopamineVersion.current.codelessReinforcementFor(sender: self.selectorType, target: self.target, selector: self.action)  { reinforcement in
-                guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
-                guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                    if let viewsAndLocations = self.reinforcementViews(targetInstance: targetInstance, options: reinforcement) {
-                        Reinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
-                    }
+        DopamineVersion.current.codelessReinforcementFor(sender: self.selectorType, target: self.target, selector: self.action)  { reinforcement in
+            guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
+            guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                if let viewsAndLocations = self.reinforcementViews(targetInstance: targetInstance, options: reinforcement) {
+                    Reinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
                 }
             }
         }
+        
     }
     
     private func reinforcementViews(targetInstance: NSObject, options: [String: Any]) -> [(UIView, CGPoint)]? {
