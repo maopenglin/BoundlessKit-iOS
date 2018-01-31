@@ -22,7 +22,7 @@ public class DopamineVersion : UserDefaultsSingleton {
     
     @objc public var versionID: String?
     @objc fileprivate var mappings: [String:Any]
-    @objc internal fileprivate(set) var visualizerMappings: [String:Any]
+    @objc internal fileprivate (set) var visualizerMappings: [String:Any]
     
     fileprivate let updateQueue = SingleOperationQueue()
     public func update(visualizer mappings: [String: Any]?) {
@@ -97,7 +97,7 @@ public class DopamineVersion : UserDefaultsSingleton {
                 let randomReinforcement = reinforcements.selectRandom() {
                 completion(randomReinforcement)
             } else {
-                DopeLog.debug("Bad visualizer parameters")
+                DopeLog.debug("Bad visualizer parameters: \(String(describing:reinforcementParameters))")
             }
         } else if let reinforcementParameters = mappings[actionID] as? [String:Any] {
             DopeLog.debug("Found reinforcement for <\(actionID)>")
@@ -119,9 +119,9 @@ public class DopamineVersion : UserDefaultsSingleton {
                 DopeLog.error("Bad reinforcement parameters")
             }
         } else {
-//            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
+            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
 //            DopeLog.debug("Reinforcement mappings:\(self.mappings as AnyObject)")
-//            DopeLog.debug("Visualizer mappings:\(self.visualizerMappings as AnyObject)")
+            DopeLog.debug("Visualizer mappings:\(self.visualizerMappings as AnyObject)")
         }
         
         

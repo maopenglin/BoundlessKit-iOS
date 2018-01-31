@@ -78,7 +78,7 @@ public class CodelessAPI : NSObject {
             completion()
             
             if DopamineConfiguration.current.integrationMethod == "codeless" {
-                _ = SelectorReinforcement.registerMethods
+                SelectorReinforcement.registerMethods()
             }
             
             promptPairing()
@@ -210,11 +210,11 @@ public class CodelessAPI : NSObject {
     public static func submit(target: NSObject, selector: Selector) {
         if let selectorReinforcer = SelectorReinforcement(targetName: NSStringFromClass(type(of: target)), selector: selector) {
             
-            selectorReinforcer.attemptReinforcement(vc: target as? UIViewController)
+            selectorReinforcer.attemptReinforcement(targetInstance: target)
             
             DopeLog.debug("Submitting class method: \(selectorReinforcer.actionID)")
             submit { payload in
-                payload["sender"] = selectorReinforcer.sender
+                payload["sender"] = selectorReinforcer.selectorType
                 payload["target"] = selectorReinforcer.target
                 payload["selector"] = selectorReinforcer.action
                 payload["actionID"] = selectorReinforcer.actionID
@@ -227,12 +227,12 @@ public class CodelessAPI : NSObject {
     
     @objc
     public static func submitTapAction(target: String, action: String) {
-        if let tapAction = SelectorReinforcement(swizzleType: ((action.contains(":")) ? .tapActionWithSender : .noParamAction), targetName: target, actionName: action) {
+        if let tapAction = SelectorReinforcement(selectorType: ((action.contains(":")) ? .tapActionWithSender : .noParamAction), targetName: target, actionName: action) {
             submit { payload in
-                payload["sender"] = tapAction.sender
+                payload["sender"] = tapAction.selectorType
                 payload["target"] = tapAction.target
                 payload["selector"] = tapAction.action
-                payload["actionID"] = [tapAction.sender, tapAction.target, tapAction.action].joined(separator: "-")
+                payload["actionID"] = [tapAction.selectorType, tapAction.target, tapAction.action].joined(separator: "-")
                 payload["senderImage"] = ""
                 payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
                 payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)

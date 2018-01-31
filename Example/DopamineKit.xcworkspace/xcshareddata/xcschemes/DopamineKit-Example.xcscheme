@@ -56,7 +56,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "57C0ABDD35005EFD2E85A654B1EF2168"
+               BlueprintIdentifier = "BEB0B3FA2409F1D3C87467BC58444EEC"
                BuildableName = "DopamineKit.framework"
                BlueprintName = "DopamineKit"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">

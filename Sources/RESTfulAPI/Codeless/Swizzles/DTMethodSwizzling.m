@@ -36,7 +36,7 @@
     NSLog(@"Value for %@:%d", defaultsKey, !shouldSwizzle);
     
     // Swizzle - UIApplication
-    [DopamineApp swizzleSelectors: shouldSwizzle];
+//    [DopamineApp swizzleSelectors: shouldSwizzle];
     
     // Swizzle - UIApplicationDelegate
     [DopamineAppDelegate swizzleSelectors: shouldSwizzle];

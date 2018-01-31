@@ -25,7 +25,7 @@ internal extension UIView {
             views += subview.getSubviewsWithClassname(classname: classname)
         }
         
-        if classname == String(describing: type(of: self)) {
+        if classname == NSStringFromClass(type(of: self)) {
             views.append(self)
         }
         
