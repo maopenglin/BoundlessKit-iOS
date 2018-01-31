@@ -22,7 +22,7 @@ public class DopamineVersion : UserDefaultsSingleton {
     
     @objc public var versionID: String?
     @objc fileprivate var mappings: [String:Any]
-    @objc internal var visualizerMappings: [String:Any]
+    @objc internal fileprivate (set) var visualizerMappings: [String:Any]
     
     fileprivate let updateQueue = SingleOperationQueue()
     public func update(visualizer mappings: [String: Any]?) {

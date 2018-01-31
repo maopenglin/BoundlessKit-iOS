@@ -102,14 +102,14 @@ open class SelectorReinforcement : NSObject {
         }
     }
     
-    public static func registerNoParamMethod(classType: AnyClass, selector: Selector, reinforcement: [String: Any]) {
-        let newReinforcement = SelectorReinforcement(selectorType: SelectorType.noParamAction.rawValue, target: NSStringFromClass(classType), action: NSStringFromSelector(selector))
-//        let snap = DopamineVersion.current
-//        snap.visualizerMappings[newReinforcement.actionID] = reinforcement
-//        print("Snap: \(snap.visualizerMappings as AnyObject)")
-//        DopamineVersion.current = snap
-        
-        newReinforcement.registerMethod()
+    public static func registerSimpleMethod(classType: AnyClass, selector: Selector, reinforcement: [String: Any]) {
+        let numParams = NSStringFromSelector(selector).components(separatedBy: ":").count - 1
+        if numParams > 1 {
+            DopeLog.error("Cannot register method with 2 or more parameters")
+            return
+        }
+        let newReinforcement = SelectorReinforcement(selectorType: (numParams==0 ? SelectorType.noParamAction.rawValue : SelectorType.tapActionWithSender.rawValue), target: NSStringFromClass(classType), action: NSStringFromSelector(selector))
+        DopamineVersion.current.update(visualizer: [newReinforcement.actionID: ["test":["Hello!"]]])
     }
     
     public static func unregisterMethods() {
@@ -124,81 +124,84 @@ open class SelectorReinforcement : NSObject {
     }
     
     fileprivate static var registeredMethods: [String:[String]] = [:]
+    
     fileprivate func registerMethod() {
-        DopeLog.debug("Attempting to register :\(self.actionID)")
+        DopeLog.debug("Attempting to register :\(self.actionID)...")
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {
             DopeLog.debug("Codeless integration mode disabled")
             return
         }
-        guard let originalClass = NSClassFromString(target).self else {
-            DopeLog.error("Invalid class <\(target)>")
-            return
-        }
-        guard SelectorReinforcement.registeredMethods[target] == nil || !SelectorReinforcement.registeredMethods[target]!.contains(action) else {
+        
+        var targetsRegisteredMethods = SelectorReinforcement.registeredMethods[target] ?? []
+        guard targetsRegisteredMethods.index(of: target) == nil else {
             DopeLog.debug("Reinforcement for selectorType-target:\(selectorType)-\(target) method:\(action) already registered.")
             return
         }
         
+        guard let originalClass = NSClassFromString(target).self,
+            originalClass.isSubclass(of: NSObject.self) else {
+            DopeLog.error("Invalid class <\(target)>")
+            return
+        }
+        
         let originalSelector = NSSelectorFromString(action)
+        guard class_getInstanceMethod(originalClass, originalSelector) != nil else {
+            DopeLog.error("Class <\(originalClass)> has no method <\(originalSelector)>")
+            return
+        }
         
-        NSObject.swizzleReinforceableMethod(
-            swizzleType: selectorType,
-            originalClass: originalClass,
-            originalSelector: originalSelector
-        )
+        if (selectorType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
+            SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodToReinforce), originalClass.self, originalSelector)
+            DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector)")
+        } else if (selectorType == SelectorReinforcement.SelectorType.tapActionWithSender.rawValue) {
+            SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodWithSenderToReinforce(_:)), originalClass.self, originalSelector)
+            DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector)")
+        } // else is a standard swizzle
         
-        var methods = SelectorReinforcement.registeredMethods[target] ?? []
-        methods.append(action)
-        SelectorReinforcement.registeredMethods[target] = methods
+        
+        targetsRegisteredMethods.append(action)
+        SelectorReinforcement.registeredMethods[target] = targetsRegisteredMethods
+        DopeLog.debug("Registered reinforcement class:\(originalClass) method:\(originalSelector)")
     }
     
     fileprivate func unregisterMethod() {
+        DopeLog.debug("Attempting to unregister :\(self.actionID)...")
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {
             DopeLog.debug("Codeless integration mode disabled")
             return
         }
-        guard let originalClass = NSClassFromString(target).self else {
-            DopeLog.error("Invalid class <\(target)>")
-            return
+        
+        guard var targetsRegisteredMethods = SelectorReinforcement.registeredMethods[target],
+            let actionIndex = targetsRegisteredMethods.index(of: action) else {
+                DopeLog.debug("Reinforcement for selectorType-target:\(selectorType)-\(target) method:\(action) not registered.")
+                return
         }
-        guard var methods = SelectorReinforcement.registeredMethods[target],
-            let actionIndex = methods.index(of: action) else {
-            DopeLog.debug("Reinforcement for selectorType-target:\(selectorType)-\(target) method:\(action) not registered.")
+        
+        guard let originalClass = NSClassFromString(target).self,
+            originalClass.isSubclass(of: NSObject.self) else {
+            DopeLog.error("Invalid class <\(target)>")
             return
         }
         
         let originalSelector = NSSelectorFromString(action)
-        
-        NSObject.swizzleReinforceableMethod(
-            swizzleType: selectorType,
-            originalClass: originalClass,
-            originalSelector: originalSelector
-        )
-        
-        methods.remove(at: actionIndex)
-        SelectorReinforcement.registeredMethods[target] = methods
-    }
-    
-}
-
-extension NSObject {
-    fileprivate class func swizzleReinforceableMethod(swizzleType: String, originalClass: AnyClass, originalSelector: Selector) {
-        guard originalClass.isSubclass(of: NSObject.self) else { DopeLog.debug("Not a NSObject"); return }
-        guard let _ = class_getInstanceMethod(originalClass, originalSelector) else { DopeLog.error("class_getInstanceMethod(\"\(originalClass), \(originalSelector)\") failed"); return }
-        
-        
-        var swizzledSelector: Selector
-        if (swizzleType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
-            swizzledSelector = #selector(DopamineObject.methodToReinforce)
-        } else if (swizzleType == SelectorReinforcement.SelectorType.tapActionWithSender.rawValue) {
-            swizzledSelector = #selector(DopamineObject.methodWithSenderToReinforce(_:))
-        } else {
-            DopeLog.debug("Registered reinforcement class:\(originalClass) method:\(originalSelector)")
+        guard class_getInstanceMethod(originalClass, originalSelector) != nil else {
+            DopeLog.error("Class <\(originalClass)> has no method <\(originalSelector)>")
             return
         }
         
-        SwizzleHelper.injectSelector(DopamineObject.self, swizzledSelector, originalClass.self, originalSelector)
+        if (selectorType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
+            SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodToReinforce), originalClass.self, originalSelector)
+            DopeLog.debug("Unswizzled class:\(originalClass) method:\(originalSelector)")
+        } else if (selectorType == SelectorReinforcement.SelectorType.tapActionWithSender.rawValue) {
+            SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodWithSenderToReinforce(_:)), originalClass.self, originalSelector)
+            DopeLog.debug("Unswizzled class:\(originalClass) method:\(originalSelector)")
+        } // else is a standard swizzle
+        
+        targetsRegisteredMethods.remove(at: actionIndex)
+        SelectorReinforcement.registeredMethods[target] = targetsRegisteredMethods
+        DopeLog.debug("Unregistered reinforcement class:\(originalClass) method:\(originalSelector)")
     }
+    
 }
 
 extension SelectorReinforcement {
@@ -206,6 +209,11 @@ extension SelectorReinforcement {
     @objc
     public static func attemptReinforcement(target: NSObject, action: Selector) {
         SelectorReinforcement(selectorType: SelectorType.noParamAction, targetName: NSStringFromClass(type(of: target)), actionName: NSStringFromSelector(action))?.attemptReinforcement(targetInstance: target)
+    }
+    
+    @objc
+    public static func attemptReinforcement(sender: AnyObject, target: NSObject, action: Selector) {
+        SelectorReinforcement(selectorType: SelectorType.tapActionWithSender, targetName: NSStringFromClass(type(of: target)), actionName: NSStringFromSelector(action))?.attemptReinforcement(targetInstance: target)
     }
     
     func attemptReinforcement(targetInstance: NSObject) {

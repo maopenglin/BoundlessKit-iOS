@@ -14,8 +14,8 @@ class ViewController: UIViewController {
     
     @objc var someCounter: Float = 0
     
-    @objc func action1Performed(){
-        print("Button 1 pushed")
+    @objc func action1Performed(button: UIButton){
+        print("Button 1 pushed. Text:\(button.currentTitle ?? "nil")")
         // Reinforce the action to make it sticky!!
 //        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
 //            reinforcement in
@@ -118,16 +118,16 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
-            SelectorReinforcement.unregisterMethods()
-            print("Unregistered")
-            DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
-                SelectorReinforcement.registerMethods()
-                print("Registered")
-            }
-        }
+//        DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+//            SelectorReinforcement.unregisterMethods()
+//            print("Unregistered")
+//            DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+//                SelectorReinforcement.registerMethods()
+//                print("Registered")
+//            }
+//        }
         
-//        SelectorReinforcement.registerNoParamMethod(classType: ViewController.self, selector: #selector(ViewController.action2Performed), reinforcement: ["test": ["Hello!"]])
+        SelectorReinforcement.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!"]])
     }
     
     @objc func loadBasicUI(){
@@ -155,7 +155,7 @@ class ViewController: UIViewController {
         action1Button.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
         action1Button.titleLabel?.textAlignment = NSTextAlignment.center
         action1Button.backgroundColor = UIColor.init(red: 51/255.0, green: 153/255.0, blue: 51/255.0, alpha: 1.0)
-        action1Button.addTarget(self, action: #selector(ViewController.action1Performed), for: UIControlEvents.touchUpInside)
+        action1Button.addTarget(self, action: #selector(ViewController.action1Performed(button:)), for: UIControlEvents.touchUpInside)
         action1Button.showsTouchWhenHighlighted = true
         self.view.addSubview(action1Button)
         

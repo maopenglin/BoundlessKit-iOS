@@ -17,7 +17,7 @@
 }
 
 - (void) methodWithSenderToReinforce :(id)sender {
-    [SelectorReinforcement attemptReinforcementWithTarget:self action:_cmd];
+    [SelectorReinforcement attemptReinforcementWithSender: sender target:self action:_cmd];
     [self methodWithSenderToReinforce :sender];
 }
 
