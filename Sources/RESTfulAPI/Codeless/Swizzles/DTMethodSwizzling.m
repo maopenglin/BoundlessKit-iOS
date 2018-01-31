@@ -31,12 +31,12 @@
 }
 
 + (void) swizzleSelectedMethods {
-    NSString *defaultsKey = [NSString stringWithFormat:@"disableSwizzlingForAll"];
+    NSString *defaultsKey = [NSString stringWithFormat:@"disableStandardSwizzling"];
     BOOL shouldSwizzle = ![[NSUserDefaults dopamine] boolForKey: defaultsKey];
     NSLog(@"Value for %@:%d", defaultsKey, !shouldSwizzle);
     
     // Swizzle - UIApplication
-//    [DopamineApp swizzleSelectors: shouldSwizzle];
+    [DopamineApp swizzleSelectors: shouldSwizzle];
     
     // Swizzle - UIApplicationDelegate
     [DopamineAppDelegate swizzleSelectors: shouldSwizzle];

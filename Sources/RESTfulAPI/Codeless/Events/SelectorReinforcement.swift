@@ -20,7 +20,7 @@ open class SelectorReinforcement : NSObject {
         viewControllerDidAppear = "viewControllerDidAppear",
         viewControllerDidDisappear = "viewControllerDidDisappear",
         collectionDidSelect = "collectionDidSelect",
-        tapActionWithSender = "tapActionWithSender",
+        singleParamAction = "singleParamAction",
         noParamAction = "noParamAction"
         
         init?(from selector: Selector) {
@@ -108,7 +108,7 @@ open class SelectorReinforcement : NSObject {
             DopeLog.error("Cannot register method with 2 or more parameters")
             return
         }
-        let newReinforcement = SelectorReinforcement(selectorType: (numParams==0 ? SelectorType.noParamAction.rawValue : SelectorType.tapActionWithSender.rawValue), target: NSStringFromClass(classType), action: NSStringFromSelector(selector))
+        let newReinforcement = SelectorReinforcement(selectorType: (numParams==1 ? SelectorType.singleParamAction.rawValue : SelectorType.noParamAction.rawValue), target: NSStringFromClass(classType), action: NSStringFromSelector(selector))
         DopamineVersion.current.update(visualizer: [newReinforcement.actionID: ["test":["Hello!"]]])
     }
     
@@ -153,7 +153,7 @@ open class SelectorReinforcement : NSObject {
         if (selectorType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
             SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodToReinforce), originalClass.self, originalSelector)
             DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector)")
-        } else if (selectorType == SelectorReinforcement.SelectorType.tapActionWithSender.rawValue) {
+        } else if (selectorType == SelectorReinforcement.SelectorType.singleParamAction.rawValue) {
             SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodWithSenderToReinforce(_:)), originalClass.self, originalSelector)
             DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector)")
         } // else is a standard swizzle
@@ -192,7 +192,7 @@ open class SelectorReinforcement : NSObject {
         if (selectorType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
             SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodToReinforce), originalClass.self, originalSelector)
             DopeLog.debug("Unswizzled class:\(originalClass) method:\(originalSelector)")
-        } else if (selectorType == SelectorReinforcement.SelectorType.tapActionWithSender.rawValue) {
+        } else if (selectorType == SelectorReinforcement.SelectorType.singleParamAction.rawValue) {
             SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodWithSenderToReinforce(_:)), originalClass.self, originalSelector)
             DopeLog.debug("Unswizzled class:\(originalClass) method:\(originalSelector)")
         } // else is a standard swizzle
@@ -213,7 +213,7 @@ extension SelectorReinforcement {
     
     @objc
     public static func attemptReinforcement(sender: AnyObject, target: NSObject, action: Selector) {
-        SelectorReinforcement(selectorType: SelectorType.tapActionWithSender, targetName: NSStringFromClass(type(of: target)), actionName: NSStringFromSelector(action))?.attemptReinforcement(targetInstance: target)
+        SelectorReinforcement(selectorType: SelectorType.singleParamAction, targetName: NSStringFromClass(type(of: target)), actionName: NSStringFromSelector(action))?.attemptReinforcement(targetInstance: target)
     }
     
     func attemptReinforcement(targetInstance: NSObject) {
@@ -251,7 +251,7 @@ extension SelectorReinforcement {
             let parts = viewCustom.components(separatedBy: "-")
             if parts.count > 0 {
                 let vcClass = parts[0]
-                let parent: NSObject
+                var parent: NSObject
                 if vcClass == "self" {
                     parent = targetInstance
                 } else if
@@ -264,12 +264,14 @@ extension SelectorReinforcement {
                 }
                 
                 let childPath = Array(parts[1...parts.count-1])
-                var child: NSObject?
                 for childName in childPath {
-                    child = parent.value(forKey: childName) as? NSObject
+                    if parent.responds(to: NSSelectorFromString(childName)),
+                        let obj = parent.value(forKey: childName) as? NSObject {
+                        parent = obj
+                    }
                 }
                 
-                if let view = child as? UIView {
+                if let view = parent as? UIView {
                     viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
                 } else {
                     DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)

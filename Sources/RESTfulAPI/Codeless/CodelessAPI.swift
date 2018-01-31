@@ -227,7 +227,7 @@ public class CodelessAPI : NSObject {
     
     @objc
     public static func submitTapAction(target: String, action: String) {
-        if let tapAction = SelectorReinforcement(selectorType: ((action.contains(":")) ? .tapActionWithSender : .noParamAction), targetName: target, actionName: action) {
+        if let tapAction = SelectorReinforcement(selectorType: ((action.contains(":")) ? .singleParamAction : .noParamAction), targetName: target, actionName: action) {
             submit { payload in
                 payload["sender"] = tapAction.selectorType
                 payload["target"] = tapAction.target

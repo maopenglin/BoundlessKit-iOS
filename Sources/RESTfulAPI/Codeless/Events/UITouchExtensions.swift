@@ -21,7 +21,7 @@ internal extension UITouch {
             }
             
             let senderClassname = NSStringFromClass(Swift.type(of: self))
-            let targetName = view.getParentResponders().joined(separator: ",")
+            let targetName = NSStringFromClass(Swift.type(of: view))
             let selectorName = "ended"
             
             DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetName, selector: selectorName)  { reinforcement in
