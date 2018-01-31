@@ -248,7 +248,7 @@ extension SelectorReinforcement {
             viewsAndLocations = [(UIWindow.topWindow!, UIWindow.lastTouchPoint.withMargins(marginX: viewMarginX, marginY: viewMarginY))]
             
         case "custom":
-            let parts = viewCustom.components(separatedBy: "-")
+            var parts = viewCustom.components(separatedBy: "-")
             if parts.count > 0 {
                 let vcClass = parts[0]
                 var parent: NSObject
@@ -263,8 +263,8 @@ extension SelectorReinforcement {
                     return nil
                 }
                 
-                let childPath = Array(parts[1...parts.count-1])
-                for childName in childPath {
+                parts.removeFirst()
+                for childName in parts {
                     if parent.responds(to: NSSelectorFromString(childName)),
                         let obj = parent.value(forKey: childName) as? NSObject {
                         parent = obj
