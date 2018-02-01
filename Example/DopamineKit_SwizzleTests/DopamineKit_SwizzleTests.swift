@@ -12,10 +12,10 @@ import XCTest
 
 
 extension ViewController {
-    @objc func testFunc() {
+    @objc func testFunc(str: String) {
         let count = Thread.callStackSymbols.count
         DopamineKit_SwizzleTests.counter = count
-        print("In testFunc count:\(count)")
+        print("In testFunc with str:\(str) count:\(count)")
 //        print("\n\(Thread.callStackSymbols as AnyObject)")
 //        return UInt32(count)
     }
@@ -50,7 +50,7 @@ class DopamineKit_SwizzleTests: XCTestCase {
         
         //given
         XCTAssert(DopamineConfiguration.current.integrationMethod == "codeless")
-        controllerUnderTest.testFunc()
+        controllerUnderTest.testFunc(str: "hello")
         let beforeTestFuncStackSize = DopamineKit_SwizzleTests.counter
         controllerUnderTest.testFunc2()
         let beforeTestFunc2StackSize = DopamineKit_SwizzleTests.counter
@@ -63,7 +63,7 @@ class DopamineKit_SwizzleTests: XCTestCase {
         XCTAssert(SelectorReinforcement.isRegistered(classType: ViewController.self, selector: #selector(ViewController.testFunc2)), "Selector was not registered")
         
         // then
-        controllerUnderTest.testFunc()
+        controllerUnderTest.testFunc(str: "goodbye")
         let afterTestFuncStackSize = DopamineKit_SwizzleTests.counter
         controllerUnderTest.testFunc2()
         let afterTestFunc2StackSize = DopamineKit_SwizzleTests.counter
