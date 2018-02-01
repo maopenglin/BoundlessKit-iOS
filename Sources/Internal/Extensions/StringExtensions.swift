@@ -41,3 +41,16 @@ internal extension String {
         return !isEmpty && count <= 36 && range(of: "[^a-zA-Z0-9\\-]", options: .regularExpression) == nil
     }
 }
+
+extension String {
+    static func random(length: Int = 6) -> String {
+        let base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        var randomString: String = ""
+        
+        for _ in 0..<length {
+            let randomValue = arc4random_uniform(UInt32(base.count))
+            randomString += "\(base[base.index(base.startIndex, offsetBy: Int(randomValue))])"
+        }
+        return randomString
+    }
+}

@@ -26,18 +26,19 @@ public class DopamineVersion : UserDefaultsSingleton {
     
     fileprivate let updateQueue = SingleOperationQueue()
     internal func update(visualizer mappings: [String: Any]?) {
-        updateQueue.addOperation {
+//        updateQueue.addOperation {
+            print("Updating visualizer to:\(mappings)")
             if let mappings = mappings {
                 self.visualizerMappings = mappings
                 SelectorReinforcement.registerVisualizerMethods()
-            } else if self.visualizerMappings.count == 0 {
+            } else if self.visualizerMappings.isEmpty {
                 return
             } else {
                 self.visualizerMappings = [:]
             }
             UserDefaults.dopamine.archive(self)
 //            DopeLog.debug("New visualizer mappings:\(self.visualizerMappings as AnyObject)")
-        }
+//        }
     }
     
     init(versionID: String?,

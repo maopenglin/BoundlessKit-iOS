@@ -12,6 +12,10 @@
 
 - (void) methodToReinforce;
 - (void) methodWithSenderToReinforce :(id)sender;
+
+- (void) testImp;
+
+- (IMP) createImp :(NSString*) name;
     
 @end
 

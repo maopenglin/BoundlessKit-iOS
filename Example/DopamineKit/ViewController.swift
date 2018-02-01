@@ -127,7 +127,7 @@ class ViewController: UIViewController {
 //            }
 //        }
         
-        SelectorReinforcement.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!"]])
+//        SelectorReinforcement.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!"]])
     }
     
     @objc func loadBasicUI(){

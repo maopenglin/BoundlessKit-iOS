@@ -159,8 +159,25 @@ open class SelectorReinforcement : NSObject {
         }
         
         if (selectorType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
-            SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodToReinforce), originalClass.self, originalSelector)
-            DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector)")
+            
+//            SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodToReinforce), originalClass.self, originalSelector)
+//            DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector)")
+            
+            
+//            let imp = imp_implementationWithBlock(DopamineObject.testImp)
+//            let imp = class_getMethodImplementation(DopamineObject.self, #selector(DopamineObject.testImp))
+
+//            let newMethodName = "\(action)\(SelectorReinforcement.count)"
+            let newMethodName = action + String.random()
+            print("New method name:\(newMethodName)")
+            let newMethod = NSSelectorFromString(newMethodName)
+            let someImp = DopamineObject().createImp(newMethodName)
+
+            class_addMethod(originalClass.self, newMethod, someImp!, "v@:")
+            SwizzleHelper.injectSelector(originalClass.self, newMethod, originalClass.self, originalSelector)
+            
+            
+            
         } else if (selectorType == SelectorReinforcement.SelectorType.singleParamAction.rawValue) {
             SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodWithSenderToReinforce(_:)), originalClass.self, originalSelector)
             DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector)")

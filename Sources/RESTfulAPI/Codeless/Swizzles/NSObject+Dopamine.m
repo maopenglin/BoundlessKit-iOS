@@ -21,4 +21,21 @@
     [self methodWithSenderToReinforce :sender];
 }
 
+- (void) testImp {
+    static NSString* myName = @"";
+    myName = NSStringFromSelector(_cmd);
+    NSLog(@"My name:%@ - %@", myName, NSStringFromSelector(@selector(testImp)));
+    
+    [self testImp];
+}
+
+- (IMP) createImp :(NSString*) name {
+    IMP dynamicImp = imp_implementationWithBlock(^(id self) {
+        NSLog(@"In dynamic imp with name:%@", name);
+        [self performSelector:NSSelectorFromString(name)];
+    });
+    
+    return dynamicImp;
+}
+
 @end
