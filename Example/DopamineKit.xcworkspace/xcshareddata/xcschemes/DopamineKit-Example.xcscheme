@@ -97,7 +97,8 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       language = ""
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      codeCoverageEnabled = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -106,6 +107,26 @@
                BlueprintIdentifier = "607FACE41AFB9204008FA782"
                BuildableName = "DopamineKit_Tests.xctest"
                BlueprintName = "DopamineKit_Tests"
+               ReferencedContainer = "container:DopamineKit.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "841CA5EA2022786D00B90009"
+               BuildableName = "DopamineKit_RewardUITests.xctest"
+               BlueprintName = "DopamineKit_RewardUITests"
+               ReferencedContainer = "container:DopamineKit.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "841CA5F820227EBA00B90009"
+               BuildableName = "DopamineKit_SwizzleTests.xctest"
+               BlueprintName = "DopamineKit_SwizzleTests"
                ReferencedContainer = "container:DopamineKit.xcodeproj">
             </BuildableReference>
          </TestableReference>

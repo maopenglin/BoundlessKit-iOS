@@ -125,6 +125,14 @@ open class SelectorReinforcement : NSObject {
     
     fileprivate static var registeredMethods: [String:[String]] = [:]
     
+    open static func isRegistered(classType: AnyClass, selector: Selector) -> Bool {
+        return isRegistered(className: NSStringFromClass(classType), selectorName: NSStringFromSelector(selector))
+    }
+    
+    open static func isRegistered(className: String, selectorName: String) -> Bool {
+        return registeredMethods[className]?.contains(selectorName) ?? false
+    }
+    
     fileprivate func registerMethod() {
         DopeLog.debug("Attempting to register :\(self.actionID)...")
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {
