@@ -169,10 +169,29 @@ open class SelectorReinforcement : NSObject {
 
 //            let newMethodName = "\(action)\(SelectorReinforcement.count)"
             let newMethodName = action + String.random()
+            
             print("New method name:\(newMethodName)")
             let newMethod = NSSelectorFromString(newMethodName)
             let someImp = DopamineObject().createImp(newMethodName)
-
+            
+            let originalMethod = class_getInstanceMethod(originalClass.self, originalSelector)!
+            
+            let aStr = UnsafeMutablePointer<Int8>.allocate(capacity: 64)
+            method_getReturnType(originalMethod, aStr, 64)
+            print("Got return type:\(String(cString: aStr))")
+            
+            
+            var index: UInt32 = 0
+            let numArgs = method_getNumberOfArguments(originalMethod)
+            while (index < numArgs) {
+                let bStr = UnsafeMutablePointer<Int8>.allocate(capacity: 256)
+                method_getArgumentType(originalMethod, index, bStr, 256)
+                print("Got arg type:\(String(cString: bStr))")
+                index += 1
+            }
+            
+            
+            
             class_addMethod(originalClass.self, newMethod, someImp!, "v@:")
             SwizzleHelper.injectSelector(originalClass.self, newMethod, originalClass.self, originalSelector)
             
