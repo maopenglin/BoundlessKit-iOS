@@ -134,7 +134,7 @@ open class SelectorReinforcement : NSObject {
     }
     
     fileprivate func registerMethod() {
-        DopeLog.debug("Attempting to register :\(self.actionID)...")
+        DopeLog.debug("Attempting to register <\(self.actionID)>...")
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {
             DopeLog.debug("Codeless integration mode disabled")
             return
@@ -142,7 +142,7 @@ open class SelectorReinforcement : NSObject {
         
         var targetsRegisteredMethods = SelectorReinforcement.registeredMethods[target] ?? []
         guard targetsRegisteredMethods.index(of: target) == nil else {
-            DopeLog.debug("Reinforcement for selectorType-target:\(selectorType)-\(target) method:\(action) already registered.")
+            DopeLog.debug("Reinforcement for class:\(target) method:\(action) already registered.")
             return
         }
         
@@ -197,11 +197,11 @@ open class SelectorReinforcement : NSObject {
         
         targetsRegisteredMethods.append(action)
         SelectorReinforcement.registeredMethods[target] = targetsRegisteredMethods
-        DopeLog.debug("Registered reinforcement class:\(originalClass) method:\(originalSelector)")
+        DopeLog.debug("Registered reinforcement for class:\(originalClass) method:\(originalSelector)")
     }
     
     fileprivate func unregisterMethod() {
-        DopeLog.debug("Attempting to unregister :\(self.actionID)...")
+        DopeLog.debug("Attempting to unregister <\(self.actionID)>...")
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {
             DopeLog.debug("Codeless integration mode disabled")
             return
@@ -209,7 +209,7 @@ open class SelectorReinforcement : NSObject {
         
         guard var targetsRegisteredMethods = SelectorReinforcement.registeredMethods[target],
             let actionIndex = targetsRegisteredMethods.index(of: action) else {
-                DopeLog.debug("Reinforcement for selectorType-target:\(selectorType)-\(target) method:\(action) not registered.")
+                DopeLog.debug("Reinforcement for class:\(target) method:\(action) not registered.")
                 return
         }
         
@@ -235,7 +235,7 @@ open class SelectorReinforcement : NSObject {
         
         targetsRegisteredMethods.remove(at: actionIndex)
         SelectorReinforcement.registeredMethods[target] = targetsRegisteredMethods
-        DopeLog.debug("Unregistered reinforcement class:\(originalClass) method:\(originalSelector)")
+        DopeLog.debug("Unregistered reinforcement for class:\(originalClass) method:\(originalSelector)")
     }
     
 }
@@ -254,6 +254,7 @@ extension SelectorReinforcement {
     
     func attemptReinforcement(targetInstance: NSObject) {
         DopamineVersion.current.codelessReinforcementFor(sender: self.selectorType, target: self.target, selector: self.action)  { reinforcement in
+            DopamineChanges.shared.delegate?.attemptingReinforcement()
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
             

@@ -10,6 +10,7 @@ import Foundation
 internal extension UITouch {
     
     func attemptReinforcement() {
+        DopamineChanges.shared.delegate?.attemptingReinforcement()
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {
             return
         }

@@ -7,10 +7,15 @@
 
 import Foundation
 
+protocol DopamineChangesDelegate {
+    func attemptingReinforcement()
+    func showingReward()
+}
 
 open class DopamineChanges : NSObject {
     
     open static let shared = DopamineChanges()
+    var delegate: DopamineChangesDelegate?
     
     public override init() {
         super.init()

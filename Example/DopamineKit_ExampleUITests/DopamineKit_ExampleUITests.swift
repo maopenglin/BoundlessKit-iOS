@@ -1,26 +1,32 @@
 //
-//  DopamineKit_RewardUITests.swift
-//  DopamineKit_RewardUITests
+//  DopamineKit_ExampleUITests.swift
+//  DopamineKit_ExampleUITests
 //
-//  Created by Akash Desai on 1/31/18.
+//  Created by Akash Desai on 2/1/18.
 //  Copyright © 2018 CocoaPods. All rights reserved.
 //
 
 import XCTest
-@testable import DopamineKit
-@testable import DopamineKit_Example
 
-class DopamineKit_RewardUITests: XCTestCase {
+@testable import DopamineKit
+@testable import Pods_DopamineKit_Example
+
+class DopamineKit_ExampleUITests: XCTestCase {
     
     var app: XCUIApplication!
-    var controllerUnderTesting: ViewController!
     
     override func setUp() {
         super.setUp()
         
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+        
+        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
+        // UI tests must launch the application that they test. Doing this in setup will make sure it happens for each test method.
         app = XCUIApplication()
         app.launch()
+
+        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
     
     override func tearDown() {
@@ -31,10 +37,7 @@ class DopamineKit_RewardUITests: XCTestCase {
     func testExample() {
         // Use recording to get started writing UI tests.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
-        
-//        let dopaminekitExampleIcon = XCUIApplication()/*@START_MENU_TOKEN@*/.otherElements["Home screen icons"].scrollViews/*[[".otherElements[\"Home screen icons\"]",".otherElements[\"SBFolderScalingView\"].scrollViews",".scrollViews"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[2,0]]@END_MENU_TOKEN@*/.otherElements.icons["DopamineKit_Example"]
-        
-        app.buttons["Reinforce a user action"].tap()
+        XCUIApplication().children(matching: .window).element(boundBy: 0).children(matching: .other).element.children(matching: .other).element(boundBy: 0).buttons["Reinforce a user action"].tap()
         
     }
     
@@ -43,7 +46,7 @@ class DopamineKit_RewardUITests: XCTestCase {
         let promise = expectation(description: "Reinforcement attempted")
         class ChangesDelegate : NSObject, DopamineChangesDelegate {
             var reinforcementAttemptPromise: XCTestExpectation
-
+            
             init(promise: XCTestExpectation) {
                 reinforcementAttemptPromise = promise
                 super.init()
@@ -52,20 +55,23 @@ class DopamineKit_RewardUITests: XCTestCase {
                 print("In attemptingReinforcement")
                 reinforcementAttemptPromise.fulfill()
             }
-
+            
             func showingReward() {
                 print("In showingReward")
             }
         }
-
-        let v = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
+        
+//        let v = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
+        app.launch()
+        
         let changesDelegate = ChangesDelegate(promise: promise)
         DopamineChanges.shared.delegate = changesDelegate
-        DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : "somereward"])
+        DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : ["reward" : "somereward"]])
         DopamineChanges.shared.setSwizzling(true)
-
-        XCUIApplication().buttons["Reinforce a user action"].tap()
-
+        
+        app.buttons["Reinforce a user action"].tap()
+//        XCUIApplication().children(matching: .window).element(boundBy: 0).children(matching: .other).element.children(matching: .other).element(boundBy: 0).buttons["Reinforce a user action"].tap()
+        
         waitForExpectations(timeout: 3, handler: nil)
         
         

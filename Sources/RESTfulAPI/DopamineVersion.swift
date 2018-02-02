@@ -25,9 +25,9 @@ public class DopamineVersion : UserDefaultsSingleton {
     @objc internal fileprivate (set) var visualizerMappings: [String:Any]
     
     fileprivate let updateQueue = SingleOperationQueue()
-    internal func update(visualizer mappings: [String: Any]?) {
+    public func update(visualizer mappings: [String: Any]?) {
 //        updateQueue.addOperation {
-            print("Updating visualizer to:\(mappings)")
+            print("Updating visualizer to:\(mappings as AnyObject)")
             if let mappings = mappings {
                 self.visualizerMappings = mappings
                 SelectorReinforcement.registerVisualizerMethods()

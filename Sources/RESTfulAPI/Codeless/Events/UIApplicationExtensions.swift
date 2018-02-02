@@ -16,6 +16,7 @@ internal extension UIApplication {
         let selectorName = NSStringFromSelector(selectorObj)
         
         DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
+            DopamineChanges.shared.delegate?.attemptingReinforcement()
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
             

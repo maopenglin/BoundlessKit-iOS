@@ -12,9 +12,18 @@ import CoreLocation
 
 class ViewController: UIViewController {
     
+    class func instance() -> ViewController {
+        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ViewController") as! ViewController
+    }
+    
+    func presentAnother() {
+        present(ViewController.instance(), animated: true)
+    }
+    
     @objc var someCounter: Float = 0
     
     @objc func action1Performed(button: UIButton){
+        presentAnother()
         print("Button 1 pushed. Text:\(button.currentTitle ?? "nil")")
         // Reinforce the action to make it sticky!!
 //        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
@@ -117,7 +126,7 @@ class ViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+        print("In view did appear of class:\(NSStringFromClass(type(of: self)))")
 //        DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
 //            SelectorReinforcement.unregisterMethods()
 //            print("Unregistered")

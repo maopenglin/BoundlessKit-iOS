@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0900"
+   LastUpgradeVersion = "0920"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DA3695B5C87661A2E59D69B04922DDD5"
+               BlueprintIdentifier = "BEB0B3FA2409F1D3C87467BC58444EEC"
                BuildableName = "DopamineKit.framework"
                BlueprintName = "DopamineKit"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -47,7 +47,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DA3695B5C87661A2E59D69B04922DDD5"
+            BlueprintIdentifier = "BEB0B3FA2409F1D3C87467BC58444EEC"
             BuildableName = "DopamineKit.framework"
             BlueprintName = "DopamineKit"
             ReferencedContainer = "container:Pods.xcodeproj">
