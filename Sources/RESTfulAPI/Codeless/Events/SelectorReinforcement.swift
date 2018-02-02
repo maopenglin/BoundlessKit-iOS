@@ -167,7 +167,7 @@ open class SelectorReinforcement : NSObject {
             // create method at runtime for simple methods (no parameters and returns void)
             let newMethodName = action + String.random()
             let newMethod = NSSelectorFromString(newMethodName)
-            let newImp = DopamineObject().createImp(newMethodName)
+            let newImp = DopamineObject.createImp(newMethod)
             class_addMethod(originalClass.self, newMethod, newImp!, "v@:")
             SwizzleHelper.injectSelector(originalClass.self, newMethod, originalClass.self, originalSelector)
             

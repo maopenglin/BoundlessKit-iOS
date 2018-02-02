@@ -29,12 +29,11 @@
     [self testImp];
 }
 
-- (IMP) createImp :(NSString*) name {
++ (IMP) createImp :(SEL) selector {
     IMP dynamicImp = imp_implementationWithBlock(^(id self) {
-        NSLog(@"In dynamic imp with name:%@", name);
-        SEL normalSelector = NSSelectorFromString(name);
-        if ([self respondsToSelector:normalSelector])
-            [self performSelector:normalSelector];
+        NSLog(@"In dynamic imp with class:%@ and selector:%@", NSStringFromClass([self class]), NSStringFromSelector(selector));
+        if ([self respondsToSelector:selector])
+            [self performSelector:selector];
     });
     
     return dynamicImp;

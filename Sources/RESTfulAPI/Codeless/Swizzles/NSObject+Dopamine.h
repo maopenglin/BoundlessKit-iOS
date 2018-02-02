@@ -15,7 +15,7 @@
 
 - (void) testImp;
 
-- (IMP) createImp :(NSString*) name;
++ (IMP) createImp :(SEL) selector;
     
 @end
 

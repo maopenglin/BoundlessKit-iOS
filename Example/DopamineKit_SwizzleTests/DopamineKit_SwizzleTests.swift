@@ -74,8 +74,8 @@ class DopamineKit_SwizzleTests: XCTestCase {
         controllerUnderTest.testFunc2()
         let afterTestFunc2StackSize = DopamineKit_SwizzleTests.counter
         
-        XCTAssert(beforeTestFuncStackSize == afterTestFuncStackSize - 1, "Swizzle did not happen")
-        XCTAssert(beforeTestFunc2StackSize == afterTestFunc2StackSize - 1, "Swizzle did not happen")
+        XCTAssert(afterTestFuncStackSize == beforeTestFuncStackSize + 1, "Swizzle did not happen")
+        XCTAssert(afterTestFunc2StackSize == beforeTestFunc2StackSize + 1, "Swizzle did not happen")
     }
     
     
