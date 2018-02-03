@@ -21,19 +21,34 @@
     [self methodWithSenderToReinforce :sender];
 }
 
-- (void) testImp {
-    static NSString* myName = @"";
-    myName = NSStringFromSelector(_cmd);
-    NSLog(@"My name:%@ - %@", myName, NSStringFromSelector(@selector(testImp)));
-    
-    [self testImp];
-}
-
 + (IMP) createImp :(SEL) selector {
     IMP dynamicImp = imp_implementationWithBlock(^(id self) {
+        if (!self || ![self respondsToSelector:selector]) {return;}
         NSLog(@"In dynamic imp with class:%@ and selector:%@", NSStringFromClass([self class]), NSStringFromSelector(selector));
-        if ([self respondsToSelector:selector])
-            [self performSelector:selector];
+        
+        ((void (*)(id, SEL))[self methodForSelector:selector])(self, selector);
+    });
+    
+    return dynamicImp;
+}
+
++ (IMP) createImpWithObjectParam :(SEL) selector {
+    IMP dynamicImp = imp_implementationWithBlock(^(id self, id object) {
+        if (!self || ![self respondsToSelector:selector]) {return;}
+        NSLog(@"In dynamic imp with class:%@ and selector:%@ and parameter:%@", NSStringFromClass([self class]), NSStringFromSelector(selector), object);
+        
+        ((void (*)(id, SEL, id))[self methodForSelector:selector])(self, selector, object);
+    });
+    
+    return dynamicImp;
+}
+
++ (IMP) createImpWithIntParam :(SEL) selector {
+    IMP dynamicImp = imp_implementationWithBlock(^(id self, int object) {
+        if (!self || ![self respondsToSelector:selector]) {return;}
+        NSLog(@"In dynamic imp with class:%@ and selector:%@ and parameter:%d", NSStringFromClass([self class]), NSStringFromSelector(selector), object);
+        
+        ((void (*)(id, SEL, int))[self methodForSelector:selector])(self, selector, object);
     });
     
     return dynamicImp;

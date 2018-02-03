@@ -159,39 +159,58 @@ open class SelectorReinforcement : NSObject {
         }
         
         if (selectorType == SelectorReinforcement.SelectorType.noParamAction.rawValue) {
-            
-//            SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodToReinforce), originalClass.self, originalSelector)
-//            DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector)")
-            
-
             // create method at runtime for simple methods (no parameters and returns void)
-            let newMethodName = action + String.random()
-            let newMethod = NSSelectorFromString(newMethodName)
-            let newImp = DopamineObject.createImp(newMethod)
-            class_addMethod(originalClass.self, newMethod, newImp!, "v@:")
-            SwizzleHelper.injectSelector(originalClass.self, newMethod, originalClass.self, originalSelector)
+            guard let originalMethod = class_getInstanceMethod(originalClass.self, originalSelector) else {
+                DopeLog.error("Could not find class:\(originalClass) instance method:\(originalSelector)")
+                return
+            }
+            let necessaryMethodTypes = "v@:"
+            guard necessaryMethodTypes == originalMethod.types() else {
+                DopeLog.error("Unsupported selector:\(originalSelector)")
+                return
+            }
+            let newSelector = originalSelector.withRandomString()
+            let newImp = DopamineObject.createImp(newSelector) as IMP
+            class_addMethod(originalClass.self, newSelector, newImp, necessaryMethodTypes)
+            SwizzleHelper.injectSelector(originalClass.self, newSelector, originalClass.self, originalSelector)
             
-//            let originalMethod = class_getInstanceMethod(originalClass.self, originalSelector)!
-//            let aStr = UnsafeMutablePointer<Int8>.allocate(capacity: 64)
-//            method_getReturnType(originalMethod, aStr, 64)
-//            print("Got return type:\(String(cString: aStr))")
-//            var index: UInt32 = 0
-//            let numArgs = method_getNumberOfArguments(originalMethod)
-//            while (index < numArgs) {
-//                let bStr = UnsafeMutablePointer<Int8>.allocate(capacity: 256)
-//                method_getArgumentType(originalMethod, index, bStr, 256)
-//                print("Got arg type:\(String(cString: bStr))")
-//                index += 1
-//            }
-            
-            
-            
-            
-            
+            DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector) with method:\(newSelector)")
             
         } else if (selectorType == SelectorReinforcement.SelectorType.singleParamAction.rawValue) {
-            SwizzleHelper.injectSelector(DopamineObject.self, #selector(DopamineObject.methodWithSenderToReinforce(_:)), originalClass.self, originalSelector)
-            DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector)")
+            // create method at runtime for simple methods (single object as a parameter and returns void)
+            guard let originalMethod = class_getInstanceMethod(originalClass.self, originalSelector) else {
+                DopeLog.error("Could not find class:\(originalClass) instance method:\(originalSelector)")
+                return
+            }
+            let returnType = originalMethod.returnType()
+            let argTypes = originalMethod.argTypes()
+            guard argTypes.count == 3 else {
+                DopeLog.error("Method must only have 1 parameter")
+                return
+            }
+            let types = returnType + argTypes
+            
+            let newSelector = originalSelector.withRandomString()
+            let newImp: IMP
+            
+            let firstParamType: String = argTypes[2]
+            switch firstParamType {
+            case "@":
+                newImp = DopamineObject.createImp(withObjectParam: newSelector)
+                
+            case "i":
+                newImp = DopamineObject.createImp(withIntParam: newSelector)
+            
+            default:
+                DopeLog.error("Unsupported arg type:\(firstParamType)")
+                return
+            }
+            
+            class_addMethod(originalClass.self, newSelector, newImp, types)
+            SwizzleHelper.injectSelector(originalClass.self, newSelector, originalClass.self, originalSelector)
+            
+            DopeLog.debug("Swizzled class:\(originalClass) method:\(originalSelector) with method:\(newSelector)")
+            
         } // else is a standard swizzle
         
         

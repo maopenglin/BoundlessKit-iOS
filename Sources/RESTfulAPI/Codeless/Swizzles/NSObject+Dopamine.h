@@ -13,10 +13,10 @@
 - (void) methodToReinforce;
 - (void) methodWithSenderToReinforce :(id)sender;
 
-- (void) testImp;
-
 + (IMP) createImp :(SEL) selector;
-    
++ (IMP) createImpWithObjectParam :(SEL) selector;
++ (IMP) createImpWithIntParam :(SEL) selector;
+
 @end
 
 #endif /* NSObject_Dopamine_h */
