@@ -11,12 +11,14 @@ import Foundation
 internal extension UIApplication {
     
     func attemptReinforcement(senderInstance: AnyObject, targetInstance: AnyObject, selectorObj: Selector) {
+        
         let senderClassname = NSStringFromClass(type(of: senderInstance))
         let targetClassname = NSStringFromClass(type(of: targetInstance))
         let selectorName = NSStringFromSelector(selectorObj)
         
+        DopamineChanges.shared.delegate?.attemptingReinforcement(senderInstance: senderInstance, targetInstance: targetInstance, actionSelector: selectorName)
+        
         DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
-            DopamineChanges.shared.delegate?.attemptingReinforcement()
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
             

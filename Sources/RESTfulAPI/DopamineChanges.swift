@@ -7,15 +7,16 @@
 
 import Foundation
 
-protocol DopamineChangesDelegate {
-    func attemptingReinforcement()
-    func showingReward()
+public protocol DopamineChangesDelegate {
+    func attemptingReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String)
+    func reinforcing(actionID: String, with reinforcementDecision: String)
 }
 
 open class DopamineChanges : NSObject {
     
     open static let shared = DopamineChanges()
-    var delegate: DopamineChangesDelegate? {
+    
+    open var delegate: DopamineChangesDelegate? {
         didSet {
             print("Did set delegate")
         }

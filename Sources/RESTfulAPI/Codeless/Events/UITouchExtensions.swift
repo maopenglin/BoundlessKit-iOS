@@ -10,11 +10,6 @@ import Foundation
 internal extension UITouch {
     
     func attemptReinforcement() {
-        DopamineChanges.shared.delegate?.attemptingReinforcement()
-        guard DopamineConfiguration.current.integrationMethod == "codeless" else {
-            return
-        }
-        
         if let view = self.view,
             self.phase == .ended {
             DispatchQueue.main.async {
@@ -24,6 +19,8 @@ internal extension UITouch {
             let senderClassname = NSStringFromClass(Swift.type(of: self))
             let targetName = NSStringFromClass(Swift.type(of: view))
             let selectorName = "ended"
+            
+            DopamineChanges.shared.delegate?.attemptingReinforcement(senderInstance: self, targetInstance: view, actionSelector: selectorName)
             
             DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetName, selector: selectorName)  { reinforcement in
                 guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
