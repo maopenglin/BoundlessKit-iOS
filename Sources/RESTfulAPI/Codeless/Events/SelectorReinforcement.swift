@@ -146,9 +146,12 @@ open class SelectorReinforcement : NSObject {
             return
         }
         
-        guard let originalClass = NSClassFromString(target).self,
-            originalClass.isSubclass(of: NSObject.self) else {
-            DopeLog.error("Invalid class <\(target)>")
+        guard let originalClass = NSClassFromString(target).self ?? NSClassFromString(target.components(separatedBy: ".").last!).self else {
+            DopeLog.error("Invalid class <\(target)> and <\(target.components(separatedBy: ".").last!)>")
+            return
+        }
+        guard originalClass.isSubclass(of: NSObject.self) else {
+            DopeLog.error("Not a subclass of NSObject (<\(target)>)")
             return
         }
         

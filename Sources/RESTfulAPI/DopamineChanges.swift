@@ -15,7 +15,11 @@ protocol DopamineChangesDelegate {
 open class DopamineChanges : NSObject {
     
     open static let shared = DopamineChanges()
-    var delegate: DopamineChangesDelegate?
+    var delegate: DopamineChangesDelegate? {
+        didSet {
+            print("Did set delegate")
+        }
+    }
     
     public override init() {
         super.init()

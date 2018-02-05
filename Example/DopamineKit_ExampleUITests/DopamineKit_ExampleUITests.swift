@@ -62,17 +62,17 @@ class DopamineKit_ExampleUITests: XCTestCase {
         }
         
 //        let v = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
-        app.launch()
+//        app.launch()
         
         let changesDelegate = ChangesDelegate(promise: promise)
         DopamineChanges.shared.delegate = changesDelegate
-        DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : ["reward" : "somereward"]])
-        DopamineChanges.shared.setSwizzling(true)
+        DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : ["reward" : ["reward1":"somereward"]]])
+//        DopamineChanges.shared.setSwizzling(true)
         
         app.buttons["Reinforce a user action"].tap()
 //        XCUIApplication().children(matching: .window).element(boundBy: 0).children(matching: .other).element.children(matching: .other).element(boundBy: 0).buttons["Reinforce a user action"].tap()
         
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
         
         
         
