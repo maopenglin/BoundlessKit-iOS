@@ -20,7 +20,7 @@ internal extension UITouch {
             let targetName = NSStringFromClass(Swift.type(of: view))
             let selectorName = "ended"
             
-            DopamineChanges.shared.delegate?.attemptingReinforcement(senderInstance: self, targetInstance: view, actionSelector: selectorName)
+            DopamineChanges.shared.delegate?.attemptingReinforcement?(senderInstance: self, targetInstance: view, actionSelector: selectorName)
             
             DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetName, selector: selectorName)  { reinforcement in
                 guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }

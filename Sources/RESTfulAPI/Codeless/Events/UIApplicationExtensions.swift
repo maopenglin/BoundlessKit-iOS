@@ -16,7 +16,7 @@ internal extension UIApplication {
         let targetClassname = NSStringFromClass(type(of: targetInstance))
         let selectorName = NSStringFromSelector(selectorObj)
         
-        DopamineChanges.shared.delegate?.attemptingReinforcement(senderInstance: senderInstance, targetInstance: targetInstance, actionSelector: selectorName)
+        DopamineChanges.shared.delegate?.attemptingReinforcement?(senderInstance: senderInstance, targetInstance: targetInstance, actionSelector: selectorName)
         
         DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }

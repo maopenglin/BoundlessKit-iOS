@@ -275,7 +275,7 @@ extension SelectorReinforcement {
     }
     
     func attemptReinforcement(targetInstance: NSObject) {
-        DopamineChanges.shared.delegate?.attemptingReinforcement(senderInstance: nil, targetInstance: targetInstance, actionSelector: self.action)
+        DopamineChanges.shared.delegate?.attemptingReinforcement?(senderInstance: nil, targetInstance: targetInstance, actionSelector: self.action)
         DopamineVersion.current.codelessReinforcementFor(sender: self.selectorType, target: self.target, selector: self.action)  { reinforcement in
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }

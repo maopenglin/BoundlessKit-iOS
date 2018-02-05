@@ -7,9 +7,10 @@
 
 import Foundation
 
+@objc
 public protocol DopamineChangesDelegate {
-    func attemptingReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String)
-    func reinforcing(actionID: String, with reinforcementDecision: String)
+    @objc optional func attemptingReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String)
+    @objc optional func reinforcing(actionID: String, with reinforcementDecision: String)
 }
 
 open class DopamineChanges : NSObject {

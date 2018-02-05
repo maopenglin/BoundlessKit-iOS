@@ -10,10 +10,11 @@ import UIKit
 import DopamineKit
 import CoreLocation
 
-class ExampleDelegate : DopamineChangesDelegate {
-    func attemptingReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String) {
-        print("DopamineChangesDelegate attemptingReinforcement (senderInstance: \(senderInstance as AnyObject), targetInstance: \(targetInstance as AnyObject), actionSelector: \(actionSelector))")
-    }
+@objc
+class ExampleDelegate : NSObject, DopamineChangesDelegate {
+//    func attemptingReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String) {
+//        print("DopamineChangesDelegate attemptingReinforcement (senderInstance: \(senderInstance as AnyObject), targetInstance: \(targetInstance as AnyObject), actionSelector: \(actionSelector))")
+//    }
     
     func reinforcing(actionID: String, with reinforcementDecision: String) {
         print("DopamineChangesDelegate reinforcing <\(actionID)> with <\(reinforcementDecision)>")
