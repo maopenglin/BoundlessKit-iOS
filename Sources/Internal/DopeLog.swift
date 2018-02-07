@@ -68,7 +68,7 @@ import Foundation
         let fileName = NSString(string: filePath).lastPathComponent
         Swift.print("❌ \(message)\n\t@\t[\(fileName):\(line):\(functionSignature)])")
         
-        if visual && !DopamineProperties.current.inProduction {
+        if visual && !DopamineProperties.productionMode {
             DispatchQueue.main.async {
                 CandyBar.init(title: message, subtitle: "🚫\(fileName):\(line)", image: "☠️".image(), position: .top
                     , backgroundColor: UIColor.darkGray.withAlphaComponent(0.7)).show(duration: 3)

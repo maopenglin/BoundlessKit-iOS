@@ -24,7 +24,7 @@ class ExampleDelegate : DopamineChangesDelegate {
 class ViewController: UIViewController {
     
     static var setReward: Void = {
-        DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : ["reward": "hello"]])
+//        DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : ["reward": "hello"]])
         return
     }()
     
@@ -153,7 +153,7 @@ class ViewController: UIViewController {
 //            }
 //        }
         
-        DopamineChanges.shared.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!!"]])
+//        DopamineChanges.shared.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!!"]])
     }
     
     @objc func loadBasicUI(){

@@ -10,15 +10,18 @@ import Foundation
 internal class DopamineProperties : UserDefaultsSingleton {
     
     @objc
-    static var current: DopamineProperties = {
+    static var current: DopamineProperties? = {
         return DopamineProperties.convert(from: DopamineKit.testCredentials) ??
             UserDefaults.dopamine.unarchive() ??
             {
-                let propertiesFile = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist")!
-                let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as! [String: Any]
-                let properties = DopamineProperties.convert(from: propertiesDictionary)!
-                UserDefaults.dopamine.archive(properties)
-                return properties
+                if let propertiesFile = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist"),
+                    let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as? [String: Any],
+                    let properties = DopamineProperties.convert(from: propertiesDictionary) {
+                    UserDefaults.dopamine.archive(properties)
+                    return properties
+                } else {
+                    return nil
+                }
             }()
         }()
         {
@@ -36,6 +39,7 @@ internal class DopamineProperties : UserDefaultsSingleton {
     var version: DopamineVersion { get { return DopamineVersion.current} set { DopamineVersion.current = newValue } }
     var configuration: DopamineConfiguration { get { return DopamineConfiguration.current} set { DopamineConfiguration.current = newValue } }
     @objc var inProduction: Bool { didSet { DopamineProperties.current = self } }
+    @objc static var productionMode: Bool { get { return (current != nil && current!.inProduction)}}
     @objc let developmentSecret: String
     @objc let productionSecret: String
     

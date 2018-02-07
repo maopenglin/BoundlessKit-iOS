@@ -28,7 +28,8 @@ open class DopamineChanges : NSObject {
     open func wake() {
         enhanceMethods(DopamineDefaults.enableEnhancement)
         registerMethods()
-        if (!DopamineProperties.current.inProduction) {
+        if let dopaProps = DopamineProperties.current,
+            !dopaProps.inProduction {
             registerVisualizerMethods()
         }
     }

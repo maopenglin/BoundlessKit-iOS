@@ -1,0 +1,6 @@
+framework module Pods_DopamineKit_ReleaseTests {
+  umbrella header "Pods-DopamineKit_ReleaseTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

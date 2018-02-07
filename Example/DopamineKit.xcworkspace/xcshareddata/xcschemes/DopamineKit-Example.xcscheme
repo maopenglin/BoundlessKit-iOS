@@ -56,7 +56,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C05A7DEF3A054CC5B2756895AFC5407B"
+               BlueprintIdentifier = "AF78047D8F8303C25E9233E3C10DDB42"
                BuildableName = "DopamineKit.framework"
                BlueprintName = "DopamineKit"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
@@ -137,6 +137,26 @@
                BlueprintIdentifier = "845FBD7E202398E100A2A8F5"
                BuildableName = "DopamineKit_ExampleUITests.xctest"
                BlueprintName = "DopamineKit_ExampleUITests"
+               ReferencedContainer = "container:DopamineKit.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8427E913202B7B3A00EAF363"
+               BuildableName = "DopamineKit_ReleaseTests.xctest"
+               BlueprintName = "DopamineKit_ReleaseTests"
+               ReferencedContainer = "container:DopamineKit.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8427E929202B7D4500EAF363"
+               BuildableName = "DopamineKit_ReleaseUITests.xctest"
+               BlueprintName = "DopamineKit_ReleaseUITests"
                ReferencedContainer = "container:DopamineKit.xcodeproj">
             </BuildableReference>
          </TestableReference>

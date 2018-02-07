@@ -56,8 +56,9 @@ public class CodelessAPI : NSObject {
     
     @objc
     public static func boot(completion: @escaping () -> () = {}) {
-        var payload = DopamineProperties.current.apiCredentials
-        payload["inProduction"] = DopamineProperties.current.inProduction
+        guard let dopaProps = DopamineProperties.current else { return }
+        var payload = dopaProps.apiCredentials
+        payload["inProduction"] = dopaProps.inProduction
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
         payload["currentConfig"] = DopamineConfiguration.current.configID ?? "nil"
         payload["initialBoot"] = (UserDefaults.initialBootDate == nil)
@@ -66,11 +67,11 @@ public class CodelessAPI : NSObject {
                 if status == 205 {
                     if let configDict = response["config"] as? [String: Any],
                         let config = DopamineConfiguration.convert(from: configDict) {
-                        DopamineProperties.current.configuration = config
+                        DopamineProperties.current?.configuration = config
                     }
                     if let versionDict = response["version"] as? [String: Any],
                         let version = DopamineVersion.convert(from: versionDict) {
-                        DopamineProperties.current.version = version
+                        DopamineProperties.current?.version = version
                     }
                 }
             }
@@ -87,12 +88,13 @@ public class CodelessAPI : NSObject {
     
     @objc
     private static func promptPairing() {
-        guard !DopamineProperties.current.inProduction || DopamineConfiguration.current.integrationMethod != "codeless" else {
-            stashSubmits = false
-            return
+        guard !DopamineProperties.productionMode && DopamineConfiguration.current.integrationMethod == "codeless",
+            var payload = DopamineProperties.current?.apiCredentials
+            else {
+                stashSubmits = false
+                return
         }
         
-        var payload = DopamineProperties.current.apiCredentials
         payload["deviceName"] = UIDevice.current.name
         
         shared.send(call: .identify, with: payload){ response in
@@ -111,7 +113,7 @@ public class CodelessAPI : NSObject {
                         let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
                         
                         pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
-                            var payload = DopamineProperties.current.apiCredentials
+                            guard var payload = DopamineProperties.current?.apiCredentials else { return }
                             payload["deviceName"] = UIDevice.current.name
                             payload["connectionUUID"] = connectionID
                             shared.send(call: .accept, with: payload) {response in
@@ -237,7 +239,7 @@ public class CodelessAPI : NSObject {
     }()
     fileprivate static func submit(payloadModifier: (inout [String: Any]) -> Void) {
         if stashSubmits {
-            var payload = DopamineProperties.current.apiCredentials
+            guard var payload = DopamineProperties.current?.apiCredentials else { return }
             payloadModifier(&payload)
             
             submitQueue.addOperation {

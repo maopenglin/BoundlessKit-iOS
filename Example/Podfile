@@ -21,6 +21,14 @@ target 'DopamineKit_ExampleUITests' do
     pod 'DopamineKit', :path => '../'
 end
 
+target 'DopamineKit_ReleaseTests' do
+    pod 'DopamineKit', :path => '../'
+end
+
+target 'DopamineKit_ReleaseUITests' do
+    pod 'DopamineKit', :path => '../'
+end
+
 post_install do |installer|
     installer.pods_project.targets.each do |target|
         if target.name == 'DopamineKit'
