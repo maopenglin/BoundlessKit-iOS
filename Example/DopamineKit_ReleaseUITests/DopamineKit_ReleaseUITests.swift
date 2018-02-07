@@ -8,7 +8,7 @@
 
 import XCTest
 @testable import DopamineKit
-@testable import Pods_DopamineKit_ReleaseUITests
+@testable import DopamineKit_Example
 
 class DopamineKit_ReleaseUITests: XCTestCase {
         
@@ -63,8 +63,10 @@ class DopamineKit_ReleaseUITests: XCTestCase {
         
         let changesDelegate = ChangesDelegate(promise: promise)
         DopamineChanges.shared.delegate = changesDelegate
+//        ViewController.setTemporaryReward()
         let selectorReinforcement = SelectorReinforcement(targetClass: ViewController.self, selector: #selector(ViewController.viewDidAppear(_:)))
         DopamineVersion.current.update(visualizer: [selectorReinforcement.actionID : ["reward" : ["reward1":"somereward"]]])
+        
         XCUIApplication().buttons["Reinforce a user action"].tap()
         
         waitForExpectations(timeout: 5, handler: nil)

@@ -25,6 +25,7 @@ class ViewController: UIViewController {
     
     static var setReward: Void = {
 //        DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : ["reward": "hello"]])
+        setTemporaryReward()
         return
     }()
     
@@ -214,3 +215,11 @@ class ViewController: UIViewController {
 extension ViewController : CLLocationManagerDelegate {
     
 }
+
+extension ViewController {
+    static func setTemporaryReward() {
+        let selectorReinforcement = SelectorReinforcement(targetClass: self, selector: #selector(ViewController.viewDidAppear(_:)))
+        DopamineVersion.current.update(visualizer: [selectorReinforcement.actionID : ["reward" : ["reward1":"somereward"]]])
+    }
+}
+

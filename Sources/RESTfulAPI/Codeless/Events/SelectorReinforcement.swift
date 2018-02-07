@@ -15,10 +15,10 @@ open class SelectorReinforcement : NSObject {
     fileprivate static var unregistered = [String:SelectorReinforcement]()
     
     let selectorType: SelectorType
-    let targetClass: AnyClass
-    let selector: Selector
-    var reinforcer: Selector?
-    var actionID: String {
+    public let targetClass: AnyClass
+    public let selector: Selector
+    public var reinforcer: Selector?
+    public var actionID: String {
         get {
             return [selectorType.rawValue,
                     NSStringFromClass(targetClass),
@@ -37,7 +37,7 @@ open class SelectorReinforcement : NSObject {
     
     
     
-    convenience init?(actionID: String) {
+    public convenience init?(actionID: String) {
         let components:[String] = actionID.components(separatedBy: "-")
         if components.count == 3,
             let selectorType = SelectorType(rawValue: components[0]),
@@ -49,11 +49,11 @@ open class SelectorReinforcement : NSObject {
         }
     }
     
-    convenience init(targetClass: AnyClass, selector: Selector) {
+    public convenience init(targetClass: AnyClass, selector: Selector) {
         self.init(selectorType: SelectorType(from: selector), targetClass: targetClass, selector: selector)
     }
     
-    convenience init(target: NSObject, selector: Selector) {
+    public convenience init(target: NSObject, selector: Selector) {
         self.init(selectorType: SelectorType(from: selector), targetClass: type(of: target), selector: selector)
     }
     
@@ -101,10 +101,10 @@ open class SelectorReinforcement : NSObject {
             self.reinforcer = reinforcedSelector
             SelectorReinforcement.registered.removeValue(forKey: actionID)
             SelectorReinforcement.unregistered[actionID] = self
-            DopeLog.debug("Registered reinforcer for class \(targetClass) selector \(selector) with reinforced selector \(reinforcedSelector)")
+            DopeLog.debug("Unregistered reinforcer for class \(targetClass) selector \(selector) with reinforced selector \(reinforcedSelector)")
             return true
         } else {
-            DopeLog.debug("Could not register reinforcer for class \(targetClass) selector \(selector)")
+            DopeLog.debug("Could not unregister reinforcer for class \(targetClass) selector \(selector)")
             return false
         }
     }

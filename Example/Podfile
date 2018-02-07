@@ -3,30 +3,15 @@ platform :ios, '9.0'
 
 target 'DopamineKit_Example' do
     pod 'DopamineKit', :path => '../'
-end
-
-target 'DopamineKit_Tests' do
-    pod 'DopamineKit', :path => '../'
-end
-
-target 'DopamineKit_SwizzleTests' do
-    pod 'DopamineKit', :path => '../'
-end
-
-target 'DopamineKit_RewardUITests' do
-    pod 'DopamineKit', :path => '../'
-end
-
-target 'DopamineKit_ExampleUITests' do
-    pod 'DopamineKit', :path => '../'
-end
-
-target 'DopamineKit_ReleaseTests' do
-    pod 'DopamineKit', :path => '../'
-end
-
-target 'DopamineKit_ReleaseUITests' do
-    pod 'DopamineKit', :path => '../'
+    
+    target 'DopamineKit_ReleaseTests' do
+        inherit! :search_paths
+    end
+    
+    target 'DopamineKit_ReleaseUITests' do
+        inherit! :search_paths
+    end
+    
 end
 
 post_install do |installer|
