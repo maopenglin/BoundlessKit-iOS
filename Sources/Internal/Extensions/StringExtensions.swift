@@ -42,7 +42,8 @@ internal extension String {
     }
 }
 
-extension String {
+@objc
+extension NSString {
     static func random(length: Int = 6) -> String {
         let base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
         var randomString: String = ""
@@ -53,7 +54,9 @@ extension String {
         }
         return randomString
     }
-    
+}
+
+extension String {
     subscript (bounds: CountableClosedRange<Int>) -> String {
         let start = index(startIndex, offsetBy: bounds.lowerBound)
         let end = index(startIndex, offsetBy: bounds.upperBound)

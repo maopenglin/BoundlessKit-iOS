@@ -15,34 +15,34 @@
 
 @implementation DopamineTapGestureRecognizer
 
-+ (void) swizzleSelectors: (BOOL) enable {
++ (void) enhanceSelectors: (BOOL) enable {
     @synchronized(self) {
-        static BOOL didSwizzle = false;
-        if (enable ^ didSwizzle) {
-            didSwizzle = !didSwizzle;
+        static BOOL didEnhance = false;
+        if (enable ^ didEnhance) {
+            didEnhance = !didEnhance;
             
-            [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_initWithTarget:action:) :[UITapGestureRecognizer class] :@selector(initWithTarget:action:)];
-            [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(swizzled_addTarget:action:) :[UITapGestureRecognizer class] :@selector(addTarget:action:)];
+            [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(enhanced_initWithTarget:action:) :[UITapGestureRecognizer class] :@selector(initWithTarget:action:)];
+            [SwizzleHelper injectSelector:[DopamineTapGestureRecognizer class] :@selector(enhanced_addTarget:action:) :[UITapGestureRecognizer class] :@selector(addTarget:action:)];
         }
     }
     
 }
 
-- (instancetype) swizzled_initWithTarget:(id)target action:(SEL)action {
+- (instancetype) enhanced_initWithTarget:(id)target action:(SEL)action {
     if (target && action) {
-        [CodelessAPI submitTapActionWithTarget:NSStringFromClass([target class]) action:NSStringFromSelector(action)];
+        [CodelessAPI submitWithTargetInstance:target selector:action];
     }
     
-    return [self swizzled_initWithTarget:target action:action];
+    return [self enhanced_initWithTarget:target action:action];
 }
 
-- (void) swizzled_addTarget:(id)target action:(SEL)action {
+- (void) enhanced_addTarget:(id)target action:(SEL)action {
     if (target && action) {
-        [CodelessAPI submitTapActionWithTarget:NSStringFromClass([target class]) action:NSStringFromSelector(action)];
+        [CodelessAPI submitWithTargetInstance:target selector:action];
     }
     
-    if ([self respondsToSelector:@selector(swizzled_addTarget:action:)])
-    [self swizzled_addTarget:target action:action];
+    if ([self respondsToSelector:@selector(enhanced_addTarget:action:)])
+    [self enhanced_addTarget:target action:action];
 }
 
 @end

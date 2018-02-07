@@ -27,6 +27,20 @@ class DopamineKit_SwizzleTests: XCTestCase {
         super.tearDown()
     }
     
+    func testSwizzleForViewControllerDidAppear() {
+        var controllerUnderTest: ViewController!
+        controllerUnderTest = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
+        
+        doubleSwizzle(
+            sut: controllerUnderTest,
+            selector1: #selector(ViewController.funcReturnVoidParams0),
+            args1: [],
+            selector2: #selector(ViewController.func2ReturnVoidParams0),
+            args2: [],
+            argsCount: 0
+        )
+    }
+    
     func testSwizzleForMethodReturnsVoidParam0() {
         var controllerUnderTest: ViewController!
         controllerUnderTest = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!

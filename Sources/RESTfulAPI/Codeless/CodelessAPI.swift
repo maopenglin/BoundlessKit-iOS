@@ -11,7 +11,7 @@ import Foundation
 @objc
 public class CodelessAPI : NSObject {
     
-    public static var logCalls = false
+    public static var logCalls = true
     
     /// Valid API actions appeneded to the CodelessAPI URL
     ///
@@ -78,7 +78,7 @@ public class CodelessAPI : NSObject {
             completion()
             
             if DopamineConfiguration.current.integrationMethod == "codeless" {
-                SelectorReinforcement.registerMethods()
+                DopamineChanges.shared.registerMethods()
             }
             
             promptPairing()
@@ -152,7 +152,7 @@ public class CodelessAPI : NSObject {
             if let view = touch.view,
                 touch.phase == .ended {
                 
-                touch.attemptReinforcement()
+//                touch.attemptReinforcement()
                 
                 submit { payload in
                     let senderClassname = NSStringFromClass(type(of: touch))
@@ -178,7 +178,7 @@ public class CodelessAPI : NSObject {
             let targetClassname = NSStringFromClass(type(of: targetInstance))
             let selectorName = NSStringFromSelector(selectorObj)
             
-            application.attemptReinforcement(senderInstance: senderInstance, targetInstance: targetInstance, selectorObj: selectorObj)
+//            application.attemptReinforcement(senderInstance: senderInstance, targetInstance: targetInstance, selectorObj: selectorObj)
             
             submit { payload in
                 payload["sender"] = senderClassname
@@ -207,37 +207,26 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
-    public static func submit(target: NSObject, selector: Selector) {
-        if let selectorReinforcer = SelectorReinforcement(targetName: NSStringFromClass(type(of: target)), selector: selector) {
-            
-            selectorReinforcer.attemptReinforcement(targetInstance: target)
-            
-            DopeLog.debug("Submitting class method: \(selectorReinforcer.actionID)")
-            submit { payload in
-                payload["sender"] = selectorReinforcer.selectorType
-                payload["target"] = selectorReinforcer.target
-                payload["selector"] = selectorReinforcer.action
-                payload["actionID"] = selectorReinforcer.actionID
-                payload["senderImage"] = ""
-                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
-            }
+    public static func submit(targetInstance: AnyObject, selector: Selector) {
+        guard let targetInstance = targetInstance as? NSObject else {
+            DopeLog.error("Can only submit classes that inherit from NSObject")
+            return
         }
-    }
-    
-    @objc
-    public static func submitTapAction(target: String, action: String) {
-        if let tapAction = SelectorReinforcement(selectorType: ((action.contains(":")) ? .singleParamAction : .noParamAction), targetName: target, actionName: action) {
-            submit { payload in
-                payload["sender"] = tapAction.selectorType
-                payload["target"] = tapAction.target
-                payload["selector"] = tapAction.action
-                payload["actionID"] = [tapAction.selectorType, tapAction.target, tapAction.action].joined(separator: "-")
-                payload["senderImage"] = ""
-                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
-            }
+        let selectorReinforcement = SelectorReinforcement(targetClass: type(of: targetInstance), selector: selector)
+        
+//        selectorReinforcement.attemptReinforcement(targetInstance: targetInstance)
+        
+        DopeLog.debug("Submitting class method: \(selectorReinforcement.actionID)")
+        submit { payload in
+            payload["sender"] = selectorReinforcement.selectorType
+            payload["target"] = NSStringFromClass(selectorReinforcement.targetClass)
+            payload["selector"] = NSStringFromSelector(selectorReinforcement.selector)
+            payload["actionID"] = selectorReinforcement.actionID
+            payload["senderImage"] = ""
+            payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
+            payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
         }
+        
     }
     
     fileprivate static var submitQueue: OperationQueue = {

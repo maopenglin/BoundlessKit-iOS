@@ -10,8 +10,8 @@ import UIKit
 import DopamineKit
 import CoreLocation
 
-@objc
-class ExampleDelegate : NSObject, DopamineChangesDelegate {
+
+class ExampleDelegate : DopamineChangesDelegate {
 //    func attemptingReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String) {
 //        print("DopamineChangesDelegate attemptingReinforcement (senderInstance: \(senderInstance as AnyObject), targetInstance: \(targetInstance as AnyObject), actionSelector: \(actionSelector))")
 //    }
@@ -23,7 +23,14 @@ class ExampleDelegate : NSObject, DopamineChangesDelegate {
 
 class ViewController: UIViewController {
     
+    static var setReward: Void = {
+        DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : ["reward": "hello"]])
+        return
+    }()
+    
     class func instance() -> ViewController {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            let _ = ViewController.setReward }
         return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ViewController") as! ViewController
     }
     

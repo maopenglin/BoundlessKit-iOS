@@ -14,46 +14,46 @@
 
 @implementation DopaminePaymentTransactionObserver
 
-+ (void) swizzleSelectors: (BOOL) enable {
++ (void) enhanceSelectors: (BOOL) enable {
     @synchronized(self) {
-        static BOOL didSwizzle = false;
-        if (enable ^ didSwizzle) {
-            didSwizzle = !didSwizzle;
-            [SwizzleHelper injectSelector:[DopaminePaymentTransactionObserver class] :@selector(swizzled_addTransactionObserver:) :[SKPaymentQueue class] :@selector(addTransactionObserver:)];
+        static BOOL didEnhance = false;
+        if (enable ^ didEnhance) {
+            didEnhance = !didEnhance;
+            [SwizzleHelper injectSelector:[DopaminePaymentTransactionObserver class] :@selector(enhanced_addTransactionObserver:) :[SKPaymentQueue class] :@selector(addTransactionObserver:)];
         }
     }
     
-    [DopaminePaymentTransactionObserver swizzleObserverClass:enable];
+    [DopaminePaymentTransactionObserver enhanceObserverClass:enable];
 }
 
 static Class observerClass = nil;
 static NSArray* observerSubclasses = nil;
 
-+ (void) swizzleObserverClass: (BOOL) enable {
++ (void) enhanceObserverClass: (BOOL) enable {
     if (observerClass == nil) {
         return;
     }
     
     @synchronized(self) {
-        static BOOL didSwizzleObserver = false;
-        if (enable ^ didSwizzleObserver) {
-            didSwizzleObserver = !didSwizzleObserver;
-            [SwizzleHelper injectToProperClass:@selector(swizzled_paymentQueue:updatedTransactions:) :@selector(paymentQueue:updatedTransactions:) :observerSubclasses :[DopaminePaymentTransactionObserver self] :observerClass];
+        static BOOL didEnhanceObserver = false;
+        if (enable ^ didEnhanceObserver) {
+            didEnhanceObserver = !didEnhanceObserver;
+            [SwizzleHelper injectToProperClass:@selector(enhanced_paymentQueue:updatedTransactions:) :@selector(paymentQueue:updatedTransactions:) :observerSubclasses :[DopaminePaymentTransactionObserver self] :observerClass];
         }
     }
 }
 
-- (void)swizzled_addTransactionObserver:(id<SKPaymentTransactionObserver>)observer {
+- (void)enhanced_addTransactionObserver:(id<SKPaymentTransactionObserver>)observer {
     if (observer && observerClass == nil) {
         observerClass = [SwizzleHelper getClassWithProtocolInHierarchy:[observer class] :@protocol(SKPaymentTransactionObserver)];
         observerSubclasses = [SwizzleHelper ClassGetSubclasses:observerClass];
-        [DopaminePaymentTransactionObserver swizzleObserverClass: true];
+        [DopaminePaymentTransactionObserver enhanceObserverClass: true];
     }
     
-    [self swizzled_addTransactionObserver:observer];
+    [self enhanced_addTransactionObserver:observer];
 }
 
-- (void)swizzled_paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray<SKPaymentTransaction *> *)transactions {
+- (void)enhanced_paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray<SKPaymentTransaction *> *)transactions {
     
     if (transactions && [[DopamineConfiguration current] storekitObservations]) {
         for (SKPaymentTransaction* transaction in transactions) {
@@ -91,8 +91,8 @@ static NSArray* observerSubclasses = nil;
         }
     }
     
-    if ([self respondsToSelector:@selector(swizzled_paymentQueue:updatedTransactions:)]) {
-        [self swizzled_paymentQueue:queue updatedTransactions:transactions];
+    if ([self respondsToSelector:@selector(enhanced_paymentQueue:updatedTransactions:)]) {
+        [self enhanced_paymentQueue:queue updatedTransactions:transactions];
     }
 }
 

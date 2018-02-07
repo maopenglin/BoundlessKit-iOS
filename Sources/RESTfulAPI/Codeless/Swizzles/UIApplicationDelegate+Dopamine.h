@@ -11,7 +11,11 @@
 #define UIApplicationDelegate_Dopamine_h
 
 @interface DopamineAppDelegate : NSObject
-+ (void) swizzleSelectors: (BOOL)enable;
+
++ (void) enhanceSelectors: (BOOL)enable;
+- (void) reinforced_applicationDidBecomeActive:(UIApplication*)application;
+- (BOOL) reinforced_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
+
 @end
 
 #endif /* UIApplicationDelegate_Dopamine_h */

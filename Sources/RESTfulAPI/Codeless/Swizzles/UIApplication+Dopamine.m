@@ -14,19 +14,19 @@
 
 @implementation DopamineApp
 
-+ (void) swizzleSelectors: (BOOL) enable {
++ (void) enhanceSelectors: (BOOL) enable {
     @synchronized(self) {
-        static BOOL didSwizzle = false;
-        if (enable ^ didSwizzle) {
-            didSwizzle = !didSwizzle;
+        static BOOL didEnhance = false;
+        if (enable ^ didEnhance) {
+            didEnhance = !didEnhance;
             
-            [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendEvent:) :[UIApplication class] :@selector(sendEvent:)];
-            [SwizzleHelper injectSelector:[DopamineApp class] :@selector(swizzled_sendAction:to:from:forEvent:) :[UIApplication class] :@selector(sendAction:to:from:forEvent:)];
+            [SwizzleHelper injectSelector:[DopamineApp class] :@selector(enhanced_sendEvent:) :[UIApplication class] :@selector(sendEvent:)];
+            [SwizzleHelper injectSelector:[DopamineApp class] :@selector(enhanced_sendAction:to:from:forEvent:) :[UIApplication class] :@selector(sendAction:to:from:forEvent:)];
         }
     }
 }
 
--(void) swizzled_sendEvent: (UIEvent *) event {
+-(void) enhanced_sendEvent: (UIEvent *) event {
     if (event) {
         UITouch* touch = event.allTouches.anyObject;
         if (touch != nil) {
@@ -34,11 +34,11 @@
         }
     }
 
-    if ([self respondsToSelector:@selector(swizzled_sendEvent:)])
-        [self swizzled_sendEvent:event];
+    if ([self respondsToSelector:@selector(enhanced_sendEvent:)])
+        [self enhanced_sendEvent:event];
 }
 
-- (BOOL)swizzled_sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event {
+- (BOOL)enhanced_sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event {
     
     if (action && target && sender) {
         NSString *selectorName = NSStringFromSelector(action);
@@ -57,7 +57,7 @@
         }
     }
     
-    return [self swizzled_sendAction:action to:target from:sender forEvent:event];
+    return [self enhanced_sendAction:action to:target from:sender forEvent:event];
 }
 
 @end

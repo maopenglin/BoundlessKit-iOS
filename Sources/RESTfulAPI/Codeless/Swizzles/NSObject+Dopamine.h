@@ -9,14 +9,7 @@
 #define NSObject_Dopamine_h
 
 @interface DopamineObject : NSObject
-
-- (void) methodToReinforce;
-- (void) methodWithSenderToReinforce :(id)sender;
-
-+ (IMP) createImp :(SEL) selector;
-+ (IMP) createImpWithObjectParam :(SEL) selector;
-+ (IMP) createImpWithIntParam :(SEL) selector;
-
++ (SEL) createReinforcedMethodFor :(Class) targetClass :(SEL) originalSelector :(SEL) newSelector;
 @end
 
 #endif /* NSObject_Dopamine_h */

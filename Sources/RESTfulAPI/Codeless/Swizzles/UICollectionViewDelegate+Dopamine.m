@@ -16,55 +16,55 @@
 
 @implementation DopamineCollectionViewDelegate
 
-+ (void) swizzleSelectors: (BOOL) enable {
++ (void) enhanceSelectors: (BOOL) enable {
     @synchronized(self) {
-        static BOOL didSwizzle = false;
-        if (enable ^ didSwizzle) {
-            didSwizzle = !didSwizzle;
-            [SwizzleHelper injectSelector:[DopamineCollectionViewDelegate class] :@selector(swizzled_setDelegate:) :[UICollectionView class] :@selector(setDelegate:)];
+        static BOOL didEnhance = false;
+        if (enable ^ didEnhance) {
+            didEnhance = !didEnhance;
+            [SwizzleHelper injectSelector:[DopamineCollectionViewDelegate class] :@selector(enhanced_setDelegate:) :[UICollectionView class] :@selector(setDelegate:)];
         }
     }
-    [DopamineCollectionViewDelegate swizzleDelegateClass:enable];
+    [DopamineCollectionViewDelegate enhanceDelegateClass:enable];
 }
 
 
 static Class delegateClass = nil;
 static NSArray* delegateSubclasses = nil;
 
-+ (void) swizzleDelegateClass:(BOOL) enable {
++ (void) enhanceDelegateClass:(BOOL) enable {
     if (delegateClass == nil) {
         return;
     }
     
     @synchronized(self) {
-        static BOOL didSwizzleDelegate = false;
-        if (enable ^ didSwizzleDelegate) {
-            didSwizzleDelegate = !didSwizzleDelegate;
+        static BOOL didEnhanceDelegate = false;
+        if (enable ^ didEnhanceDelegate) {
+            didEnhanceDelegate = !didEnhanceDelegate;
             
-            [SwizzleHelper injectToProperClass:@selector(swizzled_collectionView:didSelectItemAtIndexPath:) :@selector(collectionView:didSelectItemAtIndexPath:) :delegateSubclasses :[DopamineCollectionViewDelegate class] :delegateClass];
+            [SwizzleHelper injectToProperClass:@selector(enhanced_collectionView:didSelectItemAtIndexPath:) :@selector(collectionView:didSelectItemAtIndexPath:) :delegateSubclasses :[DopamineCollectionViewDelegate class] :delegateClass];
         }
     }
 }
 
-- (void) swizzled_setDelegate:(id<UICollectionViewDelegate>)delegate {
+- (void) enhanced_setDelegate:(id<UICollectionViewDelegate>)delegate {
     if (delegate && delegateClass == nil) {
         delegateClass = [SwizzleHelper getClassWithProtocolInHierarchy:[delegate class] :@protocol(UICollectionViewDelegate)];
         delegateSubclasses = [SwizzleHelper ClassGetSubclasses:delegateClass];
-        [DopamineCollectionViewDelegate swizzleDelegateClass:true];
+        [DopamineCollectionViewDelegate enhanceDelegateClass:true];
     }
     
-    [self swizzled_setDelegate:delegate];
+    [self enhanced_setDelegate:delegate];
 }
 
 // Did Select Row
 
-- (void)swizzled_collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+- (void)enhanced_collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (self) {
-        [CodelessAPI submitWithTarget:self selector:@selector(collectionView:didSelectItemAtIndexPath:)];
+        [CodelessAPI submitWithTargetInstance:self selector:@selector(collectionView:didSelectItemAtIndexPath:)];
     }
     
-    if ([self respondsToSelector:@selector(swizzled_collectionView:didSelectItemAtIndexPath:)]) {
-        [self swizzled_collectionView:collectionView didSelectItemAtIndexPath:indexPath];
+    if ([self respondsToSelector:@selector(enhanced_collectionView:didSelectItemAtIndexPath:)]) {
+        [self enhanced_collectionView:collectionView didSelectItemAtIndexPath:indexPath];
     }
 }
 

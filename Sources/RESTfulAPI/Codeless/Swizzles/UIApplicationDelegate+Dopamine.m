@@ -14,77 +14,77 @@
 
 @implementation DopamineAppDelegate
 
-+ (void) swizzleSelectors: (BOOL) enable {
++ (void) enhanceSelectors: (BOOL) enable {
     @synchronized(self) {
-        static BOOL didSwizzle = false;
-        if (enable ^ didSwizzle) {
-            didSwizzle = !didSwizzle;
-            [SwizzleHelper injectSelector:[DopamineAppDelegate class] :@selector(swizzled_setDelegate:) :[UIApplication class] :@selector(setDelegate:)];
+        static BOOL didEnhance = false;
+        if (enable ^ didEnhance) {
+            didEnhance = !didEnhance;
+            [SwizzleHelper injectSelector:[DopamineAppDelegate class] :@selector(enhanced_setDelegate:) :[UIApplication class] :@selector(setDelegate:)];
         }
     }
-    [self swizzleDelegateClass:enable];
+    [self enhanceDelegateClass:enable];
 }
 
 
 static Class delegateClass = nil;
 static NSArray* delegateSubclasses = nil;
-+ (void) swizzleDelegateClass:(BOOL) enable {
++ (void) enhanceDelegateClass:(BOOL) enable {
     if (delegateClass == nil) {
         return;
     }
     
     @synchronized(self) {
-        static BOOL didSwizzleDelegate = false;
-        if (enable ^ didSwizzleDelegate) {
-            didSwizzleDelegate = !didSwizzleDelegate;
+        static BOOL didEnhanceDelegate = false;
+        if (enable ^ didEnhanceDelegate) {
+            didEnhanceDelegate = !didEnhanceDelegate;
             
             // Application state
             //
-            Class swizzledClass = [DopamineAppDelegate class];
-            [SwizzleHelper injectToProperClass:@selector(swizzled_application:didFinishLaunchingWithOptions:) :@selector(application:didFinishLaunchingWithOptions:) :delegateSubclasses :swizzledClass :delegateClass];
-//            [SwizzleHelper injectToProperClass:@selector(swizzled_applicationWillTerminate:) :@selector(applicationWillTerminate:) :delegateSubclasses :swizzledClass :delegateClass];
-            [SwizzleHelper injectToProperClass :@selector(swizzled_applicationDidBecomeActive:) :@selector(applicationDidBecomeActive:) :delegateSubclasses :swizzledClass :delegateClass ];
-            [SwizzleHelper injectToProperClass :@selector(swizzled_applicationWillResignActive:) :@selector(applicationWillResignActive:) :delegateSubclasses :swizzledClass :delegateClass ];
+            Class enhancedClass = [DopamineAppDelegate class];
+            [SwizzleHelper injectToProperClass:@selector(enhanced_application:didFinishLaunchingWithOptions:) :@selector(application:didFinishLaunchingWithOptions:) :delegateSubclasses :enhancedClass :delegateClass];
+//            [SwizzleHelper injectToProperClass:@selector(enhanced_applicationWillTerminate:) :@selector(applicationWillTerminate:) :delegateSubclasses :enhancedClass :delegateClass];
+            [SwizzleHelper injectToProperClass :@selector(enhanced_applicationDidBecomeActive:) :@selector(applicationDidBecomeActive:) :delegateSubclasses :enhancedClass :delegateClass ];
+            [SwizzleHelper injectToProperClass :@selector(enhanced_applicationWillResignActive:) :@selector(applicationWillResignActive:) :delegateSubclasses :enhancedClass :delegateClass ];
         }
     }
 }
 
-- (void) swizzled_setDelegate:(id<UIApplicationDelegate>)delegate {
+- (void) enhanced_setDelegate:(id<UIApplicationDelegate>)delegate {
     if (delegate && delegateClass == nil) {
         delegateClass = [SwizzleHelper getClassWithProtocolInHierarchy:[delegate class] :@protocol(UIApplicationDelegate)];
         delegateSubclasses = [SwizzleHelper ClassGetSubclasses:delegateClass];
-        [DopamineAppDelegate swizzleDelegateClass:true];
+        [DopamineAppDelegate enhanceDelegateClass:true];
     }
     
-    [self swizzled_setDelegate:delegate];
+    [self enhanced_setDelegate:delegate];
 }
 
-// Application State Swizzles
+// Application State Enhances
 
-- (BOOL) swizzled_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [CodelessAPI submitWithTarget:self selector:@selector(application:didFinishLaunchingWithOptions:)];
+- (BOOL) enhanced_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [CodelessAPI submitWithTargetInstance:self selector:@selector(application:didFinishLaunchingWithOptions:)];
     
-    if ([self respondsToSelector:@selector(swizzled_application:didFinishLaunchingWithOptions:)]) {
-        return [self swizzled_application:application didFinishLaunchingWithOptions:launchOptions];
+    if ([self respondsToSelector:@selector(enhanced_application:didFinishLaunchingWithOptions:)]) {
+        return [self enhanced_application:application didFinishLaunchingWithOptions:launchOptions];
     } else {
         return true;
     }
 }
 
-- (void) swizzled_applicationWillTerminate:(UIApplication *)application {
-    [CodelessAPI submitWithTarget:self selector:@selector(applicationWillTerminate:)];
+- (void) enhanced_applicationWillTerminate:(UIApplication *)application {
+    [CodelessAPI submitWithTargetInstance:self selector:@selector(applicationWillTerminate:)];
     
-    if ([self respondsToSelector:@selector(swizzled_applicationWillTerminate:)]) {
-        [self swizzled_applicationWillTerminate:application];
+    if ([self respondsToSelector:@selector(enhanced_applicationWillTerminate:)]) {
+        [self enhanced_applicationWillTerminate:application];
     }
 }
 
-- (void) swizzled_applicationDidBecomeActive:(UIApplication*)application {
-    if ([self respondsToSelector:@selector(swizzled_applicationDidBecomeActive:)])
-        [self swizzled_applicationDidBecomeActive:application];
+- (void) enhanced_applicationDidBecomeActive:(UIApplication*)application {
+    if ([self respondsToSelector:@selector(enhanced_applicationDidBecomeActive:)])
+        [self enhanced_applicationDidBecomeActive:application];
     
     [CodelessAPI bootWithCompletion:^{}];
-    [CodelessAPI submitWithTarget:self selector:@selector(applicationDidBecomeActive:)];
+    [CodelessAPI submitWithTargetInstance:self selector:@selector(applicationDidBecomeActive:)];
     
     if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"didBecomeActive",
@@ -95,8 +95,8 @@ static NSArray* delegateSubclasses = nil;
     
 }
 
-- (void) swizzled_applicationWillResignActive:(UIApplication*)application {
-    [CodelessAPI submitWithTarget:self selector:@selector(applicationWillResignActive:)];
+- (void) enhanced_applicationWillResignActive:(UIApplication*)application {
+    [CodelessAPI submitWithTargetInstance:self selector:@selector(applicationWillResignActive:)];
     
     if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"willResignActive",
@@ -105,8 +105,25 @@ static NSArray* delegateSubclasses = nil;
                                                           }];
     }
     
-    if ([self respondsToSelector:@selector(swizzled_applicationWillResignActive:)])
-        [self swizzled_applicationWillResignActive:application];
+    if ([self respondsToSelector:@selector(enhanced_applicationWillResignActive:)])
+        [self enhanced_applicationWillResignActive:application];
+}
+
+- (BOOL) reinforced_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [SelectorReinforcement attemptReinforcementWithTarget:self action:@selector(application:didFinishLaunchingWithOptions:)];
+    
+    if ([self respondsToSelector:@selector(reinforced_application:didFinishLaunchingWithOptions:)]) {
+        return [self reinforced_application:application didFinishLaunchingWithOptions:launchOptions];
+    } else {
+        return true;
+    }
+}
+
+- (void) reinforced_applicationDidBecomeActive:(UIApplication*)application {
+    if ([self respondsToSelector:@selector(reinforced_applicationDidBecomeActive:)])
+        [self reinforced_applicationDidBecomeActive:application];
+    
+    [SelectorReinforcement attemptReinforcementWithTarget:self action:@selector(applicationDidBecomeActive:)];
 }
 
 @end

@@ -11,7 +11,7 @@
 #define UICollectionViewDelegate_Dopamine_h
 
 @interface DopamineCollectionViewDelegate : NSObject
-+ (void) swizzleSelectors: (BOOL)enable;
++ (void) enhanceSelectors: (BOOL)enable;
 @end
 
 #endif /* UICollectionViewDelegate_Dopamine_h */

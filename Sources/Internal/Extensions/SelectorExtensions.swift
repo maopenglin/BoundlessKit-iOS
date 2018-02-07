@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal extension Selector {
+public extension Selector {
     func withRandomString(length: Int = 6) -> Selector {
         var components = NSStringFromSelector(self).components(separatedBy: ":")
         components[0] += String.random(length: length)

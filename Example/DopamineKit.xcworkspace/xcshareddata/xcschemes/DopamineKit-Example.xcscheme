@@ -56,7 +56,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "67AB7FF056F64C6FDC1118D97EA8DEF9"
+               BlueprintIdentifier = "C05A7DEF3A054CC5B2756895AFC5407B"
                BuildableName = "DopamineKit.framework"
                BlueprintName = "DopamineKit"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
@@ -175,6 +175,11 @@
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
+         <AdditionalOption
+            key = "NSZombieEnabled"
+            value = "YES"
+            isEnabled = "YES">
+         </AdditionalOption>
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction

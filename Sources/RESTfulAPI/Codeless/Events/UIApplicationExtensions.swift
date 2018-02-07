@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 internal extension UIApplication {
     
     func attemptReinforcement(senderInstance: AnyObject, targetInstance: AnyObject, selectorObj: Selector) {

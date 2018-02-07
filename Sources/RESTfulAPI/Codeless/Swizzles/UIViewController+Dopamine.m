@@ -15,40 +15,39 @@
 
 @implementation DopamineViewController
 
-+ (void) swizzleSelectors: (BOOL) enable {
++ (void) enhanceSelectors: (BOOL) enable {
     @synchronized(self) {
-        static BOOL didSwizzle = false;
-        if (enable ^ didSwizzle) {
-            didSwizzle = !didSwizzle;
-            [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidAppear:) :[UIViewController class] :@selector(viewDidAppear:)];
-            [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(swizzled_viewDidDisappear:) :[UIViewController class] :@selector(viewDidDisappear:)];
+        static BOOL didEnhance = false;
+        if (enable ^ didEnhance) {
+            didEnhance = !didEnhance;
+            [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(enhanced_viewDidAppear:) :[UIViewController class] :@selector(viewDidAppear:)];
+            [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(enhanced_viewDidDisappear:) :[UIViewController class] :@selector(viewDidDisappear:)];
         }
     }
 }
 
-- (void) swizzled_viewDidAppear:(BOOL)animated {
-    if ([self respondsToSelector:@selector(swizzled_viewDidAppear:)])
-        [self swizzled_viewDidAppear:animated];
-    
+- (void) enhanced_viewDidAppear:(BOOL)animated {
+    if ([self respondsToSelector:@selector(enhanced_viewDidAppear:)])
+        [self enhanced_viewDidAppear:animated];
     
     if (self) {
-        [CodelessAPI submitWithTarget:self selector:@selector(viewDidAppear:)];
+        [CodelessAPI submitWithTargetInstance:self selector:@selector(viewDidAppear:)];
     }
     
     if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
         [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didAppear",
-                                                          @"classname": NSStringFromClass([self class]),
-                                                          @"time": [DopeTimer trackStartTimeFor:[self description]]
-                                                          }];
+                                                         @"classname": NSStringFromClass([self class]),
+                                                         @"time": [DopeTimer trackStartTimeFor:[self description]]
+                                                         }];
     }
 }
 
-- (void) swizzled_viewDidDisappear:(BOOL)animated {
-    if ([self respondsToSelector:@selector(swizzled_viewDidDisappear:)])
-        [self swizzled_viewDidDisappear:animated];
+- (void) enhanced_viewDidDisappear:(BOOL)animated {
+    if ([self respondsToSelector:@selector(enhanced_viewDidDisappear:)])
+        [self enhanced_viewDidDisappear:animated];
     
     if (self) {
-        [CodelessAPI submitWithTarget:self selector:@selector(viewDidDisappear:)];
+        [CodelessAPI submitWithTargetInstance:self selector:@selector(viewDidDisappear:)];
     }
     
     if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
@@ -56,6 +55,16 @@
                                                           @"classname": NSStringFromClass([self class]),
                                                           @"time": [DopeTimer timeTrackedFor:[self description]]
                                                               }];
+    }
+}
+
+- (void) reinforced_viewDidAppear:(BOOL)animated {
+    if ([self respondsToSelector:@selector(reinforced_viewDidAppear:)])
+        [self reinforced_viewDidAppear:animated];
+    // TO-DO: test if else call super.viewDidAppear
+    
+    if (self) {
+        [SelectorReinforcement attemptReinforcementWithTarget:self action:@selector(viewDidAppear:)];
     }
 }
 @end

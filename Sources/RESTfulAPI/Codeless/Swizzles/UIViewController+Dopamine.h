@@ -11,7 +11,9 @@
 
 @interface DopamineViewController : UIViewController
 
-+ (void) swizzleSelectors: (BOOL)enable;
++ (void) enhanceSelectors: (BOOL)enable;
+- (void) enhanced_viewDidAppear:(BOOL)animated;
+- (void) reinforced_viewDidAppear:(BOOL)animated;
 
 @end
 
