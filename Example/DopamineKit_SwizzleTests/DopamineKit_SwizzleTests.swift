@@ -27,19 +27,19 @@ class DopamineKit_SwizzleTests: XCTestCase {
         super.tearDown()
     }
     
-    func testSwizzleForViewControllerDidAppear() {
-        var controllerUnderTest: ViewController!
-        controllerUnderTest = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
-        
-        doubleSwizzle(
-            sut: controllerUnderTest,
-            selector1: #selector(ViewController.funcReturnVoidParams0),
-            args1: [],
-            selector2: #selector(ViewController.func2ReturnVoidParams0),
-            args2: [],
-            argsCount: 0
-        )
-    }
+//    func testSwizzleForViewControllerDidAppear() {
+//        var controllerUnderTest: ViewController!
+//        controllerUnderTest = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
+//
+//        doubleSwizzle(
+//            sut: controllerUnderTest,
+//            selector1: #selector(ViewController.funcReturnVoidParams0),
+//            args1: [],
+//            selector2: #selector(ViewController.func2ReturnVoidParams0),
+//            args2: [],
+//            argsCount: 0
+//        )
+//    }
     
     func testSwizzleForMethodReturnsVoidParam0() {
         var controllerUnderTest: ViewController!
@@ -93,10 +93,10 @@ class DopamineKit_SwizzleTests: XCTestCase {
         let beforeTestFunc2StackSize = DopamineKit_SwizzleTests.counter
         
         // when
-        SelectorReinforcement.registerSimpleMethod(classType: type(of: sut), selector: selector1, reinforcement: ["reward": ["rewardForFirst": ["Hello!"]]])
-        SelectorReinforcement.registerSimpleMethod(classType: type(of: sut), selector: selector2, reinforcement: ["reward": ["rewardForSecond": ["Hello!"]]])
-        XCTAssert(SelectorReinforcement.isRegistered(classType: type(of: sut), selector: selector1), "Selector was not registered")
-        XCTAssert(SelectorReinforcement.isRegistered(classType: type(of: sut), selector: selector2), "Selector was not registered")
+        let swizzle1 = DopamineChanges.shared.registerSimpleMethod(classType: type(of: sut), selector: selector1, reinforcement: ["reward": ["rewardForFirst": ["Hello!"]]])
+        let swizzle2 = DopamineChanges.shared.registerSimpleMethod(classType: type(of: sut), selector: selector2, reinforcement: ["reward": ["rewardForSecond": ["Hello!"]]])
+        XCTAssert(swizzle1, "Selector was not registered")
+        XCTAssert(swizzle2, "Selector was not registered")
         
         
         // then

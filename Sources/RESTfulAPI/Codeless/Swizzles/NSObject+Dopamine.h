@@ -9,7 +9,10 @@
 #define NSObject_Dopamine_h
 
 @interface DopamineObject : NSObject
+
 + (SEL) createReinforcedMethodFor :(Class) targetClass :(SEL) originalSelector :(SEL) newSelector;
++ (BOOL) templateAvailableFor :(Class) classType :(SEL) selector;
+
 @end
 
 #endif /* NSObject_Dopamine_h */

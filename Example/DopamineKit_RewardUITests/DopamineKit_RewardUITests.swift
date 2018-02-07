@@ -62,7 +62,7 @@ class DopamineKit_RewardUITests: XCTestCase {
         let changesDelegate = ChangesDelegate(promise: promise)
         DopamineChanges.shared.delegate = changesDelegate
         DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : "somereward"])
-        DopamineChanges.shared.setSwizzling(true)
+        DopamineChanges.shared.enhanceMethods(true)
 
         XCUIApplication().buttons["Reinforce a user action"].tap()
 

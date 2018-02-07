@@ -28,9 +28,8 @@ class ViewController: UIViewController {
         return
     }()
     
-    class func instance() -> ViewController {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            let _ = ViewController.setReward }
+    @objc class func instance() -> ViewController {
+        let _ = ViewController.setReward
         return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ViewController") as! ViewController
     }
     
@@ -154,7 +153,7 @@ class ViewController: UIViewController {
 //            }
 //        }
         
-//        SelectorReinforcement.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!"]])
+        DopamineChanges.shared.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!!"]])
     }
     
     @objc func loadBasicUI(){

@@ -59,16 +59,16 @@ open class SelectorReinforcement : NSObject {
     
     
     
-    func registerMethod() {
+    func registerMethod() -> Bool {
         DopeLog.debug("Attempting to register <\(self.actionID)>...")
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {
             DopeLog.debug("Codeless integration mode disabled")
-            return
+            return false
         }
         
         guard SelectorReinforcement.registered[actionID] == nil else {
             DopeLog.debug("Reinforcement for class:\(NSStringFromClass(targetClass)) method:\(NSStringFromSelector(selector)) already registered.")
-            return
+            return false
         }
         
         if let (reinforcedClass, reinforcedSelector) = reinforcedCounterparts {
@@ -77,21 +77,23 @@ open class SelectorReinforcement : NSObject {
             SelectorReinforcement.unregistered.removeValue(forKey: actionID)
             SelectorReinforcement.registered[actionID] = self
             DopeLog.debug("Registered reinforcer for class \(targetClass) selector \(selector) with reinforced selector \(reinforcedSelector)")
+            return true
         } else {
             DopeLog.debug("Could not register reinforcer for class \(targetClass) selector \(selector)")
+            return false
         }
     }
     
-    func unregisterMethod() {
+    func unregisterMethod() -> Bool {
         DopeLog.debug("Attempting to unregister <\(self.actionID)>...")
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {
             DopeLog.debug("Codeless integration mode disabled")
-            return
+            return false
         }
         
         guard let _ = SelectorReinforcement.registered[actionID]?.reinforcer else {
             DopeLog.debug("Reinforcement for class:\(NSStringFromClass(targetClass)) method:\(NSStringFromSelector(selector)) not registered.")
-            return
+            return false
         }
         
         if let (reinforcedClass, reinforcedSelector) = reinforcedCounterparts {
@@ -100,8 +102,10 @@ open class SelectorReinforcement : NSObject {
             SelectorReinforcement.registered.removeValue(forKey: actionID)
             SelectorReinforcement.unregistered[actionID] = self
             DopeLog.debug("Registered reinforcer for class \(targetClass) selector \(selector) with reinforced selector \(reinforcedSelector)")
+            return true
         } else {
             DopeLog.debug("Could not register reinforcer for class \(targetClass) selector \(selector)")
+            return false
         }
     }
     

@@ -25,18 +25,33 @@
     NSString* methodTypeEncodingString = [NSString stringWithUTF8String:methodTypeEncoding];
     
     IMP dynamicImp;
-    if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(simpleMethodWithNoParam)]) {
-        dynamicImp = [DopamineObject createImpWithNoParam:newSelector :originalSelector];
-    } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(simpleMethodWithObjectParam:)]) {
-        dynamicImp = [DopamineObject createImpWithObjectParam:newSelector :originalSelector];
-    } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(simpleMethodWithIntParam:)]) {
-        dynamicImp = [DopamineObject createImpWithIntParam:newSelector :originalSelector];
+    void (^reinforceBlock)(id target) = ^void(id target) {
+        NSLog(@"In dynamic imp with class:%@ and selector:%@ and originalSelector:%@", NSStringFromClass([target class]), NSStringFromSelector(newSelector), NSStringFromSelector(originalSelector));
+        [SelectorReinforcement attemptReinforcementWithTarget:target action:originalSelector];
+    };
+    
+    if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithNoParam)]) {
+        dynamicImp = [DopamineObject createImpWithNoParam:newSelector :reinforceBlock];
+    } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithObjectParam:)]) {
+        dynamicImp = [DopamineObject createImpWithObjectParam:newSelector :reinforceBlock];
+    } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithIntParam:)]) {
+        dynamicImp = [DopamineObject createImpWithIntParam:newSelector :reinforceBlock];
     } else {
         NSLog(@"Unsupported encoding:%@", methodTypeEncodingString);
         return nil;
     }
     
     class_addMethod(targetClass, newSelector, dynamicImp, methodTypeEncoding);
+    
+    Method newMethod = class_getInstanceMethod(targetClass, originalSelector);
+    if (newMethod == nil) {
+        return nil;
+    }
+    const char* newMethodTypeEncoding = method_getTypeEncoding(newMethod);
+    NSString* newMethodTypeEncodingString = [NSString stringWithUTF8String:newMethodTypeEncoding];
+    if (![methodTypeEncodingString isEqualToString:newMethodTypeEncodingString]) {
+        return nil;
+    }
     
     return newSelector;
 }
@@ -52,38 +67,47 @@
     return [templateMethodTypeEncodingString isEqualToString:candidate];
 }
 
-- (void) simpleMethodWithNoParam { }
-+ (IMP) createImpWithNoParam :(SEL) selector :(SEL) originalSelector {
++ (BOOL) templateAvailableFor :(Class) classType :(SEL) selector {
+    Method method = class_getInstanceMethod(classType, selector);
+    if (method == nil) {
+        return false;
+    }
+    const char* methodTypeEncoding = method_getTypeEncoding(method);
+    NSString* methodTypeEncodingString = [NSString stringWithUTF8String:methodTypeEncoding];
+    
+    return
+    [methodTypeEncodingString isEqualToString:[NSString stringWithUTF8String:method_getTypeEncoding(class_getInstanceMethod([DopamineObject self], @selector(templateMethodWithNoParam)))]] ||
+    [methodTypeEncodingString isEqualToString:[NSString stringWithUTF8String:method_getTypeEncoding(class_getInstanceMethod([DopamineObject self], @selector(templateMethodWithObjectParam:)))]] ||
+    [methodTypeEncodingString isEqualToString:[NSString stringWithUTF8String:method_getTypeEncoding(class_getInstanceMethod([DopamineObject self], @selector(templateMethodWithIntParam:)))]];
+}
+
+- (void) templateMethodWithNoParam { }
++ (IMP) createImpWithNoParam :(SEL) selector :(void (^)(id)) reinforceBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self) {
         if (!self || ![self respondsToSelector:selector]) {return;}
-        NSLog(@"In dynamic imp with class:%@ and selector:%@ and originalSelector:%@", NSStringFromClass([self class]), NSStringFromSelector(selector), NSStringFromSelector(originalSelector));
-        
-        [SelectorReinforcement attemptReinforcementWithTarget:self action:originalSelector];
+        reinforceBlock(self);
         ((void (*)(id, SEL))[self methodForSelector:selector])(self, selector);
     });
     
     return dynamicImp;
 }
 
-- (void) simpleMethodWithObjectParam :(id) param1 { }
-+ (IMP) createImpWithObjectParam :(SEL) selector :(SEL) originalSelector {
+- (void) templateMethodWithObjectParam :(id) param1 { }
++ (IMP) createImpWithObjectParam :(SEL) selector :(void (^)(id)) reinforceBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self, id object) {
         if (!self || ![self respondsToSelector:selector]) {return;}
-        NSLog(@"In dynamic imp with class:%@ and selector:%@ and originalSelector:%@ and parameter:%@", NSStringFromClass([self class]), NSStringFromSelector(selector), NSStringFromSelector(originalSelector), object);
-        [SelectorReinforcement attemptReinforcementWithTarget:self action:originalSelector];
+        reinforceBlock(self);
         ((void (*)(id, SEL, id))[self methodForSelector:selector])(self, selector, object);
     });
     
     return dynamicImp;
 }
 
-- (void) simpleMethodWithIntParam :(int) param1 { }
-+ (IMP) createImpWithIntParam :(SEL) selector :(SEL) originalSelector {
+- (void) templateMethodWithIntParam :(int) param1 { }
++ (IMP) createImpWithIntParam :(SEL) selector :(void (^)(id)) reinforceBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self, int object) {
         if (!self || ![self respondsToSelector:selector]) {return;}
-        NSLog(@"In dynamic imp with class:%@ and selector:%@ and originalSelector:%@ and parameter:%d", NSStringFromClass([self class]), NSStringFromSelector(selector), NSStringFromSelector(originalSelector), object);
-        [SelectorReinforcement attemptReinforcementWithTarget:self action:originalSelector];
-        
+        reinforceBlock(self);
         ((void (*)(id, SEL, int))[self methodForSelector:selector])(self, selector, object);
     });
     

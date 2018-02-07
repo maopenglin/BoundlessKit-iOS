@@ -25,15 +25,16 @@ open class DopamineChanges : NSObject {
     }
     
     @objc
-    open func setStandardTracking() {
-        let defaultsKey = "disableStandardEnhancement"
-        let disableStandardEnhancement = UserDefaults.dopamine.bool(forKey: defaultsKey)
-        DopeLog.debug("Value for \(defaultsKey):\(disableStandardEnhancement)")
-        setEnhancement(!disableStandardEnhancement)
+    open func wake() {
+        enhanceMethods(DopamineDefaults.enableEnhancement)
+        registerMethods()
+        if (!DopamineProperties.current.inProduction) {
+            registerVisualizerMethods()
+        }
     }
     
     @objc
-    open func setEnhancement(_ shouldEnhance: Bool) {
+    open func enhanceMethods(_ shouldEnhance: Bool) {
         // Enhance - UIApplication
         DopamineApp.enhanceSelectors(shouldEnhance)
         
@@ -51,42 +52,38 @@ open class DopamineChanges : NSObject {
         
         // Enhance - UICollectionViewController
         DopamineCollectionViewDelegate.enhanceSelectors(shouldEnhance)
-        
-        registerMethods()
     }
     
     
     public func registerVisualizerMethods() {
         for actionID in DopamineVersion.current.visualizerActionIDs {
-            SelectorReinforcement(actionID: actionID)?.registerMethod()
+            let _ = SelectorReinforcement(actionID: actionID)?.registerMethod()
         }
     }
     
     public func registerMethods() {
         for actionID in DopamineVersion.current.actionIDs {
-            SelectorReinforcement(actionID: actionID)?.registerMethod()
+            let _ = SelectorReinforcement(actionID: actionID)?.registerMethod()
         }
     }
     
-    public func registerSimpleMethod(classType: AnyClass, selector: Selector, reinforcement: [String: Any]) {
-        let numParams = NSStringFromSelector(selector).components(separatedBy: ":").count - 1
-        if numParams > 1 {
-            DopeLog.error("Cannot register method with 2 or more parameters")
-            return
+    public func registerSimpleMethod(classType: AnyClass, selector: Selector, reinforcement: [String: Any]) -> Bool {
+        guard DopamineObject.templateAvailable(for: classType, selector) else {
+            DopeLog.error("No template support for class <\(classType)> method <\(selector)>")
+            return false
         }
         let newReinforcement = SelectorReinforcement(targetClass: classType, selector: selector)
-        DopamineVersion.current.update(visualizer: [newReinforcement.actionID: ["test":["Hello!"]]])
+        return newReinforcement.registerMethod()
     }
     
     public func unregisterMethods() {
         for actionID in DopamineVersion.current.actionIDs {
-            SelectorReinforcement(actionID: actionID)?.unregisterMethod()
+            let _ = SelectorReinforcement(actionID: actionID)?.unregisterMethod()
         }
     }
-    public func unregisterMethod(classType: AnyClass, selector: Selector) {
-        for actionID in DopamineVersion.current.actionIDs {
-            SelectorReinforcement(actionID: actionID)?.unregisterMethod()
-        }
+    
+    public func unregisterSimpleMethod(classType: AnyClass, selector: Selector) -> Bool {
+        return SelectorReinforcement(targetClass: classType, selector: selector).unregisterMethod()
     }
     
 }

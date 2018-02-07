@@ -16,7 +16,7 @@
 + (void) load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [[DopamineChanges shared] setStandardTracking];
+        [[DopamineChanges shared] wake];
     });
 }
 

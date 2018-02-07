@@ -19,7 +19,6 @@ open class UserDefaultsSingleton : NSObject, NSCoding {
 
 @objc
 public extension UserDefaults {
-    
     @objc
     static var dopamine: UserDefaults {
         get {
