@@ -13,6 +13,12 @@ import XCTest
 class DopamineKit_SwizzleTests: XCTestCase {
     
     static var counter = 0
+    static var counterAndClear: Int {
+        get {
+            defer { counter = 0 }
+            return counter
+        }
+    }
     
     var controllerUnderTest: ViewController!
     override func setUp() {
@@ -88,9 +94,9 @@ class DopamineKit_SwizzleTests: XCTestCase {
         // given
         XCTAssert(DopamineConfiguration.current.integrationMethod == "codeless")
         sut.performVariableSelector(sel: selector1, argsCount: argsCount, args: args1)
-        let beforeTestFuncStackSize = DopamineKit_SwizzleTests.counter
+        let beforeTestFuncStackSize = DopamineKit_SwizzleTests.counterAndClear
         sut.performVariableSelector(sel: selector2, argsCount: argsCount, args: args2)
-        let beforeTestFunc2StackSize = DopamineKit_SwizzleTests.counter
+        let beforeTestFunc2StackSize = DopamineKit_SwizzleTests.counterAndClear
         
         // when
         let swizzle1 = DopamineChanges.shared.registerSimpleMethod(classType: type(of: sut), selector: selector1, reinforcement: ["reward": ["rewardForFirst": ["Hello!"]]])
@@ -101,48 +107,51 @@ class DopamineKit_SwizzleTests: XCTestCase {
         
         // then
         sut.performVariableSelector(sel: selector1, argsCount: argsCount, args: args1)
-        let afterTestFuncStackSize = DopamineKit_SwizzleTests.counter
+        let afterTestFuncStackSize = DopamineKit_SwizzleTests.counterAndClear
         sut.performVariableSelector(sel: selector2, argsCount: argsCount, args: args2)
-        let afterTestFunc2StackSize = DopamineKit_SwizzleTests.counter
+        let afterTestFunc2StackSize = DopamineKit_SwizzleTests.counterAndClear
         
         XCTAssert(afterTestFuncStackSize == beforeTestFuncStackSize + 1, "Swizzle did not happen")
         XCTAssert(afterTestFunc2StackSize == beforeTestFunc2StackSize + 1, "Swizzle did not happen")
     }
     
-    
-//    func testViewControllerDidAppearReward() {
-//        // given
-//        let promise = expectation(description: "Reinforcement attempted")
-//        class ChangesDelegate : NSObject, DopamineChangesDelegate {
-//            var reinforcementAttemptPromise: XCTestExpectation
-//            
-//            init(promise: XCTestExpectation) {
-//                reinforcementAttemptPromise = promise
-//                super.init()
-//            }
-//            func attemptingReinforcement() {
-//                print("In attemptingReinforcement")
-//                reinforcementAttemptPromise.fulfill()
-//            }
-//            
-//            func showingReward() {
-//                print("In showingReward")
-//            }
-//        }
-//        
-//        let changesDelegate = ChangesDelegate(promise: promise)
-//        DopamineChanges.shared.delegate = changesDelegate
-//        DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : "somereward"])
-//        DopamineChanges.shared.setSwizzling(true)
-//        
-//        controllerUnderTest.presentAnother()
-//        
-//        waitForExpectations(timeout: 3, handler: nil)
-//        
-//        
-//    }
-    
-    
+    func testViewControllerDidAppearReward() {
+        // given
+        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
+        DopamineKit.testCredentials = testCredentials
+        class ChangesDelegate : NSObject, DopamineChangesDelegate {
+            var didAttemptBlock: (() -> Void)? = nil
+            var didRewardBlock: (() -> Void)? = nil
+            
+            func attemptingReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String) {
+                print("In attemptingReinforcement")
+                didAttemptBlock?()
+            }
+            
+            func showingReward() {
+                print("In showingReward")
+                didRewardBlock?()
+            }
+        }
+        
+        let changesDelegate = ChangesDelegate()
+        DopamineChanges.shared.delegate = changesDelegate
+        let promise = expectation(description: "Reinforcement attempted")
+        changesDelegate.didAttemptBlock = {
+            promise.fulfill()
+        }
+        
+        
+        // when
+        let selectorReinforcement = SelectorReinforcement(targetClass: ViewController.self, selector: #selector(ViewController.viewDidAppear(_:)))
+        DopamineVersion.current.update(visualizer: [selectorReinforcement.actionID : ["reward" : ["reward2":"somereward"]]])
+        let controllerUnderTest: ViewController! = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
+        controllerUnderTest.viewDidAppear(true)
+        
+        // then
+        
+        waitForExpectations(timeout: 5, handler: nil)
+    }
 }
 
 extension NSObject {

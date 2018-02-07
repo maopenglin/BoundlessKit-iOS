@@ -1,20 +1,16 @@
 use_frameworks!
 platform :ios, '9.0'
 
-def myPods
-    pod 'DopamineKit', :path => '../'
-end
-
 target 'DopamineKit_Example' do
-    myPods
-end
-
-target 'DopamineKit_ReleaseTests' do
-    myPods
-end
-
-target 'DopamineKit_ReleaseUITests' do
-    myPods
+    pod 'DopamineKit', :path => '../'
+    
+    target 'DopamineKit_ReleaseTests' do
+        inherit! :search_paths
+    end
+    
+    target 'DopamineKit_ReleaseUITests' do
+        inherit! :search_paths
+    end
 end
 
 post_install do |installer|
