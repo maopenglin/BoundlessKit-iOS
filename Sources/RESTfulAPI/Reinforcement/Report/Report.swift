@@ -150,6 +150,9 @@ internal class Report : UserDefaultsSingleton {
                         if let location = location {
                             action.addMetaData(location)
                         }
+                        if let ssid = DopeInfo.mySSID {
+                            action.addMetaData(["ssid": ssid])
+                        }
                         self.reportedActions.append(action)
                         if self.operationQueue.operationCount == 1 {
                             Report._current = self

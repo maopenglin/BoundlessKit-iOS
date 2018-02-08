@@ -62,6 +62,11 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     }
     
     public func getLocation(callback: @escaping ([String: Any]?)->()) {
+        guard DopamineConfiguration.current.locationObservations else {
+            callback(nil)
+            return
+        }
+        
         if !canGetLocation {
             callback(nil)
         } else if Date() < expiresAt {

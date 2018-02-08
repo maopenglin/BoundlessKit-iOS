@@ -142,25 +142,20 @@ internal class Track : UserDefaultsSingleton {
             return
         }
         operationQueue.addOperation {
-            if DopamineConfiguration.current.locationObservations {
-                DopeLocation.shared.getLocation { location in
-                    self.operationQueue.addOperation {
-                        if let location = location {
-                            action.addMetaData(["location": location])
-                        }
-                        self.trackedActions.append(action)
-                        if self.operationQueue.operationCount == 1 {
-                            Track._current = self
-                        }
-                        // DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
+            DopeLocation.shared.getLocation { location in
+                self.operationQueue.addOperation {
+                    if let location = location {
+                        action.addMetaData(["location": location])
                     }
+                    if let ssid = DopeInfo.mySSID {
+                        action.addMetaData(["ssid": ssid])
+                    }
+                    self.trackedActions.append(action)
+                    if self.operationQueue.operationCount == 1 {
+                        Track._current = self
+                    }
+                    // DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
                 }
-            } else {
-                self.trackedActions.append(action)
-                if self.operationQueue.operationCount == 1 {
-                    Track._current = self
-                }
-                // DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
             }
         }
     }

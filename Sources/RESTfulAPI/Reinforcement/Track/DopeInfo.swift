@@ -6,9 +6,9 @@
 //
 
 import Foundation
+import SystemConfiguration.CaptiveNetwork
 
-
-@objc public class DopeTimer : NSObject {
+@objc public class DopeInfo : NSObject {
     
     fileprivate static var timeMarkers = NSMutableDictionary()
     
@@ -30,5 +30,23 @@ import Foundation
                 "spent": NSNumber(value: spent)
         ]
     }
+    
+    
+    
+    
+    public static var mySSID: String? {
+        if let interfaces = CNCopySupportedInterfaces(),
+            let interfacesArray = interfaces as? [String],
+            interfacesArray.count > 0,
+            let unsafeInterfaceData = CNCopyCurrentNetworkInfo(interfacesArray[0] as CFString),
+            let interfaceData = unsafeInterfaceData as? Dictionary <String,AnyObject>,
+            let ssid = interfaceData["SSID"] as? String
+            {
+            return ssid
+        } else {
+            return nil
+        }
+    }
+    
     
 }

@@ -89,7 +89,7 @@ static NSArray* delegateSubclasses = nil;
     if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"didBecomeActive",
                                                           @"classname": NSStringFromClass([self class]),
-                                                          @"time": [DopeTimer trackStartTimeFor:[self description]]
+                                                          @"time": [DopeInfo trackStartTimeFor:[self description]]
                                                           }];
     }
     
@@ -101,7 +101,7 @@ static NSArray* delegateSubclasses = nil;
     if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"willResignActive",
                                                           @"classname": NSStringFromClass([self class]),
-                                                          @"time": [DopeTimer timeTrackedFor:[self description]]
+                                                          @"time": [DopeInfo timeTrackedFor:[self description]]
                                                           }];
     }
     
