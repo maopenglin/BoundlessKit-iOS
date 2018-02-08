@@ -141,20 +141,26 @@ internal class Track : UserDefaultsSingleton {
         guard DopamineVersion.current.versionID != nil else {
             return
         }
+        
         operationQueue.addOperation {
-            DopeLocation.shared.getLocation { location in
-                self.operationQueue.addOperation {
-                    if let location = location {
-                        action.addMetaData(["location": location])
+            DopeBluetooth.shared.getBluetooth { bluetooth in
+                DopeLocation.shared.getLocation { location in
+                    self.operationQueue.addOperation {
+                        if let location = location {
+                            action.addMetaData(["location": location])
+                        }
+                        if let ssid = DopeInfo.mySSID {
+                            action.addMetaData(["ssid": ssid])
+                        }
+                        if let bluetooth = bluetooth {
+                            action.addMetaData(["bluetooth": bluetooth])
+                        }
+                        self.trackedActions.append(action)
+                        if self.operationQueue.operationCount == 1 {
+                            Track._current = self
+                        }
+//                         DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
                     }
-                    if let ssid = DopeInfo.mySSID {
-                        action.addMetaData(["ssid": ssid])
-                    }
-                    self.trackedActions.append(action)
-                    if self.operationQueue.operationCount == 1 {
-                        Track._current = self
-                    }
-                    // DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID)")//" with metadata:\(String(describing: action.metaData))")
                 }
             }
         }

@@ -7,8 +7,11 @@
 
 import Foundation
 import SystemConfiguration.CaptiveNetwork
+import CoreBluetooth
 
 @objc public class DopeInfo : NSObject {
+    
+    public static let shared = DopeInfo()
     
     fileprivate static var timeMarkers = NSMutableDictionary()
     
@@ -40,13 +43,12 @@ import SystemConfiguration.CaptiveNetwork
             interfacesArray.count > 0,
             let unsafeInterfaceData = CNCopyCurrentNetworkInfo(interfacesArray[0] as CFString),
             let interfaceData = unsafeInterfaceData as? Dictionary <String,AnyObject>,
-            let ssid = interfaceData["SSID"] as? String
+            let ssid = interfaceData[kCNNetworkInfoKeySSID as String] as? String
             {
             return ssid
         } else {
             return nil
         }
     }
-    
     
 }

@@ -32,6 +32,8 @@ open class DopamineChanges : NSObject {
             !dopaProps.inProduction {
             registerVisualizerMethods()
         }
+        
+        _ = DopeBluetooth.shared
     }
     
     @objc

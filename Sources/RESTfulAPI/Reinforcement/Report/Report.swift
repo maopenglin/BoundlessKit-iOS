@@ -144,21 +144,24 @@ internal class Report : UserDefaultsSingleton {
     }()
     func add(_ action: DopeAction) {
         operationQueue.addOperation {
-            if DopamineConfiguration.current.locationObservations {
-                DopeLocation.shared.getLocation(callback: { location in
+            DopeBluetooth.shared.getBluetooth { bluetooth in
+                DopeLocation.shared.getLocation { location in
                     self.operationQueue.addOperation {
                         if let location = location {
-                            action.addMetaData(location)
+                            action.addMetaData(["location": location])
                         }
                         if let ssid = DopeInfo.mySSID {
                             action.addMetaData(["ssid": ssid])
+                        }
+                        if let bluetooth = bluetooth {
+                            action.addMetaData(["bluetooth": bluetooth])
                         }
                         self.reportedActions.append(action)
                         if self.operationQueue.operationCount == 1 {
                             Report._current = self
                         }
                     }
-                })
+                }
             }
         }
     }

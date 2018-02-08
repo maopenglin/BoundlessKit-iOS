@@ -42,7 +42,7 @@ class ViewController: UIViewController {
     
     @objc func action1Performed(){
 //        presentAnother()
-//        print("Button 1 pushed. Text:\(button.currentTitle ?? "nil")")
+//        print("Button 1 pushed. Text:\(String(describing:button.currentTitle))")
         print("Button 1 pushed")
         // Reinforce the action to make it sticky!!
 //        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
@@ -96,9 +96,9 @@ class ViewController: UIViewController {
     
     @objc func action2Performed(button: UIButton){
 //        print("Button 2 pushed")
-        print("Button 1 pushed. Text:\(button.currentTitle ?? "nil")")
+        print("Button 2 pushed. Text:\(String(describing:button.currentTitle))")
 ////        // Tracking call is sent asynchronously
-//////        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
+        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
 //        locationManager.delegate = self
 //        locationManager.requestAlwaysAuthorization()
         
@@ -141,6 +141,7 @@ class ViewController: UIViewController {
 //        DispatchQueue.concurrentPerform(iterations: 100) { count in
 //            DopamineKit.track("testingActionConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
 //        }
+        
         
     }
     
