@@ -4,7 +4,7 @@ platform :ios, '9.0'
 target 'DopamineKit_Example' do
     pod 'DopamineKit', :path => '../'
     
-    target 'DopamineKit_ReleaseTests' do
+    target 'DopamineKit_Tests' do
         inherit! :search_paths
     end
     
