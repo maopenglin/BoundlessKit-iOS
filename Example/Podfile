@@ -7,10 +7,6 @@ target 'DopamineKit_Example' do
     target 'DopamineKit_Tests' do
         inherit! :search_paths
     end
-    
-    target 'DopamineKit_ReleaseUITests' do
-        inherit! :search_paths
-    end
 end
 
 post_install do |installer|
