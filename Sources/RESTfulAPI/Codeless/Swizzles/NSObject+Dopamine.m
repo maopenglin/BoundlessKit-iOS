@@ -25,9 +25,9 @@
     NSString* methodTypeEncodingString = [NSString stringWithUTF8String:methodTypeEncoding];
     
     IMP dynamicImp;
-    void (^reinforceBlock)(id target) = ^void(id target) {
+    void (^reinforceBlock)(id target, id sender) = ^void(id target, id sender) {
         NSLog(@"In dynamic imp with class:%@ and selector:%@ and originalSelector:%@", NSStringFromClass([target class]), NSStringFromSelector(newSelector), NSStringFromSelector(originalSelector));
-        [SelectorReinforcement attemptReinforcementWithTarget:target action:originalSelector];
+        [SelectorReinforcement attemptReinforcementWithSenderInstance:sender targetInstance:target action:originalSelector];
     };
     
     if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithNoParam)]) {
@@ -82,10 +82,10 @@
 }
 
 - (void) templateMethodWithNoParam { }
-+ (IMP) createImpWithNoParam :(SEL) selector :(void (^)(id)) reinforceBlock {
++ (IMP) createImpWithNoParam :(SEL) selector :(void (^)(id,id)) reinforceBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self) {
         if (!self || ![self respondsToSelector:selector]) {return;}
-        reinforceBlock(self);
+        reinforceBlock(self, nil);
         ((void (*)(id, SEL))[self methodForSelector:selector])(self, selector);
     });
     
@@ -93,10 +93,10 @@
 }
 
 - (void) templateMethodWithObjectParam :(id) param1 { }
-+ (IMP) createImpWithObjectParam :(SEL) selector :(void (^)(id)) reinforceBlock {
++ (IMP) createImpWithObjectParam :(SEL) selector :(void (^)(id,id)) reinforceBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self, id object) {
         if (!self || ![self respondsToSelector:selector]) {return;}
-        reinforceBlock(self);
+        reinforceBlock(self, object);
         ((void (*)(id, SEL, id))[self methodForSelector:selector])(self, selector, object);
     });
     
@@ -104,10 +104,10 @@
 }
 
 - (void) templateMethodWithIntParam :(int) param1 { }
-+ (IMP) createImpWithIntParam :(SEL) selector :(void (^)(id)) reinforceBlock {
++ (IMP) createImpWithIntParam :(SEL) selector :(void (^)(id,id)) reinforceBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self, int object) {
         if (!self || ![self respondsToSelector:selector]) {return;}
-        reinforceBlock(self);
+        reinforceBlock(self, nil);
         ((void (*)(id, SEL, int))[self methodForSelector:selector])(self, selector, object);
     });
     

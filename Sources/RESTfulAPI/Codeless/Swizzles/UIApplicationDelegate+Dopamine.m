@@ -110,8 +110,7 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (BOOL) reinforced_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [SelectorReinforcement attemptReinforcementWithTarget:self action:@selector(application:didFinishLaunchingWithOptions:)];
-    
+    [SelectorReinforcement attemptReinforcementWithSenderInstance:nil targetInstance:self action:@selector(application:didFinishLaunchingWithOptions:)];
     if ([self respondsToSelector:@selector(reinforced_application:didFinishLaunchingWithOptions:)]) {
         return [self reinforced_application:application didFinishLaunchingWithOptions:launchOptions];
     } else {
@@ -123,7 +122,7 @@ static NSArray* delegateSubclasses = nil;
     if ([self respondsToSelector:@selector(reinforced_applicationDidBecomeActive:)])
         [self reinforced_applicationDidBecomeActive:application];
     
-    [SelectorReinforcement attemptReinforcementWithTarget:self action:@selector(applicationDidBecomeActive:)];
+    [SelectorReinforcement attemptReinforcementWithSenderInstance:nil targetInstance:self action:@selector(applicationDidBecomeActive:)];
 }
 
 @end

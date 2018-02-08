@@ -120,12 +120,12 @@ class DopamineKit_SwizzleTests: XCTestCase {
         let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
         DopamineKit.testCredentials = testCredentials
         class ChangesDelegate : NSObject, DopamineChangesDelegate {
-            var didAttemptBlock: (() -> Void)? = nil
+            var didAttemptBlock: ((_ senderInstance: AnyObject?, _ targetInstance: AnyObject?, _ actionSelector: String) -> Void)? = nil
             var didRewardBlock: (() -> Void)? = nil
             
             func attemptingReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String) {
                 print("In attemptingReinforcement")
-                didAttemptBlock?()
+                didAttemptBlock?(senderInstance, targetInstance, actionSelector)
             }
             
             func showingReward() {
@@ -137,19 +137,23 @@ class DopamineKit_SwizzleTests: XCTestCase {
         let changesDelegate = ChangesDelegate()
         DopamineChanges.shared.delegate = changesDelegate
         let promise = expectation(description: "Reinforcement attempted")
-        changesDelegate.didAttemptBlock = {
-            promise.fulfill()
-        }
+        let selector = #selector(ViewController.viewDidAppear(_:))
+        let selectorReinforcement = SelectorReinforcement(targetClass: ViewController.self, selector: selector)
+        DopamineVersion.current.update(visualizer: [selectorReinforcement.actionID : ["reward" : ["reward2":"somereward"]]])
+        let controllerUnderTest: ViewController! = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
+        
         
         
         // when
-        let selectorReinforcement = SelectorReinforcement(targetClass: ViewController.self, selector: #selector(ViewController.viewDidAppear(_:)))
-        DopamineVersion.current.update(visualizer: [selectorReinforcement.actionID : ["reward" : ["reward2":"somereward"]]])
-        let controllerUnderTest: ViewController! = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
+        changesDelegate.didAttemptBlock = {(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String) in
+            guard targetInstance === controllerUnderTest && actionSelector == NSStringFromSelector(selector) else {
+                return
+            }
+            promise.fulfill()
+        }
         controllerUnderTest.viewDidAppear(true)
         
         // then
-        
         waitForExpectations(timeout: 5, handler: nil)
     }
 }

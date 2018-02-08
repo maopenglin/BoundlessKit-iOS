@@ -64,7 +64,7 @@
     // TO-DO: test if else call super.viewDidAppear
     
     if (self) {
-        [SelectorReinforcement attemptReinforcementWithTarget:self action:@selector(viewDidAppear:)];
+        [SelectorReinforcement attemptReinforcementWithSenderInstance: nil targetInstance:self action:@selector(viewDidAppear:)];
     }
 }
 @end

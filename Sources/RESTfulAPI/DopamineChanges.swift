@@ -9,7 +9,7 @@ import Foundation
 
 @objc
 public protocol DopamineChangesDelegate {
-    @objc optional func attemptingReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String)
+    @objc optional func attemptedReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String: Any]?)
     @objc optional func reinforcing(actionID: String, with reinforcementDecision: String)
 }
 
@@ -68,7 +68,7 @@ open class DopamineChanges : NSObject {
         }
     }
     
-    public func registerSimpleMethod(classType: AnyClass, selector: Selector, reinforcement: [String: Any]) -> Bool {
+    public func registerSimpleMethod(classType: AnyClass, selector: Selector, reinforcement: [String: Any]) -> (Bool) {
         guard DopamineObject.templateAvailable(for: classType, selector) else {
             DopeLog.error("No template support for class <\(classType)> method <\(selector)>")
             return false

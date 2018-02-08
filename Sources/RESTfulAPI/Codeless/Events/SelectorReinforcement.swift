@@ -152,12 +152,13 @@ open class SelectorReinforcement : NSObject {
         case .viewControllerDidAppear:
             return (DopamineViewController.self, #selector(DopamineViewController.reinforced_viewDidAppear(_:)))
         case .custom:
+            print("Getting custom method for \(NSStringFromClass(targetClass)) \(NSStringFromSelector(selector))")
             if let createdSelector = self.reinforcer ?? SelectorReinforcement.registered[actionID]?.reinforcer ?? SelectorReinforcement.unregistered[actionID]?.reinforcer {
                 return (targetClass, createdSelector)
             } else if let newSelector = DopamineObject.createReinforcedMethod(for: targetClass, selector, selector.withRandomString()) {
                 return (targetClass, newSelector)
             } else {
-                DopeLog.error("Could not create runtime method for (<\(targetClass)>) copying method (<\(selector)>)")
+                DopeLog.error("Could not create runtime method for (<\(NSStringFromClass(targetClass))>) copying method (<\(selector)>)")
                 return nil
             }
         default:
@@ -170,26 +171,26 @@ open class SelectorReinforcement : NSObject {
 extension SelectorReinforcement {
     
     @objc
-    public static func attemptReinforcement(target: NSObject, action: Selector) {
-        SelectorReinforcement(target: target, selector: action).attemptReinforcement(targetInstance: target)
+    public static func attemptReinforcement(senderInstance: AnyObject?, targetInstance: NSObject, action: Selector) {
+        SelectorReinforcement(target: targetInstance, selector: action).attemptReinforcement(senderInstance: senderInstance, targetInstance: targetInstance)
     }
     
-    func attemptReinforcement(targetInstance: NSObject) {
-        DopamineChanges.shared.delegate?.attemptingReinforcement?(senderInstance: nil, targetInstance: targetInstance, actionSelector: NSStringFromSelector(selector))
-        DopamineVersion.current.codelessReinforcementFor(sender: selectorType.rawValue, target: NSStringFromClass(targetClass), selector: NSStringFromSelector(selector))  { reinforcement in
+    func attemptReinforcement(senderInstance: AnyObject?, targetInstance: NSObject) {
+        
+        let reinforcements = DopamineVersion.current.codelessReinforcementFor(sender: selectorType.rawValue, target: NSStringFromClass(targetClass), selector: NSStringFromSelector(selector))  { reinforcement in
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                if let viewsAndLocations = self.reinforcementViews(targetInstance: targetInstance, options: reinforcement) {
+                if let viewsAndLocations = self.reinforcementViews(senderInstance: senderInstance, targetInstance: targetInstance, options: reinforcement) {
                     Reinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
                 }
             }
         }
-        
+        DopamineChanges.shared.delegate?.attemptedReinforcement?(senderInstance: senderInstance, targetInstance: targetInstance, actionSelector: NSStringFromSelector(selector), reinforcements: reinforcements)
     }
     
-    private func reinforcementViews(targetInstance: NSObject, options: [String: Any]) -> [(UIView, CGPoint)]? {
+    private func reinforcementViews(senderInstance: AnyObject?, targetInstance: NSObject, options: [String: Any]) -> [(UIView, CGPoint)]? {
         
         guard let viewOption = options["ViewOption"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
         guard let viewCustom = options["ViewCustom"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
@@ -249,9 +250,30 @@ extension SelectorReinforcement {
                 }
             }
             
+        case "sender":
+            if let senderInstance = senderInstance {
+                if let view = senderInstance as? UIView {
+                    viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+                } else if senderInstance.responds(to: NSSelectorFromString("view")),
+                    let view = senderInstance.value(forKey: "view") as? UIView {
+                    viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+                } else if senderInstance.responds(to: NSSelectorFromString("imageView")),
+                    let view = senderInstance.value(forKey: "imageView") as? UIImageView {
+                    viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+                } else {
+                    DopeLog.error("Could not find sender view for \(type(of: senderInstance))", visual: true)
+                    return nil
+                }
+            } else {
+                DopeLog.error("No sender object", visual: true)
+                return nil
+            }
+            
         case "target":
             if let viewController = targetInstance as? UIViewController,
                 let view = viewController.view {
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else if let view = targetInstance as? UIView {
                 viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             } else {
                 DopeLog.error("Could not find viewController view", visual: true)
@@ -263,8 +285,11 @@ extension SelectorReinforcement {
                 let parentVC = vc.presentingViewController,
                 let view = parentVC.view {
                 viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else if let view = targetInstance as? UIView,
+                let superview = view.superview {
+                viewsAndLocations = [(superview, superview.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             } else {
-                DopeLog.error("Could not find viewController parent view", visual: true)
+                DopeLog.error("Could not find superview", visual: true)
                 return nil
             }
             

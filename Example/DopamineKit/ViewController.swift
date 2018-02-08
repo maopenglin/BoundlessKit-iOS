@@ -25,7 +25,7 @@ class ViewController: UIViewController {
     
     static var setReward: Void = {
 //        DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : ["reward": "hello"]])
-        setTemporaryReward()
+//        setTemporaryReward()
         return
     }()
     
@@ -40,9 +40,10 @@ class ViewController: UIViewController {
     
     @objc var someCounter: Float = 0
     
-    @objc func action1Performed(button: UIButton){
-        presentAnother()
-        print("Button 1 pushed. Text:\(button.currentTitle ?? "nil")")
+    @objc func action1Performed(){
+//        presentAnother()
+//        print("Button 1 pushed. Text:\(button.currentTitle ?? "nil")")
+        print("Button 1 pushed")
         // Reinforce the action to make it sticky!!
 //        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
 //            reinforcement in
@@ -93,8 +94,9 @@ class ViewController: UIViewController {
 //        })
     }
     
-    @objc func action2Performed(){
-        print("Button 2 pushed")
+    @objc func action2Performed(button: UIButton){
+//        print("Button 2 pushed")
+        print("Button 1 pushed. Text:\(button.currentTitle ?? "nil")")
 ////        // Tracking call is sent asynchronously
 //////        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
 //        locationManager.delegate = self
@@ -182,7 +184,7 @@ class ViewController: UIViewController {
         action1Button.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
         action1Button.titleLabel?.textAlignment = NSTextAlignment.center
         action1Button.backgroundColor = UIColor.init(red: 51/255.0, green: 153/255.0, blue: 51/255.0, alpha: 1.0)
-        action1Button.addTarget(self, action: #selector(ViewController.action1Performed(button:)), for: UIControlEvents.touchUpInside)
+        action1Button.addTarget(self, action: #selector(ViewController.action1Performed), for: UIControlEvents.touchUpInside)
         action1Button.showsTouchWhenHighlighted = true
         self.view.addSubview(action1Button)
         
@@ -194,7 +196,7 @@ class ViewController: UIViewController {
         trackedActionButton.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
         trackedActionButton.titleLabel?.textAlignment = NSTextAlignment.center
         trackedActionButton.backgroundColor = UIColor.init(red: 204/255.0, green: 51/255.0, blue: 51/255.0, alpha: 1.0)
-        trackedActionButton.addTarget(self, action: #selector(ViewController.action2Performed), for: UIControlEvents.touchUpInside)
+        trackedActionButton.addTarget(self, action: #selector(ViewController.action2Performed(button:)), for: UIControlEvents.touchUpInside)
         trackedActionButton.showsTouchWhenHighlighted = true
         self.view.addSubview(trackedActionButton)
     }

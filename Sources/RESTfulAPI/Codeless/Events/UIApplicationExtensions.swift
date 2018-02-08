@@ -15,9 +15,7 @@ internal extension UIApplication {
         let targetClassname = NSStringFromClass(type(of: targetInstance))
         let selectorName = NSStringFromSelector(selectorObj)
         
-        DopamineChanges.shared.delegate?.attemptingReinforcement?(senderInstance: senderInstance, targetInstance: targetInstance, actionSelector: selectorName)
-        
-        DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
+        let reinforcements = DopamineVersion.current.codelessReinforcementFor(sender: senderClassname, target: targetClassname, selector: selectorName) { reinforcement in
             guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
             guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
             
@@ -26,8 +24,8 @@ internal extension UIApplication {
                     Reinforcement.showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
                 }
             }
-            
         }
+        DopamineChanges.shared.delegate?.attemptedReinforcement?(senderInstance: senderInstance, targetInstance: targetInstance, actionSelector: selectorName, reinforcements: reinforcements)
     }
     
     private func reinforcementViews(senderInstance: AnyObject, targetInstance: AnyObject, options: [String: Any]) -> [(UIView, CGPoint)]? {

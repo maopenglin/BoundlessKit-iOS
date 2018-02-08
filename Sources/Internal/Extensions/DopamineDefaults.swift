@@ -15,7 +15,7 @@ open class DopamineDefaults : UserDefaults {
     @objc
     open static var enableEnhancement: Bool {
         get {
-            return UserDefaults.dopamine.bool(forKey: disableEnhancementKey)
+            return !UserDefaults.dopamine.bool(forKey: disableEnhancementKey)
         }
         set {
             UserDefaults.dopamine.setValue(!newValue, forKey: disableEnhancementKey)

@@ -83,23 +83,24 @@ public class DopamineVersion : UserDefaultsSingleton {
         return DopamineVersion(versionID: nil)
     }
     
-    public func codelessReinforcementFor(sender: String, target: String, selector: String, completion: @escaping ([String:Any]) -> ()) {
-        codelessReinforcementFor(actionID: [sender, target, selector].joined(separator: "-"), completion: completion)
+    public func codelessReinforcementFor(sender: String, target: String, selector: String, reinforcementBlock: @escaping ([String:Any]) -> ()) -> [String:Any]? {
+        return codelessReinforcementFor(actionID: [sender, target, selector].joined(separator: "-"), reinforcementBlock: reinforcementBlock)
     }
     
-    public func codelessReinforcementFor(actionID: String, completion: @escaping([String:Any]) -> Void) {
+    fileprivate func codelessReinforcementFor(actionID: String, reinforcementBlock: @escaping([String:Any]) -> Void) -> [String:Any]? {
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {
-            return
+            return nil
         }
         if let reinforcementParameters = visualizerMappings[actionID] as? [String: Any] {
             DopeLog.debug("Found visualizer reinforcement for <\(actionID)>")
             if let codeless = reinforcementParameters["codeless"] as? [String: Any],
                 let reinforcements = codeless["reinforcements"] as? [[String:Any]],
                 let randomReinforcement = reinforcements.selectRandom() {
-                completion(randomReinforcement)
+                reinforcementBlock(randomReinforcement)
             } else {
                 DopeLog.debug("Bad visualizer parameters: \(String(describing:reinforcementParameters))")
             }
+            return reinforcementParameters
         } else if let reinforcementParameters = mappings[actionID] as? [String:Any] {
             DopeLog.debug("Found reinforcement for <\(actionID)>")
             if let codeless = reinforcementParameters["codeless"] as? [String: Any],
@@ -110,7 +111,7 @@ public class DopamineVersion : UserDefaultsSingleton {
                     }
                     for reinforcement in reinforcements {
                         if reinforcement["primitive"] as? String == reinforcementType {
-                            completion(reinforcement)
+                            reinforcementBlock(reinforcement)
                             return
                         }
                     }
@@ -119,10 +120,12 @@ public class DopamineVersion : UserDefaultsSingleton {
             } else {
                 DopeLog.error("Bad reinforcement parameters")
             }
+            return reinforcementParameters
         } else {
 //            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
 //            DopeLog.debug("Reinforcement mappings:\(self.mappings as AnyObject)")
 //            DopeLog.debug("Visualizer mappings:\(self.visualizerMappings as AnyObject)")
+            return nil
         }
         
         
