@@ -137,9 +137,27 @@ internal class Report : UserDefaultsSingleton {
     /// - parameters:
     ///     - action: The action to be stored.
     ///
+    var operationQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
     func add(_ action: DopeAction) {
-        reportedActions.append(action)
-        Report._current = self
+        operationQueue.addOperation {
+            if DopamineConfiguration.current.locationObservations {
+                DopeLocation.shared.getLocation(callback: { location in
+                    self.operationQueue.addOperation {
+                        if let location = location {
+                            action.addMetaData(location)
+                        }
+                        self.reportedActions.append(action)
+                        if self.operationQueue.operationCount == 1 {
+                            Report._current = self
+                        }
+                    }
+                })
+            }
+        }
     }
     
     /// Sends reinforced actions over the DopamineAPI
