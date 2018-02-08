@@ -27,7 +27,6 @@ internal class Track : UserDefaultsSingleton {
         }
     }
     
-//    private let dispatchGroup = DispatchGroup()
     private let dispatchQueue = DispatchQueue(label: "Dopamine.Track")
     
     @objc private var trackedActions: [DopeAction]

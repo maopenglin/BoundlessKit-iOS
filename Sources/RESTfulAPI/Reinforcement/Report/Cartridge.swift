@@ -196,7 +196,7 @@ internal class Cartridge : NSObject, NSCoding {
     ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if the cartridge is already being synced by another thread.
     ///
     func sync(completion: @escaping (Int) -> () = { _ in }) {
-        DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async{
+        DispatchQueue.global().async{
             guard !self.syncInProgress else {
                 completion(0)
                 return
