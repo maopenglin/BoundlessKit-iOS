@@ -14,7 +14,10 @@ internal class Track : UserDefaultsSingleton {
     fileprivate static var _current: Track? =  { return UserDefaults.dopamine.unarchive() }()
     {
         didSet {
-            UserDefaults.dopamine.archive(_current)
+            Track.queue.addOperation {
+                guard Track.queue.operationCount <= 1 else { return }
+                UserDefaults.dopamine.archive(_current)
+            }
         }
     }
     static var current: Track {
@@ -26,8 +29,6 @@ internal class Track : UserDefaultsSingleton {
             return _current!
         }
     }
-    
-    private let dispatchQueue = DispatchQueue(label: "Dopamine.Track")
     
     @objc private var trackedActions: [DopeAction]
     @objc private var timerStartedAt: Int64
@@ -130,38 +131,37 @@ internal class Track : UserDefaultsSingleton {
     /// - parameters:
     ///     - action: The action to be stored.
     ///
-    let dispatchGroup = DispatchGroup()
-    var operationQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 1
-        return queue
-    }()
+    
+    static let queue = OperationQueue()
     func add(_ action: DopeAction) {
         guard DopamineVersion.current.versionID != nil else {
             return
         }
         
-        operationQueue.addOperation {
-            DopeBluetooth.shared.getBluetooth { bluetooth in
-                DopeLocation.shared.getLocation { location in
-                    self.operationQueue.addOperation {
-                        if let location = location {
-                            action.addMetaData(["location": location])
-                        }
-                        if let ssid = DopeInfo.mySSID {
-                            action.addMetaData(["ssid": ssid])
-                        }
-                        if let bluetooth = bluetooth {
-                            action.addMetaData(["bluetooth": bluetooth])
-                        }
-                        self.trackedActions.append(action)
-                        if self.operationQueue.operationCount == 1 {
-                            Track._current = self
-                        }
-//                         DopeLog.debug("track#\(self.trackedActions.count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
-                    }
-                }
+        Track.queue.addOperation {
+            self.trackedActions.append(action)
+            let num = self.trackedActions.count
+            DopeLog.debug("track#\(num) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
+            
+            if let ssid = DopeInfo.mySSID {
+                action.addMetaData(["ssid": ssid])
             }
+            DopeBluetooth.shared.getBluetooth { bluetooth in
+                if let bluetooth = bluetooth {
+                    action.addMetaData(["bluetooth": bluetooth])
+                }
+                DopeLog.debug("track#\(num) actionID:\(action.actionID) with bluetooth:\(bluetooth as AnyObject))")
+                Track._current = self
+            }
+            DopeLocation.shared.getLocation { location in
+                if let location = location {
+                    action.addMetaData(["location": location])
+                }
+                DopeLog.debug("track#\(num) actionID:\(action.actionID) with location:\(location as AnyObject))")
+                Track._current = self
+            }
+            
+            Track._current = self
         }
     }
     
@@ -171,7 +171,7 @@ internal class Track : UserDefaultsSingleton {
     ///     - completion(Int): Takes the status code returned from DopamineAPI, or 0 if there were no actions to sync.
     ///
     func sync(completion: @escaping (_ statusCode: Int) -> () = { _ in }) {
-        dispatchQueue.async() {
+        DispatchQueue.global().async() {
             guard !self.syncInProgress else {
                 completion(0)
                 return
