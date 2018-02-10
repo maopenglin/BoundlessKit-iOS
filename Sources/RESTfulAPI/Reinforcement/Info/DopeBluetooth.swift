@@ -81,12 +81,13 @@ fileprivate class BluetoothManager : CBCentralManager {
         }
         
         let nowDate = Date()
-        scanStopDate = nowDate.addingTimeInterval(scanDuration)
         
         if isScanning {
             if nowDate.addingTimeInterval(-scanDuration) >= scanStartDate {
-                scanCompleteQueue.addOperation {
+                DispatchQueue.global().async {
+                    self.scanCompleteQueue.addOperation {
                     completion?(self.devices(from: nowDate.addingTimeInterval(-self.scanDuration), to: nowDate))
+                }
                 }
             } else { // if scanStartDate.addingTimeInterval(scanDuration) > nowDate {
                 if let _ = completion {
@@ -101,7 +102,9 @@ fileprivate class BluetoothManager : CBCentralManager {
                 }
             }
         } else {
+            teeth.removeAll()
             scanStartDate = nowDate
+            scanStopDate = nowDate.addingTimeInterval(scanDuration)
             scanForPeripherals(withServices: nil, options: nil)
             
             if let completion = completion {
@@ -117,7 +120,7 @@ fileprivate class BluetoothManager : CBCentralManager {
     func addTooth(peripheral: CBPeripheral, rssi: NSNumber) {
         if let oldTooth = teeth[peripheral.identifier.uuidString],
             oldTooth.utc >= scanStartDate {
-            return
+            
         } else {
             teeth[peripheral.identifier.uuidString] = BluetoothInfo(utc: Date(), uuid: peripheral.identifier.uuidString, name: peripheral.name ?? "unknown", rssi: rssi)
         }
@@ -130,15 +133,11 @@ fileprivate class BluetoothManager : CBCentralManager {
     
     var teeth = [String: BluetoothInfo]()
     func devices(from start: Date, to end:Date) -> [[String: Any]] {
-        self.scanStartDate = start
         var devices = [[String: Any]]()
         for (_, device) in teeth {
             if start <= device.utc && device.utc <= end {
                 devices.append(device.info)
             }
-        }
-        if devices.count == 0 {
-            
         }
         return devices
     }
