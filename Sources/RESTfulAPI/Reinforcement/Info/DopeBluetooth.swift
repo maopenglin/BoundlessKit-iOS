@@ -62,8 +62,6 @@ fileprivate class BluetoothManager : CBCentralManager {
         }
     }
     
-    
-    
     fileprivate var canScan = false {
         didSet {
             if !canScan && isScanning {
@@ -92,9 +90,12 @@ fileprivate class BluetoothManager : CBCentralManager {
                 }
             } else { // if scanStartDate.addingTimeInterval(scanDuration) > nowDate {
                 if let _ = completion {
-                    DispatchQueue.global().asyncAfter(deadline:.now() + nowDate.timeIntervalSince(scanStartDate.addingTimeInterval(scanDuration))) {
+                    let holdStartDate = scanStartDate
+                    
+                    print("Response delay:\(holdStartDate.addingTimeInterval(scanDuration).timeIntervalSinceNow as AnyObject)")
+                    DispatchQueue.global().asyncAfter(deadline:.now() + holdStartDate.addingTimeInterval(scanDuration).timeIntervalSinceNow) {
                         self.scanCompleteQueue.addOperation {
-                            completion?(self.devices(from: self.scanStartDate, to: self.scanStartDate.addingTimeInterval(self.scanDuration)))
+                            completion?(self.devices(from: holdStartDate, to: holdStartDate.addingTimeInterval(self.scanDuration)))
                         }
                     }
                 }
@@ -135,6 +136,9 @@ fileprivate class BluetoothManager : CBCentralManager {
             if start <= device.utc && device.utc <= end {
                 devices.append(device.info)
             }
+        }
+        if devices.count == 0 {
+            
         }
         return devices
     }
