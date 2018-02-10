@@ -93,4 +93,12 @@ internal class DopeAction : NSObject, NSCoding {
         
         return jsonObject
     }
+    
+    func addBluetoothInfo(_ info: [[String: Any]]) {
+        addMetaData(["bluetooth": info])
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 }

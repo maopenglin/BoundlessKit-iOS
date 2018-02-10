@@ -28,17 +28,6 @@ public extension UserDefaults {
 }
 
 internal extension UserDefaults {
-    static var initialBootDate: Date? {
-        get {
-            let defaultsKey = "initialBootDate"
-            let date = UserDefaults.dopamine.object(forKey: defaultsKey) as? Date
-            defer { if date == nil { UserDefaults.dopamine.set(Date(), forKey: defaultsKey) } }
-            return date
-        }
-    }
-}
-
-internal extension UserDefaults {
     
     func archive<T:UserDefaultsSingleton>(_ value: T?) {
         archive(value, forKey: T.defaultsKey)

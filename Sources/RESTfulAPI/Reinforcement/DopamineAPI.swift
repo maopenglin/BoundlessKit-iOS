@@ -147,7 +147,7 @@ public class DopamineAPI : NSObject{
             defer { completion(responseDict) }
             
             if responseURL == nil {
-                DopeLog.debug("❌ invalid response:\(String(describing: error?.localizedDescription))")
+                DopeLog.debug("❌ \(type.path) call got invalid response:\(String(describing: error?.localizedDescription))")
                 responseDict["error"] = error?.localizedDescription
                 switch type {
                 case .track:

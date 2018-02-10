@@ -26,6 +26,8 @@ open class DopamineChanges : NSObject {
     
     @objc
     open func wake() {
+        _ = DopeBluetooth.shared
+        
         enhanceMethods(DopamineDefaults.enableEnhancement)
         registerMethods()
         if let dopaProps = DopamineProperties.current,
@@ -33,7 +35,6 @@ open class DopamineChanges : NSObject {
             registerVisualizerMethods()
         }
         
-        _ = DopeBluetooth.shared
     }
     
     @objc
@@ -50,8 +51,8 @@ open class DopamineChanges : NSObject {
         // Enhance - UITapGestureRecognizer
         DopamineTapGestureRecognizer.enhanceSelectors(shouldEnhance)
         
-        // Enhance - SKPaymentTransactionObserver
-        DopaminePaymentTransactionObserver.enhanceSelectors(shouldEnhance)
+//        // Enhance - SKPaymentTransactionObserver
+//        DopaminePaymentTransactionObserver.enhanceSelectors(shouldEnhance)
         
         // Enhance - UICollectionViewController
         DopamineCollectionViewDelegate.enhanceSelectors(shouldEnhance)

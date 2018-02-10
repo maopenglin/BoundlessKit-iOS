@@ -10,6 +10,7 @@ import Foundation
 
 @objc
 open class DopamineDefaults : UserDefaults {
+    
     fileprivate static var disableEnhancementKey = "disableEnhancement"
     
     @objc
@@ -19,6 +20,16 @@ open class DopamineDefaults : UserDefaults {
         }
         set {
             UserDefaults.dopamine.setValue(!newValue, forKey: disableEnhancementKey)
+        }
+    }
+    
+    
+    static var initialBootDate: Date? {
+        get {
+            let defaultsKey = "initialBootDate"
+            let date = UserDefaults.dopamine.object(forKey: defaultsKey) as? Date
+            defer { if date == nil { UserDefaults.dopamine.set(Date(), forKey: defaultsKey) } }
+            return date
         }
     }
 }

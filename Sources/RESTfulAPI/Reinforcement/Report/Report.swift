@@ -143,8 +143,15 @@ internal class Report : UserDefaultsSingleton {
         return queue
     }()
     func add(_ action: DopeAction) {
+        
+        
+        self.reportedActions.append(action)
+        let num = reportedActions.count
+        
+        
         operationQueue.addOperation {
             DopeBluetooth.shared.getBluetooth { bluetooth in
+                DopeLog.debug("report#\(num) actionID:\(action.actionID) with bluetooth:\(bluetooth as AnyObject))")
                 DopeLocation.shared.getLocation { location in
                     self.operationQueue.addOperation {
                         if let location = location {
@@ -153,10 +160,9 @@ internal class Report : UserDefaultsSingleton {
                         if let ssid = DopeInfo.mySSID {
                             action.addMetaData(["ssid": ssid])
                         }
-                        if let bluetooth = bluetooth {
-                            action.addMetaData(["bluetooth": bluetooth])
-                        }
-                        self.reportedActions.append(action)
+//                        if let bluetooth = bluetooth {
+//                            action.addMetaData(["bluetooth": bluetooth])
+//                        }
                         if self.operationQueue.operationCount == 1 {
                             Report._current = self
                         }

@@ -61,7 +61,7 @@ public class CodelessAPI : NSObject {
         payload["inProduction"] = dopaProps.inProduction
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
         payload["currentConfig"] = DopamineConfiguration.current.configID ?? "nil"
-        payload["initialBoot"] = (UserDefaults.initialBootDate == nil)
+        payload["initialBoot"] = (DopamineDefaults.initialBootDate == nil)
         shared.send(call: .boot, with: payload){ response in
             if let status = response["status"] as? Int {
                 if status == 205 {
@@ -296,7 +296,7 @@ public class CodelessAPI : NSObject {
             defer { completion(responseDict) }
             
             if responseURL == nil {
-                DopeLog.debug("❌ invalid response:\(String(describing: error?.localizedDescription))")
+                DopeLog.debug("❌ \(type.path) call got invalid response:\(String(describing: error?.localizedDescription))")
                 responseDict["error"] = error?.localizedDescription
                 return
             }

@@ -37,7 +37,9 @@ open class DopamineKit : NSObject {
     @objc internal static var productionIdentity:String?
     
     @objc public static let shared: DopamineKit = DopamineKit()
+    
     public static let syncCoordinator = SyncCoordinator.shared
+    fileprivate let queue = OperationQueue()
     
     private override init() {
         super.init()
@@ -56,7 +58,7 @@ open class DopamineKit : NSObject {
             return
         }
         // store the action to be synced
-        DispatchQueue.global(qos: .background).async {
+        shared.queue.addOperation {
             let action = DopeAction(actionID: actionID, metaData:metaData)
             syncCoordinator.store(track: action)
 //            DopeLog.debug("tracked:\(actionID) with metadata:\(String(describing: metaData))")
@@ -73,17 +75,22 @@ open class DopamineKit : NSObject {
     ///     - completion: A closure with the reinforcement decision passed as a `String`.
     ///
     @objc open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, completion: @escaping (String) -> ()) {
-        let action = DopeAction(actionID: actionID, metaData: metaData)
-        let reinforcementDecision = DopamineConfiguration.current.reinforcementEnabled ? syncCoordinator.retrieve(cartridgeFor: action.actionID).remove() : Cartridge.defaultReinforcementDecision
-        
-        DispatchQueue.main.async {
-            completion(reinforcementDecision)
-            DopamineChanges.shared.delegate?.reinforcing?(actionID: actionID, with: reinforcementDecision)
+        guard DopamineConfiguration.current.reinforcementEnabled else {
+            return
         }
-        
-        // store the action to be synced
-        action.reinforcementDecision = reinforcementDecision
-        syncCoordinator.store(report: action)
+        shared.queue.addOperation {
+            let action = DopeAction(actionID: actionID, metaData: metaData)
+            let reinforcementDecision = DopamineConfiguration.current.reinforcementEnabled ? syncCoordinator.retrieve(cartridgeFor: action.actionID).remove() : Cartridge.defaultReinforcementDecision
+            
+            DispatchQueue.main.async {
+                completion(reinforcementDecision)
+                DopamineChanges.shared.delegate?.reinforcing?(actionID: actionID, with: reinforcementDecision)
+            }
+            
+            // store the action to be synced
+            action.reinforcementDecision = reinforcementDecision
+            syncCoordinator.store(report: action)
+        }
     }
     
 }

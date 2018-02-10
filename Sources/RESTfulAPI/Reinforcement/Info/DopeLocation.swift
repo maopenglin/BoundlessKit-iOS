@@ -56,7 +56,6 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     }
     
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        DopeLog.error("locationManager didFailWithError:\(error)")
         canGetLocation = false
         queue.isSuspended = false
     }
@@ -104,7 +103,12 @@ class DopeLocation : NSObject, CLLocationManagerDelegate {
     fileprivate var locationInfo: [String: Any]? {
         get {
             if let lastLocation = self.lastLocation {
-                var locationInfo: [String: Any] = ["timestamp": lastLocation.timestamp.timeIntervalSince1970 * 1000,
+                let utc = Int64(1000*lastLocation.timestamp.timeIntervalSince1970)
+                let timezoneOffset = Int64(1000*NSTimeZone.default.secondsFromGMT())
+                let localTime = utc + timezoneOffset
+                var locationInfo: [String: Any] = ["utc": utc,
+                                                   "timezoneOffset": timezoneOffset,
+                                                   "localTime": localTime,
                                                    "latitude": lastLocation.coordinate.latitude,
                                                    "horizontalAccuracy": lastLocation.horizontalAccuracy,
                                                    "longitude": lastLocation.coordinate.longitude,
