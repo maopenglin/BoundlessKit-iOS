@@ -13,9 +13,13 @@ public class DopeBluetooth : NSObject {
     
     public static let shared = DopeBluetooth()
     
+    fileprivate let bluetoothManager = BluetoothManager(delegate: nil, queue: .main, options: [CBCentralManagerOptionShowPowerAlertKey: 0])
+    
+    
     fileprivate override init() {
         super.init()
-//        BluetoothManager.probe = BluetoothManager(delegate: self, queue: .main, options: [CBCentralManagerOptionShowPowerAlertKey: 0])
+        bluetoothManager.delegate = self
+        bluetoothManager.scan(completion: {_ in})
     }
     
     public func getBluetooth(callback: @escaping([[String: Any]]?) -> Void) {
@@ -23,16 +27,8 @@ public class DopeBluetooth : NSObject {
 //            callback(nil)
 //            return
 //        }
-        BluetoothManager.queue.addOperation {
-            if !BluetoothManager.canScanConfirmed {
-                BluetoothManager.probe = BluetoothManager(delegate: self, queue: .main, options: [CBCentralManagerOptionShowPowerAlertKey: 0])
-                print("Created probe bluetooth")
-                sleep(2)
-                print("Done waiting for probe bluetooth")
-                BluetoothManager.canScanConfirmed = true
-            }
-            BluetoothManager.scan(delegate: self, completion: callback)
-        }
+        
+        bluetoothManager.scan(completion: callback)
     }
     
 }
@@ -40,14 +36,12 @@ public class DopeBluetooth : NSObject {
 extension DopeBluetooth : CBPeripheralDelegate, CBCentralManagerDelegate {
     
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        BluetoothManager.canScan = (central.state == .poweredOn)
-        BluetoothManager.canScanConfirmed = true
-        
-        print("Manager did update bluetooth state on?:\(BluetoothManager.canScan)")
+        bluetoothManager.canScan = (central.state == .poweredOn)
+        print("Manager did update bluetooth state on?:\(bluetoothManager.canScan)")
     }
     
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        BluetoothManager.addTooth(peripheral: peripheral, rssi: RSSI)
+        bluetoothManager.addTooth(peripheral: peripheral, rssi: RSSI)
     }
     
 }
@@ -55,6 +49,7 @@ extension DopeBluetooth : CBPeripheralDelegate, CBCentralManagerDelegate {
 
 fileprivate class BluetoothManager : CBCentralManager {
     
+    typealias ScanFinishBlock = (([[String: Any]]?) -> Void)?
     struct BluetoothInfo {
         var utc: Date
         var uuid: String
@@ -70,104 +65,113 @@ fileprivate class BluetoothManager : CBCentralManager {
         }
     }
     
-    var teeth = [String: BluetoothInfo]()
-    var finishHandlers = [(([[String: Any]]?) -> Void)?]()
     
-    func finish() {
-        if isScanning { stopScan() }
-        var devices = [[String: Any]]()
-        for (_, device) in teeth {
-            devices.append(device.info)
-        }
-        
-        for finishHandler in finishHandlers {
-            finishHandler?(devices)
+    var finishHandlers = [Date: ([String: BluetoothInfo], [ScanFinishBlock]) ]()
+    private var devicesDiscovered = [String: BluetoothInfo]()
+    
+    func addTooth(peripheral: CBPeripheral, rssi: NSNumber) {
+        print("Found tooth device:\(peripheral.name ?? "unknown")")
+        let info = BluetoothInfo(utc: Date(), uuid: peripheral.identifier.uuidString, name: peripheral.name ?? "unknown", rssi: rssi)
+        devicesDiscovered[peripheral.identifier.uuidString] = info
+        for (key, finishHandler) in finishHandlers {
+            if finishHandler.0[info.uuid] == nil {
+                self.finishHandlers[key]?.0[info.uuid] = info
+            }
         }
     }
     
-    fileprivate static var managers = [Date: BluetoothManager]()
-    fileprivate static var probe: BluetoothManager?
-    fileprivate static var queue = OperationQueue()
-    fileprivate static var canScan: Bool = false
-    fileprivate static var canScanConfirmed: Bool = false {
+    func finish(startDate: Date) {
+        if let (teeth, blocks) = finishHandlers[startDate] {
+            var devices = [[String: Any]]()
+            for (_, tooth) in teeth {
+                devices.append(tooth.info)
+            }
+            for block in blocks {
+                block?(devices)
+            }
+            self.queue.addOperation {
+                self.finishHandlers.removeValue(forKey: startDate)
+                print("Removed bluetooth teeth(\(devices.count)) for \(startDate as AnyObject)")
+                if self.finishHandlers.isEmpty && self.isScanning {
+                    self.stopScan()
+                    DopeLog.debug("Finished all scans, stopping scan")
+                }
+            }
+        }
+    }
+    
+    fileprivate var queue = OperationQueue()
+    fileprivate let scanDuration = TimeInterval(5)
+    fileprivate var canScan: Bool? {
         didSet {
-            if canScanConfirmed {
-                if !canScan {
-                    BluetoothManager.queue.addOperation {
-                        print("Confirmed bluetoothmanager can't scan")
-                        for (key, manager) in managers {
-                            manager.finish()
-                            managers.removeValue(forKey: key)
-                            print("Removed bluetoothmanager for key:\(key)")
-                        }
+            if let canScan = canScan {
+                if canScan {
+                    self.scanForPeripherals(withServices: nil, options: nil)
+                } else {
+                    stopScan()
+                    for key in finishHandlers.keys {
+                        finish(startDate: key)
                     }
                 }
             }
         }
     }
-    fileprivate static let scanDuration = TimeInterval(5)
     
-    static func scan(delegate: CBCentralManagerDelegate, completion: @escaping (([[String: Any]]?) -> Void)) {
+    func scan(startDate: Date = Date(), completion: ScanFinishBlock) {
         queue.addOperation {
-            if !canScanConfirmed || !canScan {
-                completion(nil)
+            if self.canScan == nil {
+                print("Waiting for can scan bluetooth...")
+                sleep(3)
+            }
+            if self.canScan == nil || !self.canScan! {
+                completion?(nil)
                 print("Can't scan bluetooth")
                 return
             }
             
-            let scanStartDate = Date()
-            guard managers[scanStartDate] == nil else {
-                managers[scanStartDate]?.finishHandlers.append(completion)
+            print("Bluetoothmanager looking for devices with startDate \(startDate as AnyObject)")
+            
+            // check if there is a previous scan that this can add on to
+            let lookBackDate = startDate.addingTimeInterval(-self.scanDuration)
+            var lastScanStart = startDate
+            
+            for date in self.finishHandlers.keys {
+                if lookBackDate <= date && date <= lastScanStart {
+                    lastScanStart = date
+                }
+            }
+            if let _ = self.finishHandlers[lastScanStart] {
+                self.finishHandlers[lastScanStart]?.1.append(completion)
+                print("Appending finishHandler to \(lastScanStart as AnyObject)")
                 return
             }
             
-            if let manager = managers[scanStartDate] {
-                manager.finishHandlers.append(completion)
-                return
+            if !self.isScanning {
+                self.scanForPeripherals(withServices: nil, options: nil)
             }
-            let manager = BluetoothManager(delegate: nil, queue: .main, options: [CBCentralManagerOptionShowPowerAlertKey: 0])
-            manager.delegate = delegate
-            manager.scanForPeripherals(withServices: nil, options: nil)
-            managers[scanStartDate] = manager
             
-            print("Created bluetoothmanager for \(scanStartDate as AnyObject)")
-            
-            let lookBackDate = scanStartDate.addingTimeInterval(-scanDuration)
-            var lastDeviceTime = Date()
-            for otherManager in managers {
-                for (uuid, info) in otherManager.value.teeth {
-                    if info.utc > lookBackDate {
-                        if let prevInfo = manager.teeth[uuid],
-                            info.utc > prevInfo.utc {
-                            continue
-                        }
-                        manager.teeth[uuid] = info
-                        if info.utc < lastDeviceTime {
-                            lastDeviceTime = info.utc
-                        }
+            // grab any previous devices before creating new teeth
+            var newTeeth = [String: BluetoothInfo]()
+            var lastDiscoveryDate = startDate
+            for (_, info) in self.devicesDiscovered {
+                if lookBackDate <= info.utc {
+                    if let prevInfo = newTeeth[info.uuid], prevInfo.utc < info.utc {
+                        continue
+                    }
+                    newTeeth[info.uuid] = info
+                    if info.utc < lastDiscoveryDate {
+                        lastDiscoveryDate = info.utc
                     }
                 }
             }
+            self.finishHandlers[lastDiscoveryDate] = (newTeeth, [completion])
+            print("Created new finishHandler and teeth(\(newTeeth.count)) for \(lastDiscoveryDate as AnyObject)")
             
-            
-            DispatchQueue.global().asyncAfter(deadline: .now() + scanDuration - Date().timeIntervalSince(lastDeviceTime)) {
-                BluetoothManager.queue.addOperation {
-                    print("Async dispatch for \(scanStartDate as AnyObject)")
-                    if let manager = managers[scanStartDate] {
-                        manager.finish()
-                        managers.removeValue(forKey: scanStartDate)
-                        print("Removed bluetoothmanager for \(scanStartDate as AnyObject)")
-                    }
+            DispatchQueue.global().asyncAfter(deadline: .now() + self.scanDuration - Date().timeIntervalSince(lastDiscoveryDate)) {
+                self.queue.addOperation {
+                    print("Async dispatch for \(lastDiscoveryDate as AnyObject)")
+                    self.finish(startDate: lastDiscoveryDate)
                 }
-            }
-        }
-    }
-    
-    static func addTooth(peripheral: CBPeripheral, rssi: NSNumber) {
-        print("Found tooth device:\(peripheral.name ?? "unknown")")
-        for (_, manager) in managers {
-            if manager.teeth[peripheral.identifier.uuidString] == nil {
-                manager.teeth[peripheral.identifier.uuidString] = BluetoothInfo(utc: Date(), uuid: peripheral.identifier.uuidString, name: peripheral.name ?? "unknown", rssi: rssi)
             }
         }
     }
