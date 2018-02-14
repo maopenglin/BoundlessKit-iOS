@@ -42,7 +42,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "607FACE41AFB9204008FA782"
+               BlueprintIdentifier = "84A41543202C079000A79443"
                BuildableName = "DopamineKit_Tests.xctest"
                BlueprintName = "DopamineKit_Tests"
                ReferencedContainer = "container:DopamineKit.xcodeproj">
@@ -56,7 +56,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AF78047D8F8303C25E9233E3C10DDB42"
+               BlueprintIdentifier = "9FADE4608F4DEED6727921B4C88E82B2"
                BuildableName = "DopamineKit.framework"
                BlueprintName = "DopamineKit"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
@@ -84,7 +84,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9A2D855F5ADD1BAB0377B3D04E0AA1D8"
+               BlueprintIdentifier = "F51AB8B652ECFD47269292F3270AD6B5"
                BuildableName = "Pods_DopamineKit_Tests.framework"
                BlueprintName = "Pods-DopamineKit_Tests"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
@@ -104,7 +104,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "607FACE41AFB9204008FA782"
+               BlueprintIdentifier = "84A41543202C079000A79443"
                BuildableName = "DopamineKit_Tests.xctest"
                BlueprintName = "DopamineKit_Tests"
                ReferencedContainer = "container:DopamineKit.xcodeproj">
@@ -195,11 +195,6 @@
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
-         <AdditionalOption
-            key = "NSZombieEnabled"
-            value = "YES"
-            isEnabled = "YES">
-         </AdditionalOption>
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction

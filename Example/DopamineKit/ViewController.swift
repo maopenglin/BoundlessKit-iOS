@@ -44,6 +44,7 @@ class ViewController: UIViewController {
 //        presentAnother()
 //        print("Button 1 pushed. Text:\(String(describing:button.currentTitle))")
         print("Button 1 pushed")
+        
         // Reinforce the action to make it sticky!!
 //        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
 //            reinforcement in
@@ -142,11 +143,11 @@ class ViewController: UIViewController {
 //            DopamineKit.track("testingActionConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
 //        }
         
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
         print("In view did appear of class:\(NSStringFromClass(type(of: self)))")
 //        DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
 //            SelectorReinforcement.unregisterMethods()
