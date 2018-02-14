@@ -85,7 +85,7 @@ fileprivate class BluetoothManager : CBCentralManager {
     }
     
     fileprivate func addTooth(peripheral: CBPeripheral, rssi: NSNumber) {
-        print("Found tooth device:\(peripheral.name ?? "unknown")")
+//        print("Found tooth device:\(peripheral.name ?? "unknown")")
         let info = BluetoothInfo(utc: Date(), uuid: peripheral.identifier.uuidString, name: peripheral.name ?? "unknown", rssi: rssi)
         devicesDiscovered[peripheral.identifier.uuidString] = info
         for (key, finishHandler) in finishHandlers {
@@ -106,21 +106,21 @@ fileprivate class BluetoothManager : CBCentralManager {
             }
             self.queue.addOperation {
                 self.finishHandlers.removeValue(forKey: startDate)
-                print("Removed bluetooth teeth(\(devices.count)) for \(startDate as AnyObject)")
+//                print("Removed bluetooth teeth(\(devices.count)) for \(startDate as AnyObject)")
                 if self.finishHandlers.isEmpty && self.isScanning {
                     self.stopScan()
-                    DopeLog.debug("Finished all scans, stopping scan")
+//                    DopeLog.debug("Finished all scans, stopping bluetooth scan")
                 }
             }
         } else {
-            DopeLog.debug("Couldn't find finish startDate")
+//            DopeLog.debug("Couldn't find finish startDate")
         }
         
     }
     
     func scan(startDate: Date = Date(), completion: ScanFinishBlock) {
         queue.addOperation {
-            print("Bluetoothmanager looking for devices with startDate \(startDate as AnyObject)")
+//            print("Bluetoothmanager looking for devices with startDate \(startDate as AnyObject)")
             
             // check if there is a previous scan that this can add on to
             let lookBackDate = startDate.addingTimeInterval(-self.scanDuration)
@@ -176,4 +176,5 @@ fileprivate class BluetoothManager : CBCentralManager {
     }
     
 }
+
 

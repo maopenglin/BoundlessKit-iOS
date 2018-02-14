@@ -17,6 +17,7 @@ internal class Track : UserDefaultsSingleton {
             Track.queue.addOperation {
                 guard Track.queue.operationCount <= 1 else { return }
                 UserDefaults.dopamine.archive(_current)
+                print("Saved track..")
             }
         }
     }
@@ -132,7 +133,7 @@ internal class Track : UserDefaultsSingleton {
     ///     - action: The action to be stored.
     ///
     
-    static let queue = OperationQueue()
+    fileprivate static let queue = OperationQueue()
     func add(_ action: DopeAction) {
         guard DopamineVersion.current.versionID != nil else {
             return
@@ -141,24 +142,27 @@ internal class Track : UserDefaultsSingleton {
         Track.queue.addOperation {
             self.trackedActions.append(action)
             let num = self.trackedActions.count
+            
             DopeLog.debug("track#\(num) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
             
             if let ssid = DopeInfo.mySSID {
                 action.addMetaData(["ssid": ssid])
             }
-            DopeBluetooth.shared.getBluetooth { bluetooth in
-                if let bluetooth = bluetooth {
-                    action.addMetaData(["bluetooth": bluetooth])
+            DopeBluetooth.shared.getBluetooth { [weak action] bluetooth in
+                if let bluetooth = bluetooth,
+                    let _ = action {
+                    action?.addMetaData(["bluetooth": bluetooth])
+                    Track._current = self
                 }
-                DopeLog.debug("track#\(num) actionID:\(action.actionID) with bluetooth:\(bluetooth as AnyObject))")
-                Track._current = self
+//                DopeLog.debug("track#\(num) actionID:\(String(describing: action?.actionID)) with bluetooth:\(bluetooth as AnyObject))")
             }
-            DopeLocation.shared.getLocation { location in
-                if let location = location {
-                    action.addMetaData(["location": location])
+            DopeLocation.shared.getLocation { [weak action] location in
+                if let location = location,
+                    let _ = action {
+                    action?.addMetaData(["location": location])
+                    Track._current = self
                 }
-                DopeLog.debug("track#\(num) actionID:\(action.actionID) with location:\(location as AnyObject))")
-                Track._current = self
+//                DopeLog.debug("track#\(num) actionID:\(String(describing: action?.actionID)) with location:\(location as AnyObject))")
             }
             
             Track._current = self

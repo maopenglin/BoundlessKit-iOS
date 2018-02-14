@@ -14,7 +14,11 @@ internal class Report : UserDefaultsSingleton {
     fileprivate static var _current: Report? =  { return UserDefaults.dopamine.unarchive() }()
     {
         didSet {
-            UserDefaults.dopamine.archive(_current)
+            Report.queue.addOperation {
+                guard Report.queue.operationCount <= 1 else { return }
+                UserDefaults.dopamine.archive(_current)
+                print("Saved report..")
+            }
         }
     }
     static var current: Report {
@@ -137,38 +141,39 @@ internal class Report : UserDefaultsSingleton {
     /// - parameters:
     ///     - action: The action to be stored.
     ///
-    var operationQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 1
-        return queue
-    }()
+    fileprivate static let queue = OperationQueue()
     func add(_ action: DopeAction) {
+        guard DopamineVersion.current.versionID != nil else {
+            return
+        }
         
-        
-        self.reportedActions.append(action)
-        let num = reportedActions.count
-        
-        
-        operationQueue.addOperation {
-            DopeBluetooth.shared.getBluetooth { bluetooth in
-                DopeLog.debug("report#\(num) actionID:\(action.actionID) with bluetooth:\(bluetooth as AnyObject))")
-                DopeLocation.shared.getLocation { location in
-                    self.operationQueue.addOperation {
-                        if let location = location {
-                            action.addMetaData(["location": location])
-                        }
-                        if let ssid = DopeInfo.mySSID {
-                            action.addMetaData(["ssid": ssid])
-                        }
-//                        if let bluetooth = bluetooth {
-//                            action.addMetaData(["bluetooth": bluetooth])
-//                        }
-                        if self.operationQueue.operationCount == 1 {
-                            Report._current = self
-                        }
-                    }
-                }
+        Report.queue.addOperation {
+            self.reportedActions.append(action)
+            let num = self.reportedActions.count
+            
+            DopeLog.debug("report#\(num) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
+            
+            if let ssid = DopeInfo.mySSID {
+                action.addMetaData(["ssid": ssid])
             }
+            DopeBluetooth.shared.getBluetooth { [weak action] bluetooth in
+                if let bluetooth = bluetooth,
+                    let _ = action {
+                    action?.addMetaData(["bluetooth": bluetooth])
+                    Report._current = self
+                }
+//                DopeLog.debug("report#\(num) actionID:\(String(describing: action?.actionID)) with bluetooth:\(bluetooth as AnyObject))")
+            }
+            DopeLocation.shared.getLocation { [weak action] location in
+                if let location = location,
+                    let _ = action {
+                    action?.addMetaData(["location": location])
+                    Report._current = self
+                }
+//                DopeLog.debug("report#\(num) actionID:\(String(describing: action?.actionID)) with location:\(location as AnyObject))")
+            }
+            
+            Report._current = self
         }
     }
     
