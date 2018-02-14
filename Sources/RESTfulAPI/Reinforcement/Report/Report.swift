@@ -149,29 +149,29 @@ internal class Report : UserDefaultsSingleton {
         
         Report.queue.addOperation {
             self.reportedActions.append(action)
-            let num = self.reportedActions.count
             
-            DopeLog.debug("report#\(num) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
+//            let num = self.reportedActions.count
+//            DopeLog.debug("report#\(num) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
             
             if let ssid = DopeInfo.mySSID {
                 action.addMetaData(["ssid": ssid])
             }
-            DopeBluetooth.shared.getBluetooth { [weak action] bluetooth in
-                if let bluetooth = bluetooth,
-                    let _ = action {
-                    action?.addMetaData(["bluetooth": bluetooth])
-                    Report._current = self
-                }
+//            DopeBluetooth.shared.getBluetooth { [weak action] bluetooth in
+//                if let bluetooth = bluetooth,
+//                    let _ = action {
+//                    action?.addMetaData(["bluetooth": bluetooth])
+//                    Report._current = self
+//                }
 //                DopeLog.debug("report#\(num) actionID:\(String(describing: action?.actionID)) with bluetooth:\(bluetooth as AnyObject))")
-            }
-            DopeLocation.shared.getLocation { [weak action] location in
-                if let location = location,
-                    let _ = action {
-                    action?.addMetaData(["location": location])
-                    Report._current = self
-                }
+//            }
+//            DopeLocation.shared.getLocation { [weak action] location in
+//                if let location = location,
+//                    let _ = action {
+//                    action?.addMetaData(["location": location])
+//                    Report._current = self
+//                }
 //                DopeLog.debug("report#\(num) actionID:\(String(describing: action?.actionID)) with location:\(location as AnyObject))")
-            }
+//            }
             
             Report._current = self
         }
