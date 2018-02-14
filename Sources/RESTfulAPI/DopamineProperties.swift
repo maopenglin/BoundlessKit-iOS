@@ -108,6 +108,9 @@ internal class DopamineProperties : UserDefaultsSingleton {
     ///
     internal static func resetIdentity(completion: @escaping (String?) -> () = {_ in}) {
         _primaryIdentity = nil
+        Cartridge.flush()
+        Report.flush()
+        Track.flush()
         DopamineConfiguration.current = DopamineConfiguration.standard
         DopamineVersion.current = DopamineVersion.standard
         CodelessAPI.boot() {

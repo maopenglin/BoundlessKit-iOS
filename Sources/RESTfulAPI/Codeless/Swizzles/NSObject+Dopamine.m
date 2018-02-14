@@ -26,7 +26,7 @@
     
     IMP dynamicImp;
     void (^reinforceBlock)(id target, id sender) = ^void(id target, id sender) {
-        NSLog(@"In dynamic imp with class:%@ and selector:%@ and originalSelector:%@", NSStringFromClass([target class]), NSStringFromSelector(newSelector), NSStringFromSelector(originalSelector));
+//        NSLog(@"In dynamic imp with class:%@ and selector:%@ and originalSelector:%@", NSStringFromClass([target class]), NSStringFromSelector(newSelector), NSStringFromSelector(originalSelector));
         [SelectorReinforcement attemptReinforcementWithSenderInstance:sender targetInstance:target action:originalSelector];
     };
     
