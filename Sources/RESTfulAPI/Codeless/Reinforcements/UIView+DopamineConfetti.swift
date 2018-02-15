@@ -23,7 +23,7 @@ public extension UIView {
         - shapes: This directly affects the quantity of confetti. For example, [.circle] will show half as much confetti as [.circle, .circle]
         - colors: This directly affects the quantity of confetti. For example, [.blue] will show half as much confetti as [.blue, .blue]
      */
-    public func showConfetti(duration:Double = 0,
+    public func showConfetti(duration:Double = 2,
                       size:CGSize = CGSize(width: 9, height: 6),
                       shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle, .spiral],
                       colors:[UIColor] = [UIColor.from(rgb: "4d81fb", alpha: 0.8), UIColor.from(rgb: "4ac4fb", alpha: 0.8), UIColor.from(rgb: "9243f9", alpha: 0.8), UIColor.from(rgb: "fdc33b", alpha: 0.8), UIColor.from(rgb: "f7332f", alpha: 0.8)],
@@ -41,9 +41,9 @@ public extension UIView {
             
             /* Create bursting confetti */
             let confettiEmitter = CAEmitterLayer()
-            confettiEmitter.emitterPosition = CGPoint(x: self.frame.width/2.0, y: -30)
+            confettiEmitter.emitterPosition = CGPoint(x: self.frame.width / 2.0, y: -30)
             confettiEmitter.emitterShape = kCAEmitterLayerLine
-            confettiEmitter.emitterSize = CGSize(width: self.frame.width / 4, height: 0)
+            confettiEmitter.emitterSize = CGSize(width: self.frame.width / 4.0, height: 0)
             
             var cells:[CAEmitterCell] = []
             for shape in shapes {
@@ -58,9 +58,9 @@ public extension UIView {
                 }
                 for color in colors {
                     let cell = CAEmitterCell()
-                    cell.setValuesForBurstPhase1()
                     cell.contents = confettiImage
                     cell.color = color.cgColor
+                    cell.setValuesForBurstPhase1()
                     cells.append(cell)
                 }
             }
@@ -69,11 +69,11 @@ public extension UIView {
             /* Start showing the confetti */
             confettiEmitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(confettiEmitter)
-            self.setNeedsLayout()
+            self.layer.setNeedsDisplay()
             completion()
             
             /* Remove the burst effect */
-            DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2.0) {
                 if let cells = confettiEmitter.emitterCells {
                     for cell in cells {
                         cell.setValuesForBurstPhase2()
@@ -81,9 +81,9 @@ public extension UIView {
                 }
                 
                 /* Remove the confetti emitter */
-                DispatchQueue.main.asyncAfter(deadline: .now() + duration * 3/4) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2.0) {
                     confettiEmitter.birthRate = 0
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                         confettiEmitter.removeFromSuperlayer()
                     }
                 }
@@ -96,7 +96,7 @@ public extension UIView {
             
             /* Create showering confetti */
             let confettiEmitter = CAEmitterLayer()
-            confettiEmitter.emitterPosition = CGPoint(x: self.frame.width/2.0, y: -30)
+            confettiEmitter.emitterPosition = CGPoint(x: self.frame.width / 2, y: -30)
             confettiEmitter.emitterShape = kCAEmitterLayerLine
             confettiEmitter.emitterSize = CGSize(width: self.frame.width, height: 0)
             
@@ -113,17 +113,17 @@ public extension UIView {
                 }
                 for color in colors {
                     let cell = CAEmitterCell()
-                    cell.setValuesForShower()
                     cell.contents = confettiImage
                     cell.color = color.cgColor
+                    cell.setValuesForShower()
                     cells.append(cell)
                     /* Create some blurred confetti for depth perception */
                     let rand = Int(arc4random_uniform(2))
                     if rand != 0 {
                         let blurredCell = CAEmitterCell()
-                        blurredCell.setValuesForShowerBlurred(scale: rand)
                         blurredCell.contents = confettiImage.blurImage(radius: rand)
                         blurredCell.color = color.cgColor
+                        blurredCell.setValuesForShowerBlurred(scale: rand)
                         cells.append(blurredCell)
                     }
                 }
@@ -133,12 +133,12 @@ public extension UIView {
             /* Start showing the confetti */
             confettiEmitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(confettiEmitter)
-            self.setNeedsLayout()
+            self.layer.setNeedsDisplay()
             
             /* Remove the confetti emitter */
             DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                 confettiEmitter.birthRate = 0
-                DispatchQueue.main.asyncAfter(deadline: .now() + 7.0) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                     confettiEmitter.removeFromSuperlayer()
                     completion()
                 }
@@ -150,7 +150,7 @@ public extension UIView {
 fileprivate extension CAEmitterCell {
     fileprivate func setValuesForBurstPhase1() {
         self.birthRate = 12
-        self.lifetime = 7
+        self.lifetime = 5
         self.velocity = 250
         self.velocityRange = 50
         self.yAcceleration = -80
@@ -162,6 +162,9 @@ fileprivate extension CAEmitterCell {
         self.redRange = 0.2
         self.blueRange = 0.2
         self.greenRange = 0.2
+        
+//        self.alphaSpeed = 1.0 / 0.2
+//        self.color = self.color?.copy(alpha: 0)
     }
     
     fileprivate func setValuesForBurstPhase2() {
@@ -171,8 +174,8 @@ fileprivate extension CAEmitterCell {
     }
     
     fileprivate func setValuesForShower() {
-        self.birthRate = 10
-        self.lifetime = 7
+        self.birthRate = 20
+        self.lifetime = 3
         self.velocity = 200
         self.velocityRange = 50
         self.yAcceleration = 200
@@ -185,11 +188,14 @@ fileprivate extension CAEmitterCell {
         self.redRange = 0.2
         self.blueRange = 0.2
         self.greenRange = 0.2
+        
+//        self.alphaSpeed = 1.0 / 0.2
+//        self.color = self.color?.copy(alpha: 0)
     }
     
     fileprivate func setValuesForShowerBlurred(scale: Int) {
-        self.birthRate = 1
-        self.lifetime = 7
+        self.birthRate = 7
+        self.lifetime = 3
         self.velocity = 300
         self.velocityRange = 150
         self.yAcceleration = 200
@@ -201,6 +207,9 @@ fileprivate extension CAEmitterCell {
         self.redRange = 0.2
         self.blueRange = 0.2
         self.greenRange = 0.2
+        
+//        self.alphaSpeed = 1.0 / 0.2
+//        self.color = self.color?.copy(alpha: 0)
     }
 }
 
