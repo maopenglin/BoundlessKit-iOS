@@ -169,11 +169,11 @@ class ViewController: UIViewController {
         let dopamineIcon = UIImage(named:"DopamineLogo")
         
         let imageView = UIImageView(image: dopamineIcon)
-        imageView.center = CGPoint(x: viewSize.width/2, y: 100)
+        imageView.center = CGPoint(x: viewSize.width/2, y: 120)
         self.view.addSubview(imageView)
         
         // Response label below dopamine icon
-        responseLabel = UILabel.init(frame: CGRect(x: 0, y: 150, width: viewSize.width, height: 50))
+        responseLabel = UILabel.init(frame: CGRect(x: 0, y: 170, width: viewSize.width, height: 50))
         responseLabel.text = "Click a button below!"
         responseLabel.textAlignment = NSTextAlignment.center
         self.view.addSubview(responseLabel)
@@ -201,6 +201,17 @@ class ViewController: UIViewController {
         trackedActionButton.addTarget(self, action: #selector(ViewController.action2Performed(button:)), for: UIControlEvents.touchUpInside)
         trackedActionButton.showsTouchWhenHighlighted = true
         self.view.addSubview(trackedActionButton)
+        
+//        let navItem = UINavigationItem(title: "Reinforce/Track")
+//        navItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.fastForward, target: self, action: #selector(showRewardsController))
+//        navigationController?.navigationBar.setItems([navItem], animated: false)
+        
+    }
+    
+    
+    @objc func showRewardsController() {
+        let rewardsController = RewardsViewController.instance()
+        navigationController?.pushViewController(rewardsController, animated: true)
     }
     
     @objc func flash(_ elm:UIView){
