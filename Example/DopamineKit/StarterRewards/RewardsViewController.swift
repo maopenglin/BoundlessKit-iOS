@@ -15,13 +15,6 @@ class RewardsViewController : UICollectionViewController {
     fileprivate let sectionInsets = UIEdgeInsets(top: 50.0, left: 20.0, bottom: 50.0, right: 20.0)
     fileprivate let itemsPerRow: CGFloat = 3
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        collectionView?.backgroundColor = .orange
-    }
-    
-    
-    
 }
 
 extension RewardsViewController {
@@ -33,8 +26,9 @@ extension RewardsViewController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! RewardTypeCell
         
-        cell.backgroundColor = .gray
         cell.label.text = Reward.cases[indexPath.row].rawValue
+        cell.layer.cornerRadius = 25
+        cell.layer.borderWidth = 1
         
         return cell
     }
