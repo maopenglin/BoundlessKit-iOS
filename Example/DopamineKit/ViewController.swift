@@ -200,18 +200,7 @@ class ViewController: UIViewController {
         trackedActionButton.backgroundColor = UIColor.init(red: 204/255.0, green: 51/255.0, blue: 51/255.0, alpha: 1.0)
         trackedActionButton.addTarget(self, action: #selector(ViewController.action2Performed(button:)), for: UIControlEvents.touchUpInside)
         trackedActionButton.showsTouchWhenHighlighted = true
-        self.view.addSubview(trackedActionButton)
-        
-//        let navItem = UINavigationItem(title: "Reinforce/Track")
-//        navItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.fastForward, target: self, action: #selector(showRewardsController))
-//        navigationController?.navigationBar.setItems([navItem], animated: false)
-        
-    }
-    
-    
-    @objc func showRewardsController() {
-        let rewardsController = RewardsViewController.instance()
-        navigationController?.pushViewController(rewardsController, animated: true)
+        self.view.addSubview(trackedActionButton)   
     }
     
     @objc func flash(_ elm:UIView){

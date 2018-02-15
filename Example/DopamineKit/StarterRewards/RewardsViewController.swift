@@ -15,15 +15,8 @@ class RewardsViewController : UICollectionViewController {
     fileprivate let sectionInsets = UIEdgeInsets(top: 50.0, left: 20.0, bottom: 50.0, right: 20.0)
     fileprivate let itemsPerRow: CGFloat = 3
     
-    var collectionObjects = ["one", "two", "three"]
-    
-    @objc class func instance() -> RewardsViewController {
-        let _ = ViewController.setReward
-        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RewardsViewController") as! RewardsViewController
-    }
-    
     override func viewDidLoad() {
-        
+        super.viewDidLoad()
         collectionView?.backgroundColor = .orange
     }
     
@@ -33,24 +26,24 @@ class RewardsViewController : UICollectionViewController {
 
 extension RewardsViewController {
     
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return collectionObjects.count
+        return Reward.cases.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! RewardTypeCell
         
         cell.backgroundColor = .gray
-        cell.label.text = collectionObjects[indexPath.row]
+        cell.label.text = Reward.cases[indexPath.row].rawValue
         
         return cell
     }
     
-    
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        Reward.cases[indexPath.item].test(
+            view: collectionView.cellForItem(at: indexPath)!
+        )
+    }
 }
 
 
