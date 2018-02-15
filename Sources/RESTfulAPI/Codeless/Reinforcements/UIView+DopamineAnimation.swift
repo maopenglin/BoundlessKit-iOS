@@ -95,10 +95,10 @@ public extension UIView {
     
     public func rotate360Degrees(count: Float = 2, duration: CFTimeInterval = 1.0, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
         let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")
-        rotateAnimation.repeatCount = count
-        rotateAnimation.duration = duration/TimeInterval(rotateAnimation.repeatCount)
+        rotateAnimation.duration = duration
         rotateAnimation.fromValue = 0.0
-        rotateAnimation.toValue = 2.0 * CGFloat.pi
+        rotateAnimation.toValue = 2.0 * Float.pi * count
+        rotateAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         
         CoreAnimationDelegate(
             didStart:{

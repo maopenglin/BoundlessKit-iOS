@@ -30,9 +30,11 @@ public extension UIView {
                       hapticFeedback: Bool = false,
                       systemSound: UInt32 = 0,
                       completion: @escaping ()->Void = {}) {
-        self.confettiBurst(duration: 0.8, size: size, shapes: shapes, colors: colors) {
+        let burstDuration = 0.8
+        let showerDuration = max(0, duration - burstDuration)
+        self.confettiBurst(duration: burstDuration, size: size, shapes: shapes, colors: colors) {
             DopeAudio.play(systemSound, vibrate: hapticFeedback)
-            self.confettiShower(duration: duration, size: size, shapes: shapes, colors: colors, completion: completion)
+            self.confettiShower(duration: showerDuration, size: size, shapes: shapes, colors: colors, completion: completion)
         }
     }
     
@@ -69,7 +71,7 @@ public extension UIView {
             /* Start showing the confetti */
             confettiEmitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(confettiEmitter)
-            self.layer.setNeedsDisplay()
+            self.layer.setNeedsLayout()
             completion()
             
             /* Remove the burst effect */
@@ -83,7 +85,8 @@ public extension UIView {
                 /* Remove the confetti emitter */
                 DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2.0) {
                     confettiEmitter.birthRate = 0
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                    let cellLifetime: TimeInterval = TimeInterval(confettiEmitter.emitterCells?.first?.lifetime ?? 3)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + cellLifetime) {
                         confettiEmitter.removeFromSuperlayer()
                     }
                 }
@@ -133,12 +136,13 @@ public extension UIView {
             /* Start showing the confetti */
             confettiEmitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(confettiEmitter)
-            self.layer.setNeedsDisplay()
+            self.layer.setNeedsLayout()
             
             /* Remove the confetti emitter */
             DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                 confettiEmitter.birthRate = 0
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                let cellLifetime: TimeInterval = TimeInterval(confettiEmitter.emitterCells?.first?.lifetime ?? 3)
+                DispatchQueue.main.asyncAfter(deadline: .now() + cellLifetime) {
                     confettiEmitter.removeFromSuperlayer()
                     completion()
                 }
@@ -194,7 +198,7 @@ fileprivate extension CAEmitterCell {
     }
     
     fileprivate func setValuesForShowerBlurred(scale: Int) {
-        self.birthRate = 7
+        self.birthRate = 3
         self.lifetime = 3
         self.velocity = 300
         self.velocityRange = 150

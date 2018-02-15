@@ -20,12 +20,13 @@ enum Reward : String {
         case .pulse:
             view.showPulse()
         case .vibrate:
-            view.showVibrate()
+            view.showVibrate(hapticFeedback: true, systemSound: 1009)
         case .rotate:
             view.rotate360Degrees()
         case .glow:
             view.showGlow()
         case .sheen:
+            view.clipsToBounds = true
             view.showSheen()
         case .emojisplosion:
             view.superview!.showEmojiSplosion(at: view.center)
