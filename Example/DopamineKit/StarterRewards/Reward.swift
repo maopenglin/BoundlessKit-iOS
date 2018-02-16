@@ -14,26 +14,29 @@ enum Reward : String {
     static let cases:[Reward] = [.shimmy, .pulse, .vibrate, .rotate, .glow, .sheen, .emojisplosion, .gifsplosion, .confetti]
  
     func test(view: UIView) {
+        let completion = {
+            print("Completed showing reward type:\(self.rawValue)")
+        }
         switch self {
         case .shimmy:
-            view.showShimmy()
+            view.showShimmy(completion: completion)
         case .pulse:
-            view.showPulse()
+            view.showPulse(completion: completion)
         case .vibrate:
-            view.showVibrate(hapticFeedback: true, systemSound: 1009)
+            view.showVibrate(hapticFeedback: true, systemSound: 1009, completion: completion)
         case .rotate:
-            view.rotate360Degrees()
+            view.rotate360Degrees(completion: completion)
         case .glow:
-            view.showGlow()
+            view.showGlow(completion: completion)
         case .sheen:
             view.clipsToBounds = true
-            view.showSheen()
+            view.showSheen(completion: completion)
         case .emojisplosion:
-            view.superview!.showEmojiSplosion(at: view.center)
+            view.superview!.showEmojiSplosion(at: view.center, completion: completion)
         case .gifsplosion:
-            view.showGifSplosion(at: CGPoint(x: view.bounds.width/2, y: view.bounds.height/2), contentString: "UnknownBehavior")
+            view.showGifSplosion(at: CGPoint(x: view.bounds.width/2, y: view.bounds.height/2), contentString: "UnknownBehavior", completion: completion)
         case .confetti:
-            view.showConfetti()
+            view.showConfetti(completion: completion)
         }
     }
 }

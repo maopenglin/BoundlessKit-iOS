@@ -38,7 +38,7 @@ public extension UIView {
         }
     }
     
-    internal func confettiBurst(duration:Double, size:CGSize, shapes:[ConfettiShape], colors:[UIColor], completion: @escaping ()->Void) {
+    internal func confettiBurst(duration:Double, size:CGSize, shapes:[ConfettiShape], colors:[UIColor], startedHandler: @escaping ()->Void) {
         DispatchQueue.main.async {
             
             /* Create bursting confetti */
@@ -72,7 +72,7 @@ public extension UIView {
             confettiEmitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(confettiEmitter)
             self.layer.setNeedsLayout()
-            completion()
+            startedHandler()
             
             /* Remove the burst effect */
             DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2.0) {
@@ -85,8 +85,9 @@ public extension UIView {
                 /* Remove the confetti emitter */
                 DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2.0) {
                     confettiEmitter.birthRate = 0
-                    let cellLifetime: TimeInterval = TimeInterval(confettiEmitter.emitterCells?.first?.lifetime ?? 3)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + cellLifetime) {
+                    
+                    print("Cell max lifetime: \(TimeInterval(confettiEmitter.emitterCells?.first?.lifetimeMax ?? 0))")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(confettiEmitter.emitterCells?.first?.lifetimeMax ?? 0)) {
                         confettiEmitter.removeFromSuperlayer()
                     }
                 }
@@ -141,8 +142,8 @@ public extension UIView {
             /* Remove the confetti emitter */
             DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                 confettiEmitter.birthRate = 0
-                let cellLifetime: TimeInterval = TimeInterval(confettiEmitter.emitterCells?.first?.lifetime ?? 3)
-                DispatchQueue.main.asyncAfter(deadline: .now() + cellLifetime) {
+                print("Cell max lifetime: \(TimeInterval(confettiEmitter.emitterCells?.first?.lifetimeMax ?? 0))")
+                DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(confettiEmitter.emitterCells?.first?.lifetimeMax ?? 0)) {
                     confettiEmitter.removeFromSuperlayer()
                     completion()
                 }
@@ -214,6 +215,12 @@ fileprivate extension CAEmitterCell {
         
 //        self.alphaSpeed = 1.0 / 0.2
 //        self.color = self.color?.copy(alpha: 0)
+    }
+    
+    fileprivate var lifetimeMax: Float {
+        get {
+            return lifetime + lifetimeRange
+        }
     }
 }
 

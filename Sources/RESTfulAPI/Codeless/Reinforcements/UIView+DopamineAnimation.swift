@@ -50,7 +50,7 @@ public extension UIView {
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: pulse)
     }
     
-    public func showVibrate(vibrateCount:Int = 6, vibrateDuration:TimeInterval = 1.0, vibrateTranslation:Int = 10, vibrateSpeed:Float = 3, scale:CGFloat = 0.8, scaleCount:Float = 1, scaleDuration:TimeInterval = 0.3, scaleVelocity:CGFloat = 20, scaleDamping:CGFloat = 10, hapticFeedback: Bool = false, systemSound: UInt32 = 0)  {
+    public func showVibrate(vibrateCount:Int = 6, vibrateDuration:TimeInterval = 1.0, vibrateTranslation:Int = 10, vibrateSpeed:Float = 3, scale:CGFloat = 0.8, scaleCount:Float = 1, scaleDuration:TimeInterval = 0.3, scaleVelocity:CGFloat = 20, scaleDamping:CGFloat = 10, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
         
         let path = UIBezierPath()
         path.move(to: .zero)
@@ -89,6 +89,7 @@ public extension UIView {
             DopeAudio.play(systemSound, vibrate: hapticFeedback)
         }, didStop: {
             self.clipsToBounds = oldClipsToBounds
+            completion()
         }
             ).start(view: self, animation: group)
     }
@@ -101,13 +102,13 @@ public extension UIView {
         rotateAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         
         CoreAnimationDelegate(
-            didStart:{
+            didStart: {
                 DopeAudio.play(systemSound, vibrate: hapticFeedback)
-        },
-            didStop: completion).start(view: self, animation: rotateAnimation)
+        }, didStop: completion
+            ).start(view: self, animation: rotateAnimation)
     }
     
-    public func showGlow(duration: Double = 0.2, color: UIColor = UIColor(red: 153/256.0, green: 101/256.0, blue: 21/256.0, alpha: 0.8), alpha: CGFloat = 0.8, radius: CGFloat = 50, count: Float = 2, hapticFeedback: Bool = false, systemSound: UInt32 = 0) {
+    public func showGlow(duration: Double = 0.2, color: UIColor = UIColor(red: 153/256.0, green: 101/256.0, blue: 21/256.0, alpha: 0.8), alpha: CGFloat = 0.8, radius: CGFloat = 50, count: Float = 2, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
         
         UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
         
@@ -145,11 +146,12 @@ public extension UIView {
         },
             didStop: {
                 glowView.removeFromSuperview()
+                completion()
         }
             ).start(view: glowView, animation: animation)
     }
     
-    public func showSheen(duration: Double = 2.0, color: UIColor? = nil, hapticFeedback: Bool = false, systemSound: UInt32 = 0) {
+    public func showSheen(duration: Double = 2.0, color: UIColor? = nil, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
         guard let bundle = DopamineKit.frameworkBundle else {
             return
         }
@@ -182,6 +184,7 @@ public extension UIView {
         },
             didStop: {
                 imageView.removeFromSuperview()
+                completion()
         }
             ).start(view: imageView, animation: animation)
     }
