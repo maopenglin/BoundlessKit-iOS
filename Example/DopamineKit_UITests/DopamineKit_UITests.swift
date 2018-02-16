@@ -7,6 +7,7 @@
 //
 
 import XCTest
+@testable import DopamineKit
 
 class DopamineKit_UITests: XCTestCase {
         
@@ -14,6 +15,9 @@ class DopamineKit_UITests: XCTestCase {
         super.setUp()
         
         // Put setup code here. This method is called before the invocation of each test method in the class.
+        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
+        DopamineKit.testCredentials = testCredentials
+        
         
         // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
