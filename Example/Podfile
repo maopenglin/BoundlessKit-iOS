@@ -9,7 +9,7 @@ target 'DopamineKit_Tests' do
     pod 'DopamineKit', :path => '../'
 end
 
-target 'DopamineKit_UITests' do
+target 'DopamineKit_UIUnitTests' do
     pod 'DopamineKit', :path => '../'
 end
 

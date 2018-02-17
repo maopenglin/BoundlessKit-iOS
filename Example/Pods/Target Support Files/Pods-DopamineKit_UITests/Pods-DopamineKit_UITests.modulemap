@@ -1,6 +1,0 @@
-framework module Pods_DopamineKit_UITests {
-  umbrella header "Pods-DopamineKit_UITests-umbrella.h"
-
-  export *
-  module * { export * }
-}

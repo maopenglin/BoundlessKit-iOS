@@ -9,7 +9,7 @@ class Tests: XCTestCase {
         super.setUp()
         
         // Set the plist so DopamineKit can read the appID, versionID, production and development secrets, and the inProduction flag
-        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
+        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineProperties", ofType: "plist")!) as! [String:Any]
         DopamineKit.testCredentials = testCredentials
         Tests.log(message: "Set dopamine credentials to:'\(testCredentials)'")
     }

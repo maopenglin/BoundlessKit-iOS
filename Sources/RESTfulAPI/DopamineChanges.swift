@@ -11,6 +11,7 @@ import Foundation
 public protocol DopamineChangesDelegate {
     @objc optional func attemptedReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String: Any]?)
     @objc optional func reinforcing(actionID: String, with reinforcementDecision: String)
+    @objc optional func didShowReward()
 }
 
 open class DopamineChanges : NSObject {

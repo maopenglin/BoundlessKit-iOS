@@ -15,6 +15,8 @@ class RewardsViewController : UICollectionViewController {
     fileprivate let sectionInsets = UIEdgeInsets(top: 50.0, left: 20.0, bottom: 50.0, right: 20.0)
     fileprivate let itemsPerRow: CGFloat = 3
     
+    static var current: RewardsViewController?
+    
 }
 
 extension RewardsViewController {
@@ -37,6 +39,11 @@ extension RewardsViewController {
         Reward.cases[indexPath.item].test(
             view: collectionView.cellForItem(at: indexPath)!
         )
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        RewardsViewController.current = self
     }
 }
 

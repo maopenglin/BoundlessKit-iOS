@@ -29,11 +29,6 @@ class ViewController: UIViewController {
         return
     }()
     
-    @objc class func instance() -> ViewController {
-        let _ = ViewController.setReward
-        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ViewController") as! ViewController
-    }
-    
     func presentAnother() {
         present(ViewController.instance(), animated: true)
     }
@@ -224,6 +219,12 @@ extension ViewController {
     static func setTemporaryReward() {
         let selectorReinforcement = SelectorReinforcement(targetClass: self, selector: #selector(ViewController.viewDidAppear(_:)))
         DopamineVersion.current.update(visualizer: [selectorReinforcement.actionID : ["reward" : ["reward1":"somereward"]]])
+    }
+}
+
+extension ViewController {
+    static func instance() -> ViewController {
+        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: NSStringFromClass(ViewController.self).components(separatedBy: ".").last!) as! ViewController
     }
 }
 

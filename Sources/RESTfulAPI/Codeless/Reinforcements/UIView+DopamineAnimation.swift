@@ -31,10 +31,12 @@ public extension UIView {
         animation.path = path.cgPath
         animation.speed = speed
         
-        CoreAnimationDelegate(
-            didStart:{
-                DopeAudio.play(systemSound, vibrate: hapticFeedback)
-        }, didStop: completion).start(view: self, animation: animation)
+        CoreAnimationDelegate(didStart:{
+            DopeAudio.play(systemSound, vibrate: hapticFeedback)
+        }, didStop: {
+            completion()
+            DopamineChanges.shared.delegate?.didShowReward?()
+        }).start(view: self, animation: animation)
     }
     
     public func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
@@ -47,7 +49,10 @@ public extension UIView {
         pulse.initialVelocity = velocity
         pulse.damping = damping
         
-        CoreAnimationDelegate(didStop: completion).start(view: self, animation: pulse)
+        CoreAnimationDelegate(didStop: {
+            completion()
+            DopamineChanges.shared.delegate?.didShowReward?()
+        }).start(view: self, animation: pulse)
     }
     
     public func showVibrate(vibrateCount:Int = 6, vibrateDuration:TimeInterval = 1.0, vibrateTranslation:Int = 10, vibrateSpeed:Float = 3, scale:CGFloat = 0.8, scaleCount:Float = 1, scaleDuration:TimeInterval = 0.3, scaleVelocity:CGFloat = 20, scaleDamping:CGFloat = 10, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
@@ -90,6 +95,7 @@ public extension UIView {
         }, didStop: {
             self.clipsToBounds = oldClipsToBounds
             completion()
+            DopamineChanges.shared.delegate?.didShowReward?()
         }
             ).start(view: self, animation: group)
     }
@@ -104,7 +110,10 @@ public extension UIView {
         CoreAnimationDelegate(
             didStart: {
                 DopeAudio.play(systemSound, vibrate: hapticFeedback)
-        }, didStop: completion
+        }, didStop: {
+            completion()
+            DopamineChanges.shared.delegate?.didShowReward?()
+        }
             ).start(view: self, animation: rotateAnimation)
     }
     
@@ -147,6 +156,7 @@ public extension UIView {
             didStop: {
                 glowView.removeFromSuperview()
                 completion()
+                DopamineChanges.shared.delegate?.didShowReward?()
         }
             ).start(view: glowView, animation: animation)
     }
@@ -185,6 +195,7 @@ public extension UIView {
             didStop: {
                 imageView.removeFromSuperview()
                 completion()
+                DopamineChanges.shared.delegate?.didShowReward?()
         }
             ).start(view: imageView, animation: animation)
     }

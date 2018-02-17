@@ -11,6 +11,6 @@
 #endif
 
 
-FOUNDATION_EXPORT double Pods_DopamineKit_UITestsVersionNumber;
-FOUNDATION_EXPORT const unsigned char Pods_DopamineKit_UITestsVersionString[];
+FOUNDATION_EXPORT double Pods_DopamineKit_UIUnitTestsVersionNumber;
+FOUNDATION_EXPORT const unsigned char Pods_DopamineKit_UIUnitTestsVersionString[];
 

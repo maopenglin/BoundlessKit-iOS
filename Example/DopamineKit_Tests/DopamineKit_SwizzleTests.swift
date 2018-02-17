@@ -20,13 +20,17 @@ class DopamineKit_SwizzleTests: XCTestCase {
         }
     }
     
+    var window: UIWindow!
     var controllerUnderTest: ViewController!
     override func setUp() {
         super.setUp()
         DopamineVersion.current.update(visualizer: nil)
         
-        controllerUnderTest = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
+        controllerUnderTest = ViewController.instance()
         
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = controllerUnderTest
+        window.makeKeyAndVisible()
     }
     
     override func tearDown() {
@@ -48,9 +52,6 @@ class DopamineKit_SwizzleTests: XCTestCase {
 //    }
     
     func testSwizzleForMethodReturnsVoidParam0() {
-        var controllerUnderTest: ViewController!
-        controllerUnderTest = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
-        
         doubleSwizzle(
             sut: controllerUnderTest,
             selector1: #selector(ViewController.funcReturnVoidParams0),
@@ -62,9 +63,6 @@ class DopamineKit_SwizzleTests: XCTestCase {
     }
     
     func testSwizzleForMethodReturnsVoidParam1obj() {
-        var controllerUnderTest: ViewController!
-        controllerUnderTest = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
-        
         doubleSwizzle(
             sut: controllerUnderTest,
             selector1: #selector(ViewController.funcReturnsVoidParam1obj(param1:)),
@@ -76,9 +74,6 @@ class DopamineKit_SwizzleTests: XCTestCase {
     }
     
     func testSwizzleForMethodReturnsVoidParam1int() {
-        var controllerUnderTest: ViewController!
-        controllerUnderTest = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
-        
         doubleSwizzle(
             sut: controllerUnderTest,
             selector1: #selector(ViewController.funcReturnsVoidParam1int(param1:)),
@@ -117,7 +112,7 @@ class DopamineKit_SwizzleTests: XCTestCase {
     
     func testViewControllerDidAppearReward() {
         // given
-        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
+        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineProperties", ofType: "plist")!) as! [String:Any]
         DopamineKit.testCredentials = testCredentials
         class ChangesDelegate : NSObject, DopamineChangesDelegate {
             var didAttemptBlock: ((_ senderInstance: AnyObject?, _ targetInstance: AnyObject?, _ actionSelector: String, _ reinforcements: [String : Any]?) -> Void)? = nil
@@ -140,14 +135,13 @@ class DopamineKit_SwizzleTests: XCTestCase {
         let selectorReinforcement = SelectorReinforcement(targetClass: ViewController.self, selector: selector)
         let reinforcementsDict: [String : Any] = ["reward" : ["reward2":"somereward"]]
         DopamineVersion.current.update(visualizer: [selectorReinforcement.actionID : reinforcementsDict])
-        let controllerUnderTest: ViewController! = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as! ViewController!
         
         
         
         // when
         let promise = expectation(description: "Reinforcement attempted")
         changesDelegate.didAttemptBlock = {(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String : Any]?) in
-            guard targetInstance === controllerUnderTest,
+            guard targetInstance === self.controllerUnderTest,
                 let reinforcements = reinforcements,
                 NSDictionary(dictionary: reinforcementsDict).isEqual(to: reinforcements),
                 actionSelector == NSStringFromSelector(selector) else {
@@ -160,6 +154,111 @@ class DopamineKit_SwizzleTests: XCTestCase {
         // then
         waitForExpectations(timeout: 5, handler: nil)
     }
+    
+    func testRewardShimmy() {
+        // given
+        let promise1 = expectation(description: "Shimmy reward")
+        
+        // when
+        controllerUnderTest.view.showShimmy {
+            promise1.fulfill()
+        }
+        
+        // then
+        waitForExpectations(timeout: 5, handler: nil)
+    }
+    
+    func testRewardPulse() {
+        // given
+        let promise1 = expectation(description: "Pulse reward")
+        
+        // when
+        controllerUnderTest.view.showPulse {
+            promise1.fulfill()
+        }
+        
+        // then
+        waitForExpectations(timeout: 5, handler: nil)
+    }
+    
+    func testRewardVibrate() {
+        // given
+        let promise1 = expectation(description: "Vibrate reward")
+        
+        // when
+        controllerUnderTest.view.showVibrate {
+            promise1.fulfill()
+        }
+        
+        // then
+        waitForExpectations(timeout: 5, handler: nil)
+    }
+    
+    func testRewardRotate() {
+        // given
+        let promise1 = expectation(description: "Rotate reward")
+        
+        // when
+        controllerUnderTest.view.rotate360Degrees {
+            promise1.fulfill()
+        }
+        
+        // then
+        waitForExpectations(timeout: 5, handler: nil)
+    }
+    
+    func testRewardGlow() {
+        // given
+        let promise1 = expectation(description: "Glow reward")
+        
+        // when
+        controllerUnderTest.view.showGlow {
+            promise1.fulfill()
+        }
+        
+        // then
+        waitForExpectations(timeout: 5, handler: nil)
+    }
+    
+    func testRewardSheen() {
+        // given
+        let promise1 = expectation(description: "Sheen reward")
+        
+        // when
+        controllerUnderTest.view.showSheen {
+            promise1.fulfill()
+        }
+        
+        // then
+        waitForExpectations(timeout: 5, handler: nil)
+    }
+    
+    func testRewardConfetti() {
+        // given
+        let promise1 = expectation(description: "Confetti reward")
+        
+        // when
+        controllerUnderTest.view.showConfetti {
+            promise1.fulfill()
+        }
+        
+        // then
+        waitForExpectations(timeout: 7, handler: nil)
+    }
+    
+    func testRewardEmojiSplosion() {
+        // given
+        let promise1 = expectation(description: "EmojiSplosion reward")
+        
+        // when
+        controllerUnderTest.view.showEmojiSplosion(at: controllerUnderTest.view.center) {
+            promise1.fulfill()
+        }
+        
+        // then
+        waitForExpectations(timeout: 5, handler: nil)
+    }
+    
 }
 
 extension NSObject {

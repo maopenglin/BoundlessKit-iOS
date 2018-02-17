@@ -86,7 +86,6 @@ public extension UIView {
                 DispatchQueue.main.asyncAfter(deadline: .now() + duration / 2.0) {
                     confettiEmitter.birthRate = 0
                     
-                    print("Cell max lifetime: \(TimeInterval(confettiEmitter.emitterCells?.first?.lifetimeMax ?? 0))")
                     DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(confettiEmitter.emitterCells?.first?.lifetimeMax ?? 0)) {
                         confettiEmitter.removeFromSuperlayer()
                     }
@@ -142,10 +141,11 @@ public extension UIView {
             /* Remove the confetti emitter */
             DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                 confettiEmitter.birthRate = 0
-                print("Cell max lifetime: \(TimeInterval(confettiEmitter.emitterCells?.first?.lifetimeMax ?? 0))")
+                
                 DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(confettiEmitter.emitterCells?.first?.lifetimeMax ?? 0)) {
                     confettiEmitter.removeFromSuperlayer()
                     completion()
+                    DopamineChanges.shared.delegate?.didShowReward?()
                 }
             }
         }
