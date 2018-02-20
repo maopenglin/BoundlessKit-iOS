@@ -29,9 +29,7 @@
 -(void) enhanced_sendEvent: (UIEvent *) event {
     if (event) {
         UITouch* touch = event.allTouches.anyObject;
-        if (touch != nil) {
-            [CodelessAPI submitEventWithTouch:touch];
-        }
+        [Reinforcement setLastTouch: touch];
     }
 
     if ([self respondsToSelector:@selector(enhanced_sendEvent:)])

@@ -64,14 +64,13 @@ class DopamineKit_UIUnitTests: XCTestCase {
         collectionViewsQuery/*@START_MENU_TOKEN@*/.staticTexts["glow"]/*[[".cells.staticTexts[\"glow\"]",".staticTexts[\"glow\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
         collectionViewsQuery/*@START_MENU_TOKEN@*/.staticTexts["sheen"]/*[[".cells.staticTexts[\"sheen\"]",".staticTexts[\"sheen\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
         collectionViewsQuery/*@START_MENU_TOKEN@*/.staticTexts["emojisplosion"]/*[[".cells.staticTexts[\"emojisplosion\"]",".staticTexts[\"emojisplosion\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-        collectionViewsQuery/*@START_MENU_TOKEN@*/.staticTexts["gifsplosion"]/*[[".cells.staticTexts[\"gifsplosion\"]",".staticTexts[\"gifsplosion\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
         collectionViewsQuery/*@START_MENU_TOKEN@*/.staticTexts["confetti"]/*[[".cells.staticTexts[\"confetti\"]",".staticTexts[\"confetti\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
         
         
         // then
         sleep(5)
         print("Showed \(rewardCount) rewards")
-        XCTAssert(rewardCount == 9)
+        XCTAssert(rewardCount == 8)
     }
     
 }

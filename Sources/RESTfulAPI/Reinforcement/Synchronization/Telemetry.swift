@@ -93,7 +93,7 @@ internal class Telemetry {
             for (actionID, cartridge) in Cartridge.cartridgeSyncers {
                 cartridgeTriggers[actionID] = cartridge.toJSONType()
             }
-            currentSyncOverview = SyncOverview.init(cause: cause, trackTriggers: Track.current.toJSONType(), reportTriggers: Report.current.toJSONType(), cartridgeTriggers: cartridgeTriggers)
+            currentSyncOverview = SyncOverview.init(cause: cause, trackTriggers: SyncCoordinator.shared.trackedActions.toJSONType(), reportTriggers: SyncCoordinator.shared.reportedActions.toJSONType(), cartridgeTriggers: cartridgeTriggers)
         }
     }
     

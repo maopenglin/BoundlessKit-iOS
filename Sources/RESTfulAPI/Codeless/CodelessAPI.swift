@@ -149,31 +149,6 @@ public class CodelessAPI : NSObject {
     }
     
     @objc
-    public static func submitEvent(touch: UITouch) {
-        DispatchQueue.global().async {
-            if let view = touch.view,
-                touch.phase == .ended {
-                
-//                touch.attemptReinforcement()
-                
-                submit { payload in
-                    let senderClassname = NSStringFromClass(type(of: touch))
-                    let targetName = view.getParentResponders().joined(separator: ",")
-                    let selectorName = "ended"
-                    
-                    payload["sender"] = senderClassname
-                    payload["target"] = targetName
-                    payload["selector"] = selectorName
-                    payload["actionID"] = [senderClassname, targetName, selectorName].joined(separator: "-")
-                    payload["senderImage"] = ""
-                    payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-                    payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
-                }
-            }
-        }
-    }
-    
-    @objc
     public static func submitAction(application: UIApplication, senderInstance: AnyObject, targetInstance: AnyObject, selectorObj: Selector) {
         DispatchQueue.global().async {
             let senderClassname = NSStringFromClass(type(of: senderInstance))

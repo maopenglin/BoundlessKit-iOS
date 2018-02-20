@@ -11,44 +11,6 @@ import UIKit
 import AVFoundation
 
 public extension UIView {
-    
-    public func showGifSplosion(at location:CGPoint,
-                                contentString: String,
-                                scale: CGFloat = 1.0,
-                                scaleSpeed: CGFloat = 0,
-                                scaleRange: CGFloat = 0,
-                                lifetime: Float = 2.0,
-                                lifetimeRange: Float = 0,
-                                fadeout: Float = 0.2,
-                                quantity: Float = 1.0,
-                                bursts: Double = 1.0,
-                                velocity: CGFloat = 30,
-                                xAcceleration: CGFloat = 0,
-                                yAcceleration: CGFloat = -30,
-                                angle: CGFloat = -90,
-                                range: CGFloat = 0,
-                                spin: CGFloat = 0,
-                                backgroundColor: UIColor = .black,
-                                backgroundAlpha: CGFloat = 0.7,
-                                hapticFeedback: Bool = false,
-                                systemSound: UInt32 = 0,
-                                completion: @escaping ()->Void = {}
-        ) {
-        if let content = contentString.base64DecodedImage?.cgImage {
-            
-            if backgroundAlpha > 0 {
-                
-                DispatchQueue.main.async {
-                    let vc = UIGifgliaViewController(autoDismissTimeout: bursts * Double(lifetime), backgroundColor: backgroundColor, backgroundAlpha: backgroundAlpha) { }
-                    UIApplication.shared.keyWindow?.rootViewController?.present(vc, animated: false)
-                    self.showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, quantity:quantity, bursts:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
-                }
-            } else {
-                self.showEmojiSplosion(at:location, content:content, scale:scale, scaleSpeed:scaleSpeed, scaleRange:scaleRange, lifetime:lifetime, lifetimeRange:lifetimeRange, fadeout:fadeout, quantity:quantity, bursts:bursts, velocity:velocity, xAcceleration:xAcceleration, yAcceleration:yAcceleration, angle:angle, range:range, spin:spin, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
-            }
-        }
-    }
-    
     public func showEmojiSplosion(at location:CGPoint,
                                   content: CGImage? = "❤️".image().cgImage,
                                   scale: CGFloat = 0.6,

@@ -1,6 +1,6 @@
 import UIKit
 import XCTest
-import DopamineKit
+@testable import DopamineKit
 //import Pods_DopamineKit_ReleaseTests
 
 class Tests: XCTestCase {
@@ -81,18 +81,22 @@ class Tests: XCTestCase {
     /// Test multiple (4) DopamineKit.track() called back to back
     ///
     func testTrackMultiple() {
-        let asyncExpectation = expectation(description: "Multiple tracking request")
         
+        // given
+        SyncCoordinator.shared.flush()
+        
+        
+        // when
         let numRequests = 4
         for i in 1...numRequests {
             DopamineKit.track("test_track_multiple_\(i)/\(numRequests)")
         }
-        sleep(sleepTimeForTrack)
-        asyncExpectation.fulfill()
         
-        waitForExpectations(timeout: standardExpectationTimeout, handler: {error in
-            XCTAssertNil(error, "DopamineKitTest error: testTrackMultiple timed out")
-        })
+        
+        // then
+        sleep(2)
+        print("Track count:\(SyncCoordinator.shared.trackedActions.count) expected:\(numRequests)")
+        XCTAssert(SyncCoordinator.shared.trackedActions.count == numRequests)
     }
     
     /// Test performance for track() averaged over 10 calls
