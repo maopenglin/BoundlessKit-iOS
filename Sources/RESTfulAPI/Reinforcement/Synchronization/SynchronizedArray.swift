@@ -7,19 +7,12 @@
 
 import Foundation
 
-internal class SynchronizedArray<Element> : NSObject {
+internal class SynchronizedArray<Element> {
     fileprivate let queue = DispatchQueue(label: "SynchronizedArrayDispatch", attributes: .concurrent)
     fileprivate var array: [Element]
     
     init(_ initialArray: [Element] = []) {
         array = initialArray
-    }
-    
-    /// A textual representation of the array and its elements.
-    override var description: String {
-        var result = ""
-        queue.sync { result = self.array.description }
-        return result
     }
 }
 

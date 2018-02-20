@@ -18,8 +18,8 @@ public class SyncCoordinator {
     /// Initializer for SyncCoordinator performs a sync
     ///
     private init() {
-        trackedActions = UserDefaults.dopamine.unarchive(key: "SyncCoordinator.TrackedActions") ?? DopeActionCollection()
-        reportedActions = UserDefaults.dopamine.unarchive(key: "SyncCoordinator.ReportedActions") ?? DopeActionCollection()
+        trackedActions = DopeActionCollection(actions: UserDefaults.dopamine.unarchive(key: "SyncCoordinator.TrackedActions"))
+        reportedActions = DopeActionCollection(actions: UserDefaults.dopamine.unarchive(key: "SyncCoordinator.ReportedActions"))
     }
     
     deinit {
@@ -33,13 +33,14 @@ public class SyncCoordinator {
     ///     - trackedAction: A tracked action.
     ///
     internal func store(track action: DopeAction) {
-        trackedActions.add(action)
+        let count = trackedActions.add(action)
+        DopeLog.debug("track#\(count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
         saveTrackedActions()
-        self.performSync()
+        performSync()
     }
     
     fileprivate func saveTrackedActions() {
-        UserDefaults.dopamine.archive(trackedActions, forKey: "SyncCoordinator.TrackedActions")
+        UserDefaults.dopamine.set(NSKeyedArchiver.archivedData(withRootObject: trackedActions.filter({_ in return true})), forKey: "SyncCoordinator.TrackedActions")
     }
     
     /// Stores a reinforced action to be synced
@@ -48,13 +49,14 @@ public class SyncCoordinator {
     ///     - reportedAction: A reinforced action.
     ///
     internal func store(report action: DopeAction) {
-        reportedActions.add(action)
+        let count = reportedActions.add(action)
+        DopeLog.debug("report#\(count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
         saveReportedActions()
         performSync()
     }
     
     fileprivate func saveReportedActions() {
-        UserDefaults.dopamine.archive(reportedActions, forKey: "SyncCoordinator.ReportedActions")
+        UserDefaults.dopamine.set(NSKeyedArchiver.archivedData(withRootObject: reportedActions.filter({_ in return true})), forKey: "SyncCoordinator.ReportedActions")
     }
     
     /// Finds the right cartridge for an action and returns a reinforcement decision

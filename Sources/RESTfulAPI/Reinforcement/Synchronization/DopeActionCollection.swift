@@ -7,35 +7,17 @@
 
 import Foundation
 
-internal class DopeActionCollection : SynchronizedArray<DopeAction>, NSCoding {
+internal class DopeActionCollection : SynchronizedArray<DopeAction> {
     
     @objc var sizeForBatch: Int
     @objc fileprivate var timerStartedAt: Int64
     @objc fileprivate var timerExpiresIn: Int64
     
-    init(actions: [DopeAction] = [], sizeForBatch: Int = 10, timerStartedAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
+    init(actions: [DopeAction]? = nil, sizeForBatch: Int = 10, timerStartedAt: Int64 = Int64( 1000*NSDate().timeIntervalSince1970 ), timerExpiresIn: Int64 = 172800000) {
         self.sizeForBatch = sizeForBatch
         self.timerStartedAt = timerStartedAt
         self.timerExpiresIn = timerExpiresIn
-        super.init(actions)
-    }
-    
-    required convenience init?(coder aDecoder: NSCoder) {
-        if let savedActions = aDecoder.decodeObject(forKey: "actions") as? [DopeAction] {
-            self.init(actions: savedActions,
-                      sizeForBatch: aDecoder.decodeInteger(forKey: #keyPath(DopeActionCollection.sizeForBatch)),
-                      timerStartedAt: aDecoder.decodeInt64(forKey: #keyPath(DopeActionCollection.timerStartedAt)),
-                      timerExpiresIn: aDecoder.decodeInt64(forKey: #keyPath(DopeActionCollection.timerExpiresIn))
-            )
-        } else {
-            return nil
-        }
-    }
-    
-    func encode(with aCoder: NSCoder) {
-        aCoder.encode(self.filter({_ in return true}), forKey: "actions")
-        aCoder.encode(timerStartedAt, forKey: #keyPath(DopeActionCollection.timerStartedAt))
-        aCoder.encode(timerExpiresIn, forKey: #keyPath(DopeActionCollection.timerExpiresIn))
+        super.init(actions ?? [])
     }
     
     /// Stores an action
@@ -43,11 +25,12 @@ internal class DopeActionCollection : SynchronizedArray<DopeAction>, NSCoding {
     /// - parameters:
     ///     - action: The action to be stored.
     ///
-    func add(_ action: DopeAction) {
+    /// - returns: the count for the collection after appending
+    ///
+    func add(_ action: DopeAction) -> Int {
         self.append(action)
         
         let num = self.count
-        DopeLog.debug("action#\(num) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
         
         if let ssid = DopeInfo.mySSID {
             action.addMetaData(["ssid": ssid])
@@ -57,17 +40,17 @@ internal class DopeActionCollection : SynchronizedArray<DopeAction>, NSCoding {
                 let _ = action {
                 action?.addMetaData(["bluetooth": bluetooth])
             }
-            DopeLog.debug("action#\(num) actionID:\(String(describing: action?.actionID)) with bluetooth:\(bluetooth as AnyObject))")
+//            DopeLog.debug("action#\(num) actionID:\(String(describing: action?.actionID)) with bluetooth:\(bluetooth as AnyObject))")
         }
         DopeLocation.shared.getLocation { [weak action] location in
             if let location = location,
                 let _ = action {
                 action?.addMetaData(["location": location])
             }
-            DopeLog.debug("action#\(num) actionID:\(String(describing: action?.actionID)) with location:\(location as AnyObject))")
+//            DopeLog.debug("action#\(num) actionID:\(String(describing: action?.actionID)) with location:\(location as AnyObject))")
         }
 
-        
+        return num
     }
     
     
