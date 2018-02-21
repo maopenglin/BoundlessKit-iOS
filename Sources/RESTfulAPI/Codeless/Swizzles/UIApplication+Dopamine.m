@@ -29,7 +29,7 @@
 -(void) enhanced_sendEvent: (UIEvent *) event {
     if (event) {
         UITouch* touch = event.allTouches.anyObject;
-        [Reinforcement setLastTouch: touch];
+        [CodelessReinforcement setLastTouch: touch];
     }
 
     if ([self respondsToSelector:@selector(enhanced_sendEvent:)])

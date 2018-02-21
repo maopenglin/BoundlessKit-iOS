@@ -9,16 +9,16 @@ import Foundation
 
 @objc
 public protocol DopamineChangesDelegate {
-    @objc optional func attemptedReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String: Any]?)
-    @objc optional func reinforcing(actionID: String, with reinforcementDecision: String)
-    @objc optional func didShowReward()
+    func didAttemptReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String: Any]?)
+    func isReinforcing(actionID: String, with reinforcementDecision: String?)
+    func didShowReward()
 }
 
 public class DopamineChangesDelegateTester : DopamineChangesDelegate {
-    public func attemptedReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String: Any]?) {
+    public func didAttemptReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String: Any]?) {
         DopeLog.debug("AttemptedReinforcement for selector:\(actionSelector)")
     }
-    public func reinforcing(actionID: String, with reinforcementDecision: String) {
+    public func isReinforcing(actionID: String, with reinforcementDecision: String?) {
         DopeLog.debug("Reinforcing actionID:\(actionID) with reinforcementDecision:\(reinforcementDecision)")
     }
     public func didShowReward() {

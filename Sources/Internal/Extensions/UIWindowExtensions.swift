@@ -34,10 +34,10 @@ internal extension UIWindow {
     
     static var lastTouchPoint: CGPoint {
         get {
-            return Reinforcement.lastTouchLocationInUIWindow
+            return CodelessReinforcement.lastTouchLocationInUIWindow
         }
         set {
-            Reinforcement.lastTouchLocationInUIWindow = newValue
+            CodelessReinforcement.lastTouchLocationInUIWindow = newValue
         }
     }
 }

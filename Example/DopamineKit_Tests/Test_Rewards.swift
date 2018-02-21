@@ -40,14 +40,12 @@ class TestRewards: XCTestCase {
         // given
         let rewardMapping = controllerUnderTest.didReceiveSomeUIEventReward
         let someActionID = rewardMapping.keys.first!
-//        class RewardDelegate : DopamineChangesDelegate {
-//            var reinforcingBlock: ((String,String) -> ())?
-//            func reinforcing(actionID: String, with reinforcementDecision: String) {
-//                print("In DopamineKit_VisualizerTests delegate")
-//                reinforcingBlock?(actionID, reinforcementDecision)
-//            }
-//        }
-//        let rewardDelegate = RewardDelegate()
+        class RewardDelegate : DopamineChangesDelegateTester {
+            override func isReinforcing(actionID: String, with reinforcementDecision: String?) {
+                print("In testdelegate")
+            }
+        }
+        let rewardDelegate = RewardDelegate()
 //        DopamineChanges.shared.delegate = rewardDelegate
         
         // when

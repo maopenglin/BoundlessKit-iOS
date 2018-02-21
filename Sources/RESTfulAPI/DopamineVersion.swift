@@ -22,6 +22,11 @@ public class DopamineVersion : UserDefaultsSingleton {
     
     @objc public var versionID: String?
     @objc fileprivate var mappings: [String:Any]
+    internal var visualizerMode = false {
+        didSet {
+            if !visualizerMode { update(visualizer: nil) }
+        }
+    }
     @objc internal fileprivate (set) var visualizerMappings: [String:Any]
     
     fileprivate let updateQueue = SingleOperationQueue()
@@ -83,24 +88,25 @@ public class DopamineVersion : UserDefaultsSingleton {
         return DopamineVersion(versionID: nil)
     }
     
-    public func codelessReinforcementFor(sender: String, target: String, selector: String, reinforcementBlock: @escaping ([String:Any]) -> ()) -> [String:Any]? {
-        return codelessReinforcementFor(actionID: [sender, target, selector].joined(separator: "-"), reinforcementBlock: reinforcementBlock)
+    public func reinforcementDecision(for actionID: String) -> String {
+        let reinforcementDecision = SyncCoordinator.shared.retrieve(cartridgeFor: actionID).remove()
+        DopamineChanges.shared.delegate.isReinforcing(actionID: actionID, with: reinforcementDecision)
+        return reinforcementDecision
     }
     
-    fileprivate func codelessReinforcementFor(actionID: String, reinforcementBlock: @escaping([String:Any]) -> Void) -> [String:Any]? {
-        guard DopamineConfiguration.current.integrationMethod == "codeless" else {
-            return nil
-        }
+    public func reinforcementDecicionForCodeless(sender: String, target: String, selector: String, reinforcementBlock: @escaping ([String:Any]) -> ()) {
+        let actionID = [sender, target, selector].joined(separator: "-")
+        
         if let reinforcementParameters = visualizerMappings[actionID] as? [String: Any] {
             DopeLog.debug("Found visualizer reinforcement for <\(actionID)>")
             if let codeless = reinforcementParameters["codeless"] as? [String: Any],
                 let reinforcements = codeless["reinforcements"] as? [[String:Any]],
                 let randomReinforcement = reinforcements.selectRandom() {
+                DopamineChanges.shared.delegate.isReinforcing(actionID: actionID, with: randomReinforcement["actionID"] as? String)
                 reinforcementBlock(randomReinforcement)
             } else {
                 DopeLog.debug("Bad visualizer parameters: \(String(describing:reinforcementParameters))")
             }
-            return reinforcementParameters
         } else if let reinforcementParameters = mappings[actionID] as? [String:Any] {
             DopeLog.debug("Found reinforcement for <\(actionID)>")
             if let codeless = reinforcementParameters["codeless"] as? [String: Any],
@@ -120,12 +126,10 @@ public class DopamineVersion : UserDefaultsSingleton {
             } else {
                 DopeLog.error("Bad reinforcement parameters")
             }
-            return reinforcementParameters
         } else {
 //            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
 //            DopeLog.debug("Reinforcement mappings:\(self.mappings as AnyObject)")
 //            DopeLog.debug("Visualizer mappings:\(self.visualizerMappings as AnyObject)")
-            return nil
         }
         
         

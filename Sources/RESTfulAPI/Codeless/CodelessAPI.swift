@@ -42,9 +42,9 @@ public class CodelessAPI : NSObject {
                 DopeLog.debug("🔍 \(connectionID != nil ? "C" : "Disc")onnected to visualizer")
             }
             
-            if connectionID == nil {
-                DopamineVersion.current.update(visualizer: nil)
-            } else if submitQueue.isSuspended {
+            DopamineVersion.current.visualizerMode = (connectionID != nil)
+            
+            if submitQueue.isSuspended {
                 submitQueue.isSuspended = false
             }
         }

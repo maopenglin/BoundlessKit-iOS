@@ -116,7 +116,7 @@ class TestSwizzler: XCTestCase {
         // given
         let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineProperties", ofType: "plist")!) as! [String:Any]
         DopamineKit.testCredentials = testCredentials
-        class ChangesDelegate : NSObject, DopamineChangesDelegate {
+        class ChangesDelegate : DopamineChangesDelegateTester {
             var didAttemptBlock: ((_ senderInstance: AnyObject?, _ targetInstance: AnyObject?, _ actionSelector: String, _ reinforcements: [String : Any]?) -> Void)? = nil
             var didRewardBlock: (() -> Void)? = nil
             

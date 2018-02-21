@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class Reinforcement : NSObject {
+public class CodelessReinforcement : NSObject {
     
 //    internal static var needsLastTouchLocation = false
     internal static var lastTouchLocationInUIWindow: CGPoint = .zero
@@ -21,7 +21,18 @@ public class Reinforcement : NSObject {
         }
     }
     
-    internal static func showReinforcement(on viewAndLocation: [(UIView, CGPoint)], of type: String, withParameters reinforcement: [String: Any]) {
+    internal static func show(reinforcement: [String:Any], senderInstance: AnyObject?, targetInstance: NSObject) {
+        guard let delay = reinforcement["Delay"] as? Double else { DopeLog.error("Missing parameter", visual: true); return }
+        guard let reinforcementType = reinforcement["primitive"] as? String else { DopeLog.error("Missing parameter", visual: true); return }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            if let viewsAndLocations = reinforcementViews(senderInstance: senderInstance, targetInstance: targetInstance, options: reinforcement) {
+                showReinforcement(on: viewsAndLocations, of: reinforcementType, withParameters: reinforcement)
+            }
+        }
+    }
+    
+    fileprivate static func showReinforcement(on viewAndLocation: [(UIView, CGPoint)], of type: String, withParameters reinforcement: [String: Any]) {
         switch type {
             
         case "Confetti":
@@ -126,5 +137,115 @@ public class Reinforcement : NSObject {
             DopeLog.error("Unknown reinforcement type:\(String(describing: reinforcement))", visual: true)
             return
         }
+    }
+    
+    fileprivate static func reinforcementViews(senderInstance: AnyObject?, targetInstance: NSObject, options: [String: Any]) -> [(UIView, CGPoint)]? {
+        guard let viewOption = options["ViewOption"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
+        guard let viewCustom = options["ViewCustom"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
+        guard let viewMarginX = options["ViewMarginX"] as? CGFloat else { DopeLog.error("Missing parameter", visual: true); return nil }
+        guard let viewMarginY = options["ViewMarginY"] as? CGFloat else { DopeLog.error("Missing parameter", visual: true); return nil }
+        
+        let viewsAndLocations: [(UIView, CGPoint)]?
+        
+        switch viewOption {
+        case "fixed":
+            let view = UIWindow.topWindow!
+            viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            
+        case "touch":
+            viewsAndLocations = [(UIWindow.topWindow!, UIWindow.lastTouchPoint.withMargins(marginX: viewMarginX, marginY: viewMarginY))]
+            
+        case "custom":
+            var parts = viewCustom.components(separatedBy: "-")
+            if parts.count > 0 {
+                let vcClass = parts[0]
+                var parent: NSObject
+                if vcClass == "self" {
+                    parent = targetInstance
+                } else if
+                    let keyWindow = UIApplication.shared.keyWindow,
+                    let vc = keyWindow.getViewControllersWithClassname(classname: vcClass).first {
+                    parent = vc
+                } else {
+                    DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                    return nil
+                }
+                
+                parts.removeFirst()
+                for childName in parts {
+                    if parent.responds(to: NSSelectorFromString(childName)),
+                        let obj = parent.value(forKey: childName) as? NSObject {
+                        parent = obj
+                    }
+                }
+                
+                if let view = parent as? UIView {
+                    viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+                } else {
+                    DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                    return nil
+                }
+                
+            } else if viewCustom == "self", let view = targetInstance as? UIView {
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else {
+                viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
+                    return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
+                })
+                if viewsAndLocations?.count == 0 {
+                    DopeLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                    return nil
+                }
+            }
+            
+        case "sender":
+            if let senderInstance = senderInstance {
+                if let view = senderInstance as? UIView {
+                    viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+                } else if senderInstance.responds(to: NSSelectorFromString("view")),
+                    let view = senderInstance.value(forKey: "view") as? UIView {
+                    viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+                } else if senderInstance.responds(to: NSSelectorFromString("imageView")),
+                    let view = senderInstance.value(forKey: "imageView") as? UIImageView {
+                    viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+                } else {
+                    DopeLog.error("Could not find sender view for \(type(of: senderInstance))", visual: true)
+                    return nil
+                }
+            } else {
+                DopeLog.error("No sender object", visual: true)
+                return nil
+            }
+            
+        case "target":
+            if let viewController = targetInstance as? UIViewController,
+                let view = viewController.view {
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else if let view = targetInstance as? UIView {
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else {
+                DopeLog.error("Could not find viewController view", visual: true)
+                return nil
+            }
+            
+        case "superview":
+            if let vc = targetInstance as? UIViewController,
+                let parentVC = vc.presentingViewController,
+                let view = parentVC.view {
+                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else if let view = targetInstance as? UIView,
+                let superview = view.superview {
+                viewsAndLocations = [(superview, superview.pointWithMargins(x: viewMarginX, y: viewMarginY))]
+            } else {
+                DopeLog.error("Could not find superview", visual: true)
+                return nil
+            }
+            
+        default:
+            DopeLog.error("Unsupported ViewOption <\(viewOption)> for ApplicationEvent", visual: true)
+            return nil
+        }
+        
+        return viewsAndLocations
     }
 }

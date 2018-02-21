@@ -80,11 +80,10 @@ open class DopamineKit : NSObject {
         }
         shared.queue.addOperation {
             let action = DopeAction(actionID: actionID, metaData: metaData)
-            let reinforcementDecision = DopamineConfiguration.current.reinforcementEnabled ? syncCoordinator.retrieve(cartridgeFor: action.actionID).remove() : Cartridge.defaultReinforcementDecision
+            let reinforcementDecision = DopamineVersion.current.reinforcementDecision(for: action.actionID)
             
             DispatchQueue.main.async {
                 completion(reinforcementDecision)
-                DopamineChanges.shared.delegate.reinforcing?(actionID: actionID, with: reinforcementDecision)
             }
             
             // store the action to be synced
