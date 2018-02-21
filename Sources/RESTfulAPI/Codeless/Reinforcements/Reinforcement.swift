@@ -9,7 +9,17 @@ import Foundation
 
 public class Reinforcement : NSObject {
     
-    internal static var lastTouchLocationInUIWindow: CGPoint = CGPoint.zero
+//    internal static var needsLastTouchLocation = false
+    internal static var lastTouchLocationInUIWindow: CGPoint = .zero
+    @objc public class func setLastTouch(_ touch: UITouch?) {
+        if let touch = touch,
+            touch.phase == .ended,
+            let view = touch.view {
+            DispatchQueue.main.async {
+                UIWindow.lastTouchPoint = view.convert(touch.location(in: view), to: nil)
+            }
+        }
+    }
     
     internal static func showReinforcement(on viewAndLocation: [(UIView, CGPoint)], of type: String, withParameters reinforcement: [String: Any]) {
         switch type {
@@ -44,31 +54,6 @@ public class Reinforcement : NSObject {
             let image = content.decode().image().cgImage
             for (view, location) in viewAndLocation {
                 view.showEmojiSplosion(at: location, content: image, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, hapticFeedback: hapticFeedback, systemSound: systemSound)
-            }
-            return
-            
-        case "Gifsplosion":
-            guard let contentString = reinforcement["Content"] as? String  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let xAcceleration = reinforcement["AccelX"] as? CGFloat  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let yAcceleration = reinforcement["AccelY"] as? CGFloat  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let bursts = reinforcement["Bursts"] as? Double  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let angle = reinforcement["EmissionAngle"] as? CGFloat  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let range = reinforcement["EmissionRange"] as? CGFloat  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let fadeout = reinforcement["FadeOut"] as? Float  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let lifetime = reinforcement["Lifetime"] as? Float  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let lifetimeRange = reinforcement["LifetimeRange"] as? Float  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let quantity = reinforcement["Quantity"] as? Float  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let scale = reinforcement["Scale"] as? CGFloat  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let scaleRange = reinforcement["ScaleRange"] as? CGFloat  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let scaleSpeed = reinforcement["ScaleSpeed"] as? CGFloat  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let spin = reinforcement["Spin"] as? CGFloat  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let velocity = reinforcement["Velocity"] as? CGFloat  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let backgroundColorString = reinforcement["BackgroundColor"] as? String  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let backgroundAlpha = reinforcement["BackgroundAlpha"] as? CGFloat  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let hapticFeedback = reinforcement["HapticFeedback"] as? Bool  else { DopeLog.error("Missing parameter", visual: true); break }
-            guard let systemSound = reinforcement["SystemSound"] as? UInt32  else { DopeLog.error("Missing parameter", visual: true); break }
-            for (view, location) in viewAndLocation {
-                view.showGifSplosion(at: location, contentString: contentString, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, backgroundColor: UIColor.from(rgb: backgroundColorString), backgroundAlpha: backgroundAlpha, hapticFeedback: hapticFeedback, systemSound: systemSound)
             }
             return
             

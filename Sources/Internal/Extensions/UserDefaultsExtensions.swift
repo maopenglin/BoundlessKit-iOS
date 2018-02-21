@@ -21,9 +21,7 @@ open class UserDefaultsSingleton : NSObject, NSCoding {
 public extension UserDefaults {
     @objc
     static var dopamine: UserDefaults {
-        get {
-            return UserDefaults(suiteName: "com.usedopamine.dopaminekit") ?? UserDefaults.standard
-        }
+        return UserDefaults(suiteName: "com.usedopamine.dopaminekit") ?? UserDefaults.standard
     }
 }
 

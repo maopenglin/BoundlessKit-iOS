@@ -12,9 +12,20 @@ public class SyncCoordinator {
     
     internal static let shared = SyncCoordinator()
     
+    internal let trackedActions: DopeActionCollection
+    internal let reportedActions: DopeActionCollection
+    
     /// Initializer for SyncCoordinator performs a sync
     ///
-    private init() { }
+    private init() {
+        trackedActions = DopeActionCollection(actions: UserDefaults.dopamine.unarchive(key: "SyncCoordinator.TrackedActions"))
+        reportedActions = DopeActionCollection(actions: UserDefaults.dopamine.unarchive(key: "SyncCoordinator.ReportedActions"))
+    }
+    
+    deinit {
+        saveTrackedActions()
+        saveReportedActions()
+    }
     
     /// Stores a tracked action to be synced
     ///
@@ -22,8 +33,14 @@ public class SyncCoordinator {
     ///     - trackedAction: A tracked action.
     ///
     internal func store(track action: DopeAction) {
-        Track.current.add(action)
-        self.performSync()
+        let count = trackedActions.add(action)
+        DopeLog.debug("track#\(count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
+        saveTrackedActions()
+        performSync()
+    }
+    
+    fileprivate func saveTrackedActions() {
+        UserDefaults.dopamine.set(NSKeyedArchiver.archivedData(withRootObject: trackedActions.filter({_ in return true})), forKey: "SyncCoordinator.TrackedActions")
     }
     
     /// Stores a reinforced action to be synced
@@ -32,8 +49,14 @@ public class SyncCoordinator {
     ///     - reportedAction: A reinforced action.
     ///
     internal func store(report action: DopeAction) {
-        Report.current.add(action)
+        let count = reportedActions.add(action)
+        DopeLog.debug("report#\(count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
+        saveReportedActions()
         performSync()
+    }
+    
+    fileprivate func saveReportedActions() {
+        UserDefaults.dopamine.set(NSKeyedArchiver.archivedData(withRootObject: reportedActions.filter({_ in return true})), forKey: "SyncCoordinator.ReportedActions")
     }
     
     /// Finds the right cartridge for an action and returns a reinforcement decision
@@ -55,7 +78,7 @@ public class SyncCoordinator {
     /// Checks which syncers have been triggered, and syncs them in an order
     /// that allows time for the DopamineAPI to generate cartridges
     ///
-    fileprivate var syncOperationQueue = SingleOperationQueue(delayBefore: true, qualityOfService: .userInitiated)
+    fileprivate var syncOperationQueue = SingleOperationQueue(delayBefore: 3)
     public func performSync() {
         syncOperationQueue.addOperation {
             // since a cartridge might be triggered during the sleep time,
@@ -67,8 +90,8 @@ public class SyncCoordinator {
                     break
                 }
             }
-            let reportShouldSync = (someCartridgeToSync != nil) || Report.current.isTriggered()
-            let trackShouldSync = reportShouldSync || Track.current.isTriggered()
+            let reportShouldSync = (someCartridgeToSync != nil) || self.trackedActions.isTriggered()
+            let trackShouldSync = reportShouldSync || self.trackedActions.isTriggered()
             
             if trackShouldSync {
                 var syncCause: String
@@ -84,36 +107,44 @@ public class SyncCoordinator {
                 Telemetry.startRecordingSync(cause: syncCause)
                 var goodProgress = true
                 
-                Track.current.sync() { status in
-                    guard status == 200 || status == 0 else {
-                        DopeLog.debug("Track failed during sync. Halting sync.")
-                        goodProgress = false
-                        Telemetry.stopRecordingSync(successfulSync: false)
-                        return
-                    }
-                }
-                
-                sleep(1)
-                if !goodProgress { return }
-                
-                if reportShouldSync {
-                    Report.current.sync() { status in
-                        if status == 0 {
-                            DopeLog.debug("Report has nothing to sync")
-                        } else if status == 200 {
-                            DopeLog.debug("Report successfully synced")
-                        } else if status == 400 {
-                            DopeLog.debug("Flushed outdated actions.")
-                        } else {
-                            DopeLog.debug("Report failed during sync. Halting sync.")
-                            goodProgress = false
-                            Telemetry.stopRecordingSync(successfulSync: false)
+                if !self.trackedActions.isEmpty {
+                    let actions = self.trackedActions.filter({_ in return true})
+                    DopamineAPI.track(actions, completion: { response in
+                        if let status = response["status"] as? Int {
+                            if status == 200 {
+                                self.trackedActions.removeFirst(actions.count)
+                                self.trackedActions.updateTriggers()
+                                self.saveTrackedActions()
+                            } else {
+                                DopeLog.debug("Track failed during sync. Halting sync.")
+                                goodProgress = false
+                                Telemetry.stopRecordingSync(successfulSync: false)
+                            }
                         }
-                    }
+                    })
+                    sleep(1)
+                    if !goodProgress { return }
                 }
                 
-                sleep(5)
-                if !goodProgress { return }
+                if reportShouldSync && !self.reportedActions.isEmpty {
+                    let actions = self.reportedActions.filter({_ in return true})
+                    DopamineAPI.report(actions, completion: { response in
+                        if let status = response["status"] as? Int {
+                            if status == 200 || status == 400 {
+                                self.reportedActions.removeFirst(actions.count)
+                                self.reportedActions.updateTriggers()
+                                self.saveReportedActions()
+                            } else {
+                                DopeLog.debug("Report failed during sync. Halting sync.")
+                                goodProgress = false
+                                Telemetry.stopRecordingSync(successfulSync: false)
+                            }
+                        }
+                    })
+                    sleep(5)
+                    if !goodProgress { return }
+                }
+                
                 
                 // since a cartridge might be triggered during the sleep time,
                 // lazily check which are triggered
@@ -136,21 +167,15 @@ public class SyncCoordinator {
         }
     }
     
-    /// Modifies the number of reported actions to trigger a sync
-    ///
-    /// - parameters:
-    ///     - size: The number of reported actions to trigger a sync.
-    ///
-    public func setSizeToSync(forReport size: Int?) {
-        Report.current.updateTriggers(timerStartsAt: nil, timerExpiresIn: nil)
-    }
-    
     /// Erase the sync objects along with their data
     ///
     public func flush() {
-        Track.flush()
-        Report.flush()
+        trackedActions.removeAll()
+        reportedActions.removeAll()
         Cartridge.flush()
+        
+        saveTrackedActions()
+        saveReportedActions()
     }
 }
 

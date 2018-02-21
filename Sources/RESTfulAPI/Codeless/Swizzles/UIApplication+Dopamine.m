@@ -29,9 +29,7 @@
 -(void) enhanced_sendEvent: (UIEvent *) event {
     if (event) {
         UITouch* touch = event.allTouches.anyObject;
-        if (touch != nil) {
-            [CodelessAPI submitEventWithTouch:touch];
-        }
+        [Reinforcement setLastTouch: touch];
     }
 
     if ([self respondsToSelector:@selector(enhanced_sendEvent:)])
@@ -46,14 +44,6 @@
         // Sometimes this method proxies through to its internal method. We want to ignore those calls.
         if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
             [CodelessAPI submitActionWithApplication:self senderInstance:sender targetInstance:target selectorObj:action];
-            
-            if ([[[DopamineConfiguration current] customEvents] objectForKey:[@[NSStringFromClass([sender class]), NSStringFromClass([target class]), selectorName] componentsJoinedByString:@"-"]]) {
-                [DopamineKit track:@"UIApplication" metaData:@{@"tag": @"sendAction",
-                                                               @"sender": NSStringFromClass([sender class]),
-                                                               @"target": NSStringFromClass([target class]),
-                                                               @"selector": selectorName}
-                 ];
-            }
         }
     }
     

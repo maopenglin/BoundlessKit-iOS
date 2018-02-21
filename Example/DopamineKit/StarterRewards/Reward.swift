@@ -10,8 +10,8 @@ import Foundation
 import DopamineKit
 
 enum Reward : String {
-    case shimmy, pulse, vibrate, rotate, glow, sheen, emojisplosion, gifsplosion, confetti
-    static let cases:[Reward] = [.shimmy, .pulse, .vibrate, .rotate, .glow, .sheen, .emojisplosion, .gifsplosion, .confetti]
+    case shimmy, pulse, vibrate, rotate, glow, sheen, emojisplosion, confetti
+    static let cases:[Reward] = [.shimmy, .pulse, .vibrate, .rotate, .glow, .sheen, .emojisplosion, .confetti]
  
     func test(view: UIView) {
         let completion = {
@@ -33,8 +33,6 @@ enum Reward : String {
             view.showSheen(completion: completion)
         case .emojisplosion:
             view.superview!.showEmojiSplosion(at: view.center, completion: completion)
-        case .gifsplosion:
-            view.showGifSplosion(at: CGPoint(x: view.bounds.width/2, y: view.bounds.height/2), contentString: "UnknownBehavior", completion: completion)
         case .confetti:
             view.showConfetti(completion: completion)
         }

@@ -137,8 +137,9 @@ public extension DopamineVersion {
     public static func convert(from versionDictionary: [String: Any]) -> DopamineVersion? {
         guard let versionID = versionDictionary["versionID"] as? String? else { DopeLog.debug("Bad parameter"); return nil }
         guard let mappings = versionDictionary["mappings"] as? [String:Any] else { DopeLog.debug("Bad parameter"); return nil }
+        let visualizerMappings = versionDictionary["visualizerMappings"] as? [String:Any] ?? [:]
         
-        return DopamineVersion.init(versionID: versionID, mappings: mappings, visualizerMappings: versionDictionary["visualizerMappings"] as? [String:Any] ?? [:])
+        return DopamineVersion.init(versionID: versionID, mappings: mappings, visualizerMappings: visualizerMappings)
     }
     
     public var actionIDs: [String] {

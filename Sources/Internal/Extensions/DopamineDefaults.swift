@@ -19,7 +19,7 @@ open class DopamineDefaults : UserDefaults {
             return !UserDefaults.dopamine.bool(forKey: disableEnhancementKey)
         }
         set {
-            UserDefaults.dopamine.setValue(!newValue, forKey: disableEnhancementKey)
+            UserDefaults.dopamine.set(!newValue, forKey: disableEnhancementKey)
         }
     }
     

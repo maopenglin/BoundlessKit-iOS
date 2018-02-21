@@ -1,9 +1,9 @@
 import UIKit
 import XCTest
-import DopamineKit
+@testable import DopamineKit
 //import Pods_DopamineKit_ReleaseTests
 
-class Tests: XCTestCase {
+class TestDopamineAPI: XCTestCase {
     
     override func setUp() {
         super.setUp()
@@ -11,7 +11,7 @@ class Tests: XCTestCase {
         // Set the plist so DopamineKit can read the appID, versionID, production and development secrets, and the inProduction flag
         let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineProperties", ofType: "plist")!) as! [String:Any]
         DopamineKit.testCredentials = testCredentials
-        Tests.log(message: "Set dopamine credentials to:'\(testCredentials)'")
+        TestDopamineAPI.log(message: "Set dopamine credentials to:'\(testCredentials)'")
     }
     
     override func tearDown() {
@@ -81,18 +81,22 @@ class Tests: XCTestCase {
     /// Test multiple (4) DopamineKit.track() called back to back
     ///
     func testTrackMultiple() {
-        let asyncExpectation = expectation(description: "Multiple tracking request")
         
+        // given
+        SyncCoordinator.shared.flush()
+        
+        
+        // when
         let numRequests = 4
         for i in 1...numRequests {
             DopamineKit.track("test_track_multiple_\(i)/\(numRequests)")
         }
-        sleep(sleepTimeForTrack)
-        asyncExpectation.fulfill()
         
-        waitForExpectations(timeout: standardExpectationTimeout, handler: {error in
-            XCTAssertNil(error, "DopamineKitTest error: testTrackMultiple timed out")
-        })
+        
+        // then
+        sleep(2)
+        print("Track count:\(SyncCoordinator.shared.trackedActions.count) expected:\(numRequests)")
+        XCTAssert(SyncCoordinator.shared.trackedActions.count == numRequests)
     }
     
     /// Test performance for track() averaged over 10 calls
@@ -118,7 +122,7 @@ class Tests: XCTestCase {
         let asyncExpectation = expectation(description: "Reinforcement decision simple")
         
         DopamineKit.reinforce(actionID, completion: { response in
-            Tests.log(message: "DopamineKitTest actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
+            TestDopamineAPI.log(message: "DopamineKitTest actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
             sleep(self.sleepTimeForReinforce)
             asyncExpectation.fulfill()
         })
@@ -134,7 +138,7 @@ class Tests: XCTestCase {
         let asyncExpectation = expectation(description: "Reinforcement decision with metadata")
         
         DopamineKit.reinforce(actionID, metaData: metaData, completion: { response in
-            Tests.log(message: "DopamineKitTest actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
+            TestDopamineAPI.log(message: "DopamineKitTest actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
             sleep(self.sleepTimeForReinforce)
             asyncExpectation.fulfill()
         })
@@ -152,7 +156,7 @@ class Tests: XCTestCase {
         let numRequests = 4
         for i in 1...numRequests {
             DopamineKit.reinforce(actionID, completion: { response in
-                Tests.log(message: "Reinforce() call \(i)/\(numRequests) with  actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
+                TestDopamineAPI.log(message: "Reinforce() call \(i)/\(numRequests) with  actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
                 if i==numRequests {
                     sleep(self.sleepTimeForReinforce)
                     asyncExpectation.fulfill()
