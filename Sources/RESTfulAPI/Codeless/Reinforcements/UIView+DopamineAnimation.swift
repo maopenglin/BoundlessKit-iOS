@@ -35,7 +35,6 @@ public extension UIView {
             DopeAudio.play(systemSound, vibrate: hapticFeedback)
         }, didStop: {
             completion()
-            DopamineChanges.shared.delegate.didShowReward()
         }).start(view: self, animation: animation)
     }
     
@@ -51,7 +50,6 @@ public extension UIView {
         
         CoreAnimationDelegate(didStop: {
             completion()
-            DopamineChanges.shared.delegate.didShowReward()
         }).start(view: self, animation: pulse)
     }
     
@@ -95,7 +93,6 @@ public extension UIView {
         }, didStop: {
             self.clipsToBounds = oldClipsToBounds
             completion()
-            DopamineChanges.shared.delegate.didShowReward()
         }
             ).start(view: self, animation: group)
     }
@@ -112,7 +109,6 @@ public extension UIView {
                 DopeAudio.play(systemSound, vibrate: hapticFeedback)
         }, didStop: {
             completion()
-            DopamineChanges.shared.delegate.didShowReward()
         }
             ).start(view: self, animation: rotateAnimation)
     }
@@ -156,7 +152,6 @@ public extension UIView {
             didStop: {
                 glowView.removeFromSuperview()
                 completion()
-                DopamineChanges.shared.delegate.didShowReward()
         }
             ).start(view: glowView, animation: animation)
     }
@@ -195,7 +190,6 @@ public extension UIView {
             didStop: {
                 imageView.removeFromSuperview()
                 completion()
-                DopamineChanges.shared.delegate.didShowReward()
         }
             ).start(view: imageView, animation: animation)
     }

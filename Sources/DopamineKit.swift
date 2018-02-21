@@ -37,6 +37,7 @@ open class DopamineKit : NSObject {
     @objc internal static var productionIdentity:String?
     
     @objc public static let shared: DopamineKit = DopamineKit()
+    public var delegate: DopamineKitDelegate?
     
     public static let syncCoordinator = SyncCoordinator.shared
     fileprivate let queue = OperationQueue()
@@ -82,6 +83,7 @@ open class DopamineKit : NSObject {
             let action = DopeAction(actionID: actionID, metaData: metaData)
             let reinforcementDecision = DopamineVersion.current.reinforcementDecision(for: action.actionID)
             
+            shared.delegate?.willReinforce(actionID: actionID, with: reinforcementDecision)
             DispatchQueue.main.async {
                 completion(reinforcementDecision)
             }
@@ -91,5 +93,8 @@ open class DopamineKit : NSObject {
             syncCoordinator.store(report: action)
         }
     }
-    
+}
+
+public protocol DopamineKitDelegate {
+    func willReinforce(actionID: String, with decision: String)
 }

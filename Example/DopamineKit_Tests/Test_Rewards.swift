@@ -34,37 +34,37 @@ class TestRewards: XCTestCase {
         super.tearDown()
     }
     
-    func testAReward() {
-        sleep(4)
-        
-        // given
-        let rewardMapping = controllerUnderTest.didReceiveSomeUIEventReward
-        let someActionID = rewardMapping.keys.first!
-        class RewardDelegate : DopamineChangesDelegateTester {
-            override func isReinforcing(actionID: String, with reinforcementDecision: String?) {
-                print("In testdelegate")
-            }
-        }
-        let rewardDelegate = RewardDelegate()
-//        DopamineChanges.shared.delegate = rewardDelegate
-        
-        // when
-        DopamineVersion.current.update(visualizer: rewardMapping)
-        let promise = expectation(description: "Reinforcing mapped action")
-//        rewardDelegate.reinforcingBlock = { (actionID, reinforcementDecision) in
-//            print("Actionid for promise:\(actionID)")
-//            if someActionID == actionID {
-//                promise.fulfill()
+//    func testAReward() {
+//        sleep(4)
+//        
+//        // given
+//        let rewardMapping = controllerUnderTest.didReceiveSomeUIEventReward
+//        let someActionID = rewardMapping.keys.first!
+//        class DKDelegate : DopamineKitDelegate {
+//            func willReinforce(actionID: String, with decision: String) {
+//                print("In testdelegate")
 //            }
 //        }
-        sleep(1)
-        controllerUnderTest.didReceiveSomeUIEvent()
-        sleep(2)
-        // then
-        waitForExpectations(timeout: 3, handler: {error in
-            XCTAssertNil(error, "DopamineKitTest error: dopamine delegate timed out")
-        })
-    }
+//        let rewardDelegate = DKDelegate()
+////        DopamineChanges.shared.delegate = rewardDelegate
+//        
+//        // when
+//        DopamineVersion.current.update(visualizer: rewardMapping)
+//        let promise = expectation(description: "Reinforcing mapped action")
+////        rewardDelegate.reinforcingBlock = { (actionID, reinforcementDecision) in
+////            print("Actionid for promise:\(actionID)")
+////            if someActionID == actionID {
+////                promise.fulfill()
+////            }
+////        }
+//        sleep(1)
+//        controllerUnderTest.didReceiveSomeUIEvent()
+//        sleep(2)
+//        // then
+//        waitForExpectations(timeout: 3, handler: {error in
+//            XCTAssertNil(error, "DopamineKitTest error: dopamine delegate timed out")
+//        })
+//    }
     
     func testBoot() {
         let asyncExpectation = expectation(description: "Sent boot call")

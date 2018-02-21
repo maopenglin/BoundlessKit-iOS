@@ -7,31 +7,10 @@
 
 import Foundation
 
-@objc
-public protocol DopamineChangesDelegate {
-    func didAttemptReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String: Any]?)
-    func isReinforcing(actionID: String, with reinforcementDecision: String?)
-    func didShowReward()
-}
-
-public class DopamineChangesDelegateTester : DopamineChangesDelegate {
-    public func didAttemptReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String: Any]?) {
-        DopeLog.debug("AttemptedReinforcement for selector:\(actionSelector)")
-    }
-    public func isReinforcing(actionID: String, with reinforcementDecision: String?) {
-        DopeLog.debug("Reinforcing actionID:\(actionID) with reinforcementDecision:\(reinforcementDecision)")
-    }
-    public func didShowReward() {
-        DopeLog.debug("Did show reward")
-    }
-}
-
 open class DopamineChanges : NSObject {
     
     @objc
     open static let shared = DopamineChanges()
-    
-    open var delegate: DopamineChangesDelegate = DopamineChangesDelegateTester()
     
     @objc
     open func wake() {

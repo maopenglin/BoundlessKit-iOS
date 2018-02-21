@@ -176,12 +176,14 @@ extension SelectorReinforcement {
     }
     
     func attemptReinforcement(senderInstance: AnyObject?, targetInstance: NSObject) {
-        
-        
-        DopamineVersion.current.reinforcementDecicionForCodeless(sender: selectorType.rawValue, target: NSStringFromClass(targetClass), selector: NSStringFromSelector(selector))  { reinforcement in
-            CodelessReinforcement.show(reinforcement: reinforcement, senderInstance: senderInstance, targetInstance: targetInstance)
+        if DopamineVersion.current.visualizerMode {
+            let reinforcementDecision = DopamineVersion.current.reinforcementDecision(for: self.actionID)
+            CodelessReinforcement.show(actionID: actionID, reinforcementDecision: reinforcementDecision, senderInstance: senderInstance, targetInstance: targetInstance)
+        } else {
+            DopamineKit.reinforce(actionID, completion: { reinforcementDecision in
+                CodelessReinforcement.show(actionID: self.actionID, reinforcementDecision: reinforcementDecision, senderInstance: senderInstance, targetInstance: targetInstance)
+            })
         }
-//        DopamineChanges.shared.delegate.didAttemptReinforcement(senderInstance: senderInstance, targetInstance: targetInstance, actionSelector: NSStringFromSelector(selector), reinforcements: reinforcements)
     }
     
 }

@@ -112,50 +112,50 @@ class TestSwizzler: XCTestCase {
         XCTAssert(afterTestFunc2StackSize == beforeTestFunc2StackSize + 1, "Swizzle did not happen")
     }
     
-    func testViewControllerDidAppearReward() {
-        // given
-        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineProperties", ofType: "plist")!) as! [String:Any]
-        DopamineKit.testCredentials = testCredentials
-        class ChangesDelegate : DopamineChangesDelegateTester {
-            var didAttemptBlock: ((_ senderInstance: AnyObject?, _ targetInstance: AnyObject?, _ actionSelector: String, _ reinforcements: [String : Any]?) -> Void)? = nil
-            var didRewardBlock: (() -> Void)? = nil
-            
-            func attemptedReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String : Any]?) {
-                print("In attemptingReinforcement")
-                didAttemptBlock?(senderInstance, targetInstance, actionSelector, reinforcements)
-            }
-            
-            func reinforcing(actionID: String, with reinforcementDecision: String) {
-                print("In showingReward")
-                didRewardBlock?()
-            }
-        }
-        
-        let changesDelegate = ChangesDelegate()
-        DopamineChanges.shared.delegate = changesDelegate
-        let selector = #selector(ViewController.viewDidAppear(_:))
-        let selectorReinforcement = SelectorReinforcement(targetClass: ViewController.self, selector: selector)
-        let reinforcementsDict: [String : Any] = ["reward" : ["reward2":"somereward"]]
-        DopamineVersion.current.update(visualizer: [selectorReinforcement.actionID : reinforcementsDict])
-        
-        
-        
-        // when
-        let promise = expectation(description: "Reinforcement attempted")
-        changesDelegate.didAttemptBlock = {(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String : Any]?) in
-            guard targetInstance === self.controllerUnderTest,
-                let reinforcements = reinforcements,
-                NSDictionary(dictionary: reinforcementsDict).isEqual(to: reinforcements),
-                actionSelector == NSStringFromSelector(selector) else {
-                return
-            }
-            promise.fulfill()
-        }
-        controllerUnderTest.viewDidAppear(true)
-        
-        // then
-        waitForExpectations(timeout: 5, handler: nil)
-    }
+//    func testViewControllerDidAppearReward() {
+//        // given
+//        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineProperties", ofType: "plist")!) as! [String:Any]
+//        DopamineKit.testCredentials = testCredentials
+//        class ChangesDelegate : DopamineChangesDelegateTester {
+//            var didAttemptBlock: ((_ senderInstance: AnyObject?, _ targetInstance: AnyObject?, _ actionSelector: String, _ reinforcements: [String : Any]?) -> Void)? = nil
+//            var didRewardBlock: (() -> Void)? = nil
+//            
+//            func attemptedReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String : Any]?) {
+//                print("In attemptingReinforcement")
+//                didAttemptBlock?(senderInstance, targetInstance, actionSelector, reinforcements)
+//            }
+//            
+//            func reinforcing(actionID: String, with reinforcementDecision: String) {
+//                print("In showingReward")
+//                didRewardBlock?()
+//            }
+//        }
+//        
+//        let changesDelegate = ChangesDelegate()
+//        DopamineChanges.shared.delegate = changesDelegate
+//        let selector = #selector(ViewController.viewDidAppear(_:))
+//        let selectorReinforcement = SelectorReinforcement(targetClass: ViewController.self, selector: selector)
+//        let reinforcementsDict: [String : Any] = ["reward" : ["reward2":"somereward"]]
+//        DopamineVersion.current.update(visualizer: [selectorReinforcement.actionID : reinforcementsDict])
+//        
+//        
+//        
+//        // when
+//        let promise = expectation(description: "Reinforcement attempted")
+//        changesDelegate.didAttemptBlock = {(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String : Any]?) in
+//            guard targetInstance === self.controllerUnderTest,
+//                let reinforcements = reinforcements,
+//                NSDictionary(dictionary: reinforcementsDict).isEqual(to: reinforcements),
+//                actionSelector == NSStringFromSelector(selector) else {
+//                return
+//            }
+//            promise.fulfill()
+//        }
+//        controllerUnderTest.viewDidAppear(true)
+//        
+//        // then
+//        waitForExpectations(timeout: 5, handler: nil)
+//    }
     
 }
 

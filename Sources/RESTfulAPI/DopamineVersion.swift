@@ -22,12 +22,12 @@ public class DopamineVersion : UserDefaultsSingleton {
     
     @objc public var versionID: String?
     @objc fileprivate var mappings: [String:Any]
+    @objc internal fileprivate (set) var visualizerMappings: [String:Any]
     internal var visualizerMode = false {
         didSet {
             if !visualizerMode { update(visualizer: nil) }
         }
     }
-    @objc internal fileprivate (set) var visualizerMappings: [String:Any]
     
     fileprivate let updateQueue = SingleOperationQueue()
     public func update(visualizer mappings: [String: Any]?) {
@@ -88,52 +88,17 @@ public class DopamineVersion : UserDefaultsSingleton {
         return DopamineVersion(versionID: nil)
     }
     
-    public func reinforcementDecision(for actionID: String) -> String {
-        let reinforcementDecision = SyncCoordinator.shared.retrieve(cartridgeFor: actionID).remove()
-        DopamineChanges.shared.delegate.isReinforcing(actionID: actionID, with: reinforcementDecision)
-        return reinforcementDecision
-    }
-    
-    public func reinforcementDecicionForCodeless(sender: String, target: String, selector: String, reinforcementBlock: @escaping ([String:Any]) -> ()) {
-        let actionID = [sender, target, selector].joined(separator: "-")
-        
-        if let reinforcementParameters = visualizerMappings[actionID] as? [String: Any] {
-            DopeLog.debug("Found visualizer reinforcement for <\(actionID)>")
-            if let codeless = reinforcementParameters["codeless"] as? [String: Any],
-                let reinforcements = codeless["reinforcements"] as? [[String:Any]],
-                let randomReinforcement = reinforcements.selectRandom() {
-                DopamineChanges.shared.delegate.isReinforcing(actionID: actionID, with: randomReinforcement["actionID"] as? String)
-                reinforcementBlock(randomReinforcement)
-            } else {
-                DopeLog.debug("Bad visualizer parameters: \(String(describing:reinforcementParameters))")
-            }
-        } else if let reinforcementParameters = mappings[actionID] as? [String:Any] {
-            DopeLog.debug("Found reinforcement for <\(actionID)>")
-            if let codeless = reinforcementParameters["codeless"] as? [String: Any],
-                let reinforcements = codeless["reinforcements"] as? [[String:Any]] {
-                DopamineKit.reinforce(actionID) { reinforcementType in
-                    if reinforcementType == Cartridge.defaultReinforcementDecision {
-                        return
-                    }
-                    for reinforcement in reinforcements {
-                        if reinforcement["primitive"] as? String == reinforcementType {
-                            reinforcementBlock(reinforcement)
-                            return
-                        }
-                    }
-                    DopeLog.error("Could not find reinforcementType:\(reinforcementType)")
-                }
-            } else {
-                DopeLog.error("Bad reinforcement parameters")
-            }
+    internal func reinforcementDecision(for actionID: String) -> String {
+        let reinforcementDecision: String
+        if visualizerMode,
+            let actionMapping = actionMapping(for: actionID),
+            let randomReinforcement = CodelessReinforcement.reinforcementsIDs(in: actionMapping)?.selectRandom()
+        {
+            reinforcementDecision = randomReinforcement
         } else {
-//            DopeLog.debug("No reinforcement mapping found for <\(actionID)>")
-//            DopeLog.debug("Reinforcement mappings:\(self.mappings as AnyObject)")
-//            DopeLog.debug("Visualizer mappings:\(self.visualizerMappings as AnyObject)")
+            reinforcementDecision = SyncCoordinator.shared.retrieve(cartridgeFor: actionID).remove()
         }
-        
-        
-        
+        return reinforcementDecision
     }
 }
 
@@ -146,12 +111,20 @@ public extension DopamineVersion {
         return DopamineVersion.init(versionID: versionID, mappings: mappings, visualizerMappings: visualizerMappings)
     }
     
-    public var actionIDs: [String] {
+    public var actionIDs: [String] { get {
         return Array(mappings.keys)
-    }
+        } }
     
-    public var visualizerActionIDs: [String] {
+    public var visualizerActionIDs: [String] { get {
         return Array(visualizerMappings.keys)
+        } }
+    
+    public func actionMapping(for actionID: String) -> [String: Any]? {
+        if visualizerMode {
+            return visualizerMappings[actionID] as? [String: Any] ?? mappings[actionID] as? [String: Any]
+        } else {
+            return mappings[actionID] as? [String: Any]
+        }
     }
     
 }

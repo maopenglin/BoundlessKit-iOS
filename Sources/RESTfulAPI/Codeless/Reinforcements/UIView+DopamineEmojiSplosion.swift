@@ -29,7 +29,7 @@ public extension UIView {
                                   spin: CGFloat = 0,
                                   hapticFeedback: Bool = false,
                                   systemSound: UInt32 = 0,
-                                  completion: (() -> Void)? = nil
+                                  completion: @escaping ()->Void = {}
         ) {
         guard let content = content else {
             DopeLog.debug("❌ received nil image content!")
@@ -76,8 +76,7 @@ public extension UIView {
                 DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(lifetime + lifetimeRange)) {
                     emitter.removeFromSuperlayer()
 //                    DopeLog.debug("💥 Emojisplosion done")
-                    completion?()
-                    DopamineChanges.shared.delegate.didShowReward()
+                    completion()
                 }
             }
         }
