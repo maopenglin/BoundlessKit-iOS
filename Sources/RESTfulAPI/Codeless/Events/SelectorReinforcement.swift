@@ -187,11 +187,10 @@ extension SelectorReinforcement {
                 }
             }
         }
-        DopamineChanges.shared.delegate?.attemptedReinforcement?(senderInstance: senderInstance, targetInstance: targetInstance, actionSelector: NSStringFromSelector(selector), reinforcements: reinforcements)
+        DopamineChanges.shared.delegate.attemptedReinforcement?(senderInstance: senderInstance, targetInstance: targetInstance, actionSelector: NSStringFromSelector(selector), reinforcements: reinforcements)
     }
     
     private func reinforcementViews(senderInstance: AnyObject?, targetInstance: NSObject, options: [String: Any]) -> [(UIView, CGPoint)]? {
-        
         guard let viewOption = options["ViewOption"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
         guard let viewCustom = options["ViewCustom"] as? String else { DopeLog.error("Missing parameter", visual: true); return nil }
         guard let viewMarginX = options["ViewMarginX"] as? CGFloat else { DopeLog.error("Missing parameter", visual: true); return nil }

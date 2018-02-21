@@ -84,7 +84,7 @@ open class DopamineKit : NSObject {
             
             DispatchQueue.main.async {
                 completion(reinforcementDecision)
-                DopamineChanges.shared.delegate?.reinforcing?(actionID: actionID, with: reinforcementDecision)
+                DopamineChanges.shared.delegate.reinforcing?(actionID: actionID, with: reinforcementDecision)
             }
             
             // store the action to be synced

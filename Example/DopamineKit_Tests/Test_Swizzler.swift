@@ -1,6 +1,6 @@
 //
-//  DopamineKit_SwizzleTests.swift
-//  DopamineKit_SwizzleTests
+//  Test_Swizzler.swift
+//  DopamineKit_Tests
 //
 //  Created by Akash Desai on 1/31/18.
 //  Copyright © 2018 CocoaPods. All rights reserved.
@@ -10,7 +10,7 @@ import XCTest
 @testable import DopamineKit
 @testable import DopamineKit_Example
 
-class DopamineKit_SwizzleTests: XCTestCase {
+class TestSwizzler: XCTestCase {
     
     static var counter = 0
     static var counterAndClear: Int {
@@ -34,6 +34,8 @@ class DopamineKit_SwizzleTests: XCTestCase {
     }
     
     override func tearDown() {
+        DopamineKit.syncCoordinator.flush()          // clears the sync state, recorded actions, and cartridges
+        
         super.tearDown()
     }
     
@@ -89,9 +91,9 @@ class DopamineKit_SwizzleTests: XCTestCase {
         // given
         XCTAssert(DopamineConfiguration.current.integrationMethod == "codeless")
         sut.performVariableSelector(sel: selector1, argsCount: argsCount, args: args1)
-        let beforeTestFuncStackSize = DopamineKit_SwizzleTests.counterAndClear
+        let beforeTestFuncStackSize = TestSwizzler.counterAndClear
         sut.performVariableSelector(sel: selector2, argsCount: argsCount, args: args2)
-        let beforeTestFunc2StackSize = DopamineKit_SwizzleTests.counterAndClear
+        let beforeTestFunc2StackSize = TestSwizzler.counterAndClear
         
         // when
         let swizzle1 = DopamineChanges.shared.registerSimpleMethod(classType: type(of: sut), selector: selector1, reinforcement: ["reward": ["rewardForFirst": ["Hello!"]]])
@@ -102,9 +104,9 @@ class DopamineKit_SwizzleTests: XCTestCase {
         
         // then
         sut.performVariableSelector(sel: selector1, argsCount: argsCount, args: args1)
-        let afterTestFuncStackSize = DopamineKit_SwizzleTests.counterAndClear
+        let afterTestFuncStackSize = TestSwizzler.counterAndClear
         sut.performVariableSelector(sel: selector2, argsCount: argsCount, args: args2)
-        let afterTestFunc2StackSize = DopamineKit_SwizzleTests.counterAndClear
+        let afterTestFunc2StackSize = TestSwizzler.counterAndClear
         
         XCTAssert(afterTestFuncStackSize == beforeTestFuncStackSize + 1, "Swizzle did not happen")
         XCTAssert(afterTestFunc2StackSize == beforeTestFunc2StackSize + 1, "Swizzle did not happen")
@@ -155,110 +157,6 @@ class DopamineKit_SwizzleTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
     }
     
-    func testRewardShimmy() {
-        // given
-        let promise1 = expectation(description: "Shimmy reward")
-        
-        // when
-        controllerUnderTest.view.showShimmy {
-            promise1.fulfill()
-        }
-        
-        // then
-        waitForExpectations(timeout: 5, handler: nil)
-    }
-    
-    func testRewardPulse() {
-        // given
-        let promise1 = expectation(description: "Pulse reward")
-        
-        // when
-        controllerUnderTest.view.showPulse {
-            promise1.fulfill()
-        }
-        
-        // then
-        waitForExpectations(timeout: 5, handler: nil)
-    }
-    
-    func testRewardVibrate() {
-        // given
-        let promise1 = expectation(description: "Vibrate reward")
-        
-        // when
-        controllerUnderTest.view.showVibrate {
-            promise1.fulfill()
-        }
-        
-        // then
-        waitForExpectations(timeout: 5, handler: nil)
-    }
-    
-    func testRewardRotate() {
-        // given
-        let promise1 = expectation(description: "Rotate reward")
-        
-        // when
-        controllerUnderTest.view.rotate360Degrees {
-            promise1.fulfill()
-        }
-        
-        // then
-        waitForExpectations(timeout: 5, handler: nil)
-    }
-    
-    func testRewardGlow() {
-        // given
-        let promise1 = expectation(description: "Glow reward")
-        
-        // when
-        controllerUnderTest.view.showGlow {
-            promise1.fulfill()
-        }
-        
-        // then
-        waitForExpectations(timeout: 5, handler: nil)
-    }
-    
-    func testRewardSheen() {
-        // given
-        let promise1 = expectation(description: "Sheen reward")
-        
-        // when
-        controllerUnderTest.view.showSheen {
-            promise1.fulfill()
-        }
-        
-        // then
-        waitForExpectations(timeout: 5, handler: nil)
-    }
-    
-    func testRewardConfetti() {
-        // given
-        let promise1 = expectation(description: "Confetti reward")
-        
-        // when
-        controllerUnderTest.view.showConfetti {
-            promise1.fulfill()
-        }
-        
-        // then
-        waitForExpectations(timeout: 7, handler: nil)
-    }
-    
-    func testRewardEmojiSplosion() {
-        // given
-        let promise1 = expectation(description: "EmojiSplosion reward")
-        
-        // when
-        controllerUnderTest.view.showEmojiSplosion(at: controllerUnderTest.view.center) {
-            promise1.fulfill()
-        }
-        
-        // then
-        waitForExpectations(timeout: 5, handler: nil)
-    }
-    
 }
 
 extension NSObject {
@@ -272,3 +170,4 @@ extension NSObject {
         }
     }
 }
+

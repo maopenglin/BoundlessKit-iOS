@@ -14,16 +14,24 @@ public protocol DopamineChangesDelegate {
     @objc optional func didShowReward()
 }
 
+public class DopamineChangesDelegateTester : DopamineChangesDelegate {
+    public func attemptedReinforcement(senderInstance: AnyObject?, targetInstance: AnyObject?, actionSelector: String, reinforcements: [String: Any]?) {
+        DopeLog.debug("AttemptedReinforcement for selector:\(actionSelector)")
+    }
+    public func reinforcing(actionID: String, with reinforcementDecision: String) {
+        DopeLog.debug("Reinforcing actionID:\(actionID) with reinforcementDecision:\(reinforcementDecision)")
+    }
+    public func didShowReward() {
+        DopeLog.debug("Did show reward")
+    }
+}
+
 open class DopamineChanges : NSObject {
     
     @objc
     open static let shared = DopamineChanges()
     
-    open var delegate: DopamineChangesDelegate? {
-        didSet {
-            print("Did set delegate")
-        }
-    }
+    open var delegate: DopamineChangesDelegate = DopamineChangesDelegateTester()
     
     @objc
     open func wake() {
@@ -40,23 +48,26 @@ open class DopamineChanges : NSObject {
     
     @objc
     open func enhanceMethods(_ shouldEnhance: Bool) {
-        // Enhance - UIApplication
-        DopamineApp.enhanceSelectors(shouldEnhance)
-        
         // Enhance - UIApplicationDelegate
         DopamineAppDelegate.enhanceSelectors(shouldEnhance)
         
         // Enhance - UIViewController
         DopamineViewController.enhanceSelectors(shouldEnhance)
         
-        // Enhance - UITapGestureRecognizer
-        DopamineTapGestureRecognizer.enhanceSelectors(shouldEnhance)
-        
-//        // Enhance - SKPaymentTransactionObserver
-//        DopaminePaymentTransactionObserver.enhanceSelectors(shouldEnhance)
-        
         // Enhance - UICollectionViewController
         DopamineCollectionViewDelegate.enhanceSelectors(shouldEnhance)
+        
+        // Enhance - SKPaymentTransactionObserver
+        DopaminePaymentTransactionObserver.enhanceSelectors(shouldEnhance)
+    }
+    
+    @objc
+    open func visualizeMethods(_ shouldEnhance: Bool) {
+        // Enhance - UIApplication
+        DopamineApp.enhanceSelectors(shouldEnhance)
+        
+        // Enhance - UITapGestureRecognizer
+        DopamineTapGestureRecognizer.enhanceSelectors(shouldEnhance)
     }
     
     

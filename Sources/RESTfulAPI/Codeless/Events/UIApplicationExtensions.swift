@@ -25,7 +25,7 @@ internal extension UIApplication {
                 }
             }
         }
-        DopamineChanges.shared.delegate?.attemptedReinforcement?(senderInstance: senderInstance, targetInstance: targetInstance, actionSelector: selectorName, reinforcements: reinforcements)
+        DopamineChanges.shared.delegate.attemptedReinforcement?(senderInstance: senderInstance, targetInstance: targetInstance, actionSelector: selectorName, reinforcements: reinforcements)
     }
     
     private func reinforcementViews(senderInstance: AnyObject, targetInstance: AnyObject, options: [String: Any]) -> [(UIView, CGPoint)]? {

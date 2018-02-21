@@ -44,14 +44,6 @@
         // Sometimes this method proxies through to its internal method. We want to ignore those calls.
         if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
             [CodelessAPI submitActionWithApplication:self senderInstance:sender targetInstance:target selectorObj:action];
-            
-            if ([[[DopamineConfiguration current] customEvents] objectForKey:[@[NSStringFromClass([sender class]), NSStringFromClass([target class]), selectorName] componentsJoinedByString:@"-"]]) {
-                [DopamineKit track:@"UIApplication" metaData:@{@"tag": @"sendAction",
-                                                               @"sender": NSStringFromClass([sender class]),
-                                                               @"target": NSStringFromClass([target class]),
-                                                               @"selector": selectorName}
-                 ];
-            }
         }
     }
     

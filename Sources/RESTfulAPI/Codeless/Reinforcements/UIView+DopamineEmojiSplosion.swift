@@ -77,7 +77,7 @@ public extension UIView {
                     emitter.removeFromSuperlayer()
 //                    DopeLog.debug("💥 Emojisplosion done")
                     completion?()
-                    DopamineChanges.shared.delegate?.didShowReward?()
+                    DopamineChanges.shared.delegate.didShowReward?()
                 }
             }
         }

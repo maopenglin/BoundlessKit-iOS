@@ -145,7 +145,7 @@ public extension UIView {
                 DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(confettiEmitter.emitterCells?.first?.lifetimeMax ?? 0)) {
                     confettiEmitter.removeFromSuperlayer()
                     completion()
-                    DopamineChanges.shared.delegate?.didShowReward?()
+                    DopamineChanges.shared.delegate.didShowReward?()
                 }
             }
         }
