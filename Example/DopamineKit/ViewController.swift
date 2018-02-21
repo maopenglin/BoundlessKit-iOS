@@ -24,7 +24,7 @@ class ViewController: UIViewController {
     
     @objc var someCounter: Float = 0
     
-    @objc func action1Performed(){
+    @objc func action1Performed(button: UIButton) {
 //        presentAnother()
 //        print("Button 1 pushed. Text:\(String(describing:button.currentTitle))")
         print("Button 1 pushed")
