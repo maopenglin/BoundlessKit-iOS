@@ -28,6 +28,7 @@
 
 static Class delegateClass = nil;
 static NSArray* delegateSubclasses = nil;
+
 + (void) enhanceDelegateClass:(BOOL) enable {
     if (delegateClass == nil) {
         return;
@@ -62,7 +63,7 @@ static NSArray* delegateSubclasses = nil;
 // Application State Enhances
 
 - (BOOL) enhanced_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [CodelessAPI submitWithTargetInstance:self selector:@selector(application:didFinishLaunchingWithOptions:)];
+    [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(application:didFinishLaunchingWithOptions:)];
     
     if ([self respondsToSelector:@selector(enhanced_application:didFinishLaunchingWithOptions:)]) {
         return [self enhanced_application:application didFinishLaunchingWithOptions:launchOptions];
@@ -72,7 +73,7 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (void) enhanced_applicationWillTerminate:(UIApplication *)application {
-    [CodelessAPI submitWithTargetInstance:self selector:@selector(applicationWillTerminate:)];
+    [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(applicationWillTerminate:)];
     
     if ([self respondsToSelector:@selector(enhanced_applicationWillTerminate:)]) {
         [self enhanced_applicationWillTerminate:application];
@@ -83,8 +84,8 @@ static NSArray* delegateSubclasses = nil;
     if ([self respondsToSelector:@selector(enhanced_applicationDidBecomeActive:)])
         [self enhanced_applicationDidBecomeActive:application];
     
-    [CodelessAPI bootWithCompletion:^{}];
-    [CodelessAPI submitWithTargetInstance:self selector:@selector(applicationDidBecomeActive:)];
+//    [CodelessAPI bootWithCompletion:^{}];
+    [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(applicationDidBecomeActive:)];
     
     if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"didBecomeActive",
@@ -96,7 +97,7 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (void) enhanced_applicationWillResignActive:(UIApplication*)application {
-    [CodelessAPI submitWithTargetInstance:self selector:@selector(applicationWillResignActive:)];
+    [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(applicationWillResignActive:)];
     
     if ([[DopamineConfiguration current] applicationState]) {
         [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"willResignActive",

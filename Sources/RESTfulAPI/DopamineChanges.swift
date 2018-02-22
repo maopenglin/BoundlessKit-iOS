@@ -10,23 +10,23 @@ import Foundation
 open class DopamineChanges : NSObject {
     
     @objc
-    open static let shared = DopamineChanges()
+    open static let shared: DopamineChanges = {
+        _ = DopeBluetooth.shared
+        return DopamineChanges()
+    }()
     
     @objc
     open func wake() {
-        _ = DopeBluetooth.shared
-        
-        enhanceMethods(DopamineDefaults.enableEnhancement)
-        registerMethods()
-        if let dopaProps = DopamineProperties.current,
-            !dopaProps.inProduction {
-            registerVisualizerMethods()
+        if DopamineConfiguration.current.integrationMethod == "codeless" {
+            registerMethods()
         }
-        
+        CodelessAPI.boot {
+            CodelessAPI.promptPairing()
+        }
     }
     
     @objc
-    open func enhanceMethods(_ shouldEnhance: Bool) {
+    open func integrationModeMethods(_ shouldEnhance: Bool) {
         // Enhance - UIApplicationDelegate
         DopamineAppDelegate.enhanceSelectors(shouldEnhance)
         
@@ -38,10 +38,10 @@ open class DopamineChanges : NSObject {
         
         // Enhance - SKPaymentTransactionObserver
         DopaminePaymentTransactionObserver.enhanceSelectors(shouldEnhance)
-    }
-    
-    @objc
-    open func visualizeMethods(_ shouldEnhance: Bool) {
+//    }
+//
+//    @objc
+//    open func integrationModeMethods(_ shouldEnhance: Bool) {
         // Enhance - UIApplication
         DopamineApp.enhanceSelectors(shouldEnhance)
         

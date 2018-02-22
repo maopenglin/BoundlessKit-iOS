@@ -39,7 +39,7 @@ open class DopamineKit : NSObject {
     @objc public static let shared: DopamineKit = DopamineKit()
     public var delegate: DopamineKitDelegate?
     
-    public static let syncCoordinator = SyncCoordinator.shared
+    static let syncCoordinator = SyncCoordinator.shared
     fileprivate let queue = OperationQueue()
     
     private override init() {

@@ -7,12 +7,7 @@
 
 import Foundation
 
-public protocol CodelessReinforcementDelegate {
-    func didShowReward(actionID: String, rewardType: String)
-}
 public class CodelessReinforcement : NSObject {
-    
-    static var delegate: CodelessReinforcementDelegate?
     
 //    internal static var needsLastTouchLocation = false
     internal static var lastTouchLocationInUIWindow: CGPoint = .zero
@@ -43,9 +38,9 @@ public class CodelessReinforcement : NSObject {
         return nil
     }
     
-    internal static func show(actionID: String, reinforcementDecision: String, senderInstance: AnyObject?, targetInstance: NSObject) {
+    internal static func show(actionID: String, reinforcementDecision: String, senderInstance: AnyObject?, targetInstance: NSObject, completion: @escaping ()->Void = {}) {
         guard reinforcementDecision != Cartridge.defaultReinforcementDecision else {
-            CodelessReinforcement.delegate?.didShowReward(actionID: actionID, rewardType: reinforcementDecision)
+            completion()
             return
         }
         
@@ -62,7 +57,7 @@ public class CodelessReinforcement : NSObject {
         }
         if let reinforcement = reinforcement {
             show(reinforcement: reinforcement, senderInstance: senderInstance, targetInstance: targetInstance) {
-                CodelessReinforcement.delegate?.didShowReward(actionID: actionID, rewardType: reinforcementDecision)
+                completion()
             }
         } else {
             DopeLog.error("No reinforcement found for actionID:\(actionID)")

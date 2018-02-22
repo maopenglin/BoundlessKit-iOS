@@ -60,7 +60,7 @@ static NSArray* delegateSubclasses = nil;
 
 - (void)enhanced_collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (self) {
-        [CodelessAPI submitWithTargetInstance:self selector:@selector(collectionView:didSelectItemAtIndexPath:)];
+        [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(collectionView:didSelectItemAtIndexPath:)];
     }
     
     if ([self respondsToSelector:@selector(enhanced_collectionView:didSelectItemAtIndexPath:)]) {

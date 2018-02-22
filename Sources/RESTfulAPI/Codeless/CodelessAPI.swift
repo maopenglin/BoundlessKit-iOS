@@ -8,10 +8,9 @@
 
 import Foundation
 
-@objc
-public class CodelessAPI : NSObject {
+internal class CodelessAPI : NSObject {
     
-    public static var logCalls = false
+    static var logCalls = true
     
     /// Valid API actions appeneded to the CodelessAPI URL
     ///
@@ -26,8 +25,7 @@ public class CodelessAPI : NSObject {
         }
     }
     
-    @objc
-    public static let shared = CodelessAPI()
+    internal static let shared = CodelessAPI()
     
     private static var stashSubmits = true {
         didSet {
@@ -42,7 +40,7 @@ public class CodelessAPI : NSObject {
                 DopeLog.debug("🔍 \(connectionID != nil ? "C" : "Disc")onnected to visualizer")
             }
             
-            DopamineVersion.current.visualizerMode = (connectionID != nil)
+            DopamineVersion.current.isIntegrating = (connectionID != nil)
             
             if submitQueue.isSuspended {
                 submitQueue.isSuspended = false
@@ -54,8 +52,7 @@ public class CodelessAPI : NSObject {
         super.init()
     }
     
-    @objc
-    public static func boot(completion: @escaping () -> () = {}) {
+    internal static func boot(completion: @escaping () -> () = {}) {
         guard let dopaProps = DopamineProperties.current else { return }
         var payload = dopaProps.apiCredentials
         payload["inProduction"] = dopaProps.inProduction
@@ -81,13 +78,10 @@ public class CodelessAPI : NSObject {
             if DopamineConfiguration.current.integrationMethod == "codeless" {
                 DopamineChanges.shared.registerMethods()
             }
-            
-            promptPairing()
         }
     }
     
-    @objc
-    private static func promptPairing() {
+    internal static func promptPairing() {
         guard !DopamineProperties.productionMode && DopamineConfiguration.current.integrationMethod == "codeless",
             var payload = DopamineProperties.current?.apiCredentials
             else {
@@ -148,62 +142,30 @@ public class CodelessAPI : NSObject {
         }
     }
     
-    @objc
-    public static func submitAction(application: UIApplication, senderInstance: AnyObject, targetInstance: AnyObject, selectorObj: Selector) {
+    internal static func submitSelectorReinforcement(selectorReinforcement: SelectorReinforcement, senderInstance: AnyObject?) {
         DispatchQueue.global().async {
-            let senderClassname = NSStringFromClass(type(of: senderInstance))
-            let targetClassname = NSStringFromClass(type(of: targetInstance))
-            let selectorName = NSStringFromSelector(selectorObj)
-            
-//            application.attemptReinforcement(senderInstance: senderInstance, targetInstance: targetInstance, selectorObj: selectorObj)
-            
             submit { payload in
-                payload["sender"] = senderClassname
-                payload["target"] = targetClassname
-                payload["selector"] = selectorName
-                payload["actionID"] = [senderClassname, targetClassname, selectorName].joined(separator: "-")
-                DispatchQueue.main.sync {
-                    if let view = senderInstance as? UIView,
-                        let imageString = view.snapshotImage()?.base64EncodedPNGString() {
-                        payload["senderImage"] = imageString
-                    } else if let barItem = senderInstance as? UIBarItem,
-                        let image = barItem.image,
-                        let imageString = image.base64EncodedPNGString() {
-                        payload["senderImage"] = imageString
-                    } else if senderInstance.responds(to: NSSelectorFromString("view")),
-                        let sv = senderInstance.value(forKey: "view") as? UIView,
-                        let imageString = sv.snapshotImage()?.base64EncodedPNGString() {
-                        payload["senderImage"] = imageString
-                    } else {
-                        NSLog("Cannot create image, please message team@usedopamine.com to add support for visualizer snapshots of class type:<\(type(of: senderInstance))>!")
-                        payload["senderImage"] = ""
-                    }
+                payload["sender"] = selectorReinforcement.selectorType.rawValue
+                payload["target"] = NSStringFromClass(selectorReinforcement.targetClass)
+                payload["selector"] = NSStringFromSelector(selectorReinforcement.selector)
+                payload["actionID"] = selectorReinforcement.actionID
+                if let view = senderInstance as? UIView,
+                    let imageString = view.snapshotImage()?.base64EncodedPNGString() {
+                    payload["senderImage"] = imageString
+                } else if let barItem = senderInstance as? UIBarItem,
+                    let image = barItem.image,
+                    let imageString = image.base64EncodedPNGString() {
+                    payload["senderImage"] = imageString
+                } else if let senderInstance = senderInstance as? NSObject,
+                    senderInstance.responds(to: NSSelectorFromString("view")),
+                    let senderView = senderInstance.value(forKey: "view") as? UIView,
+                    let imageString = senderView.snapshotImage()?.base64EncodedPNGString() {
+                    payload["senderImage"] = imageString
+                } else {
+                    payload["senderImage"] = ""
                 }
             }
         }
-    }
-    
-    @objc
-    public static func submit(targetInstance: AnyObject, selector: Selector) {
-        guard let targetInstance = targetInstance as? NSObject else {
-            DopeLog.error("Can only submit classes that inherit from NSObject")
-            return
-        }
-        let selectorReinforcement = SelectorReinforcement(targetClass: type(of: targetInstance), selector: selector)
-        
-//        selectorReinforcement.attemptReinforcement(targetInstance: targetInstance)
-        
-        DopeLog.debug("Submitting class method: \(selectorReinforcement.actionID)")
-        submit { payload in
-            payload["sender"] = selectorReinforcement.selectorType
-            payload["target"] = NSStringFromClass(selectorReinforcement.targetClass)
-            payload["selector"] = NSStringFromSelector(selectorReinforcement.selector)
-            payload["actionID"] = selectorReinforcement.actionID
-            payload["senderImage"] = ""
-            payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
-            payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
-        }
-        
     }
     
     fileprivate static var submitQueue: OperationQueue = {
@@ -238,6 +200,8 @@ public class CodelessAPI : NSObject {
         }
     }
     
+    internal lazy var httpClient = HTTPClient()
+    
     /// This function sends a request to the CodelessAPI
     ///
     /// - parameters:
@@ -246,27 +210,15 @@ public class CodelessAPI : NSObject {
     ///     - timeout: A timeout, in seconds, for the request. Defaults to 3 seconds.
     ///     - completion: A closure with a JSON formatted dictionary.
     ///
-    private func send(call type: CallType, with payload: [String:Any], timeout:TimeInterval = 3.0, completion: @escaping ([String: Any]) -> Void) {
+    private func send(call type: CallType, with payload: [String:Any], completion: @escaping ([String: Any]) -> Void) {
         
         guard let url = URL(string: type.path) else {
             DopeLog.debug("Invalid url <\(type.path)>")
             return
         }
         
-        var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "POST"
-        request.timeoutInterval = timeout
-        do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: payload, options: JSONSerialization.WritingOptions())
-        } catch {
-            let message = "Error sending \(type.path) api call with payload:(\(payload as AnyObject))"
-            DopeLog.debug(message)
-            Telemetry.storeException(className: "JSONSerialization", message: message)
-        }
-        
         let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
-        let task = URLSession.shared.dataTask(with: request, completionHandler: { responseData, responseURL, error in
+        let task = httpClient.post(to: url, jsonObject: payload) { responseData, responseURL, error in
             var responseDict: [String : Any] = [:]
             defer { completion(responseDict) }
             
@@ -301,7 +253,7 @@ public class CodelessAPI : NSObject {
             
             DopeLog.debug("✅\(type.path) call")
             if CodelessAPI.logCalls { DopeLog.debug("got response:\(responseDict as AnyObject)") }
-        })
+        }
         
         // send request
         DopeLog.debug("Sending \(type.path) api call")

@@ -41,7 +41,7 @@ class TestRewards: XCTestCase {
 //        let rewardMapping = controllerUnderTest.didReceiveSomeUIEventReward
 //        let someActionID = rewardMapping.keys.first!
 //        class DKDelegate : DopamineKitDelegate {
-//            func willReinforce(actionID: String, with decision: String) {
+//            func willTryReinforce(actionID: String, with decision: String) {
 //                print("In testdelegate")
 //            }
 //        }

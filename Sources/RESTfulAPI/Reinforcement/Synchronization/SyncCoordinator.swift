@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class SyncCoordinator {
+class SyncCoordinator {
     
     internal static let shared = SyncCoordinator()
     
@@ -33,6 +33,7 @@ public class SyncCoordinator {
     ///     - trackedAction: A tracked action.
     ///
     internal func store(track action: DopeAction) {
+        guard DopamineVersion.current.isIntegrating == false else { return }
         let count = trackedActions.add(action)
         DopeLog.debug("track#\(count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
         saveTrackedActions()
@@ -49,6 +50,7 @@ public class SyncCoordinator {
     ///     - reportedAction: A reinforced action.
     ///
     internal func store(report action: DopeAction) {
+        guard DopamineVersion.current.isIntegrating == false else { return }
         let count = reportedActions.add(action)
         DopeLog.debug("report#\(count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
         saveReportedActions()

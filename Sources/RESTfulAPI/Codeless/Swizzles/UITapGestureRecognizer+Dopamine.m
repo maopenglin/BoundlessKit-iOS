@@ -30,7 +30,7 @@
 
 - (instancetype) enhanced_initWithTarget:(id)target action:(SEL)action {
     if (target && action) {
-        [CodelessAPI submitWithTargetInstance:target selector:action];
+        [SelectorReinforcement integrationModeSubmitWithTargetInstance:target action:action];
     }
     
     return [self enhanced_initWithTarget:target action:action];
@@ -38,7 +38,7 @@
 
 - (void) enhanced_addTarget:(id)target action:(SEL)action {
     if (target && action) {
-        [CodelessAPI submitWithTargetInstance:target selector:action];
+        [SelectorReinforcement integrationModeSubmitWithTargetInstance:target action:action];
     }
     
     if ([self respondsToSelector:@selector(enhanced_addTarget:action:)])

@@ -38,12 +38,12 @@
 
 - (BOOL)enhanced_sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event {
     
-    if (action && target && sender) {
+    if (action && target) {
         NSString *selectorName = NSStringFromSelector(action);
         
         // Sometimes this method proxies through to its internal method. We want to ignore those calls.
         if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
-            [CodelessAPI submitActionWithApplication:self senderInstance:sender targetInstance:target selectorObj:action];
+            [SelectorReinforcement integrationModeSubmitWithSenderInstance:sender targetInstance:target action:action];
         }
     }
     

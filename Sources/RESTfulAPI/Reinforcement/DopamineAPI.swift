@@ -9,10 +9,9 @@
 import Foundation
 import AdSupport
 
-@objc
-public class DopamineAPI : NSObject{
+internal class DopamineAPI : NSObject{
     
-    public static var logCalls = false
+    static var logCalls = false
     
     /// Valid API actions appeneded to the DopamineAPI URL
     ///
@@ -113,7 +112,7 @@ public class DopamineAPI : NSObject{
         shared.send(call: .telemetry, with: payload, completion: completion)
     }
     
-    private lazy var session = URLSession.shared
+    internal lazy var httpClient = HTTPClient()
     
     /// This function sends a request to the DopamineAPI
     ///
@@ -123,26 +122,15 @@ public class DopamineAPI : NSObject{
     ///     - timeout: A timeout, in seconds, for the request. Defaults to 3 seconds.
     ///     - completion: A closure with a JSON formatted dictionary.
     ///
-    private func send(call type: CallType, with payload: [String:Any], timeout:TimeInterval = 3.0, completion: @escaping ([String: Any]) -> Void) {
+    private func send(call type: CallType, with payload: [String:Any], completion: @escaping ([String: Any]) -> Void) {
 //        return
         guard let url = URL(string: type.path) else {
             DopeLog.debug("Invalid url <\(type.path)>")
             return
         }
         
-        var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "POST"
-        request.timeoutInterval = timeout
-        do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: payload, options: JSONSerialization.WritingOptions())
-        } catch {
-            let message = "Error sending \(type.path) api call with payload:(\(payload as AnyObject))"
-            DopeLog.debug(message)
-            Telemetry.storeException(className: "JSONSerialization", message: message)
-        }
         let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
-        let task = session.dataTask(with: request, completionHandler: { responseData, responseURL, error in
+        let task = httpClient.post(to: url, jsonObject: payload) { responseData, responseURL, error in
             var responseDict: [String : Any] = [:]
             defer { completion(responseDict) }
             
@@ -201,7 +189,7 @@ public class DopamineAPI : NSObject{
             
             DopeLog.debug("✅\(type.path) call")
             if DopamineAPI.logCalls { DopeLog.debug("got response:\(responseDict.debugDescription)") }
-        })
+        }
         
         // send request
         DopeLog.debug("Sending \(type.path) api call")
@@ -211,3 +199,4 @@ public class DopamineAPI : NSObject{
     }
     
 }
+

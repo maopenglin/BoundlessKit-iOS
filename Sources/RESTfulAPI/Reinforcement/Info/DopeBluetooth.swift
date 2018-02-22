@@ -9,9 +9,9 @@
 import Foundation
 import CoreBluetooth
 
-public class DopeBluetooth : NSObject {
+internal class DopeBluetooth : NSObject {
     
-    public static let shared = DopeBluetooth()
+    static let shared = DopeBluetooth()
     
     fileprivate let bluetoothManager = BluetoothManager(delegate: nil, queue: .main, options: [CBCentralManagerOptionShowPowerAlertKey: 0])
     
@@ -22,7 +22,7 @@ public class DopeBluetooth : NSObject {
         bluetoothManager.scan(completion: {_ in})
     }
     
-    public func getBluetooth(callback: @escaping([[String: Any]]?) -> Void) {
+    func getBluetooth(callback: @escaping([[String: Any]]?) -> Void) {
 //        guard canGetBluetooth else {
 //            callback(nil)
 //            return

@@ -31,7 +31,7 @@
         [self enhanced_viewDidAppear:animated];
     
     if (self) {
-        [CodelessAPI submitWithTargetInstance:self selector:@selector(viewDidAppear:)];
+        [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(viewDidAppear:)];
     }
     
     if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
@@ -47,7 +47,7 @@
         [self enhanced_viewDidDisappear:animated];
     
     if (self) {
-        [CodelessAPI submitWithTargetInstance:self selector:@selector(viewDidDisappear:)];
+        [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(viewDidDisappear:)];
     }
     
     if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {

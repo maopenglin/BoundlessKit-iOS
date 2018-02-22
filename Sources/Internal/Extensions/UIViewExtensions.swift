@@ -10,11 +10,13 @@ import Foundation
 internal extension UIView {
     
     func snapshotImage() -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(bounds.size, false, 0)
-        drawHierarchy(in: self.bounds, afterScreenUpdates: true)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
+        var image: UIImage?
+        DispatchQueue.main.sync {
+            UIGraphicsBeginImageContextWithOptions(bounds.size, false, 0)
+            drawHierarchy(in: self.bounds, afterScreenUpdates: true)
+            image = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+        }
         return image
     }
     

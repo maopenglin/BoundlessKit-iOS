@@ -7,9 +7,15 @@
 
 import Foundation
 
+public protocol SelectorReinforcementDelegate {
+    func willTryReinforce(actionID: String)
+    func didReinforce(actionID: String, reinforcementDecision: String)
+}
 
 @objc
 open class SelectorReinforcement : NSObject {
+    
+    static var delegate: SelectorReinforcementDelegate?
     
     fileprivate static var registered = [String:SelectorReinforcement]()
     fileprivate static var unregistered = [String:SelectorReinforcement]()
@@ -171,18 +177,29 @@ open class SelectorReinforcement : NSObject {
 extension SelectorReinforcement {
     
     @objc
+    public static func integrationModeSubmit(targetInstance: AnyObject, action: Selector) {
+        integrationModeSubmit(senderInstance: nil, targetInstance: targetInstance, action: action)
+    }
+    
+    @objc
+    public static func integrationModeSubmit(senderInstance: AnyObject?, targetInstance: AnyObject, action: Selector) {
+        guard let targetInstance = targetInstance as? NSObject else { return }
+        let selectorReinforcement = SelectorReinforcement(target: targetInstance, selector: action)
+        CodelessAPI.submitSelectorReinforcement(selectorReinforcement: selectorReinforcement, senderInstance: senderInstance)
+    }
+    
+    @objc
     public static func attemptReinforcement(senderInstance: AnyObject?, targetInstance: NSObject, action: Selector) {
         SelectorReinforcement(target: targetInstance, selector: action).attemptReinforcement(senderInstance: senderInstance, targetInstance: targetInstance)
     }
     
     func attemptReinforcement(senderInstance: AnyObject?, targetInstance: NSObject) {
-        if DopamineVersion.current.visualizerMode {
-            let reinforcementDecision = DopamineVersion.current.reinforcementDecision(for: self.actionID)
-            CodelessReinforcement.show(actionID: actionID, reinforcementDecision: reinforcementDecision, senderInstance: senderInstance, targetInstance: targetInstance)
-        } else {
-            DopamineKit.reinforce(actionID, completion: { reinforcementDecision in
-                CodelessReinforcement.show(actionID: self.actionID, reinforcementDecision: reinforcementDecision, senderInstance: senderInstance, targetInstance: targetInstance)
-            })
+        SelectorReinforcement.delegate?.willTryReinforce(actionID: actionID)
+        
+        DopamineKit.reinforce(actionID) { reinforcementDecision in
+            CodelessReinforcement.show(actionID: self.actionID, reinforcementDecision: reinforcementDecision, senderInstance: senderInstance, targetInstance: targetInstance) {
+                SelectorReinforcement.delegate?.didReinforce(actionID: self.actionID, reinforcementDecision: reinforcementDecision)
+            }
         }
     }
     

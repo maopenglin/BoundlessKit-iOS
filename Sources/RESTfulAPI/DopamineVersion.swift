@@ -23,9 +23,15 @@ public class DopamineVersion : UserDefaultsSingleton {
     @objc public var versionID: String?
     @objc fileprivate var mappings: [String:Any]
     @objc internal fileprivate (set) var visualizerMappings: [String:Any]
-    internal var visualizerMode = false {
+    internal var isIntegrating = false {
         didSet {
-            if !visualizerMode { update(visualizer: nil) }
+            if !isIntegrating {
+                DopamineChanges.shared.integrationModeMethods(false)
+                update(visualizer: nil)
+            } else {
+                DopamineChanges.shared.integrationModeMethods(true)
+                DopamineChanges.shared.registerVisualizerMethods()
+            }
         }
     }
     
@@ -90,7 +96,7 @@ public class DopamineVersion : UserDefaultsSingleton {
     
     internal func reinforcementDecision(for actionID: String) -> String {
         let reinforcementDecision: String
-        if visualizerMode,
+        if isIntegrating,
             let actionMapping = actionMapping(for: actionID),
             let randomReinforcement = CodelessReinforcement.reinforcementsIDs(in: actionMapping)?.selectRandom()
         {
@@ -120,7 +126,7 @@ public extension DopamineVersion {
         } }
     
     public func actionMapping(for actionID: String) -> [String: Any]? {
-        if visualizerMode {
+        if isIntegrating {
             return visualizerMappings[actionID] as? [String: Any] ?? mappings[actionID] as? [String: Any]
         } else {
             return mappings[actionID] as? [String: Any]
