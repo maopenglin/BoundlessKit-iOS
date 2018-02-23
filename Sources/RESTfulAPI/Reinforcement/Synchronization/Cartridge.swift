@@ -212,7 +212,7 @@ internal class Cartridge : NSObject, NSCoding {
                     {
                         self.reinforcementDecisions = cartridgeDecisions
                         self.updateTriggers(initialSize: cartridgeDecisions.count, timerExpiresIn: Int64(expiresIn) )
-//                        DopeLog.debug("✅ \(self.actionID) refreshed!")
+//                        DopeLog.confirmed("\(self.actionID) refreshed!")
                     } else if responseStatusCode == 400 {
 //                        DopeLog.debug("Cartridge contained outdated actionID. Flushing.")
                         Cartridge.flush(self)

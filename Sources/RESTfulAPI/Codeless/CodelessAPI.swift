@@ -10,20 +10,20 @@ import Foundation
 
 internal class CodelessAPI : NSObject {
     
-    static var logCalls = true
-    
-    /// Valid API actions appeneded to the CodelessAPI URL
-    ///
-    internal enum CallType{
+    enum APICallTypes {
         case identify, accept, submit, boot
-        var path:String{ switch self{
-        case .identify: return "https://dashboard-api.usedopamine.com/codeless/pair/customer/identity/"
-        case .boot: return "https://api.usedopamine.com/v5/app/boot"
-        case .accept: return "https://dashboard-api.usedopamine.com/codeless/pair/customer/accept/"
-        case .submit: return "https://dashboard-api.usedopamine.com/codeless/visualizer/customer/submit/"
+        
+        var clientType: HTTPClient.CallType {
+            switch self {
+            case .identify: return .identify
+            case .accept: return .accept
+            case .submit: return .submit
+            case .boot: return .boot
             }
         }
     }
+    
+    static var logCalls = true
     
     internal static let shared = CodelessAPI()
     
@@ -142,8 +142,9 @@ internal class CodelessAPI : NSObject {
         }
     }
     
+    internal static let visualizerDashboardQueue = DispatchQueue(label: "DopamineKit.VisualizerDashboardQueue", qos: .background)
     internal static func submitSelectorReinforcement(selectorReinforcement: SelectorReinforcement, senderInstance: AnyObject?) {
-        DispatchQueue.global().async {
+        visualizerDashboardQueue.async {
             submit { payload in
                 payload["sender"] = selectorReinforcement.selectorType.rawValue
                 payload["target"] = NSStringFromClass(selectorReinforcement.targetClass)
@@ -210,56 +211,19 @@ internal class CodelessAPI : NSObject {
     ///     - timeout: A timeout, in seconds, for the request. Defaults to 3 seconds.
     ///     - completion: A closure with a JSON formatted dictionary.
     ///
-    private func send(call type: CallType, with payload: [String:Any], completion: @escaping ([String: Any]) -> Void) {
+    private func send(call type: APICallTypes, with payload: [String:Any], completion: @escaping ([String: Any]) -> Void) {
         
-        guard let url = URL(string: type.path) else {
-            DopeLog.debug("Invalid url <\(type.path)>")
-            return
-        }
-        
-        let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
-        let task = httpClient.post(to: url, jsonObject: payload) { responseData, responseURL, error in
-            var responseDict: [String : Any] = [:]
-            defer { completion(responseDict) }
+        let task = httpClient.post(type: type.clientType, jsonObject: payload) { response in
+            DopeLog.confirmed("\(type.clientType.path) called")
+            if CodelessAPI.logCalls { DopeLog.debug("got response:\(response as AnyObject)") }
             
-            if responseURL == nil {
-                DopeLog.debug("❌ \(type.path) call got invalid response:\(String(describing: error?.localizedDescription))")
-                responseDict["error"] = error?.localizedDescription
-                return
-            }
-            
-            if let responseData = responseData,
-                responseData.isEmpty {
-                DopeLog.debug("✅\(type.path) call got empty response.")
-                return
-            }
-            
-            do {
-                // turn the response into a json object
-                guard let data = responseData,
-                    let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-                    else {
-                        let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
-                        let message = "❌ Error reading \(type.path) response data, not a dictionary: \(json)"
-                        DopeLog.debug(message)
-                        Telemetry.storeException(className: "JSONSerialization", message: message)
-                        return
-                }
-                responseDict = dict
-            } catch {
-                DopeLog.debug("❌ Error reading \(type.path) response data: \(String(describing: (responseData != nil) ? String(data: responseData!, encoding: .utf8) : String(describing: responseData.debugDescription)))")
-                return
-            }
-            
-            DopeLog.debug("✅\(type.path) call")
-            if CodelessAPI.logCalls { DopeLog.debug("got response:\(responseDict as AnyObject)") }
+            completion(response ?? [:])
         }
         
         // send request
-        DopeLog.debug("Sending \(type.path) api call")
+        DopeLog.debug("Sending \(type.clientType.path) api call")
         if CodelessAPI.logCalls { DopeLog.debug("with payload: \(payload as AnyObject)") }
         task.resume()
-        
     }
 }
 

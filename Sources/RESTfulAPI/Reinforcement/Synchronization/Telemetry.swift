@@ -62,9 +62,9 @@ internal class Telemetry {
     ///
     static func storeException( className: String, message: String, dataDescription: String?=nil, filePath: String = #file, function: String = #function) {
         queue.async {
-            var exceptionMessage = message
+            var exceptionMessage = "Message:<\(message)>"
             if let dataDescription = dataDescription {
-                exceptionMessage.append("\nDataDescription:\(dataDescription)")
+                exceptionMessage.append("\nDataDescription:<\(dataDescription)>")
             }
             var stackTrace = Thread.callStackSymbols
             stackTrace[0] = "0\t\(NSString(string: filePath).lastPathComponent)\t\t\t\t\t\(function)"

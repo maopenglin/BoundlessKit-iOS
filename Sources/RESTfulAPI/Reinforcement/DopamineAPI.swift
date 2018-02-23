@@ -11,20 +11,20 @@ import AdSupport
 
 internal class DopamineAPI : NSObject{
     
-    static var logCalls = false
-    
-    /// Valid API actions appeneded to the DopamineAPI URL
-    ///
-    internal enum CallType{
+    enum APICallTypes {
         case track, report, refresh, telemetry
-        var path:String{ switch self{
-        case .track: return "https://api.usedopamine.com/v4/app/track/"
-        case .report: return "https://api.usedopamine.com/v4/app/report/"
-        case .refresh: return "https://api.usedopamine.com/v4/app/refresh/"
-        case .telemetry: return "https://api.usedopamine.com/v4/telemetry/sync/"
+        
+        var clientType: HTTPClient.CallType {
+            switch self {
+            case .track: return .track
+            case .report: return .report
+            case .refresh: return .refresh
+            case .telemetry: return .telemetry
             }
         }
     }
+    
+    static var logCalls = false
     
     internal static let shared: DopamineAPI = DopamineAPI()
     
@@ -122,77 +122,32 @@ internal class DopamineAPI : NSObject{
     ///     - timeout: A timeout, in seconds, for the request. Defaults to 3 seconds.
     ///     - completion: A closure with a JSON formatted dictionary.
     ///
-    private func send(call type: CallType, with payload: [String:Any], completion: @escaping ([String: Any]) -> Void) {
-//        return
-        guard let url = URL(string: type.path) else {
-            DopeLog.debug("Invalid url <\(type.path)>")
-            return
-        }
+    private func send(call type: APICallTypes, with payload: [String:Any], completion: @escaping ([String: Any]) -> Void) {
         
         let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
-        let task = httpClient.post(to: url, jsonObject: payload) { responseData, responseURL, error in
-            var responseDict: [String : Any] = [:]
-            defer { completion(responseDict) }
+        let task = httpClient.post(type: type.clientType, jsonObject: payload) { response in
+            DopeLog.confirmed("\(type.clientType.path) called")
+            if DopamineAPI.logCalls { DopeLog.debug("got response:\(response as AnyObject)") }
             
-            if responseURL == nil {
-                DopeLog.debug("❌ \(type.path) call got invalid response:\(String(describing: error?.localizedDescription))")
-                responseDict["error"] = error?.localizedDescription
-                switch type {
-                case .track:
-                    Telemetry.setResponseForTrackSync(-1, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                case .report:
-                    Telemetry.setResponseForReportSync(-1, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                case .refresh:
-                    if let actionID = payload["actionID"] as? String {
-                        Telemetry.setResponseForCartridgeSync(forAction: actionID, -1, error: error?.localizedDescription, whichStartedAt: callStartTime)
-                    }
-                case .telemetry:
-                    break
-                }
-                return
-            }
+            completion(response ?? [:])
             
-            do {
-                guard let data = responseData,
-                    let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
-                    else {
-                        let json = responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? ""
-                        let message = "❌ Error reading \(type.path) response data, not a dictionary: \(json)"
-                        DopeLog.debug(message)
-                        Telemetry.storeException(className: "JSONSerialization", message: message)
-                        return
-                }
-                responseDict = dict
-            } catch {
-                let message = "❌ Error reading \(type.path) response data: \(responseData.debugDescription)"
-                DopeLog.debug(message)
-                Telemetry.storeException(className: "JSONSerialization", message: message)
-                return
-            }
-            
-            var statusCode: Int = -2
-            if let responseStatusCode = responseDict["status"] as? Int {
-                statusCode = responseStatusCode
-            }
+            let statusCode: Int = response?["status"] as? Int ?? -2
             switch type {
             case .track:
-                Telemetry.setResponseForTrackSync(statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
+                Telemetry.setResponseForTrackSync(statusCode, whichStartedAt: callStartTime)
             case .report:
-                Telemetry.setResponseForReportSync(statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
+                Telemetry.setResponseForReportSync(statusCode, whichStartedAt: callStartTime)
             case .refresh:
                 if let actionID = payload["actionID"] as? String {
-                    Telemetry.setResponseForCartridgeSync(forAction: actionID, statusCode, error: error?.localizedDescription, whichStartedAt: callStartTime)
+                    Telemetry.setResponseForCartridgeSync(forAction: actionID, statusCode, whichStartedAt: callStartTime)
                 }
             case .telemetry:
                 break
             }
-            
-            DopeLog.debug("✅\(type.path) call")
-            if DopamineAPI.logCalls { DopeLog.debug("got response:\(responseDict.debugDescription)") }
         }
         
         // send request
-        DopeLog.debug("Sending \(type.path) api call")
+        DopeLog.debug("Sending \(type.clientType.path) api call")
         if DopamineAPI.logCalls { DopeLog.debug("with payload: \(payload as AnyObject)") }
         task.resume()
         

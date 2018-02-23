@@ -195,7 +195,7 @@ class ViewController: UIViewController {
     }
     
     override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
-        let touchD = UITapGestureRecognizer()
+//        let touchD = UITapGestureRecognizer()
         return UIInterfaceOrientationMask.portrait
     }
 }
