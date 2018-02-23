@@ -92,10 +92,10 @@ class SyncCoordinator {
                     break
                 }
             }
-            let reportShouldSync = (someCartridgeToSync != nil) || self.trackedActions.isTriggered()
-            let trackShouldSync = reportShouldSync || self.trackedActions.isTriggered()
+            let reportShouldSync = self.reportedActions.isTriggered()
+            let trackShouldSync = self.trackedActions.isTriggered()
             
-            if trackShouldSync {
+            if someCartridgeToSync != nil || reportShouldSync || trackShouldSync {
                 var syncCause: String
                 if let cartridgeToSync = someCartridgeToSync {
                     syncCause = "Cartridge \(cartridgeToSync.actionID) needs to sync."
@@ -126,9 +126,13 @@ class SyncCoordinator {
                     })
                     sleep(1)
                     if !goodProgress { return }
+                } else {
+                    // TO-DO: save triggers to userdefaults
+                    self.trackedActions.updateTriggers()
+                    self.saveTrackedActions()
                 }
                 
-                if reportShouldSync && !self.reportedActions.isEmpty {
+                if !self.reportedActions.isEmpty {
                     let actions = self.reportedActions.filter({_ in return true})
                     DopamineAPI.report(actions, completion: { response in
                         if let status = response["status"] as? Int {
@@ -145,6 +149,9 @@ class SyncCoordinator {
                     })
                     sleep(5)
                     if !goodProgress { return }
+                } else {
+                    self.reportedActions.updateTriggers()
+                    self.saveReportedActions()
                 }
                 
                 

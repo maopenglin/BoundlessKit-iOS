@@ -14,6 +14,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		840C356C203BC1FA0069B28C /* Test_Rewards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840C356B203BC1FA0069B28C /* Test_Rewards.swift */; };
+		840CA77A203FF6AE008108D1 /* MockHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840CA779203FF6AE008108D1 /* MockHTTPClient.swift */; };
 		842EB6872036688D00523265 /* DopamineKit_UIUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842EB6862036688D00523265 /* DopamineKit_UIUnitTests.swift */; };
 		842EB69220366E8700523265 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		842EB69320366E8A00523265 /* RewardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCAFE2203619F70095E273 /* RewardsViewController.swift */; };
@@ -75,6 +76,7 @@
 		709DB9CD95354A8D2FA1F119 /* Pods_DopamineKit_UITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DopamineKit_UITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83D85254AEE0F2D7F728BC87 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		840C356B203BC1FA0069B28C /* Test_Rewards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test_Rewards.swift; sourceTree = "<group>"; };
+		840CA779203FF6AE008108D1 /* MockHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockHTTPClient.swift; sourceTree = "<group>"; };
 		841CA604202283EC00B90009 /* DopamineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = DopamineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		841CA6082022846900B90009 /* DopamineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = DopamineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		841CA60C2022860D00B90009 /* DopamineKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = DopamineKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -237,6 +239,7 @@
 				84727A31203CFCC80011A7F1 /* MockUserDefaults.swift */,
 				84727A33203D0C2D0011A7F1 /* Test_CodelessIntegration.swift */,
 				84A41551202C07C300A79443 /* Test_DopamineAPI.swift */,
+				840CA779203FF6AE008108D1 /* MockHTTPClient.swift */,
 				840C356B203BC1FA0069B28C /* Test_Rewards.swift */,
 				84A41552202C07C300A79443 /* Test_Swizzler.swift */,
 				84A4154F202C07C300A79443 /* ViewController+Extensions.swift */,
@@ -611,6 +614,7 @@
 			files = (
 				84A41554202C07C300A79443 /* ViewController+Extensions.swift in Sources */,
 				84727A32203CFCC80011A7F1 /* MockUserDefaults.swift in Sources */,
+				840CA77A203FF6AE008108D1 /* MockHTTPClient.swift in Sources */,
 				84727A34203D0C2D0011A7F1 /* Test_CodelessIntegration.swift in Sources */,
 				84A41557202C07C300A79443 /* Test_Swizzler.swift in Sources */,
 				84A41556202C07C300A79443 /* Test_DopamineAPI.swift in Sources */,

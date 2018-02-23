@@ -7,11 +7,12 @@ class TestDopamineAPI: XCTestCase {
     
     override func setUp() {
         super.setUp()
+        DopamineAPI.shared.httpClient = HTTPClient(session: MockURLSession())
         
         // Set the plist so DopamineKit can read the appID, versionID, production and development secrets, and the inProduction flag
         let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineProperties", ofType: "plist")!) as! [String:Any]
         DopamineKit.testCredentials = testCredentials
-        TestDopamineAPI.log(message: "Set dopamine credentials to:'\(testCredentials)'")
+        DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
     }
     
     override func tearDown() {
@@ -33,28 +34,18 @@ class TestDopamineAPI: XCTestCase {
     lazy var metaData: [String:AnyObject] = ["string":"str" as AnyObject, "boolsArray":[true, false] as AnyObject, "numbersArray" : ["int":Int(1), "double":Double(2.2), "float":Float(3.3)] as AnyObject ]
     
     
-    internal static func log(message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
-        var functionSignature:String = function
-        if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
-            functionSignature.replaceSubrange(parameterNames, with: "()")
-        }
-        let fileName = NSString(string: filePath).lastPathComponent.components(separatedBy: ",")[0]
-        NSLog("[\(fileName):\(line):\(functionSignature)] - \(message)")
-    }
-    
-    
     ////////////////////////////////////////
     //*-*
     //*-*  DopamineKit.track() Tests
     //*-*
     ////////////////////////////////////////
     
-    
     /// Test DopamineKit.track() with only actionID
     ///
     func testTrack() {
         let asyncExpectation = expectation(description: "Tracking request simple")
         
+        sleep(1)
         DopamineKit.track("track_test_simple")
         sleep(sleepTimeForTrack)
         asyncExpectation.fulfill()
@@ -85,16 +76,19 @@ class TestDopamineAPI: XCTestCase {
         // given
         SyncCoordinator.shared.flush()
         
-        
+        sleep(4)
         // when
-        let numRequests = 4
-        for i in 1...numRequests {
-            DopamineKit.track("test_track_multiple_\(i)/\(numRequests)")
+        let numRequests = 25
+//        for i in 1...numRequests {
+//            DopamineKit.track("test_track_multiple_\(i)/\(numRequests)")
+//        }
+        DispatchQueue.concurrentPerform(iterations: numRequests) { count in
+            DopamineKit.track("testingTrackConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
         }
-        
+
         
         // then
-        sleep(2)
+        sleep(6)
         print("Track count:\(SyncCoordinator.shared.trackedActions.count) expected:\(numRequests)")
         XCTAssert(SyncCoordinator.shared.trackedActions.count == numRequests)
     }
@@ -122,7 +116,7 @@ class TestDopamineAPI: XCTestCase {
         let asyncExpectation = expectation(description: "Reinforcement decision simple")
         
         DopamineKit.reinforce(actionID, completion: { response in
-            TestDopamineAPI.log(message: "DopamineKitTest actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
+            DopeLog.print("DopamineKitTest actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
             sleep(self.sleepTimeForReinforce)
             asyncExpectation.fulfill()
         })
@@ -138,7 +132,7 @@ class TestDopamineAPI: XCTestCase {
         let asyncExpectation = expectation(description: "Reinforcement decision with metadata")
         
         DopamineKit.reinforce(actionID, metaData: metaData, completion: { response in
-            TestDopamineAPI.log(message: "DopamineKitTest actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
+            DopeLog.print("DopamineKitTest actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
             sleep(self.sleepTimeForReinforce)
             asyncExpectation.fulfill()
         })
@@ -156,7 +150,7 @@ class TestDopamineAPI: XCTestCase {
         let numRequests = 4
         for i in 1...numRequests {
             DopamineKit.reinforce(actionID, completion: { response in
-                TestDopamineAPI.log(message: "Reinforce() call \(i)/\(numRequests) with  actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
+                DopeLog.print("Reinforce() call \(i)/\(numRequests) with  actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
                 if i==numRequests {
                     sleep(self.sleepTimeForReinforce)
                     asyncExpectation.fulfill()

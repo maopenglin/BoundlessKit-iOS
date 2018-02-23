@@ -214,16 +214,14 @@ internal class CodelessAPI : NSObject {
     private func send(call type: APICallTypes, with payload: [String:Any], completion: @escaping ([String: Any]) -> Void) {
         
         let task = httpClient.post(type: type.clientType, jsonObject: payload) { response in
-            DopeLog.confirmed("\(type.clientType.path) called")
             if CodelessAPI.logCalls { DopeLog.debug("got response:\(response as AnyObject)") }
             
             completion(response ?? [:])
         }
         
         // send request
-        DopeLog.debug("Sending \(type.clientType.path) api call")
         if CodelessAPI.logCalls { DopeLog.debug("with payload: \(payload as AnyObject)") }
-        task.resume()
+        task.start()
     }
 }
 

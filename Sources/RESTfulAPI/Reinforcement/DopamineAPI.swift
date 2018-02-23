@@ -112,7 +112,11 @@ internal class DopamineAPI : NSObject{
         shared.send(call: .telemetry, with: payload, completion: completion)
     }
     
-    internal lazy var httpClient = HTTPClient()
+    internal var httpClient = HTTPClient() {
+        didSet {
+            print("Set httpclient")
+        }
+    }
     
     /// This function sends a request to the DopamineAPI
     ///
@@ -126,8 +130,6 @@ internal class DopamineAPI : NSObject{
         
         let callStartTime = Int64( 1000*NSDate().timeIntervalSince1970 )
         let task = httpClient.post(type: type.clientType, jsonObject: payload) { response in
-            DopeLog.confirmed("\(type.clientType.path) called")
-            if DopamineAPI.logCalls { DopeLog.debug("got response:\(response as AnyObject)") }
             
             completion(response ?? [:])
             
@@ -144,12 +146,13 @@ internal class DopamineAPI : NSObject{
             case .telemetry:
                 break
             }
+            
+            if DopamineAPI.logCalls { DopeLog.debug("got response:\(response as AnyObject)") }
         }
         
         // send request
-        DopeLog.debug("Sending \(type.clientType.path) api call")
         if DopamineAPI.logCalls { DopeLog.debug("with payload: \(payload as AnyObject)") }
-        task.resume()
+        task.start()
         
     }
     

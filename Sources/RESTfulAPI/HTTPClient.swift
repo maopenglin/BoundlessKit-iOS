@@ -7,6 +7,20 @@
 
 import Foundation
 
+//class MockURLSession : URLSessionProtocol, URLSessionDataTaskProtocol {
+//    func send(request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol {
+//        print("Trying to send to url:\(String(describing: request.url))")
+//        
+//        return self
+//    }
+//    
+//    func start() {
+//        print("DId resume")
+//    }
+//    
+//    
+//}
+
 internal class HTTPClient {
     
     internal enum CallType{
@@ -64,6 +78,8 @@ internal class HTTPClient {
                 return nil
             }
             
+            DopeLog.confirmed("\(type.path) called")
+            
             if response.isEmpty {
                 return nil
             } else if let jsonResponse = try? JSONSerialization.jsonObject(with: response, options: []) as? [String: AnyObject] {
@@ -71,7 +87,7 @@ internal class HTTPClient {
             } else {
                 let message = "\(type.path) call got invalid response data"
                 let dataString: String = (responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? "") as String
-                DopeLog.error("response\n\t<\(dataString)>")
+                DopeLog.error("\(message)\n\t<\(dataString)>")
                 Telemetry.storeException(className: NSStringFromClass(HTTPClient.self), message: message, dataDescription: "Sent:<\(String(describing: jsonObject)))>Received:<\(dataString)>")
                 return nil
             }
@@ -95,8 +111,13 @@ extension URLSession: URLSessionProtocol {
 }
 
 protocol URLSessionDataTaskProtocol {
-    func resume()
+    func start()
 }
 
-extension URLSessionDataTask: URLSessionDataTaskProtocol { }
+extension URLSessionDataTask: URLSessionDataTaskProtocol {
+    func start() {
+        DopeLog.debug("Sending \(currentRequest?.url?.absoluteString ?? "nil") api call...")
+        resume()
+    }
+}
 
