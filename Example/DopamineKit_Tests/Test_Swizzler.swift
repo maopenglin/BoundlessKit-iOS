@@ -34,7 +34,7 @@ class TestSwizzler: XCTestCase {
     }
     
     override func tearDown() {
-        DopamineKit.syncCoordinator.flush()          // clears the sync state, recorded actions, and cartridges
+        SyncCoordinator.flush()          // clears the sync state, recorded actions, and cartridges
         
         super.tearDown()
     }

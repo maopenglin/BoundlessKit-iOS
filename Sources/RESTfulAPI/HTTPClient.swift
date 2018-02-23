@@ -64,7 +64,7 @@ internal class HTTPClient {
                 return nil
             }
             
-            DopeLog.confirmed("\(type.path) called")
+            DopeLog.confirmed("\(type.path) called successfully")
             
             if response.isEmpty {
                 return nil

@@ -16,16 +16,16 @@ class TestDopamineAPI: XCTestCase {
         DopamineKit.testCredentials = testCredentials
         DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
         
-        mockDopamineAPISession.mockResponse = ["Status": 204]
-        mockCodelessAPISession.mockResponse = ["Status": 204]
+//        mockDopamineAPISession.mockResponse = ["Status": 204]
+//        mockCodelessAPISession.mockResponse = ["Status": 204]
         
         DopamineAPI.shared.httpClient = HTTPClient(session: mockDopamineAPISession)
         CodelessAPI.shared.httpClient = HTTPClient(session: mockCodelessAPISession)
-        DopamineChanges.shared.wake()
+//        DopamineChanges.shared.wake()
     }
     
     override func tearDown() {
-        DopamineKit.syncCoordinator.flush()          // clears the sync state, recorded actions, and cartridges
+        SyncCoordinator.flush()          // clears the sync state, recorded actions, and cartridges
         
         super.tearDown()
     }
@@ -83,9 +83,10 @@ class TestDopamineAPI: XCTestCase {
     func testTrackMultiple() {
         
         // given
-        SyncCoordinator.shared.flush()
+        SyncCoordinator.flush()
+        mockDopamineAPISession.mockResponse = ["status": 500]
         
-        sleep(4)
+//        sleep(4)
         // when
         let numRequests = 25
 //        for i in 1...numRequests {
