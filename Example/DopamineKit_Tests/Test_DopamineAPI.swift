@@ -5,6 +5,9 @@ import XCTest
 
 class TestDopamineAPI: XCTestCase {
     
+    let mockDopamineAPISession = MockURLSession()
+    let mockCodelessAPISession = MockURLSession()
+    
     override func setUp() {
         super.setUp()
         
@@ -13,8 +16,11 @@ class TestDopamineAPI: XCTestCase {
         DopamineKit.testCredentials = testCredentials
         DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
         
-        DopamineAPI.shared.httpClient = HTTPClient(session: MockURLSession())
-        CodelessAPI.shared.httpClient = HTTPClient(session: MockURLSession())
+        mockDopamineAPISession.mockResponse = ["Status": 204]
+        mockCodelessAPISession.mockResponse = ["Status": 204]
+        
+        DopamineAPI.shared.httpClient = HTTPClient(session: mockDopamineAPISession)
+        CodelessAPI.shared.httpClient = HTTPClient(session: mockCodelessAPISession)
         DopamineChanges.shared.wake()
     }
     
@@ -48,7 +54,7 @@ class TestDopamineAPI: XCTestCase {
     func testTrack() {
         let asyncExpectation = expectation(description: "Tracking request simple")
         
-        sleep(1)
+        sleep(5)
         DopamineKit.track("track_test_simple")
         sleep(sleepTimeForTrack)
         asyncExpectation.fulfill()

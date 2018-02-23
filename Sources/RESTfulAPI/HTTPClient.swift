@@ -7,20 +7,6 @@
 
 import Foundation
 
-//class MockURLSession : URLSessionProtocol, URLSessionDataTaskProtocol {
-//    func send(request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol {
-//        print("Trying to send to url:\(String(describing: request.url))")
-//        
-//        return self
-//    }
-//    
-//    func start() {
-//        print("DId resume")
-//    }
-//    
-//    
-//}
-
 internal class HTTPClient {
     
     internal enum CallType{
@@ -56,9 +42,9 @@ internal class HTTPClient {
         request.httpMethod = "POST"
         request.timeoutInterval = timeout
         do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: jsonObject, options: JSONSerialization.WritingOptions())
+            request.httpBody = try JSONSerialization.data(withJSONObject: jsonObject)
         } catch {
-            let message = "\(type.path) call got error while converting object to JSON"
+            let message = "\(type.path) call got error while converting request to JSON"
             DopeLog.debug(message)
             Telemetry.storeException(className: "JSONSerialization", message: message, dataDescription: String(describing: jsonObject))
         }
@@ -82,7 +68,7 @@ internal class HTTPClient {
             
             if response.isEmpty {
                 return nil
-            } else if let jsonResponse = try? JSONSerialization.jsonObject(with: response, options: []) as? [String: AnyObject] {
+            } else if let jsonResponse = try? JSONSerialization.jsonObject(with: response) as? [String: AnyObject] {
                 return jsonResponse
             } else {
                 let message = "\(type.path) call got invalid response data"
@@ -94,6 +80,7 @@ internal class HTTPClient {
         }
         
         return session.send(request: request) { responseData, responseURL, error in
+            DopeLog.debug("\(request.url?.absoluteString ?? "url:nil") got \(responseData != nil ? "response:\(String(data: responseData!, encoding: .utf8)!)" : "no response")")
             completion( convertResponseToJSON( responseData, responseURL, error ) )
         }
     }

@@ -9,18 +9,42 @@
 import Foundation
 @testable import DopamineKit
 
-class MockURLSession : URLSessionProtocol, URLSessionDataTaskProtocol {
+class MockURLSession : URLSessionProtocol {
+    
+    var lastURL: URL?
+    var mockResponse: [String: Any] = [:]
+    
     func send(request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol {
-        print("Trying to send to url:\(String(describing: request.url))")
+        DopeLog.debug("Trying to send to url:\(String(describing: request.url))")
         
-        return self
+        lastURL = request.url
+        
+        return MockURLSessionDataTask(
+            request: request,
+            responseData: try! JSONSerialization.data(withJSONObject: mockResponse),
+            completion: completionHandler
+        )
+    }
+    
+}
+
+class MockURLSessionDataTask : URLSessionDataTaskProtocol {
+    
+    let urlRequest: URLRequest
+    let mockResponseData: Data
+    let taskFinishHandler: (Data?, URLResponse?, Error?) -> Void
+    
+    init(request: URLRequest, responseData: Data, completion: @escaping (Data?, URLResponse?, Error?) -> Void ) {
+        urlRequest = request
+        mockResponseData = responseData
+        taskFinishHandler = completion
     }
     
     func start() {
-        print("DId resume")
+        DopeLog.debug("Did start url session data task to:<\(String(describing: urlRequest.url))> with mock response:<\(String(describing: String(data: mockResponseData, encoding: .utf8)))> ")
+        
+        taskFinishHandler(mockResponseData, URLResponse(), nil)
     }
-    
-    
 }
 
 //protocol URLSessionProtocol {
