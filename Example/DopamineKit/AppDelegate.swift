@@ -14,11 +14,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
-    let wakeDopamine: Void = {
-        print("Waking up dopamine...")
-        DopamineChanges.shared.wake()
-        return
-    }()
+//    let wakeDopamine: Void = {
+//        print("Waking up dopamine...")
+//        DopamineChanges.shared.wake()
+//        return
+//    }()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.

@@ -7,12 +7,15 @@ class TestDopamineAPI: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        DopamineAPI.shared.httpClient = HTTPClient(session: MockURLSession())
         
         // Set the plist so DopamineKit can read the appID, versionID, production and development secrets, and the inProduction flag
         let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineProperties", ofType: "plist")!) as! [String:Any]
         DopamineKit.testCredentials = testCredentials
         DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
+        
+        DopamineAPI.shared.httpClient = HTTPClient(session: MockURLSession())
+        CodelessAPI.shared.httpClient = HTTPClient(session: MockURLSession())
+        DopamineChanges.shared.wake()
     }
     
     override func tearDown() {
