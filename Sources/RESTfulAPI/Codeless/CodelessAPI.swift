@@ -76,7 +76,7 @@ internal class CodelessAPI : NSObject {
             completion()
             
             if DopamineConfiguration.current.integrationMethod == "codeless" {
-                DopamineChanges.shared.registerMethods()
+                DopamineController.shared.registerMethods()
             }
         }
     }

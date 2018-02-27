@@ -48,7 +48,7 @@ class DopamineKit_UIUnitTests: XCTestCase {
 //        }
 //        
 //        let changesDelegate = ChangesDelegate()
-//        DopamineChanges.shared.delegate = changesDelegate
+//        DopamineController.shared.delegate = changesDelegate
 //        
 //        CodelessAPI.connectionID = "testing"
 //        

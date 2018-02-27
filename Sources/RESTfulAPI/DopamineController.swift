@@ -1,5 +1,5 @@
 //
-//  DopamineChanges.swift
+//  DopamineController.swift
 //  DopamineKit
 //
 //  Created by Akash Desai on 1/28/18.
@@ -7,12 +7,12 @@
 
 import Foundation
 
-open class DopamineChanges : NSObject {
+open class DopamineController : NSObject {
     
     @objc
-    open static let shared: DopamineChanges = {
+    open static let shared: DopamineController = {
         _ = DopeBluetooth.shared
-        return DopamineChanges()
+        return DopamineController()
     }()
     
     @objc

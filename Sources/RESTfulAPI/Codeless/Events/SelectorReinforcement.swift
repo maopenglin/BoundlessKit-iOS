@@ -17,8 +17,8 @@ open class SelectorReinforcement : NSObject {
     
     static var delegate: SelectorReinforcementDelegate?
     
-    fileprivate static var registered = [String:SelectorReinforcement]()
-    fileprivate static var unregistered = [String:SelectorReinforcement]()
+    internal fileprivate (set) static var registered = [String:SelectorReinforcement]()
+    internal fileprivate (set) static var unregistered = [String:SelectorReinforcement]()
     
     let selectorType: SelectorType
     public let targetClass: AnyClass

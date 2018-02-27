@@ -142,7 +142,7 @@ class ViewController: UIViewController {
 //            }
 //        }
         
-//        DopamineChanges.shared.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!!"]])
+//        DopamineController.shared.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!!"]])
     }
     
     @objc func loadBasicUI(){

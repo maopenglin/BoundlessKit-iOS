@@ -29,11 +29,14 @@ class TestDopamineAPI: XCTestCase {
         let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
         DopamineKit.testCredentials = testCredentials
         DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
+        
+        DopamineController.shared.wake()
     }
     
     override func tearDown() {
         SyncCoordinator.flush()          // clears the sync state, recorded actions, and cartridges
         
+        DopamineController.shared.sleep()
         super.tearDown()
     }
     

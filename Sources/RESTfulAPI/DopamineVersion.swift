@@ -26,11 +26,11 @@ public class DopamineVersion : UserDefaultsSingleton {
     internal var isIntegrating = false {
         didSet {
             if !isIntegrating {
-                DopamineChanges.shared.integrationModeMethods(false)
+                DopamineController.shared.integrationModeMethods(false)
                 update(visualizer: nil)
             } else {
-                DopamineChanges.shared.integrationModeMethods(true)
-                DopamineChanges.shared.registerVisualizerMethods()
+                DopamineController.shared.integrationModeMethods(true)
+                DopamineController.shared.registerVisualizerMethods()
             }
         }
     }
@@ -41,7 +41,7 @@ public class DopamineVersion : UserDefaultsSingleton {
             print("Updating visualizer to:\(mappings as AnyObject)")
             if let mappings = mappings {
                 self.visualizerMappings = mappings
-                DopamineChanges.shared.registerVisualizerMethods()
+                DopamineController.shared.registerVisualizerMethods()
             } else if self.visualizerMappings.isEmpty {
                 return
             } else {
