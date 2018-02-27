@@ -56,7 +56,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9FADE4608F4DEED6727921B4C88E82B2"
+               BlueprintIdentifier = "C05A7DEF3A054CC5B2756895AFC5407B"
                BuildableName = "DopamineKit.framework"
                BlueprintName = "DopamineKit"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
@@ -204,6 +204,13 @@
             ReferencedContainer = "container:DopamineKit.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "debugNoWake"
+            value = "true"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

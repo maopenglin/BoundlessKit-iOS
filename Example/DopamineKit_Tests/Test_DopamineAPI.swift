@@ -18,8 +18,10 @@ class TestDopamineAPI: XCTestCase {
     override func setUp() {
         super.setUp()
         
+        DopamineDefaults.current = MockDopamineDefaults.standard
         DopamineAPI.shared.httpClient = HTTPClient(session: mockDopamineAPISession)
         CodelessAPI.shared.httpClient = HTTPClient(session: mockCodelessAPISession)
+        
         SyncCoordinator.timeDelayAfterTrack = 1
         SyncCoordinator.timeDelayAfterReport = 1
         SyncCoordinator.timeDelayAfterRefresh = 1

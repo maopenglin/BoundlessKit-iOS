@@ -114,7 +114,7 @@ internal class DopamineAPI : NSObject{
     
     internal var httpClient = HTTPClient() {
         didSet {
-            print("Set httpclient")
+            DopeLog.print("Set new httpclient")
         }
     }
     

@@ -27,6 +27,7 @@
 		842EB69A20366F4400523265 /* DopamineProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 844FAF961D36EC860014A9D6 /* DopamineProperties.plist */; };
 		842EB69B20366F4400523265 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		842EB69C203673B000523265 /* DopamineProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 844FAF961D36EC860014A9D6 /* DopamineProperties.plist */; };
+		8431FFD12046131100D285FE /* MockDopamineDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8431FFD02046131100D285FE /* MockDopamineDefaults.swift */; };
 		844FAF971D36EC860014A9D6 /* DopamineProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 844FAF961D36EC860014A9D6 /* DopamineProperties.plist */; };
 		84727A32203CFCC80011A7F1 /* MockUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84727A31203CFCC80011A7F1 /* MockUserDefaults.swift */; };
 		84727A34203D0C2D0011A7F1 /* Test_CodelessIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84727A33203D0C2D0011A7F1 /* Test_CodelessIntegration.swift */; };
@@ -87,6 +88,7 @@
 		842EB6842036688D00523265 /* DopamineKit_UIUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DopamineKit_UIUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		842EB6862036688D00523265 /* DopamineKit_UIUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DopamineKit_UIUnitTests.swift; sourceTree = "<group>"; };
 		842EB6882036688D00523265 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8431FFD02046131100D285FE /* MockDopamineDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDopamineDefaults.swift; sourceTree = "<group>"; };
 		84419C3539503DB3427FCB07 /* Pods-DopamineKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DopamineKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DopamineKit_Tests/Pods-DopamineKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		844FAF961D36EC860014A9D6 /* DopamineProperties.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DopamineProperties.plist; sourceTree = "<group>"; };
 		84727A31203CFCC80011A7F1 /* MockUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUserDefaults.swift; sourceTree = "<group>"; };
@@ -243,6 +245,7 @@
 				84727A31203CFCC80011A7F1 /* MockUserDefaults.swift */,
 				84727A33203D0C2D0011A7F1 /* Test_CodelessIntegration.swift */,
 				84A41551202C07C300A79443 /* Test_DopamineAPI.swift */,
+				8431FFD02046131100D285FE /* MockDopamineDefaults.swift */,
 				840CA779203FF6AE008108D1 /* MockHTTPClient.swift */,
 				840C356B203BC1FA0069B28C /* Test_Rewards.swift */,
 				84A41552202C07C300A79443 /* Test_Swizzler.swift */,
@@ -622,6 +625,7 @@
 				84A41554202C07C300A79443 /* ViewController+Extensions.swift in Sources */,
 				84727A32203CFCC80011A7F1 /* MockUserDefaults.swift in Sources */,
 				840CA77A203FF6AE008108D1 /* MockHTTPClient.swift in Sources */,
+				8431FFD12046131100D285FE /* MockDopamineDefaults.swift in Sources */,
 				84727A34203D0C2D0011A7F1 /* Test_CodelessIntegration.swift in Sources */,
 				84A41557202C07C300A79443 /* Test_Swizzler.swift in Sources */,
 				84A41556202C07C300A79443 /* Test_DopamineAPI.swift in Sources */,

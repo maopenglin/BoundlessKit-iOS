@@ -19,6 +19,10 @@ internal class DopamineController : NSObject {
     }
     
     func wake() {
+        if (ProcessInfo.processInfo.environment["debugNoWake"] == "true") {
+            return
+        }
+        
         _ = DopeBluetooth.shared
         if DopamineConfiguration.current.integrationMethod == "codeless" {
             registerMethods()

@@ -7,17 +7,6 @@
 
 import Foundation
 
-
-//protocol DopamineDefaultsProtocol {
-//    var wakeOnLoad: Bool {get set}
-//    var initialBootDate: Date? {get}
-//    func set(_ value: Any?, forKey defaultName: String)
-//    func archive<T:DopamineDefaultsSingleton>(_ value: T?)
-//    func object(forKey defaultName: String) -> Any?
-//    func unarchive<T:DopamineDefaultsSingleton>() -> T?
-//    func clear()
-//}
-
 open class DopamineDefaultsSingleton : NSObject, NSCoding {
     override init() { super.init() }
     open func encode(with aCoder: NSCoder) {}
@@ -28,12 +17,16 @@ open class DopamineDefaultsSingleton : NSObject, NSCoding {
     }
 }
 
-open class DopamineDefaults : UserDefaults/*, DopamineDefaultsProtocol*/ {
+open class DopamineDefaults : UserDefaults {
     
     fileprivate static let suiteName = "com.usedopamine.dopaminekit"
     fileprivate static var wakeOnLoadDisabled = "wakeOnLoadDisabled"
     
-    internal static var current: DopamineDefaults/*DopamineDefaultsProtocol*/ = DopamineDefaults.standard
+    internal static var current: DopamineDefaults = DopamineDefaults.standard {
+        didSet {
+            DopeLog.print("Set new defaults")
+        }
+    }
     override open class var standard: DopamineDefaults {
         get {
             return DopamineDefaults(suiteName: DopamineDefaults.suiteName) ?? DopamineDefaults()
