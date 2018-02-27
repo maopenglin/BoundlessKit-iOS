@@ -19,9 +19,6 @@ import Foundation
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
     @objc public static func print(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
-        guard DopamineConfiguration.current.consoleLoggingEnabled else {
-            return
-        }
         var functionSignature:String = function
         if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
             functionSignature.replaceSubrange(parameterNames, with: "()")
