@@ -7,16 +7,19 @@
 
 import Foundation
 
-open class DopamineController : NSObject {
+internal class DopamineController : NSObject {
     
-    @objc
-    open static let shared: DopamineController = {
+    static let shared: DopamineController = DopamineController()
+    
+    fileprivate override init() {
+        super.init()
+        if DopamineDefaults.current.wakeOnLoad {
+            wake()
+        }
+    }
+    
+    func wake() {
         _ = DopeBluetooth.shared
-        return DopamineController()
-    }()
-    
-    @objc
-    open func wake() {
         if DopamineConfiguration.current.integrationMethod == "codeless" {
             registerMethods()
         }
@@ -25,13 +28,11 @@ open class DopamineController : NSObject {
         }
     }
     
-    @objc
-    open func sleep() {
+    func sleep() {
         unregisterMethods()
     }
     
-    @objc
-    open func integrationModeMethods(_ shouldEnhance: Bool) {
+    func integrationModeMethods(_ shouldEnhance: Bool) {
         // Enhance - UIApplicationDelegate
         DopamineAppDelegate.enhanceSelectors(shouldEnhance)
         

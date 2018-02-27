@@ -13,12 +13,12 @@
 
 @implementation UIApplication (DTMethodEnhancement)
 
-//+ (void) load {
-//    static dispatch_once_t onceToken;
-//    dispatch_once(&onceToken, ^{
-//        [[DopamineChanges shared] wake];
-//    });
-//}
++ (void) load {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        (void)[DopamineKit shared];
+    });
+}
 
 @end
 

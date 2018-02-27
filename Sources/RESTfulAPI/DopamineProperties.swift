@@ -7,17 +7,17 @@
 
 import Foundation
 
-internal class DopamineProperties : UserDefaultsSingleton {
+internal class DopamineProperties : DopamineDefaultsSingleton {
     
     @objc
     static var current: DopamineProperties? = {
         return DopamineProperties.convert(from: DopamineKit.testCredentials) ??
-            UserDefaults.dopamine.unarchive() ??
+            DopamineDefaults.current.unarchive() ??
             {
                 if let propertiesFile = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist"),
                     let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as? [String: Any],
                     let properties = DopamineProperties.convert(from: propertiesDictionary) {
-                    UserDefaults.dopamine.archive(properties)
+                    DopamineDefaults.current.archive(properties)
                     return properties
                 } else {
                     return nil
@@ -26,7 +26,7 @@ internal class DopamineProperties : UserDefaultsSingleton {
         }()
         {
         didSet {
-            UserDefaults.dopamine.archive(current)
+            DopamineDefaults.current.archive(current)
         }
     }
     

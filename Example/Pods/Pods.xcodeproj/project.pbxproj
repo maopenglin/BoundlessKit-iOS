@@ -12,7 +12,6 @@
 		089C73D3CCE89BA25F2D0795C33FDC91 /* ASIdentifierManager+ASIdentifierManagerHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = A8AD9D24E6A722343EB10042158CE233 /* ASIdentifierManager+ASIdentifierManagerHelper.m */; };
 		1344690DD57B338B2A2F744E2C3F755E /* SyncOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CA0AB6F7E1E7AD7BF8A75388EA89F6 /* SyncOverview.swift */; };
 		148A41AED9B2A98F87E63A8F113D4EA9 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 321FB34F91AE04A00596E6FDB3D74CBA /* HTTPClient.swift */; };
-		17CE84B0CA355E75896A6A8901DBF80B /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09DACC605D9CBC35D8C4DEE048A0B2B /* UserDefaultsExtensions.swift */; };
 		19292C2BA7E6C5103968EBD87F3AB357 /* sheen.png in Sources */ = {isa = PBXBuildFile; fileRef = 8FDEF2C785F9C409548D3E083AE82C10 /* sheen.png */; };
 		1CE3C4A476FA2A7B21E0598ED2F4D767 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 		23E9A16B1A9A34C910944412C7753056 /* Pods-DopamineKit_UIUnitTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8892505E485F35ADFDCEBB453E6D4839 /* Pods-DopamineKit_UIUnitTests-dummy.m */; };
@@ -209,7 +208,6 @@
 		DDFFD3312A2CA7717F5C53E549E5FC25 /* ResourceBundle-DopamineKit-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-DopamineKit-Info.plist"; sourceTree = "<group>"; };
 		DEF758AB5891FD19598957011CCD15BA /* UIViewExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
 		E041919693FC9A9074ADD7A8528184A1 /* NSObject+Dopamine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "NSObject+Dopamine.h"; sourceTree = "<group>"; };
-		E09DACC605D9CBC35D8C4DEE048A0B2B /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
 		E6E21ABB05795B63400A876D374CA922 /* StringExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		EDB39DCAC92BAFF5E5507159200EE73C /* SyncCoordinator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
 		F0818A3B5F13FBA57D79A9F82DA620B4 /* UITapGestureRecognizer+Dopamine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UITapGestureRecognizer+Dopamine.h"; sourceTree = "<group>"; };
@@ -295,7 +293,6 @@
 				8305B6D75C4923A1D4CED8044C9747C4 /* UIResponderExtensions.swift */,
 				DEF758AB5891FD19598957011CCD15BA /* UIViewExtensions.swift */,
 				5475F646E4B3F6452A63E571085498ED /* UIWindowExtensions.swift */,
-				E09DACC605D9CBC35D8C4DEE048A0B2B /* UserDefaultsExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -819,7 +816,6 @@
 				27415F69329FA99AC7CB3356DC8FF5AF /* UIViewController+Dopamine.m in Sources */,
 				FC2AD69F399C96AEEE6E7DD6F696E3DD /* UIViewExtensions.swift in Sources */,
 				A7E9AB1A115A017E2319DC145E3C2A14 /* UIWindowExtensions.swift in Sources */,
-				17CE84B0CA355E75896A6A8901DBF80B /* UserDefaultsExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

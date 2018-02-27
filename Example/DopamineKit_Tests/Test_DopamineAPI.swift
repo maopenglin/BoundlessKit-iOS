@@ -24,7 +24,7 @@ class TestDopamineAPI: XCTestCase {
         SyncCoordinator.timeDelayAfterReport = 1
         SyncCoordinator.timeDelayAfterRefresh = 1
         
-        DopamineDefaults.clear()
+        DopamineDefaults.current.clear()
         
         let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
         DopamineKit.testCredentials = testCredentials

@@ -12,11 +12,11 @@ import Foundation
 internal class Cartridge : NSObject, NSCoding {
     
     private static let cartridgeActionIDSetKey = "DopamineReinforceableActionIDSet"
-    private static func saveCartridgeActionIDsSet() { UserDefaults.dopamine.set(cartridgeSyncers.keys.sorted(), forKey: cartridgeActionIDSetKey) }
+    private static func saveCartridgeActionIDsSet() { DopamineDefaults.current.set(cartridgeSyncers.keys.sorted(), forKey: cartridgeActionIDSetKey) }
     
     internal static var cartridgeSyncers:[String:Cartridge] = {
         var cartridges:[String: Cartridge] = [:]
-        if let savedActionIDSetData = UserDefaults.dopamine.object(forKey: cartridgeActionIDSetKey) as? [String] {
+        if let savedActionIDSetData = DopamineDefaults.current.object(forKey: cartridgeActionIDSetKey) as? [String] {
             for actionID in savedActionIDSetData {
                 cartridges[actionID] = Cartridge(actionID: actionID)
             }

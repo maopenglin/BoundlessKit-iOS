@@ -8,13 +8,13 @@
 
 import Foundation
 
-internal class SyncCoordinator : UserDefaultsSingleton {
+internal class SyncCoordinator : DopamineDefaultsSingleton {
     
     internal fileprivate (set) static var current: SyncCoordinator = {
-        return UserDefaults.dopamine.unarchive() ?? SyncCoordinator()
+        return DopamineDefaults.current.unarchive() ?? SyncCoordinator()
         }() {
         didSet {
-            UserDefaults.dopamine.archive(current)
+            DopamineDefaults.current.archive(current)
         }
     }
     
@@ -68,7 +68,7 @@ internal class SyncCoordinator : UserDefaultsSingleton {
         current.trackedActions.add(action)
         let index = current.trackedActions.index(where: {trackedAction in return trackedAction === action}) ?? -1
         DopeLog.debug("track#\(index) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
-        UserDefaults.dopamine.archive(current)
+        DopamineDefaults.current.archive(current)
         current.performSync()
     }
     
@@ -82,7 +82,7 @@ internal class SyncCoordinator : UserDefaultsSingleton {
         current.reportedActions.add(action)
         let count = current.reportedActions.index(where: {trackedAction in return trackedAction === action}) ?? -1
         DopeLog.debug("report#\(count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
-        UserDefaults.dopamine.archive(current)
+        DopamineDefaults.current.archive(current)
         current.performSync()
     }
     
@@ -173,7 +173,7 @@ internal class SyncCoordinator : UserDefaultsSingleton {
                         if let status = response["status"] as? Int {
                             if status == 200 {
                                 self.trackedActions.removeFirst(actions.count)
-                                UserDefaults.dopamine.archive(self)
+                                DopamineDefaults.current.archive(self)
                                 DopeLog.debug("Cleared tracked actions.")
                             } else {
                                 DopeLog.debug("Track failed during sync. Halting sync.")
@@ -192,7 +192,7 @@ internal class SyncCoordinator : UserDefaultsSingleton {
                         if let status = response["status"] as? Int {
                             if status == 200 || status == 400 {
                                 self.reportedActions.removeFirst(actions.count)
-                                UserDefaults.dopamine.archive(self)
+                                DopamineDefaults.current.archive(self)
                                 DopeLog.debug("Cleared reported actions.")
                             } else {
                                 DopeLog.debug("Report failed during sync. Halting sync.")
@@ -207,7 +207,7 @@ internal class SyncCoordinator : UserDefaultsSingleton {
                 
                 if timerExpired {
                     self.resetWaitTimer()
-                    UserDefaults.dopamine.archive(self)
+                    DopamineDefaults.current.archive(self)
                 }
                 
                 

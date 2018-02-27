@@ -13,16 +13,11 @@ import DopamineKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    
-    let wakeDopamine: Void = {
-        print("Waking up dopamine...")
-        DopamineController.shared.wake()
-        return
-    }()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         DopeLog.print("Did launch")
+        
         return true
     }
 

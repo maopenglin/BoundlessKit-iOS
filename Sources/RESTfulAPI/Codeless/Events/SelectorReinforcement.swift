@@ -42,7 +42,7 @@ open class SelectorReinforcement : NSObject {
     }
     
     
-    
+    // MARK: - Convenience initializers
     public convenience init?(actionID: String) {
         let components:[String] = actionID.components(separatedBy: "-")
         if components.count == 3,
@@ -64,7 +64,7 @@ open class SelectorReinforcement : NSObject {
     }
     
     
-    
+    // MARK: - Methods
     func registerMethod() -> Bool {
         DopeLog.debug("Attempting to register <\(self.actionID)>...")
         guard DopamineConfiguration.current.integrationMethod == "codeless" else {

@@ -8,15 +8,15 @@
 import Foundation
 
 @objc
-public class DopamineConfiguration : UserDefaultsSingleton  {
+public class DopamineConfiguration : DopamineDefaultsSingleton  {
     
     @objc
     public static var current: DopamineConfiguration = {
-        return UserDefaults.dopamine.unarchive() ?? DopamineConfiguration.standard
+        return DopamineDefaults.current.unarchive() ?? DopamineConfiguration.standard
         }()
         {
         didSet {
-            UserDefaults.dopamine.archive(current)
+            DopamineDefaults.current.archive(current)
         }
     }
     

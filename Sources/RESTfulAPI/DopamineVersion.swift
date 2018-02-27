@@ -8,15 +8,15 @@
 import Foundation
 
 @objc
-public class DopamineVersion : UserDefaultsSingleton {
+public class DopamineVersion : DopamineDefaultsSingleton {
     
     @objc
     public static var current: DopamineVersion = {
-        return UserDefaults.dopamine.unarchive() ?? DopamineVersion.standard
+        return DopamineDefaults.current.unarchive() ?? DopamineVersion.standard
         }()
         {
         didSet {
-            UserDefaults.dopamine.archive(current)
+            DopamineDefaults.current.archive(current)
         }
     }
     
@@ -47,7 +47,7 @@ public class DopamineVersion : UserDefaultsSingleton {
             } else {
                 self.visualizerMappings = [:]
             }
-            UserDefaults.dopamine.archive(self)
+            DopamineDefaults.current.archive(self)
 //            DopeLog.debug("New visualizer mappings:\(self.visualizerMappings as AnyObject)")
         }
     }

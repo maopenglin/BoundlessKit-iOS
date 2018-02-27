@@ -58,7 +58,7 @@ internal class CodelessAPI : NSObject {
         payload["inProduction"] = dopaProps.inProduction
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
         payload["currentConfig"] = DopamineConfiguration.current.configID ?? "nil"
-        payload["initialBoot"] = (DopamineDefaults.initialBootDate == nil)
+        payload["initialBoot"] = (DopamineDefaults.current.initialBootDate == nil)
         shared.send(call: .boot, with: payload){ response in
             if let status = response["status"] as? Int {
                 if status == 205 {
