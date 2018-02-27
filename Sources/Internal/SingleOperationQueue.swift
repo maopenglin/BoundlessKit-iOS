@@ -11,10 +11,12 @@ internal class SingleOperationQueue : OperationQueue {
     
     var delayBefore: UInt32 = 0
     var delayAfter: UInt32 = 0
+    var dropCollisions = false
     
-    init(delayBefore: UInt32 = 0, delayAfter: UInt32 = 1, qualityOfService: QualityOfService? = nil) {
+    init(delayBefore: UInt32 = 0, delayAfter: UInt32 = 0, dropCollisions: Bool = false, qualityOfService: QualityOfService? = nil) {
         self.delayBefore = delayBefore
         self.delayAfter = delayAfter
+        self.dropCollisions = dropCollisions
         super.init()
         if let qos = qualityOfService {
             self.qualityOfService = qos
@@ -24,10 +26,10 @@ internal class SingleOperationQueue : OperationQueue {
     }
     
     override func addOperation(_ block: @escaping () -> Void) {
-        guard operationCount == 0 else { return }
+        if dropCollisions && operationCount != 0 { return }
         
         super.addOperation {
-            guard self.operationCount == 1 else { return }
+            if self.dropCollisions && self.operationCount != 1 { return }
             
             if self.delayBefore != 0 {
                 sleep(self.delayBefore)

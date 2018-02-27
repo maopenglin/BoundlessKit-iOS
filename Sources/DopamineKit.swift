@@ -39,7 +39,6 @@ open class DopamineKit : NSObject {
     @objc public static let shared: DopamineKit = DopamineKit()
     public var delegate: DopamineKitDelegate?
     
-    static let syncCoordinator = SyncCoordinator.shared
     fileprivate let queue = OperationQueue()
     
     private override init() {
@@ -61,7 +60,7 @@ open class DopamineKit : NSObject {
         // store the action to be synced
         shared.queue.addOperation {
             let action = DopeAction(actionID: actionID, metaData:metaData)
-            syncCoordinator.store(track: action)
+            SyncCoordinator.store(track: action)
 //            DopeLog.debug("tracked:\(actionID) with metadata:\(String(describing: metaData))")
         }
     }
@@ -90,7 +89,7 @@ open class DopamineKit : NSObject {
             
             // store the action to be synced
             action.reinforcementDecision = reinforcementDecision
-            syncCoordinator.store(report: action)
+            SyncCoordinator.store(report: action)
         }
     }
 }

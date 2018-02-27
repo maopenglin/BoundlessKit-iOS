@@ -42,10 +42,7 @@ internal class Cartridge : NSObject, NSCoding {
         let cartridge = Cartridge(actionID: actionID)
         cartridgeSyncers[actionID] = cartridge
         saveCartridgeActionIDsSet()
-        if cartridge.isTriggered() {
-            Telemetry.startRecordingSync(cause: "Syncing newly created cartridge")
-            cartridge.sync()
-        }
+        SyncCoordinator.current.performSync()
         return cartridge
     }
     
@@ -207,13 +204,12 @@ internal class Cartridge : NSObject, NSCoding {
                 if let responseStatusCode = response["status"] as? Int {
                     if responseStatusCode == 200,
                         let cartridgeDecisions = response["reinforcementCartridge"] as? [String],
-                        let expiresIn = response["expiresIn"] as? Int
-                    {
+                        let expiresIn = response["expiresIn"] as? Int {
                         self.reinforcementDecisions = cartridgeDecisions
                         self.updateTriggers(initialSize: cartridgeDecisions.count, timerExpiresIn: Int64(expiresIn) )
-//                        DopeLog.confirmed("\(self.actionID) refreshed!")
+                        DopeLog.confirmed("\(self.actionID) refreshed!")
                     } else if responseStatusCode == 400 {
-//                        DopeLog.debug("Cartridge contained outdated actionID. Flushing.")
+                        DopeLog.debug("Cartridge contained outdated actionID. Flushing.")
                         Cartridge.flush(self)
                     }
                     completion(responseStatusCode)

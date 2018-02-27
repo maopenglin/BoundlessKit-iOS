@@ -9,8 +9,17 @@ import Foundation
 
 
 @objc
+public extension UserDefaults {
+    @objc
+    static var dopamine: UserDefaults = {
+        return UserDefaults(suiteName: DopamineDefaults.suiteName) ?? UserDefaults.standard
+    }()
+}
+
+@objc
 open class DopamineDefaults : UserDefaults {
     
+    fileprivate static let suiteName = "com.usedopamine.dopaminekit"
     fileprivate static var disableEnhancementKey = "disableEnhancement"
     
     @objc
@@ -23,7 +32,6 @@ open class DopamineDefaults : UserDefaults {
         }
     }
     
-    
     static var initialBootDate: Date? {
         get {
             let defaultsKey = "initialBootDate"
@@ -32,4 +40,10 @@ open class DopamineDefaults : UserDefaults {
             return date
         }
     }
+    
+    public static func clear() {
+        UserDefaults.standard.removePersistentDomain(forName: DopamineDefaults.suiteName)
+        UserDefaults.standard.synchronize()
+    }
+    
 }

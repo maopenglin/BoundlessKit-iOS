@@ -23,7 +23,7 @@ internal class CodelessAPI : NSObject {
         }
     }
     
-    static var logCalls = true
+    static var logCalls = false
     
     internal static let shared = CodelessAPI()
     

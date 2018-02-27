@@ -5,23 +5,30 @@ import XCTest
 
 class TestDopamineAPI: XCTestCase {
     
+    
+    ////////////////////////////////////////
+    //*-*
+    //*-*  Set Up, Tear Down, & Test variables
+    //*-*
+    ////////////////////////////////////////
+    
     let mockDopamineAPISession = MockURLSession()
     let mockCodelessAPISession = MockURLSession()
     
     override func setUp() {
         super.setUp()
         
-        // Set the plist so DopamineKit can read the appID, versionID, production and development secrets, and the inProduction flag
-        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineProperties", ofType: "plist")!) as! [String:Any]
-        DopamineKit.testCredentials = testCredentials
-        DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
-        
-//        mockDopamineAPISession.mockResponse = ["Status": 204]
-//        mockCodelessAPISession.mockResponse = ["Status": 204]
-        
         DopamineAPI.shared.httpClient = HTTPClient(session: mockDopamineAPISession)
         CodelessAPI.shared.httpClient = HTTPClient(session: mockCodelessAPISession)
-//        DopamineChanges.shared.wake()
+        SyncCoordinator.timeDelayAfterTrack = 1
+        SyncCoordinator.timeDelayAfterReport = 1
+        SyncCoordinator.timeDelayAfterRefresh = 1
+        
+        DopamineDefaults.clear()
+        
+        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
+        DopamineKit.testCredentials = testCredentials
+        DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
     }
     
     override func tearDown() {
@@ -32,85 +39,101 @@ class TestDopamineAPI: XCTestCase {
     
     ////////////////////////////////////////
     //*-*
-    //*-*  Test variables
-    //*-*
-    ////////////////////////////////////////
-    
-    let sleepTimeForTrack: UInt32 = 10
-    let sleepTimeForReinforce: UInt32 = 10
-    let standardExpectationTimeout: TimeInterval = 20
-    
-    lazy var metaData: [String:AnyObject] = ["string":"str" as AnyObject, "boolsArray":[true, false] as AnyObject, "numbersArray" : ["int":Int(1), "double":Double(2.2), "float":Float(3.3)] as AnyObject ]
-    
-    
-    ////////////////////////////////////////
-    //*-*
     //*-*  DopamineKit.track() Tests
     //*-*
     ////////////////////////////////////////
     
+    lazy var metaData: [String:AnyObject] = ["string":"str" as AnyObject, "boolsArray":[true, false] as AnyObject, "numbersArray" : ["int":Int(1), "double":Double(2.2), "float":Float(3.3)] as AnyObject ]
+    
     /// Test DopamineKit.track() with only actionID
     ///
     func testTrack() {
-        let asyncExpectation = expectation(description: "Tracking request simple")
         
-        sleep(5)
-        DopamineKit.track("track_test_simple")
-        sleep(sleepTimeForTrack)
-        asyncExpectation.fulfill()
-        
-        waitForExpectations(timeout: standardExpectationTimeout, handler: {error in
-            XCTAssertNil(error, "DopamineKitTest error: track request timed out")
-        })
-    }
-    
-    /// Test DopamineKit.track() with actionID and metaData
-    ///
-    func testTrackWithMetaData() {
-        let asyncExpectation = expectation(description: "Tracking request with metadata")
-        
-        DopamineKit.track("track_test_with_metadata", metaData: metaData)
-        sleep(sleepTimeForTrack)
-        asyncExpectation.fulfill()
-        
-        waitForExpectations(timeout: standardExpectationTimeout, handler: {error in
-            XCTAssertNil(error, "DopamineKitTest error: track request timed out")
-        })
-    }
-    
-    /// Test multiple (4) DopamineKit.track() called back to back
-    ///
-    func testTrackMultiple() {
-        
-        // given
         SyncCoordinator.flush()
-        mockDopamineAPISession.mockResponse = ["status": 500]
+        DopamineKit.track("track_test_simple")
         
-//        sleep(4)
-        // when
-        let numRequests = 25
-//        for i in 1...numRequests {
-//            DopamineKit.track("test_track_multiple_\(i)/\(numRequests)")
-//        }
-        DispatchQueue.concurrentPerform(iterations: numRequests) { count in
-            DopamineKit.track("testingTrackConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
+        let promise = expectation(description: "Correct number of tracks")
+        let queue = TestOperationQueue()
+        queue.when(successCondition: {return SyncCoordinator.current.trackedActions.count == 1}) {
+            promise.fulfill()
         }
-
+        
+        waitForExpectations(timeout: 3, handler: nil)
+    }
+    
+    func testTrackSyncSuccess() {
+        mockDopamineAPISession.mockResponse = ["status": 200]
+        
+        SyncCoordinator.flush()
+        let numRequests = DopamineConfiguration.current.trackBatchSize - 1
+        DispatchQueue.concurrentPerform(iterations: numRequests) { count in
+            DopamineKit.track(
+                "testingTrackConcurrency",
+                metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000),
+                           "index": count,
+                           "concurrentTrackSize": numRequests]
+            )
+        }
+        
+        let promise = expectation(description: "Tracks Accounted")
+        let promise2 = expectation(description: "Tracks Synchronized")
+        let queue = TestOperationQueue()
+        queue.when( successCondition: {
+            sleep(1)
+            return SyncCoordinator.current.trackedActions.count == numRequests
+        }, doBlock: {
+            promise.fulfill()
+            DopeLog.debug("Promise \(promise.expectationDescription) fulfilled")
+            DopamineKit.track("trackShouldInvokeSuccessfulSync")
+            queue.when( successCondition: {
+                sleep(1)
+                return SyncCoordinator.current.trackedActions.count == 0
+            }, doBlock: {
+                promise2.fulfill()
+            })
+        })
+        
         
         // then
-        sleep(6)
-        print("Track count:\(SyncCoordinator.shared.trackedActions.count) expected:\(numRequests)")
-        XCTAssert(SyncCoordinator.shared.trackedActions.count == numRequests)
+        waitForExpectations(timeout: 4, handler: nil)
     }
     
-    /// Test performance for track() averaged over 10 calls
-    ///
-    func testTrackPerformanceExample() {
-        self.measure {
-            DopamineKit.track("test_track_performance")
+    func testTrackSyncFail() {
+        mockDopamineAPISession.mockResponse = ["status": 500]
+        
+        SyncCoordinator.flush()
+        let numRequests = DopamineConfiguration.current.trackBatchSize - 1
+        DispatchQueue.concurrentPerform(iterations: numRequests) { index in
+            DopamineKit.track(
+                "testingTrackConcurrency",
+                metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000),
+                           "count": index + 1,
+                           "concurrentTrackSize": numRequests]
+            )
         }
+        
+        let promise = expectation(description: "Tracks Accounted")
+        let promise2 = expectation(description: "Tracks Synchronize Failed")
+        let queue = TestOperationQueue()
+        queue.when( successCondition: {
+            sleep(1)
+            return SyncCoordinator.current.trackedActions.count == numRequests
+        }, doBlock:  {
+            promise.fulfill()
+            DopamineKit.track("trackShouldInvokeFailedSync")
+            queue.when( successCondition: {
+                sleep(1)
+                return SyncCoordinator.current.trackedActions.count == numRequests + 1
+            }, doBlock: {
+                promise2.fulfill()
+            })
+        })
+        
+        
+        // then
+        waitForExpectations(timeout: 3, handler: nil)
     }
-
+    
     
     ////////////////////////////////////////
     //*-*
@@ -118,66 +141,91 @@ class TestDopamineAPI: XCTestCase {
     //*-*
     ////////////////////////////////////////
     let actionID = "action1"
-    
+    let nonNeutralReinforcementDecision = "Confetti"
+    var actionCartridgeResponse: [String : Any] {
+        return [
+            "status": 200,
+            "expiresIn": 86400000,
+            "reinforcementCartridge": [
+                nonNeutralReinforcementDecision,
+                Cartridge.defaultReinforcementDecision,
+                nonNeutralReinforcementDecision,
+                Cartridge.defaultReinforcementDecision,
+                nonNeutralReinforcementDecision,
+                Cartridge.defaultReinforcementDecision,
+                nonNeutralReinforcementDecision,
+                Cartridge.defaultReinforcementDecision,
+                nonNeutralReinforcementDecision,
+                Cartridge.defaultReinforcementDecision
+            ]
+        ]
+    }
+    let unknownActionID = "someUnpublishedAction"
+    var unknownActionCartridgeResponse: [String : Any] {
+        return [
+            "status": 400
+        ]
+    }
     
     /// Test DopamineKit.reinforce() with only actionID and completion handler
     ///
-    func testReinforce() {
+    func testReinforceFirstCall() {
+        SyncCoordinator.flush()
         let asyncExpectation = expectation(description: "Reinforcement decision simple")
         
         DopamineKit.reinforce(actionID, completion: { response in
             DopeLog.print("DopamineKitTest actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
-            sleep(self.sleepTimeForReinforce)
             asyncExpectation.fulfill()
         })
         
-        waitForExpectations(timeout: standardExpectationTimeout, handler: {error in
+        waitForExpectations(timeout: 1, handler: {error in
             XCTAssertNil(error, "DopamineKitTest error: reinforce request timed out")
         })
     }
     
-    /// Test DopamineKit.reinforce() with actionID, metaData, and completion handler
-    ///
-    func testReinforceWithMetaData() {
-        let asyncExpectation = expectation(description: "Reinforcement decision with metadata")
+    func testReinforceCartridgeSyncSuccess() {
+        mockDopamineAPISession.mockResponse = actionCartridgeResponse
+        SyncCoordinator.flush()
         
-        DopamineKit.reinforce(actionID, metaData: metaData, completion: { response in
-            DopeLog.print("DopamineKitTest actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
-            sleep(self.sleepTimeForReinforce)
-            asyncExpectation.fulfill()
+        
+        let queue = TestOperationQueue()
+        var reinforcementDecision = Cartridge.defaultReinforcementDecision
+        let asyncExpectation = expectation(description: "Got non-neutral reinforcement decision")
+        
+        queue.repeatWhile( repeatCondition: {
+            return reinforcementDecision == Cartridge.defaultReinforcementDecision
+        }, doBlock: {
+            DopamineKit.reinforce(self.actionID, metaData: self.metaData) { reinforcement in
+                reinforcementDecision = reinforcement
+                DopeLog.debug("Got reinforcement:\(reinforcement)")
+            }
+            sleep(1)
+        }, finishedBlock: {
+            if reinforcementDecision == self.nonNeutralReinforcementDecision { asyncExpectation.fulfill() }
         })
         
-        waitForExpectations(timeout: standardExpectationTimeout, handler: {error in
-            XCTAssertNil(error, "DopamineKitTest error: reinforce request timed out")
+        waitForExpectations(timeout: 5, handler: {error in
+            XCTAssertNil(error, "DopamineKitTest error: cartridge refresh failed")
         })
     }
     
-    /// Test multiple (4) DopamineKit.reinforce() called back to back
-    ///
-    func testReinforceMultiple() {
-        let asyncExpectation = expectation(description: "Multiple reinforce requests")
+    func testReinforceCartridgeSyncFail() {
+        SyncCoordinator.flush()
+        mockDopamineAPISession.mockResponse = unknownActionCartridgeResponse
         
-        let numRequests = 4
-        for i in 1...numRequests {
-            DopamineKit.reinforce(actionID, completion: { response in
-                DopeLog.print("Reinforce() call \(i)/\(numRequests) with  actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
-                if i==numRequests {
-                    sleep(self.sleepTimeForReinforce)
-                    asyncExpectation.fulfill()
+        let failedSyncErasedReport = expectation(description: "Failed sync clears report")
+        let queue = TestOperationQueue()
+        
+        DopamineKit.reinforce(unknownActionID) { reinforcement in
+            if SyncCoordinator.current.reportedActions.count == 1 {
+                queue.when( successCondition: {return SyncCoordinator.current.reportedActions.count == 0}) {
+                    failedSyncErasedReport.fulfill()
                 }
-            })
+            }
         }
         
-        waitForExpectations(timeout: standardExpectationTimeout, handler: {error in
+        waitForExpectations(timeout: 5, handler: {error in
             XCTAssertNil(error, "DopamineKitTest error: testReinforceMultiple timed out")
         })
-    }
-    
-    /// Test performance for reinforce() averaged over 10 calls
-    ///
-    func testReinforcePerformanceExample() {
-        self.measure {
-            DopamineKit.reinforce(self.actionID, completion: { _ in })
-        }
     }
 }

@@ -41,7 +41,7 @@ class MockURLSessionDataTask : URLSessionDataTaskProtocol {
     }
     
     func start() {
-        DopeLog.debug("Did start url session data task to:<\(String(describing: urlRequest.url))> with mock response:<\(String(describing: String(data: mockResponseData, encoding: .utf8)))> ")
+//        DopeLog.debug("Did start url session data task to:<\(String(describing: urlRequest.url))> with \nrequest data:\(try! JSONSerialization.jsonObject(with: urlRequest.httpBody!)) \nmock response:<\(try! JSONSerialization.jsonObject(with: mockResponseData))> ")
         
         taskFinishHandler(mockResponseData, URLResponse(), nil)
     }

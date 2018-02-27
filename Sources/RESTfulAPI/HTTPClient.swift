@@ -9,6 +9,8 @@ import Foundation
 
 internal class HTTPClient {
     
+    internal static var logAPIResponses = true
+    
     internal enum CallType{
         case track, report, refresh, telemetry,
                 identify, accept, submit, boot
@@ -64,14 +66,14 @@ internal class HTTPClient {
                 return nil
             }
             
-            DopeLog.confirmed("\(type.path) called successfully")
-            
             if response.isEmpty {
+                DopeLog.confirmed("\(type.path) called and got empty response")
                 return nil
             } else if let jsonResponse = try? JSONSerialization.jsonObject(with: response) as? [String: AnyObject] {
+                DopeLog.confirmed("\(type.path) call got json response")
                 return jsonResponse
             } else {
-                let message = "\(type.path) call got invalid response data"
+                let message = "\(type.path) call got invalid response"
                 let dataString: String = (responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? "") as String
                 DopeLog.error("\(message)\n\t<\(dataString)>")
                 Telemetry.storeException(className: NSStringFromClass(HTTPClient.self), message: message, dataDescription: "Sent:<\(String(describing: jsonObject)))>Received:<\(dataString)>")
@@ -80,8 +82,11 @@ internal class HTTPClient {
         }
         
         return session.send(request: request) { responseData, responseURL, error in
-            DopeLog.debug("\(request.url?.absoluteString ?? "url:nil") got \(responseData != nil ? "response:\(String(data: responseData!, encoding: .utf8)!)" : "no response")")
-            completion( convertResponseToJSON( responseData, responseURL, error ) )
+            let response = convertResponseToJSON( responseData, responseURL, error )
+            if HTTPClient.logAPIResponses {
+                DopeLog.debug("<\(request.url?.absoluteString ?? "url:nil")> with\nrequest data:<\(jsonObject)>\ngot response:<\(response?.description ?? "nil")>")
+            }
+            completion(response)
         }
     }
 }

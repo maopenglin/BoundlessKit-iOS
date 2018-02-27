@@ -17,14 +17,6 @@ open class UserDefaultsSingleton : NSObject, NSCoding {
     }
 }
 
-@objc
-public extension UserDefaults {
-    @objc
-    static var dopamine: UserDefaults = {
-        return UserDefaults(suiteName: "com.usedopamine.dopaminekit") ?? UserDefaults.standard
-    }()
-}
-
 internal extension UserDefaults {
     
     func archive<T:UserDefaultsSingleton>(_ value: T?) {

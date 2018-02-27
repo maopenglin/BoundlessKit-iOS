@@ -10,9 +10,13 @@ import Foundation
 
 internal class SyncCoordinator : UserDefaultsSingleton {
     
-    internal fileprivate (set) static var shared: SyncCoordinator = {
+    internal fileprivate (set) static var current: SyncCoordinator = {
         return UserDefaults.dopamine.unarchive() ?? SyncCoordinator()
-    }()
+        }() {
+        didSet {
+            UserDefaults.dopamine.archive(current)
+        }
+    }
     
     internal let trackedActions: DopeActionCollection
     internal let reportedActions: DopeActionCollection
@@ -59,12 +63,13 @@ internal class SyncCoordinator : UserDefaultsSingleton {
     /// - parameters:
     ///     - trackedAction: A tracked action.
     ///
-    internal func store(track action: DopeAction) {
+    internal static func store(track action: DopeAction) {
         guard DopamineVersion.current.isIntegrating == false else { return }
-        let count = trackedActions.add(action)
-        DopeLog.debug("track#\(count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
-        UserDefaults.dopamine.archive(self)
-        performSync()
+        current.trackedActions.add(action)
+        let index = current.trackedActions.index(where: {trackedAction in return trackedAction === action}) ?? -1
+        DopeLog.debug("track#\(index) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
+        UserDefaults.dopamine.archive(current)
+        current.performSync()
     }
     
     /// Stores a reinforced action to be synced
@@ -72,12 +77,13 @@ internal class SyncCoordinator : UserDefaultsSingleton {
     /// - parameters:
     ///     - reportedAction: A reinforced action.
     ///
-    internal func store(report action: DopeAction) {
+    internal static func store(report action: DopeAction) {
         guard DopamineVersion.current.isIntegrating == false else { return }
-        let count = reportedActions.add(action)
+        current.reportedActions.add(action)
+        let count = current.reportedActions.index(where: {trackedAction in return trackedAction === action}) ?? -1
         DopeLog.debug("report#\(count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
-        UserDefaults.dopamine.archive(self)
-        performSync()
+        UserDefaults.dopamine.archive(current)
+        current.performSync()
     }
     
     /// Finds the right cartridge for an action and returns a reinforcement decision
@@ -88,7 +94,7 @@ internal class SyncCoordinator : UserDefaultsSingleton {
     /// - returns:
     ///     A reinforcement decision
     ///
-    internal func retrieve(cartridgeFor actionID: String) -> Cartridge {
+    internal static func retrieve(cartridgeFor actionID: String) -> Cartridge {
         if let cartridge = Cartridge.cartridgeSyncers[actionID] {
             return cartridge
         } else {
@@ -122,11 +128,15 @@ internal class SyncCoordinator : UserDefaultsSingleton {
         }
     }
     
+    static var timeDelayAfterTrack: UInt32 = 1
+    static var timeDelayAfterReport: UInt32 = 5
+    static var timeDelayAfterRefresh: UInt32 = 3
+    
     /// Checks which syncers have been triggered, and syncs them in an order
     /// that allows time for the DopamineAPI to generate cartridges
     ///
-    fileprivate var syncOperationQueue = SingleOperationQueue(delayBefore: 3)
-    public func performSync() {
+    fileprivate var syncOperationQueue = SingleOperationQueue(delayBefore: 3, delayAfter: 1, dropCollisions: true)
+    internal func performSync() {
         syncOperationQueue.addOperation {
             // since a cartridge might be triggered during the sleep time,
             // lazily check which are triggered
@@ -148,9 +158,9 @@ internal class SyncCoordinator : UserDefaultsSingleton {
                 } else if (timerExpired) {
                     syncCause = "Sync wait timer has expired."
                 } else if (reportShouldSync) {
-                    syncCause = "Report needs to sync."
+                    syncCause = "Report reached batch size."
                 } else {
-                    syncCause = "Track needs to sync."
+                    syncCause = "Track reached batch size."
                 }
                 DopeLog.debug("Syncing because \(syncCause)")
                 
@@ -164,6 +174,7 @@ internal class SyncCoordinator : UserDefaultsSingleton {
                             if status == 200 {
                                 self.trackedActions.removeFirst(actions.count)
                                 UserDefaults.dopamine.archive(self)
+                                DopeLog.debug("Cleared tracked actions.")
                             } else {
                                 DopeLog.debug("Track failed during sync. Halting sync.")
                                 goodProgress = false
@@ -171,7 +182,7 @@ internal class SyncCoordinator : UserDefaultsSingleton {
                             }
                         }
                     })
-                    sleep(1)
+                    sleep(SyncCoordinator.timeDelayAfterTrack)
                     if !goodProgress { return }
                 }
                 
@@ -182,6 +193,7 @@ internal class SyncCoordinator : UserDefaultsSingleton {
                             if status == 200 || status == 400 {
                                 self.reportedActions.removeFirst(actions.count)
                                 UserDefaults.dopamine.archive(self)
+                                DopeLog.debug("Cleared reported actions.")
                             } else {
                                 DopeLog.debug("Report failed during sync. Halting sync.")
                                 goodProgress = false
@@ -189,7 +201,7 @@ internal class SyncCoordinator : UserDefaultsSingleton {
                             }
                         }
                     })
-                    sleep(5)
+                    sleep(SyncCoordinator.timeDelayAfterReport)
                     if !goodProgress { return }
                 }
                 
@@ -201,7 +213,9 @@ internal class SyncCoordinator : UserDefaultsSingleton {
                 
                 // since a cartridge might be triggered during the sleep time,
                 // lazily check which are triggered
+                var isSyncingACartridge = false
                 for (actionID, cartridge) in Cartridge.cartridgeSyncers where goodProgress && cartridge.isTriggered() {
+                    isSyncingACartridge = true
                     cartridge.sync() { status in
                         guard status == 200 || status == 0 || status == 400 else {
                             DopeLog.debug("Refresh for \(actionID) failed during sync. Halting sync.")
@@ -211,8 +225,10 @@ internal class SyncCoordinator : UserDefaultsSingleton {
                         }
                     }
                 }
+                if isSyncingACartridge {
+                    sleep(SyncCoordinator.timeDelayAfterRefresh)
+                }
                 
-                sleep(3)
                 if !goodProgress { return }
                 
                 Telemetry.stopRecordingSync(successfulSync: true)
@@ -225,8 +241,7 @@ internal class SyncCoordinator : UserDefaultsSingleton {
     public static func flush() {
         Cartridge.flush()
         
-        shared = SyncCoordinator()
-        UserDefaults.dopamine.archive(shared)
+        current = SyncCoordinator()
     }
 }
 

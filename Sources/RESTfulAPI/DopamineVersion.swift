@@ -35,7 +35,7 @@ public class DopamineVersion : UserDefaultsSingleton {
         }
     }
     
-    fileprivate let updateQueue = SingleOperationQueue()
+    fileprivate let updateQueue = SingleOperationQueue(delayAfter: 1, dropCollisions: true)
     public func update(visualizer mappings: [String: Any]?) {
         updateQueue.addOperation {
             print("Updating visualizer to:\(mappings as AnyObject)")
@@ -102,7 +102,7 @@ public class DopamineVersion : UserDefaultsSingleton {
         {
             reinforcementDecision = randomReinforcement
         } else {
-            reinforcementDecision = SyncCoordinator.shared.retrieve(cartridgeFor: actionID).remove()
+            reinforcementDecision = SyncCoordinator.retrieve(cartridgeFor: actionID).remove()
         }
         return reinforcementDecision
     }

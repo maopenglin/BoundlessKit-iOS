@@ -20,10 +20,12 @@ internal class DopeActionCollection : SynchronizedArray<DopeAction> {
     ///
     /// - returns: the count for the collection after appending
     ///
-    func add(_ action: DopeAction) -> Int {
+    func add(_ action: DopeAction) {
         self.append(action)
         
-        let num = self.count
+//        let num = self.index { storedAction in
+//            return action === storedAction
+//        }!
         
         if let ssid = DopeInfo.mySSID {
             action.addMetaData(["ssid": ssid])
@@ -42,8 +44,6 @@ internal class DopeActionCollection : SynchronizedArray<DopeAction> {
             }
 //            DopeLog.debug("action#\(num) actionID:\(String(describing: action?.actionID)) with location:\(location as AnyObject))")
         }
-
-        return num
     }
     
     /// This function returns a snapshot of this instance as a JSON compatible Object

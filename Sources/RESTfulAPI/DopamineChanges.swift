@@ -26,6 +26,11 @@ open class DopamineChanges : NSObject {
     }
     
     @objc
+    open func sleep() {
+        unregisterMethods()
+    }
+    
+    @objc
     open func integrationModeMethods(_ shouldEnhance: Bool) {
         // Enhance - UIApplicationDelegate
         DopamineAppDelegate.enhanceSelectors(shouldEnhance)
