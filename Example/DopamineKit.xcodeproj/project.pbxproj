@@ -35,6 +35,7 @@
 		84A41554202C07C300A79443 /* ViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A4154F202C07C300A79443 /* ViewController+Extensions.swift */; };
 		84A41556202C07C300A79443 /* Test_DopamineAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A41551202C07C300A79443 /* Test_DopamineAPI.swift */; };
 		84A41557202C07C300A79443 /* Test_Swizzler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A41552202C07C300A79443 /* Test_Swizzler.swift */; };
+		84C4C3322047625A0046279E /* MockCartridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C4C3312047625A0046279E /* MockCartridge.swift */; };
 		84CCAFE3203619F70095E273 /* RewardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCAFE2203619F70095E273 /* RewardsViewController.swift */; };
 		84CCAFE520361A9E0095E273 /* Reward.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCAFE420361A9E0095E273 /* Reward.swift */; };
 		84DD1F212044B9BC007C668F /* OperationQueue+Testing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DD1F202044B9BC007C668F /* OperationQueue+Testing.swift */; };
@@ -99,6 +100,7 @@
 		84A4154F202C07C300A79443 /* ViewController+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+Extensions.swift"; sourceTree = "<group>"; };
 		84A41551202C07C300A79443 /* Test_DopamineAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Test_DopamineAPI.swift; sourceTree = "<group>"; };
 		84A41552202C07C300A79443 /* Test_Swizzler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Test_Swizzler.swift; sourceTree = "<group>"; };
+		84C4C3312047625A0046279E /* MockCartridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCartridge.swift; sourceTree = "<group>"; };
 		84CCAFE2203619F70095E273 /* RewardsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RewardsViewController.swift; sourceTree = "<group>"; };
 		84CCAFE420361A9E0095E273 /* Reward.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reward.swift; sourceTree = "<group>"; };
 		84DD1F202044B9BC007C668F /* OperationQueue+Testing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OperationQueue+Testing.swift"; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 			children = (
 				8431FFD02046131100D285FE /* MockDopamineDefaults.swift */,
 				840CA779203FF6AE008108D1 /* MockHTTPClient.swift */,
+				84C4C3312047625A0046279E /* MockCartridge.swift */,
 			);
 			path = MockClasses;
 			sourceTree = "<group>";
@@ -629,6 +632,7 @@
 			files = (
 				84A41554202C07C300A79443 /* ViewController+Extensions.swift in Sources */,
 				840CA77A203FF6AE008108D1 /* MockHTTPClient.swift in Sources */,
+				84C4C3322047625A0046279E /* MockCartridge.swift in Sources */,
 				8431FFD12046131100D285FE /* MockDopamineDefaults.swift in Sources */,
 				84727A34203D0C2D0011A7F1 /* Test_CodelessIntegration.swift in Sources */,
 				84A41557202C07C300A79443 /* Test_Swizzler.swift in Sources */,

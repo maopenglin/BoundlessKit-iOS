@@ -128,47 +128,16 @@ class TestDopamineAPI: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
     }
     
-    
-    ////////////////////////////////////////
-    //*-*
-    //*-*  DopamineKit.reinforce() Tests
-    //*-*
-    ////////////////////////////////////////
-    let actionID = "action1"
-    let nonNeutralReinforcementDecision = "Confetti"
-    var actionCartridgeResponse: [String : Any] {
-        return [
-            "status": 200,
-            "expiresIn": 86400000,
-            "reinforcementCartridge": [
-                nonNeutralReinforcementDecision,
-                Cartridge.defaultReinforcementDecision,
-                nonNeutralReinforcementDecision,
-                Cartridge.defaultReinforcementDecision,
-                nonNeutralReinforcementDecision,
-                Cartridge.defaultReinforcementDecision,
-                nonNeutralReinforcementDecision,
-                Cartridge.defaultReinforcementDecision,
-                nonNeutralReinforcementDecision,
-                Cartridge.defaultReinforcementDecision
-            ]
-        ]
-    }
-    let unknownActionID = "someUnpublishedAction"
-    var unknownActionCartridgeResponse: [String : Any] {
-        return [
-            "status": 400
-        ]
-    }
-    
     /// Test DopamineKit.reinforce() with only actionID and completion handler
     ///
     func testReinforceFirstCall() {
-        let asyncExpectation = expectation(description: "Reinforcement decision simple")
+        let asyncExpectation = expectation(description: "First reinforcement for new action is the default decision")
         
-        DopamineKit.reinforce(actionID, completion: { response in
-            DopeLog.print("DopamineKitTest actionID:'\(self.actionID)' resulted in reinforcement:'\(response)'")
-            asyncExpectation.fulfill()
+        DopamineKit.reinforce(Cartridge.mockGoodActionID, completion: { response in
+            DopeLog.print("DopamineKitTest actionID:'\(Cartridge.mockGoodActionID)' resulted in reinforcement:'\(response)'")
+            if response == Cartridge.defaultReinforcementDecision {
+                asyncExpectation.fulfill()
+            }
         })
         
         waitForExpectations(timeout: 1, handler: {error in
@@ -177,7 +146,7 @@ class TestDopamineAPI: XCTestCase {
     }
     
     func testReinforceCartridgeSyncSuccess() {
-        mockURLSession.setMockResponse(for: .refresh, actionCartridgeResponse)
+        mockURLSession.setMockResponse(for: .refresh, Cartridge.mockGoodCartridgeResponse)
         
         let queue = TestOperationQueue()
         var reinforcementDecision = Cartridge.defaultReinforcementDecision
@@ -186,13 +155,13 @@ class TestDopamineAPI: XCTestCase {
         queue.repeatWhile( repeatCondition: {
             return reinforcementDecision == Cartridge.defaultReinforcementDecision
         }, doBlock: {
-            DopamineKit.reinforce(self.actionID, metaData: self.metaData) { reinforcement in
+            DopamineKit.reinforce(Cartridge.mockGoodActionID, metaData: self.metaData) { reinforcement in
                 reinforcementDecision = reinforcement
                 DopeLog.debug("Got reinforcement:\(reinforcement)")
             }
             sleep(1)
         }, finishedBlock: {
-            if reinforcementDecision == self.nonNeutralReinforcementDecision { asyncExpectation.fulfill() }
+            if reinforcementDecision == Cartridge.mockGoodReinforcementID { asyncExpectation.fulfill() }
         })
         
         waitForExpectations(timeout: 7, handler: {error in
@@ -201,12 +170,12 @@ class TestDopamineAPI: XCTestCase {
     }
     
     func testReinforceCartridgeSyncFail() {
-        mockURLSession.setMockResponse(for: .refresh, unknownActionCartridgeResponse)
+        mockURLSession.setMockResponse(for: .refresh, Cartridge.mockBadCartridgeResponse)
         
         let failedSyncErasedReport = expectation(description: "Failed sync clears report")
         let queue = TestOperationQueue()
         
-        DopamineKit.reinforce(unknownActionID) { reinforcement in
+        DopamineKit.reinforce(Cartridge.mockBadActionID) { reinforcement in
             XCTAssert(SyncCoordinator.current.reportedActions.count == 1)
             queue.when( successCondition: {return SyncCoordinator.current.reportedActions.count == 0}) {
                 failedSyncErasedReport.fulfill()
