@@ -20,7 +20,8 @@ open class DopamineDefaultsSingleton : NSObject, NSCoding {
 open class DopamineDefaults : UserDefaults {
     
     fileprivate static let suiteName = "com.usedopamine.dopaminekit"
-    fileprivate static var wakeOnLoadDisabled = "wakeOnLoadDisabled"
+    fileprivate static var codelessIntegrationSavedStateKey = "codelessIntegrationSavedState"
+    fileprivate static var initialBootDateKey = "initialBootDate"
     
     internal static var current: DopamineDefaults = DopamineDefaults.standard {
         didSet {
@@ -32,22 +33,20 @@ open class DopamineDefaults : UserDefaults {
             return DopamineDefaults(suiteName: DopamineDefaults.suiteName) ?? DopamineDefaults()
         }
     }
-
-    @objc
-    open var wakeOnLoad: Bool {
+    
+    open var codelessIntegrationSavedState: String? {
         get {
-            return !bool(forKey: DopamineDefaults.wakeOnLoadDisabled)
+            return string(forKey: DopamineDefaults.codelessIntegrationSavedStateKey)
         }
         set {
-            set(!newValue, forKey: DopamineDefaults.wakeOnLoadDisabled)
+            set(newValue, forKey: DopamineDefaults.codelessIntegrationSavedStateKey)
         }
     }
 
     open var initialBootDate: Date? {
         get {
-            let defaultsKey = "initialBootDate"
-            let date = object(forKey: defaultsKey) as? Date
-            defer { if date == nil { set(Date(), forKey: defaultsKey) } }
+            let date = object(forKey: DopamineDefaults.initialBootDateKey) as? Date
+            defer { if date == nil { set(Date(), forKey: DopamineDefaults.initialBootDateKey) } }
             return date
         }
     }

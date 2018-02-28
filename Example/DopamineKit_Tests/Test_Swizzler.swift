@@ -25,7 +25,7 @@ class TestSwizzler: XCTestCase {
     override func setUp() {
         super.setUp()
         DopamineVersion.current.update(visualizer: nil)
-        CodelessIntegrationController.shared.state = .integrating
+        CodelessIntegrationController.shared.connectionInfo = ("admin", "0123")
         
         controllerUnderTest = ViewController.instance()
         

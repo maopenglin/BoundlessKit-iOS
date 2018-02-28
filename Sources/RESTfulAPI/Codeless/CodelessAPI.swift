@@ -15,10 +15,10 @@ internal class CodelessAPI : NSObject {
         
         var clientType: HTTPClient.CallType {
             switch self {
+            case .boot: return .boot
             case .identify: return .identify
             case .accept: return .accept
             case .submit: return .submit
-            case .boot: return .boot
             }
         }
     }
@@ -27,27 +27,6 @@ internal class CodelessAPI : NSObject {
     
     internal static let shared = CodelessAPI()
     
-    private static var stashSubmits = true {
-        didSet {
-            if !stashSubmits {
-                submitQueue.cancelAllOperations()
-            }
-        }
-    }
-    private static var connectionID: String? {
-        didSet {
-            if connectionID != oldValue {
-                DopeLog.debug("🔍 \(connectionID != nil ? "C" : "Disc")onnected to visualizer")
-            }
-            
-            if connectionID != nil { CodelessIntegrationController.shared.state = .integrating }
-            
-            if submitQueue.isSuspended {
-                submitQueue.isSuspended = false
-            }
-        }
-    }
-    
     private override init() {
         super.init()
     }
@@ -55,10 +34,6 @@ internal class CodelessAPI : NSObject {
     internal static func boot(completion: @escaping () -> () = {}) {
         guard let dopaProps = DopamineProperties.current else { return }
         guard ProcessInfo.processInfo.environment["debugNoBoot"] != "true" else { return }
-        
-        if DopamineConfiguration.current.integrationMethod == "codeless" {
-            CodelessIntegrationController.shared.state = .integrated
-        }
         
         var payload = dopaProps.apiCredentials
         payload["inProduction"] = dopaProps.inProduction
@@ -80,18 +55,12 @@ internal class CodelessAPI : NSObject {
             }
             
             completion()
-            if DopamineConfiguration.current.integrationMethod == "codeless" {
-                promptPairing()
-            }
         }
     }
     
     internal static func promptPairing() {
-        guard !DopamineProperties.productionMode && DopamineConfiguration.current.integrationMethod == "codeless",
-            var payload = DopamineProperties.current?.apiCredentials
-            else {
-                stashSubmits = false
-                return
+        guard var payload = DopamineProperties.current?.apiCredentials else {
+            return
         }
         
         payload["deviceName"] = UIDevice.current.name
@@ -117,7 +86,7 @@ internal class CodelessAPI : NSObject {
                             payload["connectionUUID"] = connectionID
                             shared.send(call: .accept, with: payload) {response in
                                 if response["status"] as? Int == 200 {
-                                    CodelessAPI.connectionID = connectionID
+                                    CodelessIntegrationController.shared.connectionInfo = (adminName, connectionID)
                                 }
                             }
                         }))
@@ -130,14 +99,15 @@ internal class CodelessAPI : NSObject {
                     }
                     
                 case 208:
-                    CodelessAPI.connectionID = response["connectionUUID"] as? String
+                    if let connectionID = response["connectionUUID"] as? String {
+                        CodelessIntegrationController.shared.connectionInfo = ("reconnected", connectionID)
+                    }
                     
                 case 204:
-                    CodelessAPI.connectionID = nil
-                    stashSubmits = false
+                    CodelessIntegrationController.shared.connectionInfo = nil
                     
                 case 500:
-                    stashSubmits = false
+                    CodelessIntegrationController.shared.connectionInfo = nil
                     break
                     
                 default:
@@ -147,61 +117,17 @@ internal class CodelessAPI : NSObject {
         }
     }
     
-    internal static let visualizerDashboardQueue = DispatchQueue(label: "DopamineKit.VisualizerDashboardQueue", qos: .background)
-    internal static func submitSelectorReinforcement(selectorReinforcement: SelectorReinforcement, senderInstance: AnyObject?) {
-        visualizerDashboardQueue.async {
-            submit { payload in
-                payload["sender"] = selectorReinforcement.selectorType.rawValue
-                payload["target"] = NSStringFromClass(selectorReinforcement.targetClass)
-                payload["selector"] = NSStringFromSelector(selectorReinforcement.selector)
-                payload["actionID"] = selectorReinforcement.actionID
-                if let view = senderInstance as? UIView,
-                    let imageString = view.snapshotImage()?.base64EncodedPNGString() {
-                    payload["senderImage"] = imageString
-                } else if let barItem = senderInstance as? UIBarItem,
-                    let image = barItem.image,
-                    let imageString = image.base64EncodedPNGString() {
-                    payload["senderImage"] = imageString
-                } else if let senderInstance = senderInstance as? NSObject,
-                    senderInstance.responds(to: NSSelectorFromString("view")),
-                    let senderView = senderInstance.value(forKey: "view") as? UIView,
-                    let imageString = senderView.snapshotImage()?.base64EncodedPNGString() {
-                    payload["senderImage"] = imageString
-                } else {
-                    payload["senderImage"] = ""
-                }
-            }
-        }
-    }
-    
-    fileprivate static var submitQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 1
-        queue.isSuspended = true
-        return queue
-    }()
-    fileprivate static func submit(payloadModifier: (inout [String: Any]) -> Void) {
-        if stashSubmits {
-            guard var payload = DopamineProperties.current?.apiCredentials else { return }
-            payloadModifier(&payload)
-            
-            submitQueue.addOperation {
-                if let connectionID = self.connectionID {
-                    payload["connectionUUID"] = connectionID
-                    
-                    submitQueue.isSuspended = true
-                    shared.send(call: .submit, with: payload){ response in
-                        defer { submitQueue.isSuspended = false }
-                        
-                        if response["status"] as? Int != 200 {
-                            CodelessAPI.connectionID = nil
-                        } else if let visualizerMappings = response["mappings"] as? [String:Any] {
-                            DopamineVersion.current.update(visualizer: visualizerMappings)
-                        } else {
-                            DopeLog.debug("No visualizer mappings found")
-                        }
-                    }
-                }
+    internal static func submit(payloadModifier: (inout [String: Any]) -> Void) {
+        guard var payload = DopamineProperties.current?.apiCredentials else { return }
+        payloadModifier(&payload)
+        
+        shared.send(call: .submit, with: payload){ response in
+            if response["status"] as? Int != 200 {
+                CodelessIntegrationController.shared.connectionInfo = nil
+            } else if let visualizerMappings = response["mappings"] as? [String:Any] {
+                DopamineVersion.current.update(visualizer: visualizerMappings)
+            } else {
+                DopeLog.debug("No visualizer mappings found")
             }
         }
     }

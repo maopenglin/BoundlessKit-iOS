@@ -17,10 +17,10 @@ class MockDopamineDefaults : DopamineDefaults {
         }
     }
     
-    override var wakeOnLoad: Bool {
+    override var codelessIntegrationSavedState: String? {
         get {
-            return false
+            return "manual"
         }
-        set { }
+        set {}
     }
 }

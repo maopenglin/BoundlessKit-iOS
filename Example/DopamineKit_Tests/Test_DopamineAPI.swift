@@ -31,8 +31,6 @@ class TestDopamineAPI: XCTestCase {
         let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
         DopamineKit.testCredentials = testCredentials
         DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
-        
-        CodelessIntegrationController.shared.state = .integrated
     }
     
     override func tearDown() {

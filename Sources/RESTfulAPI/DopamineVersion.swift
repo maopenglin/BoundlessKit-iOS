@@ -23,9 +23,6 @@ public class DopamineVersion : DopamineDefaultsSingleton {
     @objc public var versionID: String?
     @objc fileprivate var mappings: [String:Any]
     @objc internal fileprivate (set) var visualizerMappings: [String:Any]
-    internal var isIntegrating: Bool {
-        return CodelessIntegrationController.shared.state == .integrating
-    }
     
     fileprivate let updateQueue = SingleOperationQueue(delayAfter: 1, dropCollisions: true)
     public func update(visualizer mappings: [String: Any]?) {
@@ -33,7 +30,6 @@ public class DopamineVersion : DopamineDefaultsSingleton {
             print("Updating visualizer to:\(mappings as AnyObject)")
             if let mappings = mappings {
                 self.visualizerMappings = mappings
-                CodelessIntegrationController.shared.state = .integrating
             } else if self.visualizerMappings.isEmpty {
                 return
             } else {
@@ -88,7 +84,7 @@ public class DopamineVersion : DopamineDefaultsSingleton {
     
     internal func reinforcementDecision(for actionID: String) -> String {
         let reinforcementDecision: String
-        if isIntegrating,
+        if CodelessIntegrationController.shared.state == .integrating,
             let actionMapping = actionMapping(for: actionID),
             let randomReinforcement = CodelessReinforcement.reinforcementsIDs(in: actionMapping)?.selectRandom()
         {
@@ -110,19 +106,19 @@ public extension DopamineVersion {
     }
     
     public var actionIDs: [String] {
-        if isIntegrating {
-            return Array(mappings.keys) + Array(visualizerMappings.keys)
-        } else {
-            return Array(mappings.keys)
-        }
+        return Array(mappings.keys)
+    }
+    
+    public var visualizerActionIDs: [String] {
+        return Array(mappings.keys) + Array(visualizerMappings.keys)
     }
     
     public func actionMapping(for actionID: String) -> [String: Any]? {
-        if isIntegrating {
-            return visualizerMappings[actionID] as? [String: Any] ?? mappings[actionID] as? [String: Any]
-        } else {
-            return mappings[actionID] as? [String: Any]
-        }
+        return mappings[actionID] as? [String: Any]
+    }
+    
+    public func visualizerActionMapping(for actionID: String) -> [String: Any]? {
+        return visualizerMappings[actionID] as? [String: Any] ?? mappings[actionID] as? [String: Any]
     }
     
 }

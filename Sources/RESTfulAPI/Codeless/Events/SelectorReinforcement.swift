@@ -53,6 +53,30 @@ public class SelectorReinforcement : NSObject {
         }
     }
     
+    var reinforcedCounterparts: (AnyClass, Selector)? {
+        switch selectorType {
+        case .appLaunch:
+            return (DopamineAppDelegate.self, #selector(DopamineAppDelegate.reinforced_application(_:didFinishLaunchingWithOptions:)))
+        case .appActive:
+            return (DopamineAppDelegate.self, #selector(DopamineAppDelegate.reinforced_applicationDidBecomeActive(_:)))
+        case .viewControllerDidAppear:
+            return (DopamineViewController.self, #selector(DopamineViewController.reinforced_viewDidAppear(_:)))
+        case .custom:
+            print("Getting custom method for \(NSStringFromClass(targetClass)) \(NSStringFromSelector(selector))")
+            if let createdSelector = self.reinforcer ?? SelectorReinforcement.registered[actionID]?.reinforcer ?? SelectorReinforcement.unregistered[actionID]?.reinforcer {
+                return (targetClass, createdSelector)
+            } else if let newSelector = DopamineObject.createReinforcedMethod(for: targetClass, selector, selector.withRandomString()) {
+                return (targetClass, newSelector)
+            } else {
+                DopeLog.error("Could not create runtime method for (<\(NSStringFromClass(targetClass))>) copying method (<\(selector)>)")
+                return nil
+            }
+        default:
+            DopeLog.error("Unsupported currently")
+            return nil
+        }
+    }
+    
     public static var delegate: SelectorReinforcementDelegate?
     
     fileprivate static var registered = [String:SelectorReinforcement]()
@@ -104,9 +128,10 @@ public class SelectorReinforcement : NSObject {
     public convenience init?(target: NSObject, selector: Selector) {
         self.init(targetClass: type(of: target), selector: selector)
     }
-    
-    
-    // MARK: - Methods
+}
+
+// MARK: - Methods
+extension SelectorReinforcement {
     func registerMethod() {
         DopeLog.debug("Attempting to register <\(self.actionID)>...")
         
@@ -149,7 +174,7 @@ public class SelectorReinforcement : NSObject {
         }
     }
     
-    static func registerMethods(actionIDs: [String] = DopamineVersion.current.actionIDs, unregisterOthers: Bool = true) {
+    static func registerMethods(actionIDs: [String], unregisterOthers: Bool) {
         DopeLog.print("Registering \(actionIDs)...")
         if unregisterOthers {
             let obseleteMethods = Set(registered.keys)
@@ -167,30 +192,6 @@ public class SelectorReinforcement : NSObject {
             selectorReinforcement.unregisterMethod()
         }
     }
-    
-    var reinforcedCounterparts: (AnyClass, Selector)? {
-        switch selectorType {
-        case .appLaunch:
-            return (DopamineAppDelegate.self, #selector(DopamineAppDelegate.reinforced_application(_:didFinishLaunchingWithOptions:)))
-        case .appActive:
-            return (DopamineAppDelegate.self, #selector(DopamineAppDelegate.reinforced_applicationDidBecomeActive(_:)))
-        case .viewControllerDidAppear:
-            return (DopamineViewController.self, #selector(DopamineViewController.reinforced_viewDidAppear(_:)))
-        case .custom:
-            print("Getting custom method for \(NSStringFromClass(targetClass)) \(NSStringFromSelector(selector))")
-            if let createdSelector = self.reinforcer ?? SelectorReinforcement.registered[actionID]?.reinforcer ?? SelectorReinforcement.unregistered[actionID]?.reinforcer {
-                return (targetClass, createdSelector)
-            } else if let newSelector = DopamineObject.createReinforcedMethod(for: targetClass, selector, selector.withRandomString()) {
-                return (targetClass, newSelector)
-            } else {
-                DopeLog.error("Could not create runtime method for (<\(NSStringFromClass(targetClass))>) copying method (<\(selector)>)")
-                return nil
-            }
-        default:
-            DopeLog.error("Unsupported currently")
-            return nil
-        }
-    }
 }
 
 extension SelectorReinforcement {
@@ -206,7 +207,34 @@ extension SelectorReinforcement {
             let selectorReinforcement = SelectorReinforcement(target: targetInstance, selector: action) else {
                 return
         }
-        CodelessAPI.submitSelectorReinforcement(selectorReinforcement: selectorReinforcement, senderInstance: senderInstance)
+        CodelessIntegrationController.shared.submitSelectorReinforcement(selectorReinforcement: selectorReinforcement, senderInstance: senderInstance)
+    }
+    
+    // note: don't call this from the main thread if the object is also on the main thread
+    func toJSONType(senderInstance: AnyObject?) -> [String : Any] {
+        var jsonObject: [String:Any] = [:]
+        
+        jsonObject["sender"] = selectorType.rawValue
+        jsonObject["target"] = NSStringFromClass(targetClass)
+        jsonObject["selector"] = NSStringFromSelector(selector)
+        jsonObject["actionID"] = actionID
+        if let view = senderInstance as? UIView,
+            let imageString = view.snapshotImage()?.base64EncodedPNGString() {
+            jsonObject["senderImage"] = imageString
+        } else if let barItem = senderInstance as? UIBarItem,
+            let image = barItem.image,
+            let imageString = image.base64EncodedPNGString() {
+            jsonObject["senderImage"] = imageString
+        } else if let senderInstance = senderInstance as? NSObject,
+            senderInstance.responds(to: NSSelectorFromString("view")),
+            let senderView = senderInstance.value(forKey: "view") as? UIView,
+            let imageString = senderView.snapshotImage()?.base64EncodedPNGString() {
+            jsonObject["senderImage"] = imageString
+        } else {
+            jsonObject["senderImage"] = ""
+        }
+        
+        return jsonObject
     }
     
     @objc

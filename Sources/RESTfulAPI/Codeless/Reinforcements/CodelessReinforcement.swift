@@ -45,7 +45,7 @@ public class CodelessReinforcement : NSObject {
         }
         
         var reinforcement: [String: Any]?
-        if let actionMapping = DopamineVersion.current.actionMapping(for: actionID),
+        if let actionMapping = CodelessIntegrationController.shared.state == .integrating ? DopamineVersion.current.visualizerActionMapping(for: actionID) : DopamineVersion.current.actionMapping(for: actionID),
             let codeless = actionMapping["codeless"] as? [String: Any],
             let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
             for aReinforcement in reinforcements {
