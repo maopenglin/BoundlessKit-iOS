@@ -25,7 +25,7 @@ class TestSwizzler: XCTestCase {
     override func setUp() {
         super.setUp()
         DopamineVersion.current.update(visualizer: nil)
-        CIController.shared.state = .integrating
+        CodelessIntegrationController.shared.state = .integrating
         
         controllerUnderTest = ViewController.instance()
         
@@ -131,7 +131,7 @@ class TestSwizzler: XCTestCase {
 //        }
 //        
 //        let changesDelegate = ChangesDelegate()
-//        CIController.shared.delegate = changesDelegate
+//        CodelessIntegrationController.shared.delegate = changesDelegate
 //        let selector = #selector(ViewController.viewDidAppear(_:))
 //        let selectorReinforcement = SelectorReinforcement(targetClass: ViewController.self, selector: selector)
 //        let reinforcementsDict: [String : Any] = ["reward" : ["reward2":"somereward"]]

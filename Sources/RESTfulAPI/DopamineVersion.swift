@@ -24,7 +24,7 @@ public class DopamineVersion : DopamineDefaultsSingleton {
     @objc fileprivate var mappings: [String:Any]
     @objc internal fileprivate (set) var visualizerMappings: [String:Any]
     internal var isIntegrating: Bool {
-        return CIController.shared.state == .integrating
+        return CodelessIntegrationController.shared.state == .integrating
     }
     
     fileprivate let updateQueue = SingleOperationQueue(delayAfter: 1, dropCollisions: true)
@@ -33,7 +33,7 @@ public class DopamineVersion : DopamineDefaultsSingleton {
             print("Updating visualizer to:\(mappings as AnyObject)")
             if let mappings = mappings {
                 self.visualizerMappings = mappings
-                CIController.shared.state = .integrating
+                CodelessIntegrationController.shared.state = .integrating
             } else if self.visualizerMappings.isEmpty {
                 return
             } else {

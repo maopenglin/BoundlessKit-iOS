@@ -1,5 +1,5 @@
 //
-//  CIController.swift
+//  CodelessIntegrationController.swift
 //  DopamineKit
 //
 //  Created by Akash Desai on 1/28/18.
@@ -7,13 +7,13 @@
 
 import Foundation
 
-internal class CIController : NSObject {
+internal class CodelessIntegrationController : NSObject {
     
     enum State {
         case manual, integrating, integrated
     }
     
-    static let shared: CIController = CIController()
+    static let shared: CodelessIntegrationController = CodelessIntegrationController()
     
     var state: State = .manual {
         didSet {

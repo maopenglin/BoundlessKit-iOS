@@ -32,7 +32,7 @@ class TestDopamineAPI: XCTestCase {
         DopamineKit.testCredentials = testCredentials
         DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
         
-        CIController.shared.state = .integrated
+        CodelessIntegrationController.shared.state = .integrated
     }
     
     override func tearDown() {
