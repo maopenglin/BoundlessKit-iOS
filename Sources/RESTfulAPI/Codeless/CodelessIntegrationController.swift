@@ -60,11 +60,11 @@ internal class CodelessIntegrationController : NSObject {
                 }
                 
             case .integrating:
-                SelectorReinforcement.registerMethods(actionIDs: DopamineVersion.current.visualizerActionIDs, unregisterOthers: true)
+                SelectorReinforcement.registerMethods(actionIDs: DopamineVersion.current.visualizerActionIDs)
                 codelessIntegratingMethods(true)
                 
             case .integrated:
-                SelectorReinforcement.registerMethods(actionIDs: DopamineVersion.current.actionIDs, unregisterOthers: true)
+                SelectorReinforcement.registerMethods(actionIDs: DopamineVersion.current.actionIDs)
                 codelessIntegratingMethods(false)
             }
             DopamineDefaults.current.codelessIntegrationSavedState = state.rawValue

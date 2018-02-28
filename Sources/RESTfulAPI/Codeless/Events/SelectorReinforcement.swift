@@ -46,7 +46,7 @@ public class SelectorReinforcement : NSObject {
                 if DopamineObject.templateAvailable(for: classType, selector) {
                     self = .custom
                 } else {
-//                    DopeLog.error("No template support for class <\(classType)> method <\(selector)>")
+                    DopeLog.debug("No template support for class <\(classType)> method <\(selector)>")
                     return nil
                 }
             }
@@ -174,13 +174,11 @@ extension SelectorReinforcement {
         }
     }
     
-    static func registerMethods(actionIDs: [String], unregisterOthers: Bool) {
+    static func registerMethods(actionIDs: [String]) {
         DopeLog.print("Registering \(actionIDs)...")
-        if unregisterOthers {
-            let obseleteMethods = Set(registered.keys)
-            for actionID in obseleteMethods {
-                SelectorReinforcement(actionID: actionID)?.unregisterMethod()
-            }
+        let obseleteActions = Set(registered.keys).subtracting(actionIDs)
+        for actionID in obseleteActions {
+            SelectorReinforcement(actionID: actionID)?.unregisterMethod()
         }
         for actionID in DopamineVersion.current.actionIDs {
             SelectorReinforcement(actionID: actionID)?.registerMethod()
