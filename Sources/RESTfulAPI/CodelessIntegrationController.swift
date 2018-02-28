@@ -20,6 +20,8 @@ internal class CodelessIntegrationController : NSObject {
             _shared.state = savedState
         } else if DopamineConfiguration.current.integrationMethod == "codeless" {
             _shared.state = .integrated
+        } else {
+            _shared.state = .manual
         }
         CodelessAPI.boot() {
             if !DopamineProperties.productionMode && _shared.state != .manual {
@@ -52,8 +54,10 @@ internal class CodelessIntegrationController : NSObject {
             DopeLog.print("State changed from \(oldValue) to \(state)")
             switch state {
             case .manual:
-                SelectorReinforcement.unregisterMethods()
-                codelessIntegratingMethods(false)
+                if oldValue != .manual {
+                    SelectorReinforcement.unregisterMethods()
+                    codelessIntegratingMethods(false)
+                }
                 
             case .integrating:
                 SelectorReinforcement.registerMethods(actionIDs: DopamineVersion.current.visualizerActionIDs, unregisterOthers: true)
