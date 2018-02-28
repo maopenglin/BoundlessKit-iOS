@@ -11,18 +11,29 @@ import Foundation
 
 class MockURLSession : URLSessionProtocol {
     
-    var lastURL: URL?
-    var mockResponse: [String: Any] = [:]
-    
+    //MARK: Protocol Method
     func send(request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol {
-        DopeLog.debug("Trying to send to url:\(String(describing: request.url))")
-        
-        lastURL = request.url
+        DopeLog.debug("Mock http request to url:\(String(describing: request.url!))")
         
         return MockURLSessionDataTask(
             request: request,
-            responseData: try! JSONSerialization.data(withJSONObject: mockResponse),
+            responseData: try! JSONSerialization.data(withJSONObject: mockResponse[request.url!] ?? ["status": 200]),
             completion: completionHandler
+        )
+    }
+    
+    //MARK: Mock Responses
+    fileprivate var mockResponse: [URL: [String: Any]] = [:]
+    
+    func setMockResponse(for callType: HTTPClient.CallType, _ response: [String: Any]) {
+        mockResponse[callType.url()] = response
+    }
+    
+    func setCodelessPairingReconnected() {
+        setMockResponse(for: .identify, [
+            "status": 208,
+            "connectionUUID": "unittest"
+            ]
         )
     }
     
@@ -42,8 +53,9 @@ class MockURLSessionDataTask : URLSessionDataTaskProtocol {
     
     func start() {
 //        DopeLog.debug("Did start url session data task to:<\(String(describing: urlRequest.url))> with \nrequest data:\(try! JSONSerialization.jsonObject(with: urlRequest.httpBody!)) \nmock response:<\(try! JSONSerialization.jsonObject(with: mockResponseData))> ")
-        
-        taskFinishHandler(mockResponseData, URLResponse(), nil)
+        DispatchQueue.global().async {
+            self.taskFinishHandler(self.mockResponseData, URLResponse(), nil)
+        }
     }
 }
 

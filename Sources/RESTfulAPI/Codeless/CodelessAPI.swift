@@ -33,7 +33,6 @@ internal class CodelessAPI : NSObject {
     
     internal static func boot(completion: @escaping () -> () = {}) {
         guard let dopaProps = DopamineProperties.current else { return }
-        guard ProcessInfo.processInfo.environment["debugNoBoot"] != "true" else { return }
         
         var payload = dopaProps.apiCredentials
         payload["inProduction"] = dopaProps.inProduction

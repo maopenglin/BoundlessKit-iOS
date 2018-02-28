@@ -242,16 +242,24 @@
 			children = (
 				84727A33203D0C2D0011A7F1 /* Test_CodelessIntegration.swift */,
 				84A41551202C07C300A79443 /* Test_DopamineAPI.swift */,
-				8431FFD02046131100D285FE /* MockDopamineDefaults.swift */,
-				840CA779203FF6AE008108D1 /* MockHTTPClient.swift */,
 				840C356B203BC1FA0069B28C /* Test_Rewards.swift */,
 				84A41552202C07C300A79443 /* Test_Swizzler.swift */,
+				84C4C33020475E920046279E /* MockClasses */,
 				84DD1F222044CAE5007C668F /* DopamineDemoProperties.plist */,
 				84DD1F202044B9BC007C668F /* OperationQueue+Testing.swift */,
 				84A4154F202C07C300A79443 /* ViewController+Extensions.swift */,
 				84A41548202C079000A79443 /* Info.plist */,
 			);
 			path = DopamineKit_Tests;
+			sourceTree = "<group>";
+		};
+		84C4C33020475E920046279E /* MockClasses */ = {
+			isa = PBXGroup;
+			children = (
+				8431FFD02046131100D285FE /* MockDopamineDefaults.swift */,
+				840CA779203FF6AE008108D1 /* MockHTTPClient.swift */,
+			);
+			path = MockClasses;
 			sourceTree = "<group>";
 		};
 		84CCAFE1203619F70095E273 /* StarterRewards */ = {

@@ -16,7 +16,9 @@
 + (void) load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        (void)[DopamineKit shared];
+        if ([[[NSProcessInfo processInfo] environment] objectForKey:@"skipStartOnLoad"] == nil) {
+            (void)[DopamineKit shared];
+        }
     });
 }
 

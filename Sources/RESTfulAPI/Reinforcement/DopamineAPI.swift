@@ -112,11 +112,7 @@ internal class DopamineAPI : NSObject{
         shared.send(call: .telemetry, with: payload, completion: completion)
     }
     
-    internal var httpClient = HTTPClient() {
-        didSet {
-            DopeLog.print("Set new httpclient")
-        }
-    }
+    internal var httpClient = HTTPClient()
     
     /// This function sends a request to the DopamineAPI
     ///

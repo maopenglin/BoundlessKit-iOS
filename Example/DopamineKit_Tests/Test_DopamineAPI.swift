@@ -12,25 +12,24 @@ class TestDopamineAPI: XCTestCase {
     //*-*
     ////////////////////////////////////////
     
-    let mockDopamineAPISession = MockURLSession()
-    let mockCodelessAPISession = MockURLSession()
+    let mockURLSession = MockURLSession()
     
     override func setUp() {
         super.setUp()
         
-//        DopamineDefaults.current = MockDopamineDefaults.standard
-        DopamineAPI.shared.httpClient = HTTPClient(session: mockDopamineAPISession)
-        CodelessAPI.shared.httpClient = HTTPClient(session: mockCodelessAPISession)
+        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
+        DopamineKit.testCredentials = testCredentials
+        DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
+        
+        DopamineAPI.shared.httpClient = HTTPClient(session: mockURLSession)
+        CodelessAPI.shared.httpClient = HTTPClient(session: mockURLSession)
         
         SyncCoordinator.timeDelayAfterTrack = 1
         SyncCoordinator.timeDelayAfterReport = 1
         SyncCoordinator.timeDelayAfterRefresh = 1
+        SyncCoordinator.flush()
         
-        DopamineDefaults.current.clear()
-        
-        let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
-        DopamineKit.testCredentials = testCredentials
-        DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
+        _ = DopamineKit.shared
     }
     
     override func tearDown() {
@@ -49,8 +48,6 @@ class TestDopamineAPI: XCTestCase {
     /// Test DopamineKit.track() with only actionID
     ///
     func testTrack() {
-        
-        SyncCoordinator.flush()
         DopamineKit.track("track_test_simple")
         
         let promise = expectation(description: "Correct number of tracks")
@@ -63,9 +60,6 @@ class TestDopamineAPI: XCTestCase {
     }
     
     func testTrackSyncSuccess() {
-        mockDopamineAPISession.mockResponse = ["status": 200]
-        
-        SyncCoordinator.flush()
         let numRequests = DopamineConfiguration.current.trackBatchSize - 1
         DispatchQueue.concurrentPerform(iterations: numRequests) { count in
             DopamineKit.track(
@@ -96,13 +90,12 @@ class TestDopamineAPI: XCTestCase {
         
         
         // then
-        waitForExpectations(timeout: 4, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
     }
     
     func testTrackSyncFail() {
-        mockDopamineAPISession.mockResponse = ["status": 500]
+        mockURLSession.setMockResponse(for: .track, ["status": 500])
         
-        SyncCoordinator.flush()
         let numRequests = DopamineConfiguration.current.trackBatchSize - 1
         DispatchQueue.concurrentPerform(iterations: numRequests) { index in
             DopamineKit.track(
@@ -132,7 +125,7 @@ class TestDopamineAPI: XCTestCase {
         
         
         // then
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
     }
     
     
@@ -171,7 +164,6 @@ class TestDopamineAPI: XCTestCase {
     /// Test DopamineKit.reinforce() with only actionID and completion handler
     ///
     func testReinforceFirstCall() {
-        SyncCoordinator.flush()
         let asyncExpectation = expectation(description: "Reinforcement decision simple")
         
         DopamineKit.reinforce(actionID, completion: { response in
@@ -185,9 +177,7 @@ class TestDopamineAPI: XCTestCase {
     }
     
     func testReinforceCartridgeSyncSuccess() {
-        mockDopamineAPISession.mockResponse = actionCartridgeResponse
-        SyncCoordinator.flush()
-        
+        mockURLSession.setMockResponse(for: .refresh, actionCartridgeResponse)
         
         let queue = TestOperationQueue()
         var reinforcementDecision = Cartridge.defaultReinforcementDecision
@@ -211,8 +201,7 @@ class TestDopamineAPI: XCTestCase {
     }
     
     func testReinforceCartridgeSyncFail() {
-        SyncCoordinator.flush()
-        mockDopamineAPISession.mockResponse = unknownActionCartridgeResponse
+        mockURLSession.setMockResponse(for: .refresh, unknownActionCartridgeResponse)
         
         let failedSyncErasedReport = expectation(description: "Failed sync clears report")
         let queue = TestOperationQueue()

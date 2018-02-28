@@ -83,14 +83,13 @@ open class DopamineKit : NSObject {
             let action = DopeAction(actionID: actionID, metaData: metaData)
             let reinforcementDecision = DopamineVersion.current.reinforcementDecision(for: action.actionID)
             
+            action.reinforcementDecision = reinforcementDecision
+            SyncCoordinator.store(report: action)
+            
             shared.delegate?.willReinforce(actionID: actionID, with: reinforcementDecision)
             DispatchQueue.main.async {
                 completion(reinforcementDecision)
             }
-            
-            // store the action to be synced
-            action.reinforcementDecision = reinforcementDecision
-            SyncCoordinator.store(report: action)
         }
     }
 }
