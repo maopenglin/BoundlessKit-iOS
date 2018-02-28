@@ -25,6 +25,7 @@ class TestSwizzler: XCTestCase {
     override func setUp() {
         super.setUp()
         DopamineVersion.current.update(visualizer: nil)
+        CIController.shared.state = .integrating
         
         controllerUnderTest = ViewController.instance()
         
@@ -96,10 +97,8 @@ class TestSwizzler: XCTestCase {
         let beforeTestFunc2StackSize = TestSwizzler.counterAndClear
         
         // when
-        let swizzle1 = DopamineController.shared.registerSimpleMethod(classType: type(of: sut), selector: selector1, reinforcement: ["reward": ["rewardForFirst": ["Hello!"]]])
-        let swizzle2 = DopamineController.shared.registerSimpleMethod(classType: type(of: sut), selector: selector2, reinforcement: ["reward": ["rewardForSecond": ["Hello!"]]])
-        XCTAssert(swizzle1, "Selector was not registered")
-        XCTAssert(swizzle2, "Selector was not registered")
+        SelectorReinforcement(target: sut, selector: selector1)?.registerMethod()
+        SelectorReinforcement(target: sut, selector: selector2)?.registerMethod()
         
         
         // then
@@ -132,7 +131,7 @@ class TestSwizzler: XCTestCase {
 //        }
 //        
 //        let changesDelegate = ChangesDelegate()
-//        DopamineController.shared.delegate = changesDelegate
+//        CIController.shared.delegate = changesDelegate
 //        let selector = #selector(ViewController.viewDidAppear(_:))
 //        let selectorReinforcement = SelectorReinforcement(targetClass: ViewController.self, selector: selector)
 //        let reinforcementsDict: [String : Any] = ["reward" : ["reward2":"somereward"]]

@@ -84,7 +84,7 @@ internal class HTTPClient {
         return session.send(request: request) { responseData, responseURL, error in
             let response = convertResponseToJSON( responseData, responseURL, error )
             if HTTPClient.logAPIResponses {
-                DopeLog.debug("<\(request.url?.absoluteString ?? "url:nil")> with\nrequest data:<\(jsonObject)>\ngot response:<\(response?.description ?? "nil")>")
+                DopeLog.debug("<\(request.url?.absoluteString ?? "url:nil")> with\nrequest data:<\(jsonObject as AnyObject)>\ngot response:<\(response as AnyObject)>")
             }
             completion(response)
         }

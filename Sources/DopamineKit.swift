@@ -43,7 +43,7 @@ open class DopamineKit : NSObject {
     
     private override init() {
         super.init()
-        _ = DopamineController.shared
+        CodelessAPI.boot()
     }
     
     /// This function sends an asynchronous tracking call for the specified action

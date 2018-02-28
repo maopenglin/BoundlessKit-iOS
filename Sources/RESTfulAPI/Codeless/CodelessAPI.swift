@@ -40,7 +40,7 @@ internal class CodelessAPI : NSObject {
                 DopeLog.debug("🔍 \(connectionID != nil ? "C" : "Disc")onnected to visualizer")
             }
             
-            DopamineVersion.current.isIntegrating = (connectionID != nil)
+            if connectionID != nil { CIController.shared.state = .integrating }
             
             if submitQueue.isSuspended {
                 submitQueue.isSuspended = false
@@ -54,6 +54,12 @@ internal class CodelessAPI : NSObject {
     
     internal static func boot(completion: @escaping () -> () = {}) {
         guard let dopaProps = DopamineProperties.current else { return }
+        guard ProcessInfo.processInfo.environment["debugNoBoot"] != "true" else { return }
+        
+        if DopamineConfiguration.current.integrationMethod == "codeless" {
+            CIController.shared.state = .integrated
+        }
+        
         var payload = dopaProps.apiCredentials
         payload["inProduction"] = dopaProps.inProduction
         payload["currentVersion"] = DopamineVersion.current.versionID ?? "nil"
@@ -74,9 +80,8 @@ internal class CodelessAPI : NSObject {
             }
             
             completion()
-            
             if DopamineConfiguration.current.integrationMethod == "codeless" {
-                DopamineController.shared.registerMethods()
+                promptPairing()
             }
         }
     }

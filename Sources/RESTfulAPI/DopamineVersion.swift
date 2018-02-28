@@ -23,16 +23,8 @@ public class DopamineVersion : DopamineDefaultsSingleton {
     @objc public var versionID: String?
     @objc fileprivate var mappings: [String:Any]
     @objc internal fileprivate (set) var visualizerMappings: [String:Any]
-    internal var isIntegrating = false {
-        didSet {
-            if !isIntegrating {
-                DopamineController.shared.integrationModeMethods(false)
-                update(visualizer: nil)
-            } else {
-                DopamineController.shared.integrationModeMethods(true)
-                DopamineController.shared.registerVisualizerMethods()
-            }
-        }
+    internal var isIntegrating: Bool {
+        return CIController.shared.state == .integrating
     }
     
     fileprivate let updateQueue = SingleOperationQueue(delayAfter: 1, dropCollisions: true)
@@ -41,7 +33,7 @@ public class DopamineVersion : DopamineDefaultsSingleton {
             print("Updating visualizer to:\(mappings as AnyObject)")
             if let mappings = mappings {
                 self.visualizerMappings = mappings
-                DopamineController.shared.registerVisualizerMethods()
+                CIController.shared.state = .integrating
             } else if self.visualizerMappings.isEmpty {
                 return
             } else {
@@ -117,13 +109,13 @@ public extension DopamineVersion {
         return DopamineVersion.init(versionID: versionID, mappings: mappings, visualizerMappings: visualizerMappings)
     }
     
-    public var actionIDs: [String] { get {
-        return Array(mappings.keys)
-        } }
-    
-    public var visualizerActionIDs: [String] { get {
-        return Array(visualizerMappings.keys)
-        } }
+    public var actionIDs: [String] {
+        if isIntegrating {
+            return Array(mappings.keys) + Array(visualizerMappings.keys)
+        } else {
+            return Array(mappings.keys)
+        }
+    }
     
     public func actionMapping(for actionID: String) -> [String: Any]? {
         if isIntegrating {

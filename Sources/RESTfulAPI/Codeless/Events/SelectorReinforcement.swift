@@ -13,12 +13,50 @@ public protocol SelectorReinforcementDelegate {
 }
 
 @objc
-open class SelectorReinforcement : NSObject {
+public class SelectorReinforcement : NSObject {
     
-    static var delegate: SelectorReinforcementDelegate?
+    enum SelectorType : String {
+        case
+        appLaunch = "appLaunch",
+        appTerminate = "appTerminate",
+        appActive = "appActive",
+        appInactive = "appInactive",
+        viewControllerDidAppear = "viewControllerDidAppear",
+        viewControllerDidDisappear = "viewControllerDidDisappear",
+        collectionDidSelect = "collectionDidSelect",
+        custom = "customSelector"
+        
+        init?(for classType: AnyClass, _ selector: Selector) {
+            switch selector {
+            case #selector(UIApplicationDelegate.application(_:didFinishLaunchingWithOptions:)):
+                self = .appLaunch
+            case #selector(UIApplicationDelegate.applicationWillTerminate(_:)):
+                self = .appTerminate
+            case #selector(UIApplicationDelegate.applicationDidBecomeActive(_:)):
+                self = .appActive
+            case #selector(UIApplicationDelegate.applicationWillResignActive(_:)):
+                self = .appInactive
+            case #selector(UIViewController.viewDidAppear(_:)):
+                self = .viewControllerDidAppear
+            case #selector(UIViewController.viewDidDisappear(_:)):
+                self = .viewControllerDidDisappear
+            case #selector(UICollectionViewDelegate.collectionView(_:didSelectItemAt:)):
+                self = .collectionDidSelect
+            default:
+                if DopamineObject.templateAvailable(for: classType, selector) {
+                    self = .custom
+                } else {
+//                    DopeLog.error("No template support for class <\(classType)> method <\(selector)>")
+                    return nil
+                }
+            }
+        }
+    }
     
-    internal fileprivate (set) static var registered = [String:SelectorReinforcement]()
-    internal fileprivate (set) static var unregistered = [String:SelectorReinforcement]()
+    public static var delegate: SelectorReinforcementDelegate?
+    
+    fileprivate static var registered = [String:SelectorReinforcement]()
+    fileprivate static var unregistered = [String:SelectorReinforcement]()
     
     let selectorType: SelectorType
     public let targetClass: AnyClass
@@ -55,97 +93,78 @@ open class SelectorReinforcement : NSObject {
         }
     }
     
-    public convenience init(targetClass: AnyClass, selector: Selector) {
-        self.init(selectorType: SelectorType(from: selector), targetClass: targetClass, selector: selector)
+    public convenience init?(targetClass: AnyClass, selector: Selector) {
+        if let selectorType = SelectorType(for: targetClass, selector) {
+            self.init(selectorType: selectorType, targetClass: targetClass, selector: selector)
+        } else {
+            return nil
+        }
     }
-    
-    public convenience init(target: NSObject, selector: Selector) {
-        self.init(selectorType: SelectorType(from: selector), targetClass: type(of: target), selector: selector)
+
+    public convenience init?(target: NSObject, selector: Selector) {
+        self.init(targetClass: type(of: target), selector: selector)
     }
     
     
     // MARK: - Methods
-    func registerMethod() -> Bool {
+    func registerMethod() {
         DopeLog.debug("Attempting to register <\(self.actionID)>...")
-        guard DopamineConfiguration.current.integrationMethod == "codeless" else {
-            DopeLog.debug("Codeless integration mode disabled")
-            return false
-        }
         
         guard SelectorReinforcement.registered[actionID] == nil else {
             DopeLog.debug("Reinforcement for class:\(NSStringFromClass(targetClass)) method:\(NSStringFromSelector(selector)) already registered.")
-            return false
+            return
         }
         
         if let (reinforcedClass, reinforcedSelector) = reinforcedCounterparts {
-            SwizzleHelper.injectSelector(reinforcedClass, reinforcedSelector, targetClass, selector)
+            SelectorReinforcement.registered[actionID] = self
             self.reinforcer = reinforcedSelector
             SelectorReinforcement.unregistered.removeValue(forKey: actionID)
-            SelectorReinforcement.registered[actionID] = self
+            SwizzleHelper.injectSelector(reinforcedClass, reinforcedSelector, targetClass, selector)
             DopeLog.debug("Registered reinforcer for class \(targetClass) selector \(selector) with reinforced selector \(reinforcedSelector)")
-            return true
+            return
         } else {
             DopeLog.debug("Could not register reinforcer for class \(targetClass) selector \(selector)")
-            return false
+            return
         }
     }
     
-    func unregisterMethod() -> Bool {
+    func unregisterMethod() {
         DopeLog.debug("Attempting to unregister <\(self.actionID)>...")
-        guard DopamineConfiguration.current.integrationMethod == "codeless" else {
-            DopeLog.debug("Codeless integration mode disabled")
-            return false
-        }
         
         guard let _ = SelectorReinforcement.registered[actionID]?.reinforcer else {
             DopeLog.debug("Reinforcement for class:\(NSStringFromClass(targetClass)) method:\(NSStringFromSelector(selector)) not registered.")
-            return false
+            return
         }
         
         if let (reinforcedClass, reinforcedSelector) = reinforcedCounterparts {
-            SwizzleHelper.injectSelector(reinforcedClass, reinforcedSelector, targetClass, selector)
-            self.reinforcer = reinforcedSelector
             SelectorReinforcement.registered.removeValue(forKey: actionID)
+            self.reinforcer = reinforcedSelector
             SelectorReinforcement.unregistered[actionID] = self
+            SwizzleHelper.injectSelector(reinforcedClass, reinforcedSelector, targetClass, selector)
             DopeLog.debug("Unregistered reinforcer for class \(targetClass) selector \(selector) with reinforced selector \(reinforcedSelector)")
-            return true
+            return
         } else {
             DopeLog.debug("Could not unregister reinforcer for class \(targetClass) selector \(selector)")
-            return false
+            return
         }
     }
     
-    
-    
-    enum SelectorType : String {
-        case
-        appLaunch = "appLaunch",
-        appTerminate = "appTerminate",
-        appActive = "appActive",
-        appInactive = "appInactive",
-        viewControllerDidAppear = "viewControllerDidAppear",
-        viewControllerDidDisappear = "viewControllerDidDisappear",
-        collectionDidSelect = "collectionDidSelect",
-        custom = "customSelector"
-        
-        init(from selector: Selector) {
-            if (selector == #selector(UIApplicationDelegate.application(_:didFinishLaunchingWithOptions:))) {
-                self = .appLaunch
-            } else if (selector == #selector(UIApplicationDelegate.applicationWillTerminate(_:))) {
-                self = .appTerminate
-            } else if (selector == #selector(UIApplicationDelegate.applicationDidBecomeActive(_:))) {
-                self = .appActive
-            } else if (selector == #selector(UIApplicationDelegate.applicationWillResignActive(_:))) {
-                self = .appInactive
-            } else if (selector == #selector(UIViewController.viewDidAppear(_:))) {
-                self = .viewControllerDidAppear
-            } else if (selector == #selector(UIViewController.viewDidDisappear(_:))) {
-                self = .viewControllerDidDisappear
-            } else if (selector == #selector(UICollectionViewDelegate.collectionView(_:didSelectItemAt:))) {
-                self = .collectionDidSelect
-            } else {
-                self = .custom
+    static func registerMethods(actionIDs: [String] = DopamineVersion.current.actionIDs, unregisterOthers: Bool = true) {
+        DopeLog.print("Registering \(actionIDs)...")
+        if unregisterOthers {
+            let obseleteMethods = Set(registered.keys)
+            for actionID in obseleteMethods {
+                SelectorReinforcement(actionID: actionID)?.unregisterMethod()
             }
+        }
+        for actionID in DopamineVersion.current.actionIDs {
+            SelectorReinforcement(actionID: actionID)?.registerMethod()
+        }
+    }
+    
+    static func unregisterMethods() {
+        for (_, selectorReinforcement) in registered {
+            selectorReinforcement.unregisterMethod()
         }
     }
     
@@ -183,14 +202,20 @@ extension SelectorReinforcement {
     
     @objc
     public static func integrationModeSubmit(senderInstance: AnyObject?, targetInstance: AnyObject, action: Selector) {
-        guard let targetInstance = targetInstance as? NSObject else { return }
-        let selectorReinforcement = SelectorReinforcement(target: targetInstance, selector: action)
+        guard let targetInstance = targetInstance as? NSObject,
+            let selectorReinforcement = SelectorReinforcement(target: targetInstance, selector: action) else {
+                return
+        }
         CodelessAPI.submitSelectorReinforcement(selectorReinforcement: selectorReinforcement, senderInstance: senderInstance)
     }
     
     @objc
     public static func attemptReinforcement(senderInstance: AnyObject?, targetInstance: NSObject, action: Selector) {
-        SelectorReinforcement(target: targetInstance, selector: action).attemptReinforcement(senderInstance: senderInstance, targetInstance: targetInstance)
+        if let selectorReinforcement = SelectorReinforcement(target: targetInstance, selector: action) {
+            selectorReinforcement.attemptReinforcement(senderInstance: senderInstance, targetInstance: targetInstance)
+        } else {
+            DopeLog.error("No support for class <\(type(of: targetInstance))> method <\(action)>")
+        }
     }
     
     func attemptReinforcement(senderInstance: AnyObject?, targetInstance: NSObject) {

@@ -142,7 +142,7 @@ class ViewController: UIViewController {
 //            }
 //        }
         
-//        DopamineController.shared.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!!"]])
+//        CIController.shared.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!!"]])
     }
     
     @objc func loadBasicUI(){
@@ -202,13 +202,6 @@ class ViewController: UIViewController {
 
 extension ViewController : CLLocationManagerDelegate {
     
-}
-
-extension ViewController {
-    static func setTemporaryReward() {
-        let selectorReinforcement = SelectorReinforcement(targetClass: self, selector: #selector(ViewController.viewDidAppear(_:)))
-        DopamineVersion.current.update(visualizer: [selectorReinforcement.actionID : ["reward" : ["reward1":"somereward"]]])
-    }
 }
 
 extension ViewController {

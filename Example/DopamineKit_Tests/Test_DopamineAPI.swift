@@ -18,7 +18,7 @@ class TestDopamineAPI: XCTestCase {
     override func setUp() {
         super.setUp()
         
-        DopamineDefaults.current = MockDopamineDefaults.standard
+//        DopamineDefaults.current = MockDopamineDefaults.standard
         DopamineAPI.shared.httpClient = HTTPClient(session: mockDopamineAPISession)
         CodelessAPI.shared.httpClient = HTTPClient(session: mockCodelessAPISession)
         
@@ -32,13 +32,11 @@ class TestDopamineAPI: XCTestCase {
         DopamineKit.testCredentials = testCredentials
         DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
         
-        DopamineController.shared.wake()
+        CIController.shared.state = .integrated
     }
     
     override func tearDown() {
         SyncCoordinator.flush()          // clears the sync state, recorded actions, and cartridges
-        
-        DopamineController.shared.sleep()
         super.tearDown()
     }
     
@@ -209,7 +207,7 @@ class TestDopamineAPI: XCTestCase {
             if reinforcementDecision == self.nonNeutralReinforcementDecision { asyncExpectation.fulfill() }
         })
         
-        waitForExpectations(timeout: 5, handler: {error in
+        waitForExpectations(timeout: 7, handler: {error in
             XCTAssertNil(error, "DopamineKitTest error: cartridge refresh failed")
         })
     }
@@ -222,14 +220,13 @@ class TestDopamineAPI: XCTestCase {
         let queue = TestOperationQueue()
         
         DopamineKit.reinforce(unknownActionID) { reinforcement in
-            if SyncCoordinator.current.reportedActions.count == 1 {
-                queue.when( successCondition: {return SyncCoordinator.current.reportedActions.count == 0}) {
-                    failedSyncErasedReport.fulfill()
-                }
+            XCTAssert(SyncCoordinator.current.reportedActions.count == 1)
+            queue.when( successCondition: {return SyncCoordinator.current.reportedActions.count == 0}) {
+                failedSyncErasedReport.fulfill()
             }
         }
         
-        waitForExpectations(timeout: 5, handler: {error in
+        waitForExpectations(timeout: 7, handler: {error in
             XCTAssertNil(error, "DopamineKitTest error: testReinforceMultiple timed out")
         })
     }
