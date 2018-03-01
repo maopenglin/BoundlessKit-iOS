@@ -12,10 +12,6 @@ import CoreLocation
 @objc
 open class DopamineKit : NSObject {
     
-    /// A modifiable credentials path used for running tests
-    ///
-    @objc public static var testCredentials:[String:Any]?
-    
     /// A modifiable identity used for running tests
     ///
     @objc public static func setDevelopmentId(_ id:String?, completion: @escaping (String?) -> ()) {

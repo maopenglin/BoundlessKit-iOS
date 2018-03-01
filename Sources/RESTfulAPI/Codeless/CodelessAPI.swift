@@ -86,15 +86,19 @@ internal class CodelessAPI : NSObject {
                             shared.send(call: .accept, with: payload) {response in
                                 if response["status"] as? Int == 200 {
                                     CodelessIntegrationController.shared.connectionInfo = (adminName, connectionID)
+                                } else {
+                                    CodelessIntegrationController.shared.connectionInfo = nil
                                 }
                             }
                         }))
                         
                         pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
-                            
+                            CodelessIntegrationController.shared.connectionInfo = nil
                         }))
                         
                         UIWindow.presentTopLevelAlert(alertController: pairingAlert)
+                    } else {
+                        CodelessIntegrationController.shared.connectionInfo = nil
                     }
                     
                 case 208:
@@ -103,8 +107,8 @@ internal class CodelessAPI : NSObject {
                     }
                     
                 case 204:
-                    CodelessIntegrationController.shared.connectionInfo = nil
-                    
+//                    CodelessIntegrationController.shared.connectionInfo = nil
+                    break
                 case 500:
                     CodelessIntegrationController.shared.connectionInfo = nil
                     break

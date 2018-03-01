@@ -12,15 +12,20 @@ class TestDopamineAPI: XCTestCase {
     //*-*
     ////////////////////////////////////////
     
-    let mockURLSession = MockURLSession()
+    var mockURLSession: MockURLSession!
     
     override func setUp() {
         super.setUp()
         
+        DopamineDefaults.current.clear()
+        
         let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
-        DopamineKit.testCredentials = testCredentials
+        DopamineProperties.current = DopamineProperties.convert(from: testCredentials)!
+        DopamineConfiguration.current.integrationMethod = "manual"
+        
         DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
         
+        mockURLSession = MockURLSession()
         DopamineAPI.shared.httpClient = HTTPClient(session: mockURLSession)
         CodelessAPI.shared.httpClient = HTTPClient(session: mockURLSession)
         
@@ -29,7 +34,7 @@ class TestDopamineAPI: XCTestCase {
         SyncCoordinator.timeDelayAfterRefresh = 1
         SyncCoordinator.flush()
         
-        _ = DopamineKit.shared
+//        _ = DopamineKit.shared
     }
     
     override func tearDown() {
@@ -169,16 +174,18 @@ class TestDopamineAPI: XCTestCase {
         })
     }
     
-    func testReinforceCartridgeSyncFail() {
+    func testReportSyncFail() {
+        mockURLSession.setMockResponse(for: .report, ["status": 400])
         mockURLSession.setMockResponse(for: .refresh, Cartridge.mockBadCartridgeResponse)
         
         let failedSyncErasedReport = expectation(description: "Failed sync clears report")
         let queue = TestOperationQueue()
         
         DopamineKit.reinforce(Cartridge.mockBadActionID) { reinforcement in
-            XCTAssert(SyncCoordinator.current.reportedActions.count == 1)
-            queue.when( successCondition: {return SyncCoordinator.current.reportedActions.count == 0}) {
-                failedSyncErasedReport.fulfill()
+            queue.when(successCondition: {return SyncCoordinator.current.reportedActions.count == 1}) {
+                queue.when( successCondition: {return SyncCoordinator.current.reportedActions.count == 0}) {
+                    failedSyncErasedReport.fulfill()
+                }
             }
         }
         

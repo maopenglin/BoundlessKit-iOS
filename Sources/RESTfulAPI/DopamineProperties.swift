@@ -11,8 +11,7 @@ internal class DopamineProperties : DopamineDefaultsSingleton {
     
     @objc
     static var current: DopamineProperties? = {
-        return DopamineProperties.convert(from: DopamineKit.testCredentials) ??
-            DopamineDefaults.current.unarchive() ??
+        return DopamineDefaults.current.unarchive() ??
             {
                 if let propertiesFile = Bundle.main.path(forResource: "DopamineProperties", ofType: "plist"),
                     let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as? [String: Any],

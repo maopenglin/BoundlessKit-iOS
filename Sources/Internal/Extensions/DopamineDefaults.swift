@@ -76,8 +76,10 @@ open class DopamineDefaults : UserDefaults {
     
     
     open func clear() {
+        DopeLog.print("In clear")
         removePersistentDomain(forName: DopamineDefaults.suiteName)
         synchronize()
+        DopeLog.print("Value for somethong:\(initialBootDate)")
     }
 
 }

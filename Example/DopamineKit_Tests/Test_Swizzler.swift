@@ -20,12 +20,20 @@ class TestSwizzler: XCTestCase {
         }
     }
     
+    var mockURLSession: MockURLSession!
     var window: UIWindow!
     var controllerUnderTest: ViewController!
+    
     override func setUp() {
         super.setUp()
-        DopamineVersion.current.update(visualizer: nil)
-        CodelessIntegrationController.shared.connectionInfo = ("admin", "0123")
+        
+        DopamineConfiguration.current.integrationMethod = "codeless"
+        
+        mockURLSession = MockURLSession()
+        DopamineAPI.shared.httpClient = HTTPClient(session: mockURLSession)
+        CodelessAPI.shared.httpClient = HTTPClient(session: mockURLSession)
+        
+        _ = DopamineKit.shared
         
         controllerUnderTest = ViewController.instance()
         

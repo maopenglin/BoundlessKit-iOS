@@ -15,11 +15,13 @@ internal class CodelessIntegrationController : NSObject {
     
     static let shared: CodelessIntegrationController = {
         let _shared = CodelessIntegrationController()
-        if let savedStateString = DopamineDefaults.current.codelessIntegrationSavedState,
-            let savedState = State(rawValue: savedStateString) {
-            _shared.state = savedState
-        } else if DopamineConfiguration.current.integrationMethod == "codeless" {
-            _shared.state = .integrated
+        if DopamineConfiguration.current.integrationMethod == "codeless" {
+            if let savedStateString = DopamineDefaults.current.codelessIntegrationSavedState,
+                State(rawValue: savedStateString) == .integrating {
+                _shared.state = .integrating
+            } else {
+                _shared.state = .integrated
+            }
         } else {
             _shared.state = .manual
         }
@@ -37,14 +39,17 @@ internal class CodelessIntegrationController : NSObject {
     
     internal var connectionInfo: (String, String)? {
         didSet {
-            DopeLog.debug("🔍 \(connectionInfo != nil ? "C" : "Disc")onnected to visualizer")
+            if oldValue?.1 != connectionInfo?.1 { DopeLog.debug("🔍 \(connectionInfo != nil ? "C" : "Disc")onnected to visualizer") }
+            
             if let _ = connectionInfo {
                 state = .integrating
-                if submitQueue.isSuspended { submitQueue.isSuspended = false }
-            } else {
-                state = DopamineConfiguration.current.integrationMethod == "codeless" ? .integrated : .manual
+                submitQueue.isSuspended = false
+            } else if DopamineConfiguration.current.integrationMethod == "codeless" {
+                state = .integrated
                 submitQueue.cancelAllOperations()
-                submitQueue.isSuspended = true
+                submitQueue.isSuspended = false
+            } else {
+                state = .manual
             }
         }
     }
@@ -60,18 +65,22 @@ internal class CodelessIntegrationController : NSObject {
                 }
                 
             case .integrating:
+                if oldValue != .integrating {
+                    codelessIntegratingMethods(true)
+                }
                 SelectorReinforcement.registerMethods(actionIDs: DopamineVersion.current.visualizerActionIDs)
-                codelessIntegratingMethods(true)
                 
             case .integrated:
+                if oldValue == .integrating {
+                    codelessIntegratingMethods(false)
+                }
                 SelectorReinforcement.registerMethods(actionIDs: DopamineVersion.current.actionIDs)
-                codelessIntegratingMethods(false)
             }
             DopamineDefaults.current.codelessIntegrationSavedState = state.rawValue
         }
     }
     
-    fileprivate var submitQueue: OperationQueue = {
+    fileprivate lazy var submitQueue: OperationQueue = {
         let queue = OperationQueue()
         queue.maxConcurrentOperationCount = 1
         queue.isSuspended = true
@@ -79,8 +88,10 @@ internal class CodelessIntegrationController : NSObject {
     }()
     
     func submitSelectorReinforcement(selectorReinforcement: SelectorReinforcement, senderInstance: AnyObject?) {
-        guard let connectionID = self.connectionInfo?.1 else { return }
+        guard state == .integrating else { return }
+        
         submitQueue.addOperation {
+            guard let connectionID = self.connectionInfo?.1 else { return }
             CodelessAPI.submit { payload in
                 payload["connectionUUID"] = connectionID
                 payload["sender"] = selectorReinforcement.selectorType.rawValue
@@ -109,6 +120,7 @@ internal class CodelessIntegrationController : NSObject {
 
 extension CodelessIntegrationController {
     func codelessIntegratingMethods(_ shouldEnhance: Bool) {
+        DopeLog.print("Enhancing methods:\(shouldEnhance)")
         // Enhance - UIApplication
         DopamineApp.enhanceSelectors(shouldEnhance)
         

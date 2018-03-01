@@ -16,17 +16,20 @@ class TestCodelessIntegration : XCTestCase {
     var window: UIWindow!
     var controllerUnderTest: ViewController!
     
-    let mockURLSession = MockURLSession()
+    var mockURLSession: MockURLSession!
 
     override func setUp() {
         continueAfterFailure = false
         
+        mockURLSession = MockURLSession()
         DopamineAPI.shared.httpClient = HTTPClient(session: mockURLSession)
         CodelessAPI.shared.httpClient = HTTPClient(session: mockURLSession)
         
         SyncCoordinator.timeDelayAfterTrack = 1
         SyncCoordinator.timeDelayAfterReport = 1
         SyncCoordinator.timeDelayAfterRefresh = 1
+        SyncCoordinator.flush()
+        
         
     }
 
@@ -52,7 +55,7 @@ class TestCodelessIntegration : XCTestCase {
 //        window.rootViewController = controllerUnderTest
 //        window.makeKeyAndVisible()
         
-        sleep(4)
+//        sleep(4)
     }
 }
 
