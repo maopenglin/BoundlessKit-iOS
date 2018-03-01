@@ -21,7 +21,7 @@ class TestDopamineAPI: XCTestCase {
         
         let testCredentials = NSDictionary(contentsOfFile:Bundle(for: type(of: self)).path(forResource: "DopamineDemoProperties", ofType: "plist")!) as! [String:Any]
         DopamineProperties.current = DopamineProperties.convert(from: testCredentials)!
-        DopamineConfiguration.current.integrationMethod = "manual"
+        DopamineConfiguration.current.integrationMethodType = .manual
         
         DopeLog.print("Set dopamine credentials to:'\(testCredentials)'")
         

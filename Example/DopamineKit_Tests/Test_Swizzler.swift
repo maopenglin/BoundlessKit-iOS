@@ -27,7 +27,7 @@ class TestSwizzler: XCTestCase {
     override func setUp() {
         super.setUp()
         
-        DopamineConfiguration.current.integrationMethod = "codeless"
+        DopamineConfiguration.current.integrationMethodType = .codeless
         
         mockURLSession = MockURLSession()
         DopamineAPI.shared.httpClient = HTTPClient(session: mockURLSession)
@@ -98,7 +98,7 @@ class TestSwizzler: XCTestCase {
     func doubleSwizzle(sut: NSObject, selector1: Selector, args1: [Any], selector2: Selector, args2: [Any], argsCount: Int) {
         
         // given
-        XCTAssert(DopamineConfiguration.current.integrationMethod == "codeless")
+        XCTAssert(DopamineConfiguration.current.integrationMethodType == .codeless)
         sut.performVariableSelector(sel: selector1, argsCount: argsCount, args: args1)
         let beforeTestFuncStackSize = TestSwizzler.counterAndClear
         sut.performVariableSelector(sel: selector2, argsCount: argsCount, args: args2)

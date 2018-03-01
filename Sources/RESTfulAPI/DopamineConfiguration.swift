@@ -20,6 +20,10 @@ public class DopamineConfiguration : DopamineDefaultsSingleton  {
         }
     }
     
+    public enum IntegrationMethodType : String {
+        case manual, codeless
+    }
+    
     @objc public var configID: String?
     
     @objc public var reinforcementEnabled: Bool
@@ -30,7 +34,18 @@ public class DopamineConfiguration : DopamineDefaultsSingleton  {
     @objc public var trackingEnabled: Bool
     @objc public var trackBatchSize: Int
     
-    @objc public var integrationMethod: String
+    @objc fileprivate var integrationMethod: String
+    public var integrationMethodType: IntegrationMethodType {
+        get {
+            return IntegrationMethodType.init(rawValue: integrationMethod) ?? .manual
+        }
+        set {
+            if integrationMethodType != newValue {
+                integrationMethod = integrationMethodType.rawValue
+                CodelessIntegrationController.shared.setStateForIntegrationMethodType()
+            }
+        }
+    }
     @objc public var advertiserID: Bool
     @objc public var consoleLoggingEnabled: Bool
     

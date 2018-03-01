@@ -10,23 +10,14 @@ import Foundation
 internal class CodelessIntegrationController : NSObject {
     
     enum State : String {
-        case manual, integrating, integrated
+        case unintegrated, integrating, integrated
     }
     
     static let shared: CodelessIntegrationController = {
         let _shared = CodelessIntegrationController()
-        if DopamineConfiguration.current.integrationMethod == "codeless" {
-            if let savedStateString = DopamineDefaults.current.codelessIntegrationSavedState,
-                State(rawValue: savedStateString) == .integrating {
-                _shared.state = .integrating
-            } else {
-                _shared.state = .integrated
-            }
-        } else {
-            _shared.state = .manual
-        }
+        _shared.setStateForIntegrationMethodType()
         CodelessAPI.boot() {
-            if !DopamineProperties.productionMode && _shared.state != .manual {
+            if !DopamineProperties.productionMode && _shared.state != .unintegrated {
                 CodelessAPI.promptPairing()
             }
         }
@@ -37,29 +28,12 @@ internal class CodelessIntegrationController : NSObject {
         super.init()
     }
     
-    internal var connectionInfo: (String, String)? {
-        didSet {
-            if oldValue?.1 != connectionInfo?.1 { DopeLog.debug("🔍 \(connectionInfo != nil ? "C" : "Disc")onnected to visualizer") }
-            
-            if let _ = connectionInfo {
-                state = .integrating
-                submitQueue.isSuspended = false
-            } else if DopamineConfiguration.current.integrationMethod == "codeless" {
-                state = .integrated
-                submitQueue.cancelAllOperations()
-                submitQueue.isSuspended = false
-            } else {
-                state = .manual
-            }
-        }
-    }
-    
-    internal fileprivate(set) var state: State = .manual {
+    internal fileprivate(set) var state: State = .unintegrated {
         didSet {
             DopeLog.print("State changed from \(oldValue) to \(state)")
             switch state {
-            case .manual:
-                if oldValue != .manual {
+            case .unintegrated:
+                if oldValue != .unintegrated {
                     SelectorReinforcement.unregisterMethods()
                     codelessIntegratingMethods(false)
                 }
@@ -77,6 +51,36 @@ internal class CodelessIntegrationController : NSObject {
                 SelectorReinforcement.registerMethods(actionIDs: DopamineVersion.current.actionIDs)
             }
             DopamineDefaults.current.codelessIntegrationSavedState = state.rawValue
+        }
+    }
+    
+    internal var connectionInfo: (String, String)? {
+        didSet {
+            if oldValue?.1 != connectionInfo?.1 { DopeLog.debug("🔍 \(connectionInfo != nil ? "C" : "Disc")onnected to visualizer") }
+            
+            if let _ = connectionInfo {
+                state = .integrating
+                submitQueue.isSuspended = false
+            } else if DopamineConfiguration.current.integrationMethodType == .codeless {
+                state = .integrated
+                submitQueue.cancelAllOperations()
+                submitQueue.isSuspended = false
+            } else {
+                state = .unintegrated
+            }
+        }
+    }
+    
+    internal func setStateForIntegrationMethodType() {
+        if DopamineConfiguration.current.integrationMethodType == .codeless {
+            if let savedStateString = DopamineDefaults.current.codelessIntegrationSavedState,
+                State(rawValue: savedStateString) == .integrating {
+                state = .integrating
+            } else {
+                state = .integrated
+            }
+        } else {
+            state = .unintegrated
         }
     }
     
