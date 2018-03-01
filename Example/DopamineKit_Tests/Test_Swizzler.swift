@@ -27,7 +27,7 @@ class TestSwizzler: XCTestCase {
     override func setUp() {
         super.setUp()
         
-        DopamineConfiguration.current.integrationMethodType = .codeless
+        DopamineConfiguration.current = DopamineConfiguration()
         
         mockURLSession = MockURLSession()
         DopamineAPI.shared.httpClient = HTTPClient(session: mockURLSession)

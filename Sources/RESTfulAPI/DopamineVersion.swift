@@ -11,18 +11,16 @@ import Foundation
 public class DopamineVersion : DopamineDefaultsSingleton {
     
     @objc
-    public static var current: DopamineVersion = {
-        return DopamineDefaults.current.unarchive() ?? DopamineVersion.standard
-        }()
+    public static var current: DopamineVersion = { return DopamineDefaults.current.unarchive() ?? DopamineVersion() }()
         {
         didSet {
             DopamineDefaults.current.archive(current)
         }
     }
     
-    @objc public var versionID: String?
-    @objc fileprivate var mappings: [String:Any]
-    @objc internal fileprivate (set) var visualizerMappings: [String:Any]
+    @objc public let versionID: String?
+    @objc fileprivate let mappings: [String:Any]
+    @objc fileprivate var visualizerMappings: [String:Any]
     
     fileprivate let updateQueue = SingleOperationQueue(delayAfter: 1, dropCollisions: true)
     public func update(visualizer mappings: [String: Any]?) {
@@ -40,7 +38,7 @@ public class DopamineVersion : DopamineDefaultsSingleton {
         }
     }
     
-    init(versionID: String?,
+    init(versionID: String? = nil,
          mappings: [String:Any] = [:],
          visualizerMappings: [String: Any] = [:]) {
         self.versionID = versionID
@@ -49,26 +47,19 @@ public class DopamineVersion : DopamineDefaultsSingleton {
         super.init()
     }
     
-    static func initStandard(with versionID: String?) -> DopamineVersion {
-        let standard = DopamineVersion.standard
-        standard.versionID = versionID
-        return standard
-    }
-    
     required public convenience init?(coder aDecoder: NSCoder) {
-        if let versionID = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? String?,
+        guard let versionID = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.versionID)) as? String?,
             let mappings = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.mappings)) as? [String:Any],
-            let visualizerMappings = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.visualizerMappings)) as? [String:Any] {
-//            DopeLog.debug("Found DopamineVersion saved in user defaults.")
-            self.init(
-                versionID: versionID,
-                mappings: mappings,
-                visualizerMappings: visualizerMappings
-            )
-        } else {
-//            DopeLog.debug("Invalid DopamineVersion saved to user defaults.")
-            return nil
+            let visualizerMappings = aDecoder.decodeObject(forKey: #keyPath(DopamineVersion.visualizerMappings)) as? [String:Any] else {
+                DopeLog.debug("Invalid DopamineVersion saved to user defaults.")
+                return nil
         }
+//        DopeLog.debug("Found DopamineVersion saved in user defaults.")
+        self.init(
+            versionID: versionID,
+            mappings: mappings,
+            visualizerMappings: visualizerMappings
+        )
     }
     
     public override func encode(with aCoder: NSCoder) {
@@ -76,23 +67,6 @@ public class DopamineVersion : DopamineDefaultsSingleton {
         aCoder.encode(mappings, forKey: #keyPath(DopamineVersion.mappings))
         aCoder.encode(visualizerMappings, forKey: #keyPath(DopamineVersion.visualizerMappings))
 //        DopeLog.debug("Saved DopamineVersion to user defaults.")
-    }
-    
-    static var standard: DopamineVersion {
-        return DopamineVersion(versionID: nil)
-    }
-    
-    internal func reinforcementDecision(for actionID: String) -> String {
-        let reinforcementDecision: String
-        if CodelessIntegrationController.shared.state == .integrating,
-            let actionMapping = actionMapping(for: actionID),
-            let randomReinforcement = CodelessReinforcement.reinforcementsIDs(in: actionMapping)?.selectRandom()
-        {
-            reinforcementDecision = randomReinforcement
-        } else {
-            reinforcementDecision = SyncCoordinator.retrieve(cartridgeFor: actionID).remove()
-        }
-        return reinforcementDecision
     }
 }
 
@@ -121,4 +95,16 @@ public extension DopamineVersion {
         return visualizerMappings[actionID] as? [String: Any] ?? mappings[actionID] as? [String: Any]
     }
     
+    internal func reinforcementDecision(for actionID: String) -> String {
+        let reinforcementDecision: String
+        if CodelessIntegrationController.shared.state == .integrating,
+            let actionMapping = actionMapping(for: actionID),
+            let randomReinforcement = CodelessReinforcement.reinforcementsIDs(in: actionMapping)?.selectRandom()
+        {
+            reinforcementDecision = randomReinforcement
+        } else {
+            reinforcementDecision = SyncCoordinator.retrieve(cartridgeFor: actionID).remove()
+        }
+        return reinforcementDecision
+    }
 }

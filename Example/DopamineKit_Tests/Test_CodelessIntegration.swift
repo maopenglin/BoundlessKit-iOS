@@ -21,6 +21,8 @@ class TestCodelessIntegration : XCTestCase {
     override func setUp() {
         continueAfterFailure = false
         
+        DopamineDefaults.current.clear()
+        
         mockURLSession = MockURLSession()
         DopamineAPI.shared.httpClient = HTTPClient(session: mockURLSession)
         CodelessAPI.shared.httpClient = HTTPClient(session: mockURLSession)
@@ -55,7 +57,7 @@ class TestCodelessIntegration : XCTestCase {
 //        window.rootViewController = controllerUnderTest
 //        window.makeKeyAndVisible()
         
-//        sleep(4)
+        sleep(4)
     }
 }
 

@@ -54,6 +54,19 @@ internal class CodelessIntegrationController : NSObject {
         }
     }
     
+    internal func setStateForIntegrationMethodType() {
+        if DopamineConfiguration.current.integrationMethodType == .codeless {
+            if let savedStateString = DopamineDefaults.current.codelessIntegrationSavedState,
+                State(rawValue: savedStateString) == .integrating {
+                state = .integrating
+            } else {
+                state = .integrated
+            }
+        } else {
+            state = .unintegrated
+        }
+    }
+    
     internal var connectionInfo: (String, String)? {
         didSet {
             if oldValue?.1 != connectionInfo?.1 { DopeLog.debug("🔍 \(connectionInfo != nil ? "C" : "Disc")onnected to visualizer") }
@@ -68,19 +81,6 @@ internal class CodelessIntegrationController : NSObject {
             } else {
                 state = .unintegrated
             }
-        }
-    }
-    
-    internal func setStateForIntegrationMethodType() {
-        if DopamineConfiguration.current.integrationMethodType == .codeless {
-            if let savedStateString = DopamineDefaults.current.codelessIntegrationSavedState,
-                State(rawValue: savedStateString) == .integrating {
-                state = .integrating
-            } else {
-                state = .integrated
-            }
-        } else {
-            state = .unintegrated
         }
     }
     

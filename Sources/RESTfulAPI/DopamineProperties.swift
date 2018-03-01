@@ -37,7 +37,7 @@ internal class DopamineProperties : DopamineDefaultsSingleton {
     @objc let appID: String
     var version: DopamineVersion { get { return DopamineVersion.current} set { DopamineVersion.current = newValue } }
     var configuration: DopamineConfiguration { get { return DopamineConfiguration.current} set { DopamineConfiguration.current = newValue } }
-    @objc var inProduction: Bool { didSet { DopamineProperties.current = self } }
+    @objc let inProduction: Bool
     @objc static var productionMode: Bool { get { return (current != nil && current!.inProduction)}}
     @objc let developmentSecret: String
     @objc let productionSecret: String
@@ -48,8 +48,8 @@ internal class DopamineProperties : DopamineDefaultsSingleton {
         self.developmentSecret = developmentSecret
         self.productionSecret = productionSecret
         super.init()
-        version = DopamineVersion.initStandard(with: versionID)
-        configuration = DopamineConfiguration.initStandard(with: configID)
+        version = DopamineVersion(versionID: versionID)
+        configuration = DopamineConfiguration(configID: configID)
     }
     
     init(appID: String, inProduction: Bool, developmentSecret: String, productionSecret: String) {
@@ -71,20 +71,19 @@ internal class DopamineProperties : DopamineDefaultsSingleton {
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
-        if let appID = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.appID)) as? String,
+        guard let appID = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.appID)) as? String,
             let developmentSecret = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.developmentSecret)) as? String,
-            let productionSecret = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.productionSecret)) as? String {
-//            DopeLog.debug("Found DopamineProperties saved in user defaults.")
-            self.init(
-                appID: appID,
-                inProduction: aDecoder.decodeBool(forKey: #keyPath(DopamineProperties.inProduction)),
-                developmentSecret: developmentSecret,
-                productionSecret: productionSecret
-            )
-        } else {
-//            DopeLog.debug("Invalid DopamineProperties saved to user defaults.")
-            return nil
+            let productionSecret = aDecoder.decodeObject(forKey: #keyPath(DopamineProperties.productionSecret)) as? String else {
+//                DopeLog.debug("Invalid DopamineProperties saved to user defaults.")
+                return nil
         }
+//        DopeLog.debug("Found DopamineProperties saved in user defaults.")
+        self.init(
+            appID: appID,
+            inProduction: aDecoder.decodeBool(forKey: #keyPath(DopamineProperties.inProduction)),
+            developmentSecret: developmentSecret,
+            productionSecret: productionSecret
+        )
     }
     
     var apiCredentials: [String: Any] {
@@ -108,8 +107,8 @@ internal class DopamineProperties : DopamineDefaultsSingleton {
     internal static func resetIdentity(completion: @escaping (String?) -> () = {_ in}) {
         _primaryIdentity = nil
         SyncCoordinator.flush()
-        DopamineConfiguration.current = DopamineConfiguration.standard
-        DopamineVersion.current = DopamineVersion.standard
+        DopamineConfiguration.current = DopamineConfiguration()
+        DopamineVersion.current = DopamineVersion()
         CodelessAPI.boot() {
             completion(_primaryIdentity)
         }

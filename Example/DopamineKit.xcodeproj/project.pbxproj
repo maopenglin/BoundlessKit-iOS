@@ -35,6 +35,7 @@
 		84A41554202C07C300A79443 /* ViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A4154F202C07C300A79443 /* ViewController+Extensions.swift */; };
 		84A41556202C07C300A79443 /* Test_DopamineAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A41551202C07C300A79443 /* Test_DopamineAPI.swift */; };
 		84A41557202C07C300A79443 /* Test_Swizzler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A41552202C07C300A79443 /* Test_Swizzler.swift */; };
+		84B56C792047B2DE000225AC /* MockHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840CA779203FF6AE008108D1 /* MockHTTPClient.swift */; };
 		84C4C3322047625A0046279E /* MockCartridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C4C3312047625A0046279E /* MockCartridge.swift */; };
 		84CCAFE3203619F70095E273 /* RewardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCAFE2203619F70095E273 /* RewardsViewController.swift */; };
 		84CCAFE520361A9E0095E273 /* Reward.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCAFE420361A9E0095E273 /* Reward.swift */; };
@@ -619,6 +620,7 @@
 			files = (
 				842EB69720366F2700523265 /* CandyIcon.swift in Sources */,
 				842EB69520366F1D00523265 /* AppDelegate.swift in Sources */,
+				84B56C792047B2DE000225AC /* MockHTTPClient.swift in Sources */,
 				842EB69620366F1D00523265 /* ViewController.swift in Sources */,
 				842EB6872036688D00523265 /* DopamineKit_UIUnitTests.swift in Sources */,
 				842EB69420366E8E00523265 /* Reward.swift in Sources */,

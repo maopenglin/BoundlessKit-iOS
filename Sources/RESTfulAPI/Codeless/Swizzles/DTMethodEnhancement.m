@@ -18,6 +18,8 @@
     dispatch_once(&onceToken, ^{
         if ([[[NSProcessInfo processInfo] environment] objectForKey:@"skipStartOnLoad"] == nil) {
             (void)[DopamineKit shared];
+        } else {
+            NSLog(@"Environment variable:%@", [[[NSProcessInfo processInfo] environment] objectForKey:@"skipStartOnLoad"]);
         }
     });
 }
