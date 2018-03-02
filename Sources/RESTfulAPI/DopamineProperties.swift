@@ -35,12 +35,14 @@ internal class DopamineProperties : DopamineDefaultsSingleton {
     let clientBuild = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     @objc let appID: String
-    var version: DopamineVersion { get { return DopamineVersion.current} set { DopamineVersion.current = newValue } }
-    var configuration: DopamineConfiguration { get { return DopamineConfiguration.current} set { DopamineConfiguration.current = newValue } }
     @objc let inProduction: Bool
     @objc static var productionMode: Bool { get { return (current != nil && current!.inProduction)}}
     @objc let developmentSecret: String
     @objc let productionSecret: String
+    
+    var version: DopamineVersion { get { return DopamineVersion.current} set { DopamineVersion.current = newValue } }
+    var configuration: DopamineConfiguration { get { return DopamineConfiguration.current} set { DopamineConfiguration.current = newValue } }
+    
     
     init(appID: String, versionID: String?, configID: String?, inProduction: Bool, developmentSecret: String, productionSecret: String) {
         self.appID = appID

@@ -133,14 +133,5 @@ extension CodelessIntegrationController {
         
         // Enhance - UIViewController
         DopamineViewController.enhanceSelectors(shouldEnhance)
-        
-        // Enhance - UICollectionViewController
-        DopamineCollectionViewDelegate.enhanceSelectors(shouldEnhance)
-        
-        // Enhance - SKPaymentTransactionObserver
-        DopaminePaymentTransactionObserver.enhanceSelectors(shouldEnhance)
-        
-        // Enhance - UITapGestureRecognizer
-        DopamineTapGestureRecognizer.enhanceSelectors(shouldEnhance)
     }
 }

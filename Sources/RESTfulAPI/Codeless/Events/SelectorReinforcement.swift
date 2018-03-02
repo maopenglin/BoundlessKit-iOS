@@ -23,7 +23,6 @@ public class SelectorReinforcement : NSObject {
         appInactive = "appInactive",
         viewControllerDidAppear = "viewControllerDidAppear",
         viewControllerDidDisappear = "viewControllerDidDisappear",
-        collectionDidSelect = "collectionDidSelect",
         custom = "customSelector"
         
         init?(for classType: AnyClass, _ selector: Selector) {
@@ -40,8 +39,6 @@ public class SelectorReinforcement : NSObject {
                 self = .viewControllerDidAppear
             case #selector(UIViewController.viewDidDisappear(_:)):
                 self = .viewControllerDidDisappear
-            case #selector(UICollectionViewDelegate.collectionView(_:didSelectItemAt:)):
-                self = .collectionDidSelect
             default:
                 if DopamineObject.templateAvailable(for: classType, selector) {
                     self = .custom

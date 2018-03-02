@@ -15,7 +15,7 @@ public class DopamineConfiguration : DopamineDefaultsSingleton  {
     }
     
     @objc
-    public static var current: DopamineConfiguration = { return DopamineDefaults.current.unarchive() ?? DopamineConfiguration() }()
+    public internal(set) static var current: DopamineConfiguration = { return DopamineDefaults.current.unarchive() ?? DopamineConfiguration() }()
         {
         didSet {
             DopamineDefaults.current.archive(current)
