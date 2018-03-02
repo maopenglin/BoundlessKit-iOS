@@ -20,6 +20,7 @@ internal class CodelessIntegrationController : NSObject {
             if !DopamineProperties.productionMode && _shared.state != .unintegrated {
                 CodelessAPI.promptPairing()
             }
+            _shared.setStateForIntegrationMethodType()
         }
         return _shared
     }()

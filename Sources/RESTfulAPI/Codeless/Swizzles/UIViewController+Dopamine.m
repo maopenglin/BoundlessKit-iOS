@@ -31,14 +31,7 @@
         [self enhanced_viewDidAppear:animated];
     
     if (self) {
-        [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(viewDidAppear:)];
-    }
-    
-    if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
-        [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didAppear",
-                                                         @"classname": NSStringFromClass([self class]),
-                                                         @"time": [DopeInfo trackStartTimeFor:[self description]]
-                                                         }];
+        [SelectorReinforcement recordActionForTargetInstance:self action:@selector(viewDidAppear:)];
     }
 }
 
@@ -47,14 +40,7 @@
         [self enhanced_viewDidDisappear:animated];
     
     if (self) {
-        [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(viewDidDisappear:)];
-    }
-    
-    if ([[DopamineConfiguration current] applicationViews] || [[[DopamineConfiguration current] customViews] objectForKey:NSStringFromClass([self class])]) {
-        [DopamineKit track:@"ApplicationView" metaData:@{@"tag": @"didDisappear",
-                                                          @"classname": NSStringFromClass([self class]),
-                                                          @"time": [DopeInfo timeTrackedFor:[self description]]
-                                                              }];
+        [SelectorReinforcement recordActionForTargetInstance:self action:@selector(viewDidDisappear:)];
     }
 }
 

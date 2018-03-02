@@ -8,22 +8,22 @@
 import Foundation
 
 @objc
-public class DopamineVersion : DopamineDefaultsSingleton {
+internal class DopamineVersion : DopamineDefaultsSingleton {
     
     @objc
-    public internal(set) static var current: DopamineVersion = { return DopamineDefaults.current.unarchive() ?? DopamineVersion() }()
+    internal static var current: DopamineVersion = { return DopamineDefaults.current.unarchive() ?? DopamineVersion() }()
         {
         didSet {
             DopamineDefaults.current.archive(current)
         }
     }
     
-    @objc public let versionID: String?
+    @objc let versionID: String?
     @objc fileprivate let mappings: [String:Any]
     @objc fileprivate var visualizerMappings: [String:Any]
     
     fileprivate let updateQueue = SingleOperationQueue(delayAfter: 1, dropCollisions: true)
-    public func update(visualizer mappings: [String: Any]?) {
+    func update(visualizer mappings: [String: Any]?) {
         updateQueue.addOperation {
             print("Updating visualizer to:\(mappings as AnyObject)")
             if let mappings = mappings {
@@ -70,8 +70,8 @@ public class DopamineVersion : DopamineDefaultsSingleton {
     }
 }
 
-public extension DopamineVersion {
-    public static func convert(from versionDictionary: [String: Any]) -> DopamineVersion? {
+extension DopamineVersion {
+    static func convert(from versionDictionary: [String: Any]) -> DopamineVersion? {
         guard let versionID = versionDictionary["versionID"] as? String? else { DopeLog.debug("Bad parameter"); return nil }
         guard let mappings = versionDictionary["mappings"] as? [String:Any] else { DopeLog.debug("Bad parameter"); return nil }
         let visualizerMappings = versionDictionary["visualizerMappings"] as? [String:Any] ?? [:]
@@ -79,23 +79,23 @@ public extension DopamineVersion {
         return DopamineVersion.init(versionID: versionID, mappings: mappings, visualizerMappings: visualizerMappings)
     }
     
-    public var actionIDs: [String] {
+    var actionIDs: [String] {
         return Array(mappings.keys)
     }
     
-    public var visualizerActionIDs: [String] {
+    var visualizerActionIDs: [String] {
         return Array(mappings.keys) + Array(visualizerMappings.keys)
     }
     
-    public func actionMapping(for actionID: String) -> [String: Any]? {
+    func actionMapping(for actionID: String) -> [String: Any]? {
         return mappings[actionID] as? [String: Any]
     }
     
-    public func visualizerActionMapping(for actionID: String) -> [String: Any]? {
+    func visualizerActionMapping(for actionID: String) -> [String: Any]? {
         return visualizerMappings[actionID] as? [String: Any] ?? mappings[actionID] as? [String: Any]
     }
     
-    internal func reinforcementDecision(for actionID: String) -> String {
+    func reinforcementDecision(for actionID: String) -> String {
         let reinforcementDecision: String
         if CodelessIntegrationController.shared.state == .integrating,
             let actionMapping = actionMapping(for: actionID),

@@ -122,7 +122,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
-        print("Wifi:\(String(describing: DopeInfo.mySSID))")
 //        DispatchQueue.concurrentPerform(iterations: 100) { count in
 //            DopamineKit.track("testingActionConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
 //        }

@@ -8,47 +8,44 @@
 import Foundation
 
 @objc
-public class DopamineConfiguration : DopamineDefaultsSingleton  {
+internal class DopamineConfiguration : DopamineDefaultsSingleton  {
     
-    public enum IntegrationMethodType : String {
+    enum IntegrationMethodType : String {
         case manual, codeless
     }
     
     @objc
-    public internal(set) static var current: DopamineConfiguration = { return DopamineDefaults.current.unarchive() ?? DopamineConfiguration() }()
+    internal static var current: DopamineConfiguration = { return DopamineDefaults.current.unarchive() ?? DopamineConfiguration() }()
         {
         didSet {
             DopamineDefaults.current.archive(current)
         }
     }
     
-    @objc public let configID: String?
-    
-    @objc public let reinforcementEnabled: Bool
-    @objc public let reportBatchSize: Int
-    
-    @objc public let triggerEnabled: Bool
-    
-    @objc public let trackingEnabled: Bool
-    @objc public let trackBatchSize: Int
-    
-    @objc public let integrationMethod: String
-    public var integrationMethodType: IntegrationMethodType {
+    var integrationMethodType: IntegrationMethodType {
         get {
             return IntegrationMethodType.init(rawValue: integrationMethod) ?? .manual
         }
     }
     
-    @objc public let advertiserID: Bool
-    @objc public let consoleLoggingEnabled: Bool
+    @objc let configID: String?
+    @objc let consoleLoggingEnabled: Bool
     
-    @objc public let notificationObservations: Bool
-    @objc public let storekitObservations: Bool
-    @objc public let locationObservations: Bool
-    @objc public let applicationState: Bool
-    @objc public let applicationViews: Bool
-    @objc public let customViews: [String: Any]
-    @objc public let customEvents: [String: Any]
+    @objc let integrationMethod: String
+    @objc let reinforcementEnabled: Bool
+    @objc let reportBatchSize: Int
+    @objc let triggerEnabled: Bool
+    @objc let trackingEnabled: Bool
+    @objc let trackBatchSize: Int
+    
+    @objc let advertiserID: Bool
+    @objc let notificationObservations: Bool
+    @objc let storekitObservations: Bool
+    @objc let locationObservations: Bool
+    @objc let applicationState: Bool
+    @objc let applicationViews: Bool
+    @objc let customViews: [String: Any]
+    @objc let customEvents: [String: Any]
     
     
     init(configID: String? = nil,

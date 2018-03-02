@@ -13,8 +13,8 @@
 @interface DopamineAppDelegate : NSObject
 
 + (void) enhanceSelectors: (BOOL)enable;
-- (void) reinforced_applicationDidBecomeActive:(UIApplication*)application;
-- (BOOL) reinforced_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
+- (void) reinforcedAction_applicationDidBecomeActive:(UIApplication*)application;
+- (BOOL) reinforcedAction_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
 
 @end
 

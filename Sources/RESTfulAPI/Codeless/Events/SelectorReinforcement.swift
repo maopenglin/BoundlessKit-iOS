@@ -53,9 +53,9 @@ public class SelectorReinforcement : NSObject {
     var reinforcedCounterparts: (AnyClass, Selector)? {
         switch selectorType {
         case .appLaunch:
-            return (DopamineAppDelegate.self, #selector(DopamineAppDelegate.reinforced_application(_:didFinishLaunchingWithOptions:)))
+            return (DopamineAppDelegate.self, #selector(DopamineAppDelegate.reinforcedAction_application(_:didFinishLaunchingWithOptions:)))
         case .appActive:
-            return (DopamineAppDelegate.self, #selector(DopamineAppDelegate.reinforced_applicationDidBecomeActive(_:)))
+            return (DopamineAppDelegate.self, #selector(DopamineAppDelegate.reinforcedAction_applicationDidBecomeActive(_:)))
         case .viewControllerDidAppear:
             return (DopamineViewController.self, #selector(DopamineViewController.reinforced_viewDidAppear(_:)))
         case .custom:
@@ -192,8 +192,49 @@ extension SelectorReinforcement {
 extension SelectorReinforcement {
     
     @objc
-    public static func integrationModeSubmit(targetInstance: AnyObject, action: Selector) {
+    public static func recordActionFor(targetInstance: AnyObject, action: Selector) {
         integrationModeSubmit(senderInstance: nil, targetInstance: targetInstance, action: action)
+        switch action {
+        case #selector(UIApplicationDelegate.applicationDidBecomeActive(_:)):
+            if DopamineConfiguration.current.applicationState {
+                DopamineKit.track("ApplicationState",
+                                  metaData: ["tag": "didBecomeActive",
+                                             "classname": NSStringFromClass(type(of: targetInstance)),
+                                             "time": DopeInfo.trackStartTime(for: targetInstance.description)
+                    ])
+            }
+
+        case #selector(UIApplicationDelegate.applicationWillResignActive(_:)):
+            if DopamineConfiguration.current.applicationState {
+                DopamineKit.track("ApplicationState",
+                                  metaData: ["tag": "willResignActive",
+                                             "classname": NSStringFromClass(type(of: targetInstance)),
+                                             "time": DopeInfo.timeTracked(for: targetInstance.description)
+                    ])
+            }
+            
+        case #selector(UIViewController.viewDidAppear(_:)):
+            if DopamineConfiguration.current.applicationViews || DopamineConfiguration.current.customViews[NSStringFromClass(type(of: targetInstance))] != nil {
+                DopamineKit.track("ApplicationView",
+                                  metaData: ["tag": "didAppear",
+                                             "classname": NSStringFromClass(type(of: targetInstance)),
+                                             "time": DopeInfo.trackStartTime(for: targetInstance.description)
+                    ])
+            }
+            
+        case #selector(UIViewController.viewDidDisappear(_:)):
+            if DopamineConfiguration.current.applicationViews || DopamineConfiguration.current.customViews[NSStringFromClass(type(of: targetInstance))] != nil {
+                DopamineKit.track("ApplicationView",
+                                  metaData: ["tag": "didDisappear",
+                                             "classname": NSStringFromClass(type(of: targetInstance)),
+                                             "time": DopeInfo.timeTracked(for: targetInstance.description)
+                    ])
+            }
+            
+        default:
+            break
+        }
+        
     }
     
     @objc

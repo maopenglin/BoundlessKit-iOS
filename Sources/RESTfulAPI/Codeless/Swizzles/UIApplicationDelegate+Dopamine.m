@@ -45,7 +45,7 @@ static NSArray* delegateSubclasses = nil;
             [SwizzleHelper injectToProperClass:@selector(enhanced_application:didFinishLaunchingWithOptions:) :@selector(application:didFinishLaunchingWithOptions:) :delegateSubclasses :enhancedClass :delegateClass];
 //            [SwizzleHelper injectToProperClass:@selector(enhanced_applicationWillTerminate:) :@selector(applicationWillTerminate:) :delegateSubclasses :enhancedClass :delegateClass];
             [SwizzleHelper injectToProperClass :@selector(enhanced_applicationDidBecomeActive:) :@selector(applicationDidBecomeActive:) :delegateSubclasses :enhancedClass :delegateClass ];
-            [SwizzleHelper injectToProperClass :@selector(enhanced_applicationWillResignActive:) :@selector(applicationWillResignActive:) :delegateSubclasses :enhancedClass :delegateClass ];
+            [SwizzleHelper injectToProperClass :@selector(actionTrack_applicationWillResignActive:) :@selector(applicationWillResignActive:) :delegateSubclasses :enhancedClass :delegateClass ];
         }
     }
 }
@@ -63,7 +63,7 @@ static NSArray* delegateSubclasses = nil;
 // Application State Enhances
 
 - (BOOL) enhanced_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(application:didFinishLaunchingWithOptions:)];
+    [SelectorReinforcement recordActionForTargetInstance:self action:@selector(application:didFinishLaunchingWithOptions:)];
     
     if ([self respondsToSelector:@selector(enhanced_application:didFinishLaunchingWithOptions:)]) {
         return [self enhanced_application:application didFinishLaunchingWithOptions:launchOptions];
@@ -73,7 +73,7 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (void) enhanced_applicationWillTerminate:(UIApplication *)application {
-    [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(applicationWillTerminate:)];
+    [SelectorReinforcement recordActionForTargetInstance:self action:@selector(applicationWillTerminate:)];
     
     if ([self respondsToSelector:@selector(enhanced_applicationWillTerminate:)]) {
         [self enhanced_applicationWillTerminate:application];
@@ -85,43 +85,28 @@ static NSArray* delegateSubclasses = nil;
         [self enhanced_applicationDidBecomeActive:application];
     
 //    [CodelessAPI bootWithCompletion:^{}];
-    [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(applicationDidBecomeActive:)];
-    
-    if ([[DopamineConfiguration current] applicationState]) {
-        [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"didBecomeActive",
-                                                          @"classname": NSStringFromClass([self class]),
-                                                          @"time": [DopeInfo trackStartTimeFor:[self description]]
-                                                          }];
-    }
-    
+    [SelectorReinforcement recordActionForTargetInstance:self action:@selector(applicationDidBecomeActive:)];
 }
 
-- (void) enhanced_applicationWillResignActive:(UIApplication*)application {
-    [SelectorReinforcement integrationModeSubmitWithTargetInstance:self action:@selector(applicationWillResignActive:)];
+- (void) actionTrack_applicationWillResignActive:(UIApplication*)application {
+    [SelectorReinforcement recordActionForTargetInstance:self action:@selector(applicationWillResignActive:)];
     
-    if ([[DopamineConfiguration current] applicationState]) {
-        [DopamineKit track:@"ApplicationState" metaData:@{@"tag":@"willResignActive",
-                                                          @"classname": NSStringFromClass([self class]),
-                                                          @"time": [DopeInfo timeTrackedFor:[self description]]
-                                                          }];
-    }
-    
-    if ([self respondsToSelector:@selector(enhanced_applicationWillResignActive:)])
-        [self enhanced_applicationWillResignActive:application];
+    if ([self respondsToSelector:@selector(actionTrack_applicationWillResignActive:)])
+        [self actionTrack_applicationWillResignActive:application];
 }
 
-- (BOOL) reinforced_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+- (BOOL) reinforcedAction_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [SelectorReinforcement attemptReinforcementWithSenderInstance:nil targetInstance:self action:@selector(application:didFinishLaunchingWithOptions:)];
-    if ([self respondsToSelector:@selector(reinforced_application:didFinishLaunchingWithOptions:)]) {
-        return [self reinforced_application:application didFinishLaunchingWithOptions:launchOptions];
+    if ([self respondsToSelector:@selector(reinforcedAction_application:didFinishLaunchingWithOptions:)]) {
+        return [self reinforcedAction_application:application didFinishLaunchingWithOptions:launchOptions];
     } else {
         return true;
     }
 }
 
-- (void) reinforced_applicationDidBecomeActive:(UIApplication*)application {
-    if ([self respondsToSelector:@selector(reinforced_applicationDidBecomeActive:)])
-        [self reinforced_applicationDidBecomeActive:application];
+- (void) reinforcedAction_applicationDidBecomeActive:(UIApplication*)application {
+    if ([self respondsToSelector:@selector(reinforcedAction_applicationDidBecomeActive:)])
+        [self reinforcedAction_applicationDidBecomeActive:application];
     
     [SelectorReinforcement attemptReinforcementWithSenderInstance:nil targetInstance:self action:@selector(applicationDidBecomeActive:)];
 }

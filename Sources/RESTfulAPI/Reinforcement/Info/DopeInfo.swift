@@ -9,19 +9,19 @@ import Foundation
 import SystemConfiguration.CaptiveNetwork
 import CoreBluetooth
 
-@objc public class DopeInfo : NSObject {
+internal class DopeInfo : NSObject {
     
-    public static let shared = DopeInfo()
+    static let shared = DopeInfo()
     
     fileprivate static var timeMarkers = NSMutableDictionary()
     
-    @objc public static func trackStartTime(for id: String) -> NSDictionary {
+    static func trackStartTime(for id: String) -> NSDictionary {
         let start = Date()
         timeMarkers.setValue(start, forKey: id)
         return ["start": Int64(1000*start.timeIntervalSince1970)]
     }
     
-    @objc public static func timeTracked(for id: String) -> NSDictionary {
+    static func timeTracked(for id: String) -> NSDictionary {
         defer {
             timeMarkers.removeObject(forKey: id)
         }
@@ -38,7 +38,7 @@ import CoreBluetooth
     
     
     
-    public static var mySSID: String? {
+    static var mySSID: String? {
         if let interfaces = CNCopySupportedInterfaces(),
             let interfacesArray = interfaces as? [String],
             interfacesArray.count > 0,
