@@ -13,18 +13,34 @@ import XCTest
 class DopamineKit_UIUnitTests: XCTestCase {
     
     
-    var app: XCUIApplication!
+//    var app: XCUIApplication!
+    var mockURLSession: MockURLSession = {
+        DopamineDefaults.current.clear()
+        
+        let mockSession: MockURLSession! = MockURLSession()
+        mockSession.setCodelessPairingReconnected()
+        DopamineAPI.shared.httpClient = HTTPClient(session: mockSession)
+        CodelessAPI.shared.httpClient = HTTPClient(session: mockSession)
+        
+        SyncCoordinator.timeDelayAfterTrack = 1
+        SyncCoordinator.timeDelayAfterReport = 1
+        SyncCoordinator.timeDelayAfterRefresh = 1
+        SyncCoordinator.flush()
+        
+        return mockSession
+    }()
     
     override func setUp() {
         super.setUp()
         
         // Put setup code here. This method is called before the invocation of each test method in the class.
         
+        
         // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
         // UI tests must launch the application that they test. Doing this in setup will make sure it happens for each test method.
 //        XCUIApplication().launch()
-         app = XCUIApplication()
+//         app = XCUIApplication()
 
         // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
@@ -32,6 +48,17 @@ class DopamineKit_UIUnitTests: XCTestCase {
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
+    }
+    
+    func testIntegratingMode() {
+        
+        
+        _ = DopamineKit.shared
+        
+        let app = XCUIApplication()
+        app.launch()
+        sleep(5)
+        
     }
     
 //    func testRewards() {
