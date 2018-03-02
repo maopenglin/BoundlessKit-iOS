@@ -31,7 +31,7 @@
         [self enhanced_viewDidAppear:animated];
     
     if (self) {
-        [SelectorReinforcement recordActionForTargetInstance:self action:@selector(viewDidAppear:)];
+        [SelectorReinforcement recordActionForSenderInstance: nil targetInstance:self action:@selector(viewDidAppear:)];
     }
 }
 
@@ -40,7 +40,7 @@
         [self enhanced_viewDidDisappear:animated];
     
     if (self) {
-        [SelectorReinforcement recordActionForTargetInstance:self action:@selector(viewDidDisappear:)];
+        [SelectorReinforcement recordActionForSenderInstance: nil targetInstance:self action:@selector(viewDidDisappear:)];
     }
 }
 

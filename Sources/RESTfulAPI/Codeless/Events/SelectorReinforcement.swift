@@ -192,8 +192,12 @@ extension SelectorReinforcement {
 extension SelectorReinforcement {
     
     @objc
-    public static func recordActionFor(targetInstance: AnyObject, action: Selector) {
-        integrationModeSubmit(senderInstance: nil, targetInstance: targetInstance, action: action)
+    public static func recordActionFor(senderInstance: AnyObject?, targetInstance: AnyObject, action: Selector) {
+        guard let targetInstance = targetInstance as? NSObject,
+            let selectorReinforcement = SelectorReinforcement(target: targetInstance, selector: action) else {
+                return
+        }
+        
         switch action {
         case #selector(UIApplicationDelegate.applicationDidBecomeActive(_:)):
             if DopamineConfiguration.current.applicationState {
@@ -203,7 +207,7 @@ extension SelectorReinforcement {
                                              "time": DopeInfo.trackStartTime(for: targetInstance.description)
                     ])
             }
-
+            
         case #selector(UIApplicationDelegate.applicationWillResignActive(_:)):
             if DopamineConfiguration.current.applicationState {
                 DopamineKit.track("ApplicationState",
@@ -235,15 +239,7 @@ extension SelectorReinforcement {
             break
         }
         
-    }
-    
-    @objc
-    public static func integrationModeSubmit(senderInstance: AnyObject?, targetInstance: AnyObject, action: Selector) {
-        guard let targetInstance = targetInstance as? NSObject,
-            let selectorReinforcement = SelectorReinforcement(target: targetInstance, selector: action) else {
-                return
-        }
-        CodelessIntegrationController.shared.submitSelectorReinforcement(selectorReinforcement: selectorReinforcement, senderInstance: senderInstance)
+        CodelessIntegrationController.shared.ifIntegratingSubmit(selectorReinforcement: selectorReinforcement, senderInstance: senderInstance)
     }
     
     // note: don't call this from the main thread if the object is also on the main thread

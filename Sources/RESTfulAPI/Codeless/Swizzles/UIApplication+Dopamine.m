@@ -43,7 +43,7 @@
         
         // Sometimes this method proxies through to its internal method. We want to ignore those calls.
         if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
-            [SelectorReinforcement integrationModeSubmitWithSenderInstance:sender targetInstance:target action:action];
+            [SelectorReinforcement recordActionForSenderInstance:sender targetInstance:target action:action];
         }
     }
     

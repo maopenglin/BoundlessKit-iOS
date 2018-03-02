@@ -63,7 +63,7 @@ static NSArray* delegateSubclasses = nil;
 // Application State Enhances
 
 - (BOOL) enhanced_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [SelectorReinforcement recordActionForTargetInstance:self action:@selector(application:didFinishLaunchingWithOptions:)];
+    [SelectorReinforcement recordActionForSenderInstance: nil targetInstance:self action:@selector(application:didFinishLaunchingWithOptions:)];
     
     if ([self respondsToSelector:@selector(enhanced_application:didFinishLaunchingWithOptions:)]) {
         return [self enhanced_application:application didFinishLaunchingWithOptions:launchOptions];
@@ -73,7 +73,7 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (void) enhanced_applicationWillTerminate:(UIApplication *)application {
-    [SelectorReinforcement recordActionForTargetInstance:self action:@selector(applicationWillTerminate:)];
+    [SelectorReinforcement recordActionForSenderInstance: nil targetInstance:self action:@selector(applicationWillTerminate:)];
     
     if ([self respondsToSelector:@selector(enhanced_applicationWillTerminate:)]) {
         [self enhanced_applicationWillTerminate:application];
@@ -85,11 +85,11 @@ static NSArray* delegateSubclasses = nil;
         [self enhanced_applicationDidBecomeActive:application];
     
 //    [CodelessAPI bootWithCompletion:^{}];
-    [SelectorReinforcement recordActionForTargetInstance:self action:@selector(applicationDidBecomeActive:)];
+    [SelectorReinforcement recordActionForSenderInstance: nil targetInstance:self action:@selector(applicationDidBecomeActive:)];
 }
 
 - (void) actionTrack_applicationWillResignActive:(UIApplication*)application {
-    [SelectorReinforcement recordActionForTargetInstance:self action:@selector(applicationWillResignActive:)];
+    [SelectorReinforcement recordActionForSenderInstance: nil targetInstance:self action:@selector(applicationWillResignActive:)];
     
     if ([self respondsToSelector:@selector(actionTrack_applicationWillResignActive:)])
         [self actionTrack_applicationWillResignActive:application];

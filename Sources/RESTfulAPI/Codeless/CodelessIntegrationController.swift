@@ -92,7 +92,7 @@ internal class CodelessIntegrationController : NSObject {
         return queue
     }()
     
-    func submitSelectorReinforcement(selectorReinforcement: SelectorReinforcement, senderInstance: AnyObject?) {
+    func ifIntegratingSubmit(selectorReinforcement: SelectorReinforcement, senderInstance: AnyObject?) {
         guard state == .integrating else { return }
         
         submitQueue.addOperation {
