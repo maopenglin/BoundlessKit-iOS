@@ -1,0 +1,6 @@
+framework module Pods_BoundlessKit_Tests {
+  umbrella header "Pods-BoundlessKit_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}

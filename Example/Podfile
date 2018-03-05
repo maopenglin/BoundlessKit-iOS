@@ -1,18 +1,19 @@
 use_frameworks!
 platform :ios, '9.0'
 
-target 'DopamineKit_Example' do
-  pod 'DopamineKit', :path => '../'
+target 'BoundlessKit_Example' do
+  pod 'BoundlessKit', :path => '../'
 
-target 'DopamineKit_Tests' do
+  target 'BoundlessKit_Tests' do
     inherit! :search_paths
+
     
   end
 end
 
 post_install do |installer|
     installer.pods_project.targets.each do |target|
-        if target.name == 'DopamineKit'
+        if target.name == 'BoundlessKit'
             target.build_configurations.each do |config|
                 if config.name == 'Debug'
                     config.build_settings['OTHER_SWIFT_FLAGS'] = '-DDEBUG'
