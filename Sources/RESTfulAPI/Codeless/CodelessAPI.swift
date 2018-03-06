@@ -42,13 +42,13 @@ internal class CodelessAPI : NSObject {
         shared.send(call: .boot, with: payload){ response in
             if let status = response["status"] as? Int {
                 if status == 205 {
-                    if let configDict = response["config"] as? [String: Any],
-                        let config = DopamineConfiguration.convert(from: configDict) {
-                        DopamineProperties.current?.configuration = config
-                    }
                     if let versionDict = response["version"] as? [String: Any],
                         let version = DopamineVersion.convert(from: versionDict) {
                         DopamineProperties.current?.version = version
+                    }
+                    if let configDict = response["config"] as? [String: Any],
+                        let config = DopamineConfiguration.convert(from: configDict) {
+                        DopamineProperties.current?.configuration = config
                     }
                 }
             }

@@ -19,6 +19,7 @@ internal class DopamineConfiguration : DopamineDefaultsSingleton  {
         {
         didSet {
             DopamineDefaults.current.archive(current)
+            CodelessIntegrationController.shared.setState(for: current.integrationMethodType)
         }
     }
     

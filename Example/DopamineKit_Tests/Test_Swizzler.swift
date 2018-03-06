@@ -84,13 +84,24 @@ class TestSwizzler: XCTestCase {
         )
     }
     
-    func testSwizzleForMethodReturnsVoidParam1int() {
+    func testSwizzleForMethodReturnsVoidParam1bool() {
         doubleSwizzle(
             sut: controllerUnderTest,
-            selector1: #selector(ViewController.funcReturnsVoidParam1int(param1:)),
-            args1: [10],
-            selector2: #selector(ViewController.func2ReturnsVoidParam1int(param1:)),
-            args2: [20],
+            selector1: #selector(ViewController.funcReturnsVoidParam1bool(param1:)),
+            args1: [true],
+            selector2: #selector(ViewController.func2ReturnsVoidParam1bool(param1:)),
+            args2: [false],
+            argsCount: 1
+        )
+    }
+    
+    func testSwizzleForMethodViewDidAppear() {
+        doubleSwizzle(
+            sut: controllerUnderTest,
+            selector1: #selector(ViewController.viewDidAppear(_:)),
+            args1: [true],
+            selector2: #selector(ViewController.func2ReturnsVoidParam1bool(param1:)),
+            args2: [false],
             argsCount: 1
         )
     }
@@ -105,8 +116,8 @@ class TestSwizzler: XCTestCase {
         let beforeTestFunc2StackSize = TestSwizzler.counterAndClear
         
         // when
-        SelectorReinforcement(target: sut, selector: selector1)?.registerMethod()
-        SelectorReinforcement(target: sut, selector: selector2)?.registerMethod()
+        DopamineSelector(target: sut, selector: selector1)?.registerMethod()
+        DopamineSelector(target: sut, selector: selector2)?.registerMethod()
         
         
         // then

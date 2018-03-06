@@ -23,13 +23,13 @@ extension ViewController {
         print("In \(#function) stack count:\(count)")
     }
     
-    @objc func funcReturnsVoidParam1int(param1: Int32) {
+    @objc func funcReturnsVoidParam1bool(param1: Bool) {
         let count = Thread.callStackSymbols.count
         TestSwizzler.counter = count
         print("In \(#function) stack count:\(count) with param:\(type(of: param1))(\(String(describing: param1)))")
     }
     
-    @objc func func2ReturnsVoidParam1int(param1: Int32) {
+    @objc func func2ReturnsVoidParam1bool(param1: Bool) {
         let count = Thread.callStackSymbols.count
         TestSwizzler.counter = count
         print("In \(#function) stack count:\(count) with param:\(type(of: param1))(\(String(describing: param1)))")

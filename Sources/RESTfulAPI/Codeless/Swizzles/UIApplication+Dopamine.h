@@ -11,7 +11,8 @@
 #define UIApplication_Dopamine_h
 
 @interface DopamineApp : UIApplication
-+ (void) enhanceSelectors: (BOOL)enable;
++ (void) sendActionsToDashboard: (BOOL)enable;
+- (BOOL) dashboardIntegration_sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event;
 @end
 
 #endif /* UIApplication_Dopamine_h */

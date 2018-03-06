@@ -60,8 +60,8 @@ internal class DopamineProperties : DopamineDefaultsSingleton {
         self.developmentSecret = developmentSecret
         self.productionSecret = productionSecret
         super.init()
-        _ = self.version
-        _ = self.configuration
+        self.version = {self.version}()
+        self.configuration = {self.configuration}()
     }
     
     override func encode(with aCoder: NSCoder) {

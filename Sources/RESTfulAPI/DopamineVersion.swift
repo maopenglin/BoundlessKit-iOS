@@ -33,7 +33,9 @@ internal class DopamineVersion : DopamineDefaultsSingleton {
             } else {
                 self.visualizerMappings = [:]
             }
-            DopamineDefaults.current.archive(self)
+            DopamineVersion.current = self
+            DopamineConfiguration.current = {DopamineConfiguration.current}()
+            
 //            DopeLog.debug("New visualizer mappings:\(self.visualizerMappings as AnyObject)")
         }
     }
@@ -84,7 +86,7 @@ extension DopamineVersion {
     }
     
     var visualizerActionIDs: [String] {
-        return Array(mappings.keys) + Array(visualizerMappings.keys)
+        return Array(mappings.keys) + Array(visualizerMappings.keys) + Array(DopamineSelector.dashboardIntegratingSelectors)
     }
     
     func actionMapping(for actionID: String) -> [String: Any]? {
@@ -97,12 +99,14 @@ extension DopamineVersion {
     
     func reinforcementDecision(for actionID: String) -> String {
         let reinforcementDecision: String
-        if CodelessIntegrationController.shared.state == .integrating,
-            let actionMapping = actionMapping(for: actionID),
-            let randomReinforcement = CodelessReinforcement.reinforcementsIDs(in: actionMapping)?.selectRandom()
-        {
-            reinforcementDecision = randomReinforcement
-        } else {
+        if CodelessIntegrationController.shared.state == .integrating {
+            if let actionMapping = visualizerActionMapping(for: actionID),
+                let randomReinforcement = CodelessReinforcement.reinforcementsIDs(in: actionMapping)?.selectRandom() {
+                reinforcementDecision = randomReinforcement
+            } else {
+                reinforcementDecision = Cartridge.defaultReinforcementDecision
+            }
+        }else {
             reinforcementDecision = SyncCoordinator.retrieve(cartridgeFor: actionID).remove()
         }
         return reinforcementDecision

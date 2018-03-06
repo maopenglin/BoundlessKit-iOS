@@ -13,17 +13,7 @@ internal class CodelessIntegrationController : NSObject {
         case unintegrated, integrating, integrated
     }
     
-    static let shared: CodelessIntegrationController = {
-        let _shared = CodelessIntegrationController()
-        _shared.setStateForIntegrationMethodType()
-        CodelessAPI.boot() {
-            if !DopamineProperties.productionMode && _shared.state != .unintegrated {
-                CodelessAPI.promptPairing()
-            }
-            _shared.setStateForIntegrationMethodType()
-        }
-        return _shared
-    }()
+    static let shared = CodelessIntegrationController()
     
     fileprivate override init() {
         super.init()
@@ -31,32 +21,14 @@ internal class CodelessIntegrationController : NSObject {
     
     internal fileprivate(set) var state: State = .unintegrated {
         didSet {
-            DopeLog.print("State changed from \(oldValue) to \(state)")
-            switch state {
-            case .unintegrated:
-                if oldValue != .unintegrated {
-                    SelectorReinforcement.unregisterMethods()
-                    codelessIntegratingMethods(false)
-                }
-                
-            case .integrating:
-                if oldValue != .integrating {
-                    codelessIntegratingMethods(true)
-                }
-                SelectorReinforcement.registerMethods(actionIDs: DopamineVersion.current.visualizerActionIDs)
-                
-            case .integrated:
-                if oldValue == .integrating {
-                    codelessIntegratingMethods(false)
-                }
-                SelectorReinforcement.registerMethods(actionIDs: DopamineVersion.current.actionIDs)
-            }
+            DopeLog.debug("State changed from \(oldValue) to \(state)")
+            DopamineSelector.registerMethods()
             DopamineDefaults.current.codelessIntegrationSavedState = state.rawValue
         }
     }
     
-    internal func setStateForIntegrationMethodType() {
-        if DopamineConfiguration.current.integrationMethodType == .codeless {
+    internal func setState(for integrationMethodType: DopamineConfiguration.IntegrationMethodType) {
+        if integrationMethodType == .codeless {
             if let savedStateString = DopamineDefaults.current.codelessIntegrationSavedState,
                 State(rawValue: savedStateString) == .integrating {
                 state = .integrating
@@ -92,7 +64,7 @@ internal class CodelessIntegrationController : NSObject {
         return queue
     }()
     
-    func ifIntegratingSubmit(selectorReinforcement: SelectorReinforcement, senderInstance: AnyObject?) {
+    func submitToDashboard(selectorReinforcement: DopamineSelector, senderInstance: AnyObject?) {
         guard state == .integrating else { return }
         
         submitQueue.addOperation {
@@ -120,19 +92,5 @@ internal class CodelessIntegrationController : NSObject {
                 }
             }
         }
-    }
-}
-
-extension CodelessIntegrationController {
-    func codelessIntegratingMethods(_ shouldEnhance: Bool) {
-        DopeLog.print("Enhancing methods:\(shouldEnhance)")
-        // Enhance - UIApplication
-        DopamineApp.enhanceSelectors(shouldEnhance)
-        
-        // Enhance - UIApplicationDelegate
-        DopamineAppDelegate.enhanceSelectors(shouldEnhance)
-        
-        // Enhance - UIViewController
-        DopamineViewController.enhanceSelectors(shouldEnhance)
     }
 }

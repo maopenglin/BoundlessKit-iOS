@@ -11,9 +11,8 @@
 
 @interface DopamineViewController : UIViewController
 
-+ (void) enhanceSelectors: (BOOL)enable;
-- (void) enhanced_viewDidAppear:(BOOL)animated;
-- (void) reinforced_viewDidAppear:(BOOL)animated;
++ (void) sendViewDidAppearToDashboard: (BOOL)enable;
+- (void) dashboardIntegration_viewDidAppear:(BOOL)animated;
 
 @end
 

@@ -56,7 +56,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1697549385A9F90E0515FD5E90B6FD9C"
+               BlueprintIdentifier = "08669ABC78E043712A7C9DE62C55D1F3"
                BuildableName = "DopamineKit.framework"
                BlueprintName = "DopamineKit"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
@@ -182,7 +182,7 @@
       </MacroExpansion>
       <EnvironmentVariables>
          <EnvironmentVariable
-            key = "skipStartOnLoad"
+            key = "skipLoadLaunch"
             value = "Description: Can now modify DKit models before API calls. Retreive DopamineKit.shared when ready"
             isEnabled = "YES">
          </EnvironmentVariable>

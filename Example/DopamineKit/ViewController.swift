@@ -19,6 +19,7 @@ class ViewController: UIViewController {
     }()
     
     func presentAnother() {
+        DopamineSelector.unregisterMethods()
         present(ViewController.instance(), animated: true)
     }
     
