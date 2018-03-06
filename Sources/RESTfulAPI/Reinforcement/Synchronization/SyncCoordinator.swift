@@ -65,8 +65,8 @@ internal class SyncCoordinator : DopamineDefaultsSingleton {
     ///
     internal static func store(track action: DopeAction) {
         current.trackedActions.add(action)
-        let index = current.trackedActions.index(where: {trackedAction in return trackedAction === action}) ?? -1
-        DopeLog.debug("track#\(index) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
+//        let index = current.trackedActions.index(where: {trackedAction in return trackedAction === action}) ?? -1
+//        DopeLog.debug("track#\(index) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
         DopamineDefaults.current.archive(current)
         current.performSync()
     }
@@ -79,8 +79,8 @@ internal class SyncCoordinator : DopamineDefaultsSingleton {
     internal static func store(report action: DopeAction) {
         guard CodelessIntegrationController.shared.state != .integrating else { return }
         current.reportedActions.add(action)
-        let count = current.reportedActions.index(where: {trackedAction in return trackedAction === action}) ?? -1
-        DopeLog.debug("report#\(count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
+//        let count = current.reportedActions.index(where: {trackedAction in return trackedAction === action}) ?? -1
+//        DopeLog.debug("report#\(count) actionID:\(action.actionID) with metadata:\(action.metaData as AnyObject))")
         DopamineDefaults.current.archive(current)
         current.performSync()
     }

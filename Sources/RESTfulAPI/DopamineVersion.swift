@@ -86,7 +86,7 @@ extension DopamineVersion {
     }
     
     var visualizerActionIDs: [String] {
-        return Array(mappings.keys) + Array(visualizerMappings.keys) + Array(DopamineSelector.dashboardIntegratingSelectors)
+        return  Array(DopamineSelector.dashboardIntegratingSelectors) + Array(visualizerMappings.keys) + Array(mappings.keys)
     }
     
     func actionMapping(for actionID: String) -> [String: Any]? {

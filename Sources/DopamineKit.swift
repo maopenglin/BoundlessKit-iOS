@@ -87,7 +87,9 @@ open class DopamineKit : NSObject {
             action.reinforcementDecision = reinforcementDecision
             SyncCoordinator.store(report: action)
             
+            DopeLog.debug("Will reinforce actionID:\(actionID) with reinforcement:\(reinforcementDecision)")
             shared.delegate?.willReinforce(actionID: actionID, with: reinforcementDecision)
+            
             DispatchQueue.main.async {
                 completion(reinforcementDecision)
             }

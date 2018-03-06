@@ -36,7 +36,7 @@ public class DopamineSelector : NSObject {
     }
     
     var reinforcedCounterparts: (AnyClass, Selector)? {
-        DopeLog.debug("Getting reinforced method for \(NSStringFromClass(targetClass)) \(NSStringFromSelector(selector))")
+//        DopeLog.debug("Getting reinforced method for \(NSStringFromClass(targetClass)) \(NSStringFromSelector(selector))")
         if selectorType == .sendViewDidAppearToDashboard {
             return (DopamineViewController.self, #selector(DopamineViewController.dashboardIntegration_viewDidAppear(_:)))
         } else if selectorType == .sendActionToDashboard {
@@ -113,7 +113,7 @@ public class DopamineSelector : NSObject {
 // MARK: - Methods
 extension DopamineSelector {
     func registerMethod() {
-        DopeLog.debug("Attempting to register <\(self.actionID)>...")
+//        DopeLog.debug("Attempting to register <\(self.actionID)>...")
         
         guard DopamineSelector.registered[actionID] == nil else {
             DopeLog.debug("Reinforcement for class:\(NSStringFromClass(targetClass)) method:\(NSStringFromSelector(selector)) already registered.")

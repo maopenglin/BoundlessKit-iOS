@@ -9,7 +9,7 @@ import Foundation
 
 internal class HTTPClient {
     
-    internal static var logAPIResponses = true
+    internal static var logAPIResponses = false
     
     internal enum CallType{
         case track, report, refresh, telemetry,
