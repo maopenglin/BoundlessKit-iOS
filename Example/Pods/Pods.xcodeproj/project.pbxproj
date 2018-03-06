@@ -24,7 +24,6 @@
 		2BB6890CEB3975368D91628D874908AA /* BoundlessVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF1E6780064FE08E6EE3E2D8B62DCFF /* BoundlessVersion.swift */; };
 		2C181B964F0C8DF3C0757CB5B23BC1BD /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55F67D9E895E864A683BB3D853714E4 /* Report.swift */; };
 		3559430C7F0EDC9A82DE3D2FD4AFD013 /* BMMethodSwizzling.m in Sources */ = {isa = PBXBuildFile; fileRef = F903F8EFB2EF60D8A6E5DFED6607A2FB /* BMMethodSwizzling.m */; };
-		36308C624D7B8FB71CDF5899B73317BF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 		3ADE6DFE133A889D312183435EA518A4 /* BoundlessException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EFEF2C8DBB66B6974B0FA0F5CE53A6 /* BoundlessException.swift */; };
 		3B7A1FC0035BFE8109A6CDB03B2C6F7B /* UIView+BoundlessConfetti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A9479D91BA7095C697B5D3F17BE5A91 /* UIView+BoundlessConfetti.swift */; };
 		3C3F14A1FEC34841B4B2AF1A33DB8EC6 /* ASIdentifierManager+ASIdentifierManagerHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = B2228947AC43156B77CCBCA52134C7DA /* ASIdentifierManager+ASIdentifierManagerHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -34,7 +33,6 @@
 		4FD8A9240EBDAAFD3D78563D1F3B4FD3 /* CodelessAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A315022094FE5B3D824D90A5E35C9453 /* CodelessAPI.swift */; };
 		5131ED1C94AEF33853A52A6D5A4AB703 /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72BB49F72DC64379344E13693FEE568F /* UIImageExtensions.swift */; };
 		540DB1CB0BBF50E00EAE0BDF92E4DDD2 /* UITouchExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8896933FF6EF8EBF0CBFB3622C37882E /* UITouchExtensions.swift */; };
-		57A139A9D372BE00B262C96B90181246 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 		5BB69F06EC0407FEC395D90BF097C0C3 /* EventReinforcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CC2B2FCDE1A8C5EA885B2AACB3EE70 /* EventReinforcement.swift */; };
 		5DD879B512C9AED605071708CA7ECC8C /* BoundlessAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A4A402E725DA717ED18B42C4E92D6F /* BoundlessAudio.swift */; };
 		5F585C7D0E78A9EB71779ED3353EB4C9 /* SKPaymentTransactionObserver+Boundless.h in Headers */ = {isa = PBXBuildFile; fileRef = FF91A661B6C843B97EFAE64FD39C8549 /* SKPaymentTransactionObserver+Boundless.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -50,7 +48,6 @@
 		7F29BA0D6C82324FE4B58A0F6BE30776 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969E55C32B790BCD557B21E6C319A11 /* SyncCoordinator.swift */; };
 		8125C5A2B5BB37491D75FA7EEA91AA7F /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD9AA98F080DACF90A40501D0AD0F3A6 /* UIViewExtensions.swift */; };
 		85E0813E9D83A78D8F131642F973AD27 /* BoundlessProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1768452D9A6C4FA2027742C8C7633D05 /* BoundlessProperties.swift */; };
-		898E7841049CC49AB76D3A2DF47C7B6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 		959B938E15B6E81B8A48AE05C7E48819 /* UIGifgliaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BB3E72103F489FF1A84A784C201411 /* UIGifgliaViewController.swift */; };
 		9CED6AE07614C0B05588D75339CA7413 /* UIApplicationDelegate+Boundless.h in Headers */ = {isa = PBXBuildFile; fileRef = C6E370E0695F31131C79DD73BF6D1CEC /* UIApplicationDelegate+Boundless.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9E30E217C01950E6AAD3C9C3EF92EA48 /* UIApplication+Boundless.m in Sources */ = {isa = PBXBuildFile; fileRef = B64415021BF9926C26E6987C30C85160 /* UIApplication+Boundless.m */; };
@@ -119,7 +116,7 @@
 		3FAA07F54CA3ACBAF7040E4536A16E48 /* sheen.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = sheen.png; path = BoundlessKit/Assets/sheen.png; sourceTree = "<group>"; };
 		4172F8C2C2B1F33A9B41545F27977AF2 /* ArrayExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ArrayExtensions.swift; sourceTree = "<group>"; };
 		43EB6881309A54751991B81C3DCD44F7 /* Pods-BoundlessKit_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-BoundlessKit_Example-dummy.m"; sourceTree = "<group>"; };
-		4C368914FC418F03797625AA06597C4D /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		4C368914FC418F03797625AA06597C4D /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4CBDDE9C4BEDC347F93EFDF3CB748D0E /* SKPaymentTransactionObserver+Boundless.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SKPaymentTransactionObserver+Boundless.m"; sourceTree = "<group>"; };
 		4D2833D6579C487ABDA1858A63275552 /* BoundlessKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "BoundlessKit-umbrella.h"; sourceTree = "<group>"; };
 		51FD3395F030A4F19E6BEC20BF78D436 /* UIViewController+Boundless.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Boundless.h"; sourceTree = "<group>"; };
@@ -130,7 +127,6 @@
 		64A4A402E725DA717ED18B42C4E92D6F /* BoundlessAudio.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessAudio.swift; sourceTree = "<group>"; };
 		65253BB8AA4445E78F658C9353EB9E96 /* Pods-BoundlessKit_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-BoundlessKit_Example-umbrella.h"; sourceTree = "<group>"; };
 		6586ACA412122E295B8B73B03D9B110F /* ResourceBundle-BoundlessKit-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-BoundlessKit-Info.plist"; sourceTree = "<group>"; };
-		6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		6E2C994699449DE4F9C512A23ADD577B /* Cartridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Cartridge.swift; sourceTree = "<group>"; };
 		70EC545158E0EE4ABDD0EF39E4E33B3D /* UIColorExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UIColorExtensions.swift; sourceTree = "<group>"; };
 		72BB49F72DC64379344E13693FEE568F /* UIImageExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UIImageExtensions.swift; sourceTree = "<group>"; };
@@ -141,7 +137,7 @@
 		8896933FF6EF8EBF0CBFB3622C37882E /* UITouchExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UITouchExtensions.swift; sourceTree = "<group>"; };
 		8B2DB808B08EF840B481CD01D827AD43 /* BoundlessAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessAPI.swift; sourceTree = "<group>"; };
 		9128CDBC0563D5ECB1C2381E52AF8006 /* SyncOverview.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncOverview.swift; sourceTree = "<group>"; };
-		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		954E23EBA43FD05754E959224E7F38C7 /* CustomClassMethod.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomClassMethod.swift; sourceTree = "<group>"; };
 		9A63C3A385E9121F1A50D5AFC7BDA202 /* Telemetry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
 		A315022094FE5B3D824D90A5E35C9453 /* CodelessAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CodelessAPI.swift; sourceTree = "<group>"; };
@@ -158,22 +154,22 @@
 		B3F5D291691505D68EB2679FBD293DAD /* UIWindowExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UIWindowExtensions.swift; sourceTree = "<group>"; };
 		B55F67D9E895E864A683BB3D853714E4 /* Report.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
 		B64415021BF9926C26E6987C30C85160 /* UIApplication+Boundless.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+Boundless.m"; sourceTree = "<group>"; };
-		B741236F5EFAEF28FBB15F149A56D255 /* Pods_BoundlessKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_BoundlessKit_Tests.framework; path = "Pods-BoundlessKit_Tests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B741236F5EFAEF28FBB15F149A56D255 /* Pods_BoundlessKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoundlessKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9B7258E78272400056D2603B3DF0B3F /* UITapGestureRecognizer+Boundless.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UITapGestureRecognizer+Boundless.h"; sourceTree = "<group>"; };
 		C6E370E0695F31131C79DD73BF6D1CEC /* UIApplicationDelegate+Boundless.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+Boundless.h"; sourceTree = "<group>"; };
 		C82CDACD5A55D5EB502CC9F6E44FA172 /* Pods-BoundlessKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-BoundlessKit_Tests.modulemap"; sourceTree = "<group>"; };
 		C8EFEF2C8DBB66B6974B0FA0F5CE53A6 /* BoundlessException.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessException.swift; sourceTree = "<group>"; };
 		C8FBE70D4F8CCDF80CF1BC90748EB4C4 /* UIApplication+Boundless.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIApplication+Boundless.h"; sourceTree = "<group>"; };
-		C9A79D72AF49A8373848578DFFD7A758 /* Pods_BoundlessKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_BoundlessKit_Example.framework; path = "Pods-BoundlessKit_Example.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
-		CEA6463920D0397FA5B128FD152976FE /* BoundlessKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = BoundlessKit.framework; path = BoundlessKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9A79D72AF49A8373848578DFFD7A758 /* Pods_BoundlessKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoundlessKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEA6463920D0397FA5B128FD152976FE /* BoundlessKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BoundlessKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D022EF84943D705BC145E59A1BA61838 /* Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		D07AF6F83E258EA039C8C18D8B147A64 /* Pods-BoundlessKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-BoundlessKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
-		D1D25FAF9E953F98A63B38F39C571134 /* BoundlessKit.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = BoundlessKit.bundle; path = "BoundlessKit-BoundlessKit.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1D25FAF9E953F98A63B38F39C571134 /* BoundlessKit.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoundlessKit.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		D71F961D76F564EF6BF5DA58F4A1915F /* UICollectionViewDelegate+Boundless.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UICollectionViewDelegate+Boundless.m"; sourceTree = "<group>"; };
-		D81825FCA8DA1B19AD07456778252440 /* BoundlessKit.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; path = BoundlessKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		D81825FCA8DA1B19AD07456778252440 /* BoundlessKit.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; path = BoundlessKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		D96850084F7A88C34C2F550B37A04F11 /* UIResponderExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UIResponderExtensions.swift; sourceTree = "<group>"; };
 		DBC887FE18C56167B646795426072B50 /* Pods-BoundlessKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-BoundlessKit_Example-resources.sh"; sourceTree = "<group>"; };
-		DC763CD62D4DD6890DF36EAF22238D26 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE; sourceTree = "<group>"; };
+		DC763CD62D4DD6890DF36EAF22238D26 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		DC8BBA4004A8E5855C332E8BED60454F /* Pods-BoundlessKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-BoundlessKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		DD9754A929F7D038CD13754A2A9923D5 /* CGExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CGExtensions.swift; sourceTree = "<group>"; };
 		DF7CE3F2DF46AB2BED96CB2DD42C65CD /* Track.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
@@ -201,7 +197,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				898E7841049CC49AB76D3A2DF47C7B6E /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,7 +204,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				57A139A9D372BE00B262C96B90181246 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,7 +211,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				36308C624D7B8FB71CDF5899B73317BF /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,7 +252,6 @@
 				9128CDBC0563D5ECB1C2381E52AF8006 /* SyncOverview.swift */,
 				9A63C3A385E9121F1A50D5AFC7BDA202 /* Telemetry.swift */,
 			);
-			name = Synchronization;
 			path = Synchronization;
 			sourceTree = "<group>";
 		};
@@ -277,7 +269,6 @@
 				B3F5D291691505D68EB2679FBD293DAD /* UIWindowExtensions.swift */,
 				75E424CC9FF264C2C576D1B8E6170193 /* UserDefaultsExtensions.swift */,
 			);
-			name = Extensions;
 			path = Extensions;
 			sourceTree = "<group>";
 		};
@@ -289,7 +280,6 @@
 				28513AC33150D7316F0BA18CB194F6BE /* UIApplicationExtensions.swift */,
 				8896933FF6EF8EBF0CBFB3622C37882E /* UITouchExtensions.swift */,
 			);
-			name = Events;
 			path = Events;
 			sourceTree = "<group>";
 		};
@@ -309,7 +299,6 @@
 				B2871CE65FB80F181333AE7B3505E5F8 /* BoundlessTimer.swift */,
 				DF7CE3F2DF46AB2BED96CB2DD42C65CD /* Track.swift */,
 			);
-			name = Track;
 			path = Track;
 			sourceTree = "<group>";
 		};
@@ -367,7 +356,6 @@
 				6E2C994699449DE4F9C512A23ADD577B /* Cartridge.swift */,
 				B55F67D9E895E864A683BB3D853714E4 /* Report.swift */,
 			);
-			name = Report;
 			path = Report;
 			sourceTree = "<group>";
 		};
@@ -403,7 +391,6 @@
 				51FD3395F030A4F19E6BEC20BF78D436 /* UIViewController+Boundless.h */,
 				5DD6D4842A6F134CE4EBDBF6B385886C /* UIViewController+Boundless.m */,
 			);
-			name = Swizzles;
 			path = Swizzles;
 			sourceTree = "<group>";
 		};
@@ -459,7 +446,6 @@
 		D35AF013A5F0BAD4F32504907A52519E /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */,
 			);
 			name = iOS;
 			sourceTree = "<group>";
@@ -472,7 +458,6 @@
 				E163BB5CBFB590A4C9E7D41F167CD629 /* Reinforcements */,
 				AB76060AB7785AEFB1C43AEB357C25AB /* Swizzles */,
 			);
-			name = Codeless;
 			path = Codeless;
 			sourceTree = "<group>";
 		};
@@ -484,7 +469,6 @@
 				2527539D5E40187FCFC887DEBD50C05A /* Synchronization */,
 				674C6948A3075C3F0BC20227D63BD029 /* Track */,
 			);
-			name = Reinforcement;
 			path = Reinforcement;
 			sourceTree = "<group>";
 		};
@@ -510,7 +494,6 @@
 				2A9479D91BA7095C697B5D3F17BE5A91 /* UIView+BoundlessConfetti.swift */,
 				EFABAC486817E75CD613EA14A2B476BE /* UIView+BoundlessEmojiSplosion.swift */,
 			);
-			name = Reinforcements;
 			path = Reinforcements;
 			sourceTree = "<group>";
 		};
