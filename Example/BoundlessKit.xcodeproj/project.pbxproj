@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05D0882F4ED69B87B81373E9 /* Pods_BoundlessKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BAC56939085237F03AF5C02E /* Pods_BoundlessKit_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		7E3E9430DAB0256EDC10F853 /* Pods_BoundlessKit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C5896EE6F40C3937CF30FD8 /* Pods_BoundlessKit_Tests.framework */; };
 		842661C3204DE3C5001FEA2F /* BoundlessProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 842661C2204DE3C5001FEA2F /* BoundlessProperties.plist */; };
 		842661E5204E05B3001FEA2F /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		842661E6204E05BA001FEA2F /* BoundlessDemoProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 842661C4204DFE50001FEA2F /* BoundlessDemoProperties.plist */; };
@@ -43,8 +45,10 @@
 		842661C2204DE3C5001FEA2F /* BoundlessProperties.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BoundlessProperties.plist; sourceTree = "<group>"; };
 		842661C4204DFE50001FEA2F /* BoundlessDemoProperties.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BoundlessDemoProperties.plist; sourceTree = "<group>"; };
 		842661DB204E03E8001FEA2F /* BoundlessKit_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoundlessKit_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8C5896EE6F40C3937CF30FD8 /* Pods_BoundlessKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoundlessKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		938D580BBCCFD0A22693C187 /* Pods-BoundlessKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoundlessKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BoundlessKit_Tests/Pods-BoundlessKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		A6E23EE403314927A4B43AC3 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		BAC56939085237F03AF5C02E /* Pods_BoundlessKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoundlessKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDC562A41F51EDFEEBDD96AE /* Pods-BoundlessKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoundlessKit_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-BoundlessKit_Example/Pods-BoundlessKit_Example.release.xcconfig"; sourceTree = "<group>"; };
 		C7FD915CFC81F1747DC11F5F /* Pods-BoundlessKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoundlessKit_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-BoundlessKit_Tests/Pods-BoundlessKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -54,6 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05D0882F4ED69B87B81373E9 /* Pods_BoundlessKit_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7E3E9430DAB0256EDC10F853 /* Pods_BoundlessKit_Tests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,6 +76,8 @@
 		1D6B931333D6C7980A82962F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BAC56939085237F03AF5C02E /* Pods_BoundlessKit_Example.framework */,
+				8C5896EE6F40C3937CF30FD8 /* Pods_BoundlessKit_Tests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
