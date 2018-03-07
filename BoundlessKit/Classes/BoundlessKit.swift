@@ -22,7 +22,7 @@ public class BoundlessKit : NSObject {
                 let actionOracle = ActionOracle(actionID)
                 actionOracles[actionID] = actionOracle
                 if let observer = InstanceMethodSwizzle.init(actionID: actionID) {
-                    observer.startObserving()
+                    observer.register()
                 }
                 if let codeless = value["codeless"] as? [String: Any],
                     let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
@@ -40,11 +40,13 @@ public class BoundlessKit : NSObject {
         }
     }
     
+    @objc
     public func track(actionID: String) {
         let action = BoundlessAction(actionID)
         BoundlessAction.addContext(to: action)
     }
     
+    @objc
     public func reinforce(actionID: String) -> String {
         let action = BoundlessAction(actionID)
         BoundlessAction.addContext(to: action)

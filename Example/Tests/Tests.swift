@@ -13,7 +13,7 @@ class Tests: XCTestCase {
         super.tearDown()
     }
     
-    func test() {
+    func simpleTest() {
         let bk = BoundlessKit()
         bk.launch(arguements: Helper.versionMappings)
         
@@ -22,5 +22,17 @@ class Tests: XCTestCase {
         print("Got:\(bk.reinforce(actionID: "action1"))")
         
         sleep(2)
+    }
+    
+    func swizzleTest() {
+        let sut = UIViewController()
+        let action = InstanceMethodAction.init(target: sut, selector: #selector(sut.viewDidAppear(_:)), parameter: nil)
+        let swizzle = InstanceMethodSwizzle.init(actionID: action.name)!
+        swizzle.register()
+        
+        sleep(1)
+        sut.viewDidAppear(true)
+        sleep(1)
+        XCTAssert(false)
     }
 }
