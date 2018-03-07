@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct BoundlessReinforcement {
+internal class BoundlessReinforcement : NSObject {
     let name: String
     init(_ name: String) {
         self.name = name

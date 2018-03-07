@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CodelessVisual : NSObject {
+internal class CodelessVisual : NSObject {
     
     let primitive: String
     

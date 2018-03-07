@@ -8,7 +8,7 @@
 import Foundation
 
 
-class ActionOracle : NSObject {
+internal class ActionOracle : NSObject {
     
     let actionID: String
     var manifest: FutureEventManifest

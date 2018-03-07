@@ -7,9 +7,15 @@
 
 import Foundation
 
-struct BoundlessAction {
+internal class BoundlessAction : NSObject {
     let name: String
     init(_ name: String) {
         self.name = name
+    }
+    
+    static func addContext(to action: BoundlessAction) {
+        let _ = {[weak action] in
+            
+        }()
     }
 }

@@ -21,10 +21,9 @@ public class BoundlessKit : NSObject {
             for (actionID, value) in mappings {
                 let actionOracle = ActionOracle(actionID)
                 actionOracles[actionID] = actionOracle
-//            if (true /*actionID is instance method*/) {
-//                let instanceMethodCallListener = InstanceMethodCallListener(actionID: actionID)
-//                instanceMethodCallListeners[actionID] = instanceMethodCallListener
-//            }
+                if let observer = InstanceMethodSwizzle.init(actionID: actionID) {
+                    observer.startObserving()
+                }
                 if let codeless = value["codeless"] as? [String: Any],
                     let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
                     for reinforcementDict in reinforcements {
@@ -42,11 +41,14 @@ public class BoundlessKit : NSObject {
     }
     
     public func track(actionID: String) {
-        _ = BoundlessAction(actionID)
+        let action = BoundlessAction(actionID)
+        BoundlessAction.addContext(to: action)
     }
     
     public func reinforce(actionID: String) -> String {
-        return reinforce(action: BoundlessAction.init(actionID)).name
+        let action = BoundlessAction(actionID)
+        BoundlessAction.addContext(to: action)
+        return reinforce(action: action).name
     }
     internal func reinforce(action: BoundlessAction) -> BoundlessReinforcement {
         let reinforcement: BoundlessReinforcement

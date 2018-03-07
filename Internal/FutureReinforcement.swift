@@ -7,7 +7,19 @@
 
 import Foundation
 
-struct FutureReinforcement {
+
+internal struct FutureEventManifest {
+    let actionID: String
+    var knownReinforcements: [FutureReinforcement]
+    
+    init(_ actionID: String) {
+        self.actionID = actionID
+        self.knownReinforcements = []
+        // look at version and laod
+    }
+}
+
+internal struct FutureReinforcement {
     
     static func defaultFor(actionID: String) -> FutureReinforcement {
         return FutureReinforcement(actionID, BoundlessReinforcement("neutralResponse"))
