@@ -13,16 +13,6 @@
 
 @implementation DopamineViewController
 
-+ (void) sendViewDidAppearToDashboard: (BOOL) enable {
-    @synchronized(self) {
-        static BOOL didEnhance = false;
-        if (enable ^ didEnhance) {
-            didEnhance = !didEnhance;
-            [SwizzleHelper injectSelector:[DopamineViewController class] :@selector(dashboardIntegration_viewDidAppear:) :[UIViewController class] :@selector(viewDidAppear:)];
-        }
-    }
-}
-
 - (void) dashboardIntegration_viewDidAppear:(BOOL)animated {
     if ([self respondsToSelector:@selector(dashboardIntegration_viewDidAppear:)])
         [self dashboardIntegration_viewDidAppear:animated];
@@ -32,4 +22,5 @@
         [DopamineSelector attemptIntegrationWithSenderInstance: nil targetInstance:self action:@selector(viewDidAppear:)];
     }
 }
+
 @end

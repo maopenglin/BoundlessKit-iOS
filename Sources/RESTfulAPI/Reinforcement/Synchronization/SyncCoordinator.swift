@@ -32,6 +32,9 @@ internal class SyncCoordinator : DopamineDefaultsSingleton {
         self.waitTimerStartedAt = waitTimerStartedAt
         self.waitTimerLength = waitTimerLength
         super.init()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(SyncCoordinator.appDidBecomeActive(notification:)), name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(SyncCoordinator.appWillResignActive(notification:)), name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
     }
     
     override func encode(with aCoder: NSCoder) {
@@ -56,7 +59,17 @@ internal class SyncCoordinator : DopamineDefaultsSingleton {
         }
     }
     
+    @objc
+    func appDidBecomeActive(notification: Notification) {
+        DopamineKit.track(notification.name.rawValue, metaData: ["tag": "ApplicationState",
+                                                                 "time": DopeInfo.shared.trackStartTime(for: "ApplicationState")])
+    }
     
+    @objc
+    func appWillResignActive(notification: Notification) {
+        DopamineKit.track(notification.name.rawValue, metaData: ["tag": "ApplicationState",
+                                                                 "time": DopeInfo.shared.timeTracked(for: "ApplicationState")])
+    }
     
     /// Stores a tracked action to be synced
     ///

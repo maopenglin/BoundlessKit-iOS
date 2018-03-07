@@ -23,11 +23,6 @@ internal class DopeBluetooth : NSObject {
     }
     
     func getBluetooth(callback: @escaping([[String: Any]]?) -> Void) {
-//        guard canGetBluetooth else {
-//            callback(nil)
-//            return
-//        }
-        
         bluetoothManager.scan(completion: callback)
     }
     

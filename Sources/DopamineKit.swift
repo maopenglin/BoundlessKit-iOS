@@ -39,7 +39,7 @@ open class DopamineKit : NSObject {
     
     private override init() {
         super.init()
-        
+        _ = SyncCoordinator.current
         CodelessAPI.boot() {
             if !DopamineProperties.productionMode {
                 CodelessAPI.promptPairing()
@@ -63,7 +63,7 @@ open class DopamineKit : NSObject {
         shared.queue.addOperation {
             let action = DopeAction(actionID: actionID, metaData:metaData)
             SyncCoordinator.store(track: action)
-//            DopeLog.debug("tracked:\(actionID) with metadata:\(String(describing: metaData))")
+            DopeLog.debug("tracked:\(actionID) with metadata:\(String(describing: metaData))")
         }
     }
     

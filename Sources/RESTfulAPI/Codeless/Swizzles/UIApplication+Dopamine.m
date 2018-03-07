@@ -14,17 +14,6 @@
 
 @implementation DopamineApp
 
-+ (void) sendActionsToDashboard: (BOOL) enable {
-    @synchronized(self) {
-        static BOOL didEnhance = false;
-        if (enable ^ didEnhance) {
-            didEnhance = !didEnhance;
-            
-            [SwizzleHelper injectSelector:[DopamineApp class] :@selector(enhanced_sendEvent:) :[UIApplication class] :@selector(sendEvent:)];
-        }
-    }
-}
-
 - (BOOL)dashboardIntegration_sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event {
     
     if (action && target) {

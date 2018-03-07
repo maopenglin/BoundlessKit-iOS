@@ -27,7 +27,7 @@ internal class DopeActionCollection : SynchronizedArray<DopeAction> {
 //            return action === storedAction
 //        }!
         
-        if let ssid = DopeInfo.mySSID {
+        if let ssid = DopeInfo.shared.mySSID {
             action.addMetaData(["ssid": ssid])
         }
         DopeBluetooth.shared.getBluetooth { [weak action] bluetooth in
