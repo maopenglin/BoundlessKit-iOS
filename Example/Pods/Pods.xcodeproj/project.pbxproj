@@ -17,6 +17,10 @@
 		846CE45C204F9428007D7A9F /* ActionOracle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846CE45B204F9428007D7A9F /* ActionOracle.swift */; };
 		846CE45E204FB169007D7A9F /* CodelessVisual.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846CE45D204FB169007D7A9F /* CodelessVisual.swift */; };
 		846CE460204FB599007D7A9F /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846CE45F204FB599007D7A9F /* Helper.swift */; };
+		846CE462204FC091007D7A9F /* BoundlessAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846CE461204FC091007D7A9F /* BoundlessAction.swift */; };
+		846CE464204FC099007D7A9F /* BoundlessReinforcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846CE463204FC099007D7A9F /* BoundlessReinforcement.swift */; };
+		846CE466204FC0C6007D7A9F /* FutureReinforcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846CE465204FC0C6007D7A9F /* FutureReinforcement.swift */; };
+		846CE468204FC0CF007D7A9F /* FutureReinforcementManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846CE467204FC0CF007D7A9F /* FutureReinforcementManifest.swift */; };
 		898E7841049CC49AB76D3A2DF47C7B6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 		945524E7E511B6D61399C4FF5475B565 /* sheen.png in Resources */ = {isa = PBXBuildFile; fileRef = E560AF44D6CD9076F25DC86C07289BB9 /* sheen.png */; };
 		9E2DAA660EAE652CC63DA1B3A29858B5 /* BoundlessKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D1D25FAF9E953F98A63B38F39C571134 /* BoundlessKit.bundle */; };
@@ -65,6 +69,10 @@
 		846CE45B204F9428007D7A9F /* ActionOracle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionOracle.swift; sourceTree = "<group>"; };
 		846CE45D204FB169007D7A9F /* CodelessVisual.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodelessVisual.swift; sourceTree = "<group>"; };
 		846CE45F204FB599007D7A9F /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
+		846CE461204FC091007D7A9F /* BoundlessAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundlessAction.swift; sourceTree = "<group>"; };
+		846CE463204FC099007D7A9F /* BoundlessReinforcement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundlessReinforcement.swift; sourceTree = "<group>"; };
+		846CE465204FC0C6007D7A9F /* FutureReinforcement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureReinforcement.swift; sourceTree = "<group>"; };
+		846CE467204FC0CF007D7A9F /* FutureReinforcementManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureReinforcementManifest.swift; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		98D4A1ADC060813C6EE439EAF3D0D854 /* BoundlessKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = BoundlessKit.modulemap; sourceTree = "<group>"; };
 		B741236F5EFAEF28FBB15F149A56D255 /* Pods_BoundlessKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoundlessKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -157,9 +165,13 @@
 			isa = PBXGroup;
 			children = (
 				BE9C62A6ACBB825E65F06D54DB5B7BF5 /* BoundlessKit.swift */,
+				846CE461204FC091007D7A9F /* BoundlessAction.swift */,
+				846CE463204FC099007D7A9F /* BoundlessReinforcement.swift */,
 				846CE45D204FB169007D7A9F /* CodelessVisual.swift */,
 				846CE45F204FB599007D7A9F /* Helper.swift */,
 				846CE45B204F9428007D7A9F /* ActionOracle.swift */,
+				846CE465204FC0C6007D7A9F /* FutureReinforcement.swift */,
+				846CE467204FC0CF007D7A9F /* FutureReinforcementManifest.swift */,
 				83F21A39DACCBD03014C000A147F77C5 /* Pod */,
 				BA4D32B34B4C0B17A084D088849A35B7 /* Resources */,
 				2C75ADD2354ECE12BA16D67803ADACED /* Support Files */,
@@ -421,11 +433,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				846CE466204FC0C6007D7A9F /* FutureReinforcement.swift in Sources */,
 				5E02CFE55177B01FE7927BCE41414E09 /* BoundlessKit-dummy.m in Sources */,
+				846CE468204FC0CF007D7A9F /* FutureReinforcementManifest.swift in Sources */,
+				846CE462204FC091007D7A9F /* BoundlessAction.swift in Sources */,
 				AE582ABFB7B07E7EDD4B5CAAAC21518A /* BoundlessKit.swift in Sources */,
 				846CE460204FB599007D7A9F /* Helper.swift in Sources */,
 				846CE45C204F9428007D7A9F /* ActionOracle.swift in Sources */,
 				846CE45E204FB169007D7A9F /* CodelessVisual.swift in Sources */,
+				846CE464204FC099007D7A9F /* BoundlessReinforcement.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

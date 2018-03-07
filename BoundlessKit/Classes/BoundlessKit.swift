@@ -46,30 +46,20 @@ public class BoundlessKit : NSObject {
     }
     
     public func reinforce(actionID: String) -> String {
-        if let oracle = actionOracles[actionID] {
-            return oracle.reinforce().name
+        return reinforce(action: BoundlessAction.init(actionID)).name
+    }
+    internal func reinforce(action: BoundlessAction) -> BoundlessReinforcement {
+        let reinforcement: BoundlessReinforcement
+        if let oracle = actionOracles[action.name] {
+            reinforcement = oracle.reinforce()
         } else {
-            let actionOracle = ActionOracle(actionID)
-            actionOracles[actionID] = actionOracle
-            return actionOracle.reinforce().name
+            let actionOracle = ActionOracle(action.name)
+            actionOracles[action.name] = actionOracle
+            reinforcement = actionOracle.reinforce()
         }
+        return reinforcement
     }
     
     
-}
-
-
-struct BoundlessAction {
-    let name: String
-    init(_ name: String) {
-        self.name = name
-    }
-}
-
-struct BoundlessReinforcement {
-    let name: String
-    init(_ name: String) {
-        self.name = name
-    }
 }
 
