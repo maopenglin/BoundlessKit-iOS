@@ -13,8 +13,10 @@ import CoreLocation
 class ViewController: UIViewController {
     
     @objc var someCounter: Float = 0
+    let kit = BoundlessKit()
     
     @objc func action1Performed(){
+        kit.launch(arguements: Helper.versionMappings)
         // Reinforce the action to make it sticky!!
         //        BoundlessKit.reinforce("a1", metaData: ["key":"value"], completion: {
         //            reinforcement in
@@ -66,13 +68,14 @@ class ViewController: UIViewController {
     }
     
     @objc func action2Performed(){
+        kit.reinforce(actionID: "action1")
         ////        // Tracking call is sent asynchronously
         //////        BoundlessKit.track("action2", metaData: ["key":"value", "calories":9000])
         //        locationManager.delegate = self
         //        locationManager.requestAlwaysAuthorization()
         
         
-        BoundlessKit.track("action2peformed")
+//        BoundlessKit.track("action2peformed")
         //        BoundlessKit.reinforce("a2") { reinforcement in
         //            // Update UI to display reinforcement decision on screen for learning purposes
         //            self.responseLabel.text = reinforcement
