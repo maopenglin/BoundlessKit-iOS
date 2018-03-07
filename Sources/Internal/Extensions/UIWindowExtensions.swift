@@ -34,33 +34,57 @@ internal extension UIWindow {
     
     static var lastTouchPoint: CGPoint {
         get {
-            return EventReinforcement.lastTouchLocationInUIWindow
+            return CodelessReinforcement.lastTouchLocationInUIWindow
         }
         set {
-            EventReinforcement.lastTouchLocationInUIWindow = newValue
+            CodelessReinforcement.lastTouchLocationInUIWindow = newValue
         }
     }
 }
 
+
 internal extension UIWindow {
-    func viewControllerStack() -> [UIViewController] {
-        var accumulator = [UIViewController]()
+    func getViewControllersWithClassname(classname: String) -> [UIViewController] {
+        return rootViewController?.getSubViewControllersWithClassname(classname: classname) ?? []
+    }
+}
+internal extension UIViewController {
+    func getSubViewControllersWithClassname(classname: String) -> [UIViewController] {
+        var vcs = [UIViewController]()
         
-        var vc = rootViewController
-        while(vc != nil) {
-            accumulator.append(vc!)
-            if let tabController = vc as? UITabBarController {
-                vc = tabController.selectedViewController
-            } else if let navController = vc as? UINavigationController {
-                if navController.viewControllers.isEmpty == false {
-                    accumulator.append(contentsOf: navController.viewControllers)
-                    accumulator.removeLast()
-                }
-                vc = navController.topViewController
-            } else {
-                vc = vc?.presentedViewController
+        if let tabController = self as? UITabBarController,
+            let tabVCs = tabController.viewControllers {
+            for vc in tabVCs.reversed() {
+                vcs += vc.getSubViewControllersWithClassname(classname: classname)
+            }
+        } else if let navController = self as? UINavigationController {
+            for vc in navController.viewControllers.reversed() {
+                vcs += vc.getSubViewControllersWithClassname(classname: classname)
+            }
+        } else {
+            if let vc = self.presentedViewController {
+                vcs += vc.getSubViewControllersWithClassname(classname: classname)
+            }
+            for vc in childViewControllers.reversed() {
+                vcs += vc.getSubViewControllersWithClassname(classname: classname)
             }
         }
-        return accumulator
+        
+        if classname == NSStringFromClass(type(of: self)) {
+            vcs.append(self)
+        }
+
+//        do {
+//            let regex = try NSRegularExpression(pattern: classname, options: [.caseInsensitive])
+//            let myClassname = String(describing: type(of: self))
+//            let matches = regex.numberOfMatches(in: myClassname, options: [], range: NSRange(location: 0, length: myClassname.count))
+//            if (matches > 0) {
+//                vcs.append(self)
+//            }
+//        } catch {
+//            print(error)
+//        }
+        
+        return vcs
     }
 }

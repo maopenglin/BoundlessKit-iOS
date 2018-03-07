@@ -12,10 +12,6 @@ import CoreLocation
 @objc
 open class DopamineKit : NSObject {
     
-    /// A modifiable credentials path used for running tests
-    ///
-    @objc public static var testCredentials:[String:Any]?
-    
     /// A modifiable identity used for running tests
     ///
     @objc public static func setDevelopmentId(_ id:String?, completion: @escaping (String?) -> ()) {
@@ -37,10 +33,18 @@ open class DopamineKit : NSObject {
     @objc internal static var productionIdentity:String?
     
     @objc public static let shared: DopamineKit = DopamineKit()
-    public static let syncCoordinator = SyncCoordinator.shared
+    public var delegate: DopamineKitDelegate?
+    
+    fileprivate let queue = OperationQueue()
     
     private override init() {
         super.init()
+        _ = SyncCoordinator.current
+        CodelessAPI.boot() {
+            if !DopamineProperties.productionMode {
+                CodelessAPI.promptPairing()
+            }
+        }
     }
     
     /// This function sends an asynchronous tracking call for the specified action
@@ -56,10 +60,10 @@ open class DopamineKit : NSObject {
             return
         }
         // store the action to be synced
-        DispatchQueue.global(qos: .background).async {
+        shared.queue.addOperation {
             let action = DopeAction(actionID: actionID, metaData:metaData)
-            syncCoordinator.store(track: action)
-//            DopeLog.debug("tracked:\(actionID) with metadata:\(String(describing: metaData))")
+            SyncCoordinator.store(track: action)
+            DopeLog.debug("tracked:\(actionID) with metadata:\(String(describing: metaData))")
         }
     }
     
@@ -74,19 +78,25 @@ open class DopamineKit : NSObject {
     ///
     @objc open static func reinforce(_ actionID: String, metaData: [String: Any]? = nil, completion: @escaping (String) -> ()) {
         guard DopamineConfiguration.current.reinforcementEnabled else {
-            completion(Cartridge.defaultReinforcementDecision)
             return
         }
-        
-        let action = DopeAction(actionID: actionID, metaData: metaData)
-        action.reinforcementDecision = syncCoordinator.retrieve(cartridgeFor: action.actionID).remove()
-        
-        DispatchQueue.main.async(execute: {
-            completion(action.reinforcementDecision!)
-        })
-        
-        // store the action to be synced
-        syncCoordinator.store(report: action)
+        shared.queue.addOperation {
+            let action = DopeAction(actionID: actionID, metaData: metaData)
+            let reinforcementDecision = DopamineVersion.current.reinforcementDecision(for: action.actionID)
+            
+            action.reinforcementDecision = reinforcementDecision
+            SyncCoordinator.store(report: action)
+            
+            DopeLog.debug("Will reinforce actionID:\(actionID) with reinforcement:\(reinforcementDecision)")
+            shared.delegate?.willReinforce(actionID: actionID, with: reinforcementDecision)
+            
+            DispatchQueue.main.async {
+                completion(reinforcementDecision)
+            }
+        }
     }
-    
+}
+
+public protocol DopamineKitDelegate {
+    func willReinforce(actionID: String, with decision: String)
 }

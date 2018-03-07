@@ -12,7 +12,7 @@ internal class Telemetry {
     static let sharedInstance = Telemetry()
     
 //    private static let queue = DispatchQueue(label: "com.usedopamine.dopaminekit.Telemetry")
-    private static let queue = DispatchQueue.global()
+    private static let queue = SingleOperationQueue()
     
     private static let defaults: UserDefaults = UserDefaults.standard
     private static let syncOverviewsKey = "DopamineSyncOverviews_v4.1.3"
@@ -61,10 +61,10 @@ internal class Telemetry {
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///
     static func storeException( className: String, message: String, dataDescription: String?=nil, filePath: String = #file, function: String = #function) {
-        queue.async {
-            var exceptionMessage = message
+        queue.addOperation {
+            var exceptionMessage = "Message:<\(message)>"
             if let dataDescription = dataDescription {
-                exceptionMessage.append("\nDataDescription:\(dataDescription)")
+                exceptionMessage.append("\nDataDescription:<\(dataDescription)>")
             }
             var stackTrace = Thread.callStackSymbols
             stackTrace[0] = "0\t\(NSString(string: filePath).lastPathComponent)\t\t\t\t\t\(function)"
@@ -88,12 +88,12 @@ internal class Telemetry {
     ///     - cartridges: The cartridges dictionary to snapshot its triggers
     ///
     static func startRecordingSync(cause: String) {
-        queue.async {
+        queue.addOperation {
             var cartridgeTriggers: [String: [String: Any]] = [:]
             for (actionID, cartridge) in Cartridge.cartridgeSyncers {
                 cartridgeTriggers[actionID] = cartridge.toJSONType()
             }
-            currentSyncOverview = SyncOverview.init(cause: cause, trackTriggers: Track.current.toJSONType(), reportTriggers: Report.current.toJSONType(), cartridgeTriggers: cartridgeTriggers)
+            currentSyncOverview = SyncOverview(cause: cause, trackTriggers: SyncCoordinator.current.trackedActions.toJSONType(), reportTriggers: SyncCoordinator.current.reportedActions.toJSONType(), cartridgeTriggers: cartridgeTriggers)
         }
     }
     
@@ -105,7 +105,7 @@ internal class Telemetry {
     ///     - startedAt: The time the API call started at.
     ///
     static func setResponseForTrackSync(_ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
-        queue.async {
+        queue.addOperation {
             if let syncOverview = Telemetry.currentSyncOverview {
                 var syncResponse: [String: Any] = [:]
                 syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt)
@@ -128,7 +128,7 @@ internal class Telemetry {
     ///     - startedAt: The time the API call started at.
     ///
     static func setResponseForReportSync(_ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
-        queue.async{
+        queue.addOperation {
             if let syncOverview = Telemetry.currentSyncOverview {
                 var syncResponse: [String: Any] = [:]
                 syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt)
@@ -152,7 +152,7 @@ internal class Telemetry {
     ///     - startedAt: The time the API call started at.
     ///
     static func setResponseForCartridgeSync(forAction actionID: String, _ status: Int, error: String?=nil, whichStartedAt startedAt: Int64) {
-        queue.async{
+        queue.addOperation {
             if let syncOverview = Telemetry.currentSyncOverview {
                 var syncResponse: [String: Any] = [:]
                 syncResponse[SyncOverview.utcKey] = NSNumber(value: startedAt)
@@ -176,7 +176,7 @@ internal class Telemetry {
     ///     - successfulSync: Whether a successful sync was made with the DopamineAPI.
     ///
     static func stopRecordingSync(successfulSync: Bool) {
-        queue.async {
+        queue.addOperation {
             var syncOverviewArray: [SyncOverview] = syncOverviews
             if let syncOverview = Telemetry.currentSyncOverview {
                 syncOverview.totalSyncTime = Int64(1000*NSDate().timeIntervalSince1970) - syncOverview.utc
@@ -189,7 +189,7 @@ internal class Telemetry {
             
             if(successfulSync) {
                 DopamineAPI.sync(syncOverviews: syncOverviewArray, dopeExceptions: dopeExceptions, completion: { response in
-                    queue.async {
+                    queue.addOperation {
                         if response["status"] as? Int == 200 {
                             syncOverviews = []
                             dopeExceptions = []

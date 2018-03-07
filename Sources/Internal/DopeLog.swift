@@ -18,10 +18,7 @@ import Foundation
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    @objc public static func print(_ message: String,  filePath: String = #file, function: String =  #function, line: Int = #line) {
-        guard DopamineConfiguration.current.consoleLoggingEnabled else {
-            return
-        }
+    @objc public static func print(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
         var functionSignature:String = function
         if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
             functionSignature.replaceSubrange(parameterNames, with: "()")
@@ -60,19 +57,36 @@ import Foundation
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    @objc public static func error(_ message: String, visual: Bool = false,  filePath: String = #file, function: String =  #function, line: Int = #line) {
+    @objc public static func error(_ message: String, visual: Bool = false, filePath: String = #file, function: String =  #function, line: Int = #line) {
         var functionSignature:String = function
         if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
             functionSignature.replaceSubrange(parameterNames, with: "()")
         }
         let fileName = NSString(string: filePath).lastPathComponent
-        Swift.print("❌ \(message)\n\t@\t[\(fileName):\(line):\(functionSignature)])")
+        Swift.print("[\(fileName):\(line):\(functionSignature)] - ❌ \(message)")
         
-        if visual && !DopamineProperties.current.inProduction {
+        if visual && !DopamineProperties.productionMode {
             DispatchQueue.main.async {
-                CandyBar.init(title: message, subtitle: "🚫\(fileName):\(line)", image: "☠️".image(), position: .top
+                CandyBar.init(title: message, subtitle: "🚫 \(message)", image: "☠️".image(), position: .top
                     , backgroundColor: UIColor.darkGray.withAlphaComponent(0.7)).show(duration: 3)
             }
         }
+    }
+    
+    /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
+    ///
+    /// - parameters:
+    ///     - message: The confirmation message.
+    ///     - filePath: Used to get filename. Do not use this parameter. Defaults to #file.
+    ///     - function: Used to get function name. Do not use this parameter. Defaults to #function.
+    ///     - line: Used to get the line. Do not use this parameter. Defaults to #line.
+    ///
+    @objc public static func confirmed(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
+        var functionSignature:String = function
+        if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
+            functionSignature.replaceSubrange(parameterNames, with: "()")
+        }
+        let fileName = NSString(string: filePath).lastPathComponent
+        Swift.print("[\(fileName):\(line):\(functionSignature)] - ✅ \(message)")
     }
 }

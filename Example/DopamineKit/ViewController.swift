@@ -12,9 +12,24 @@ import CoreLocation
 
 class ViewController: UIViewController {
     
+    static var setReward: Void = {
+//        DopamineVersion.current.update(visualizer: ["viewControllerDidAppear-DopamineKit_Example.ViewController-viewDidAppear:" : ["reward": "hello"]])
+//        setTemporaryReward()
+        return
+    }()
+    
+    func presentAnother() {
+        DopamineSelector.unregisterMethods()
+        present(ViewController.instance(), animated: true)
+    }
+    
     @objc var someCounter: Float = 0
     
-    @objc func action1Performed(){
+    @objc func action1Performed(button: UIButton) {
+//        presentAnother()
+//        print("Button 1 pushed. Text:\(String(describing:button.currentTitle))")
+        print("Button 1 pushed")
+        
         // Reinforce the action to make it sticky!!
 //        DopamineKit.reinforce("a1", metaData: ["key":"value"], completion: {
 //            reinforcement in
@@ -65,14 +80,16 @@ class ViewController: UIViewController {
 //        })
     }
     
-    @objc func action2Performed(){
+    @objc func action2Performed(button: UIButton){
+//        print("Button 2 pushed")
+        print("Button 2 pushed. Text:\(String(describing:button.currentTitle))")
 ////        // Tracking call is sent asynchronously
-//////        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
+        DopamineKit.track("action2", metaData: ["key":"value", "calories":9000])
 //        locationManager.delegate = self
 //        locationManager.requestAlwaysAuthorization()
         
 
-        DopamineKit.track("action2peformed")
+//        DopamineKit.track("action2peformed")
 //        DopamineKit.reinforce("a2") { reinforcement in
 //            // Update UI to display reinforcement decision on screen for learning purposes
 //            self.responseLabel.text = reinforcement
@@ -106,7 +123,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
-        
 //        DispatchQueue.concurrentPerform(iterations: 100) { count in
 //            DopamineKit.track("testingActionConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
 //        }
@@ -115,6 +131,18 @@ class ViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        print("In view did appear of class:\(NSStringFromClass(type(of: self)))")
+//        DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+//            SelectorReinforcement.unregisterMethods()
+//            print("Unregistered")
+//            DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+//                SelectorReinforcement.registerMethods()
+//                print("Registered")
+//            }
+//        }
+        
+//        CodelessIntegrationController.shared.registerSimpleMethod(classType: ViewController.self, selector: #selector(ViewController.action1Performed(button:)), reinforcement: ["test": ["Hello!!"]])
     }
     
     @objc func loadBasicUI(){
@@ -125,11 +153,11 @@ class ViewController: UIViewController {
         let dopamineIcon = UIImage(named:"DopamineLogo")
         
         let imageView = UIImageView(image: dopamineIcon)
-        imageView.center = CGPoint(x: viewSize.width/2, y: 100)
+        imageView.center = CGPoint(x: viewSize.width/2, y: 120)
         self.view.addSubview(imageView)
         
         // Response label below dopamine icon
-        responseLabel = UILabel.init(frame: CGRect(x: 0, y: 150, width: viewSize.width, height: 50))
+        responseLabel = UILabel.init(frame: CGRect(x: 0, y: 170, width: viewSize.width, height: 50))
         responseLabel.text = "Click a button below!"
         responseLabel.textAlignment = NSTextAlignment.center
         self.view.addSubview(responseLabel)
@@ -143,6 +171,7 @@ class ViewController: UIViewController {
         action1Button.titleLabel?.textAlignment = NSTextAlignment.center
         action1Button.backgroundColor = UIColor.init(red: 51/255.0, green: 153/255.0, blue: 51/255.0, alpha: 1.0)
         action1Button.addTarget(self, action: #selector(ViewController.action1Performed), for: UIControlEvents.touchUpInside)
+        action1Button.showsTouchWhenHighlighted = true
         self.view.addSubview(action1Button)
         
         // Button to represent some user action to Track
@@ -153,8 +182,9 @@ class ViewController: UIViewController {
         trackedActionButton.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
         trackedActionButton.titleLabel?.textAlignment = NSTextAlignment.center
         trackedActionButton.backgroundColor = UIColor.init(red: 204/255.0, green: 51/255.0, blue: 51/255.0, alpha: 1.0)
-        trackedActionButton.addTarget(self, action: #selector(ViewController.action2Performed), for: UIControlEvents.touchUpInside)
-        self.view.addSubview(trackedActionButton)
+        trackedActionButton.addTarget(self, action: #selector(ViewController.action2Performed(button:)), for: UIControlEvents.touchUpInside)
+        trackedActionButton.showsTouchWhenHighlighted = true
+        self.view.addSubview(trackedActionButton)   
     }
     
     @objc func flash(_ elm:UIView){
@@ -165,11 +195,18 @@ class ViewController: UIViewController {
     }
     
     override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
+//        let touchD = UITapGestureRecognizer()
         return UIInterfaceOrientationMask.portrait
     }
-    
 }
 
 extension ViewController : CLLocationManagerDelegate {
     
 }
+
+extension ViewController {
+    static func instance() -> ViewController {
+        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: NSStringFromClass(ViewController.self).components(separatedBy: ".").last!) as! ViewController
+    }
+}
+
