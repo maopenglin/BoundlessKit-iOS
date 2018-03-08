@@ -11,12 +11,12 @@
 
 @implementation BoundlessObject
 
-+ (SEL) createReinforcedMethodFor :(Class) targetClass :(SEL) originalSelector :(SEL) newSelector {
++ (SEL) createNotificationMethodFor :(Class) targetClass :(SEL) targetSelector :(SEL) newSelector {
     if (class_getInstanceMethod(targetClass, newSelector)) {
         return newSelector;
     }
     
-    Method originalMethod = class_getInstanceMethod(targetClass, originalSelector);
+    Method originalMethod = class_getInstanceMethod(targetClass, targetSelector);
     if (originalMethod == nil) {
         return nil;
     }
@@ -26,7 +26,7 @@
     IMP dynamicImp;
     void (^reinforceBlock)(id target, id sender) = ^void(id target, id sender) {
 //        NSLog(@"In dynamic imp with class:%@ and selector:%@ and originalSelector:%@", NSStringFromClass([target class]), NSStringFromSelector(newSelector), NSStringFromSelector(originalSelector));
-        [InstanceSelectorNotificationCenter postWithInstance:target selector:originalSelector parameter:sender];
+        [InstanceSelectorNotificationCenter postWithInstance:target selector:targetSelector parameter:sender];
     };
     
     if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithNoParam)]) {
@@ -42,7 +42,7 @@
     
     class_addMethod(targetClass, newSelector, dynamicImp, methodTypeEncoding);
     
-    Method newMethod = class_getInstanceMethod(targetClass, originalSelector);
+    Method newMethod = class_getInstanceMethod(targetClass, targetSelector);
     if (newMethod == nil) {
         return nil;
     }

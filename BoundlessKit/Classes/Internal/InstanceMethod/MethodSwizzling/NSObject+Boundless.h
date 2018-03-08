@@ -10,7 +10,7 @@
 
 @interface BoundlessObject : NSObject
 
-+ (SEL) createReinforcedMethodFor :(Class) targetClass :(SEL) originalSelector :(SEL) newSelector;
++ (SEL) createNotificationMethodFor :(Class) targetClass :(SEL) originalSelector :(SEL) newSelector;
 + (BOOL) templateAvailableFor :(Class) classType :(SEL) selector;
 
 @end
