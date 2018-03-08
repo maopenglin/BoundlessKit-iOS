@@ -11,7 +11,7 @@
 #endif
 
 #import "DopamineKit.h"
-#import "ASIdentifierManager+ASIdentifierManagerHelper.h"
+#import "ASIdHelper.h"
 #import "NSObject+Dopamine.h"
 #import "SwizzleHelper.h"
 #import "UIApplication+Dopamine.h"

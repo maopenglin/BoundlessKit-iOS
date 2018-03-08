@@ -134,7 +134,7 @@ internal class DopamineProperties : DopamineDefaultsSingleton {
             
             if DopamineProperties._primaryIdentity == nil {
                 if DopamineConfiguration.current.advertiserID,
-                    let aid = ASIdentifierManager.shared().adId()?.uuidString,
+                    let aid = ASIdHelper.adId()?.uuidString,
                     aid != "00000000-0000-0000-0000-000000000000" {
                     DopeLog.debug("set ASIdentifierManager for primaryIdentity:(\(aid))")
                     DopamineProperties._primaryIdentity = aid
