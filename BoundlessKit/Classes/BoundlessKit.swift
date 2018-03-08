@@ -11,32 +11,27 @@
 import Foundation
 
 
+public protocol BoundlessKitDelegate {
+    func kitActionIDs() -> [String]
+    func kitReinforcements(for actionID: String) -> [String]
+    func kitPublishAction(actionInfo: [String:Any])
+    func kitPublishReinforcement(actionInfo: [String:Any])
+}
+
 public class BoundlessKit : NSObject {
+    
+    var delegate: BoundlessKitDelegate?
     
     var actionOracles = [String: ActionOracle]()
     var codelessVisuals = [CodelessVisual]()
     
-    public func launch(arguements: [String: Any]) {
-        if let mappings = arguements["mappings"] as? [String: [String: Any]] {
-            for (actionID, value) in mappings {
-                let actionOracle = ActionOracle(actionID)
-                actionOracles[actionID] = actionOracle
-//                if let observer = InstanceMethodNotifier.init(actionID: actionID) {
-//                    observer.register()
-//                }
-                if let codeless = value["codeless"] as? [String: Any],
-                    let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
-                    for reinforcementDict in reinforcements {
-                        if let codelessVisual = CodelessVisual.convert(from: reinforcementDict) {
-                            let futureReinforcement = FutureReinforcement.init(actionID, BoundlessReinforcement.init(codelessVisual.primitive))
-                            print("Future reinforcement:\(futureReinforcement.notification.rawValue)")
-                            codelessVisual.register(for: futureReinforcement)
-                            actionOracle.manifest.knownReinforcements.append(futureReinforcement)
-                            codelessVisuals.append(codelessVisual)
-                        }
-                    }
-                }
-            }
+    public func launch(delegate: BoundlessKitDelegate, arguements: [String: Any]) {
+        self.delegate = delegate
+        for actionID in delegate.kitActionIDs() {
+            let reinforcements = delegate.kitReinforcements(for: actionID).map({ (reinforcementID) -> BoundlessReinforcement in
+                return BoundlessReinforcement.init(reinforcementID, actionID)
+            })
+            actionOracles[actionID] = ActionOracle.init(actionID, reinforcements)
         }
     }
     
@@ -53,15 +48,14 @@ public class BoundlessKit : NSObject {
         return reinforce(action: action).name
     }
     internal func reinforce(action: BoundlessAction) -> BoundlessReinforcement {
-        let reinforcement: BoundlessReinforcement
-        if let oracle = actionOracles[action.name] {
-            reinforcement = oracle.reinforce()
+        let oracle: ActionOracle
+        if let actionOracle = actionOracles[action.name] {
+            oracle = actionOracle
         } else {
-            let actionOracle = ActionOracle(action.name)
-            actionOracles[action.name] = actionOracle
-            reinforcement = actionOracle.reinforce()
+            oracle = ActionOracle(action.name, [])
+            actionOracles[action.name] = oracle
         }
-        return reinforcement
+        return oracle.reinforce()
     }
     
     

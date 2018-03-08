@@ -7,13 +7,11 @@
 
 import Foundation
 
-struct InstanceSelector : Hashable {
+internal struct InstanceSelector {
     let classType: AnyClass
     let selector: Selector
     
-    var actionID: String { return [NSStringFromClass(classType), NSStringFromSelector(selector)].joined(separator: "-") }
-    
-    var notification: Notification.Name { return Notification.Name.init(actionID) }
+    var name: String { return [NSStringFromClass(classType), NSStringFromSelector(selector)].joined(separator: "-") }
     
     init?(_ classType: AnyClass, _ selector: Selector) {
         guard classType.instancesRespond(to: selector) else {
@@ -34,22 +32,9 @@ struct InstanceSelector : Hashable {
         }
     }
     
-    init?(_ notification: Notification.Name) {
-        self.init(notification.rawValue)
-    }
-    
     func swizzle(with other: InstanceSelector) {
         SwizzleHelper.injectSelector(other.classType, other.selector, self.classType, self.selector)
     }
-    
-    var hashValue: Int {
-        return classType.hash() ^ selector.hashValue
-    }
-    
-    static func ==(lhs: InstanceSelector, rhs: InstanceSelector) -> Bool {
-        return NSStringFromSelector(lhs.selector) == NSStringFromSelector(rhs.selector) && NSStringFromClass(lhs.classType) == NSStringFromClass(rhs.classType)
-    }
-    
 }
 
 @objc
@@ -75,24 +60,28 @@ public class InstanceSelectorNotificationCenter : NotificationCenter {
             // already swizzled
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
             return
-        } else if let instanceSelector = InstanceSelector(aName),
+        }
+        
+        if let instanceSelector = InstanceSelector(aName),
             let activatedNotification = inactiveNotifications.removeValue(forKey: aName) {
             // reswizzle
             instanceSelector.swizzle(with: activatedNotification)
             activeNotifications[aName] = activatedNotification
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
+            return
         }
         
-        // add method and swizzle for the first time
-        guard let instanceSelector = InstanceSelector(aName),
+        if let instanceSelector = InstanceSelector(aName),
             let notificationSelector = BoundlessObject.createNotificationMethod(for: instanceSelector.classType, instanceSelector.selector, instanceSelector.selector.withRandomString()),
-            let newInstanceSelector = InstanceSelector.init(instanceSelector.classType, notificationSelector) else {
-                print("Error: cannot create instance method for notification<\(aName)>")
-                return
+            let newInstanceSelector = InstanceSelector.init(instanceSelector.classType, notificationSelector) {
+            // add method and swizzle for the first time
+            instanceSelector.swizzle(with: newInstanceSelector)
+            activeNotifications[aName] = newInstanceSelector
+            super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
+            return
         }
-        instanceSelector.swizzle(with: newInstanceSelector)
-        activeNotifications[aName] = newInstanceSelector
-        super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
+        
+        print("Error: cannot create instance method for notification<\(aName)>")
     }
     
     override public func removeObserver(_ observer: Any, name aName: NSNotification.Name?, object anObject: Any?) {
@@ -120,4 +109,16 @@ public class InstanceSelectorNotificationCenter : NotificationCenter {
         print("Posted instance method notification with name:\(instanceSelector.notification.rawValue)")
     }
     
+}
+
+
+
+extension InstanceSelector {
+    init?(_ notification: Notification.Name) {
+        self.init(notification.rawValue)
+    }
+    
+    var notification: Notification.Name {
+        return Notification.Name.init(name)
+    }
 }

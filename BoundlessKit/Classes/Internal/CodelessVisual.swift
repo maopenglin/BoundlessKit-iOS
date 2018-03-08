@@ -15,9 +15,9 @@ internal class CodelessVisual : NSObject {
         self.primitive = primitive
     }
     
-    func register(for futureReinforcement: FutureReinforcement) {
-        NotificationCenter.default.addObserver(self, selector: #selector(self.show(notification:)), name: futureReinforcement.notification, object: nil)
-        print("Registered for:\(futureReinforcement.notification.rawValue)")
+    func register(for notification: Notification.Name) {
+        NotificationCenter.default.addObserver(self, selector: #selector(self.show(notification:)), name: notification, object: nil)
+        print("Registered for:\(notification.rawValue)")
     }
     
     @objc

@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     let kit = BoundlessKit()
     
     @objc func action1Performed(){
-        kit.launch(arguements: Helper.versionMappings)
+//        kit.launch(arguements: Helper.versionMappings)
         // Reinforce the action to make it sticky!!
         //        BoundlessKit.reinforce("a1", metaData: ["key":"value"], completion: {
         //            reinforcement in

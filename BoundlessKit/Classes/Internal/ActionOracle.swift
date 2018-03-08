@@ -11,29 +11,24 @@ import Foundation
 internal class ActionOracle : NSObject {
     
     let actionID: String
-    var manifest: FutureEventManifest
-    var futureReinforcements: [FutureReinforcement]
+    var futureReinforcements: [BoundlessReinforcement]
     
-    init(_ actionID: String) {
+    init(_ actionID: String, _ futureReinforcements: [BoundlessReinforcement]) {
         self.actionID = actionID
-        self.manifest = FutureEventManifest.init(actionID)
-        self.futureReinforcements = []
-        // look at storage and load
+        self.futureReinforcements = futureReinforcements
     }
 
     func reinforce() -> BoundlessReinforcement {
+        let reinforcement: BoundlessReinforcement
+        
         if let futureReinforcement = futureReinforcements.first {
             futureReinforcements.remove(at: 0)
-            futureReinforcement.use()
-            return futureReinforcement.reinforcement
-        } else if let futureReinforcement = manifest.knownReinforcements.first {
-            futureReinforcement.use()
-            return futureReinforcement.reinforcement
+            reinforcement = futureReinforcement
         } else {
-            // request futures refresh
-            let future = FutureReinforcement.defaultFor(actionID: actionID)
-            future.use()
-            return future.reinforcement
+            reinforcement = BoundlessReinforcement.neutral(for: actionID)
         }
+        
+        reinforcement.notifyObservers()
+        return reinforcement
     }
 }

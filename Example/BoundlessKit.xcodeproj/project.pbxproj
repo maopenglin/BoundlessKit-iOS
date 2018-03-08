@@ -14,10 +14,13 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		7E3E9430DAB0256EDC10F853 /* Pods_BoundlessKit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C5896EE6F40C3937CF30FD8 /* Pods_BoundlessKit_Tests.framework */; };
-		8425A2F12050F43400D1ED4C /* MockViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8425A2F02050F43400D1ED4C /* MockViewController.swift */; };
 		842661C3204DE3C5001FEA2F /* BoundlessProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 842661C2204DE3C5001FEA2F /* BoundlessProperties.plist */; };
 		842661E5204E05B3001FEA2F /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		842661E6204E05BA001FEA2F /* BoundlessDemoProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 842661C4204DFE50001FEA2F /* BoundlessDemoProperties.plist */; };
+		84CBF27B2051D31800FE49B9 /* MockViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF27A2051D31800FE49B9 /* MockViewController.swift */; };
+		84CBF2802051E5D400FE49B9 /* TestInstanceSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF27F2051E5D400FE49B9 /* TestInstanceSelector.swift */; };
+		84CBF2822051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2812051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift */; };
+		84CBF2842051EA1500FE49B9 /* TestActionReinforcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2832051EA1500FE49B9 /* TestActionReinforcement.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,10 +46,13 @@
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
-		8425A2F02050F43400D1ED4C /* MockViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockViewController.swift; sourceTree = "<group>"; };
 		842661C2204DE3C5001FEA2F /* BoundlessProperties.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BoundlessProperties.plist; sourceTree = "<group>"; };
 		842661C4204DFE50001FEA2F /* BoundlessDemoProperties.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BoundlessDemoProperties.plist; sourceTree = "<group>"; };
 		842661DB204E03E8001FEA2F /* BoundlessKit_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoundlessKit_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		84CBF27A2051D31800FE49B9 /* MockViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockViewController.swift; sourceTree = "<group>"; };
+		84CBF27F2051E5D400FE49B9 /* TestInstanceSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInstanceSelector.swift; sourceTree = "<group>"; };
+		84CBF2812051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInstanceSelectorNotification.swift; sourceTree = "<group>"; };
+		84CBF2832051EA1500FE49B9 /* TestActionReinforcement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestActionReinforcement.swift; sourceTree = "<group>"; };
 		8C5896EE6F40C3937CF30FD8 /* Pods_BoundlessKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoundlessKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		938D580BBCCFD0A22693C187 /* Pods-BoundlessKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoundlessKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BoundlessKit_Tests/Pods-BoundlessKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		A6E23EE403314927A4B43AC3 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -131,9 +137,12 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				84CBF2832051EA1500FE49B9 /* TestActionReinforcement.swift */,
+				84CBF2812051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift */,
+				84CBF27F2051E5D400FE49B9 /* TestInstanceSelector.swift */,
 				842661C4204DFE50001FEA2F /* BoundlessDemoProperties.plist */,
 				607FACEB1AFB9204008FA782 /* Tests.swift */,
-				8425A2F02050F43400D1ED4C /* MockViewController.swift */,
+				84CBF2792051D31800FE49B9 /* Mocks */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -155,6 +164,14 @@
 				A6E23EE403314927A4B43AC3 /* LICENSE */,
 			);
 			name = "Podspec Metadata";
+			sourceTree = "<group>";
+		};
+		84CBF2792051D31800FE49B9 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				84CBF27A2051D31800FE49B9 /* MockViewController.swift */,
+			);
+			path = Mocks;
 			sourceTree = "<group>";
 		};
 		89DA6F2599420695EA4FC574 /* Pods */ = {
@@ -385,7 +402,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8425A2F12050F43400D1ED4C /* MockViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);
@@ -395,6 +411,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84CBF27B2051D31800FE49B9 /* MockViewController.swift in Sources */,
+				84CBF2802051E5D400FE49B9 /* TestInstanceSelector.swift in Sources */,
+				84CBF2842051EA1500FE49B9 /* TestActionReinforcement.swift in Sources */,
+				84CBF2822051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift in Sources */,
 				842661E5204E05B3001FEA2F /* Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
