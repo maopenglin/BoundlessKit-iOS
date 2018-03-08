@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'BoundlessKit'
-  s.version          = '5.2.11'
+  s.version          = '5.4.0'
   s.summary          = 'A framework to use BoundlessAI reinforcement for iOS'
   s.homepage         = 'https://github.com/BoundlessAI/BoundlessKit-iOS'
   s.social_media_url = 'https://twitter.com/boundlessAI'
@@ -32,4 +32,5 @@ Pod::Spec.new do |s|
   }
 
   s.public_header_files = 'BoundlessKit/Classes/**/*.h'
+  
 end

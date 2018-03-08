@@ -21,9 +21,9 @@ public class BoundlessKit : NSObject {
             for (actionID, value) in mappings {
                 let actionOracle = ActionOracle(actionID)
                 actionOracles[actionID] = actionOracle
-                if let observer = InstanceMethodSwizzle.init(actionID: actionID) {
-                    observer.register()
-                }
+//                if let observer = InstanceMethodNotifier.init(actionID: actionID) {
+//                    observer.register()
+//                }
                 if let codeless = value["codeless"] as? [String: Any],
                     let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
                     for reinforcementDict in reinforcements {

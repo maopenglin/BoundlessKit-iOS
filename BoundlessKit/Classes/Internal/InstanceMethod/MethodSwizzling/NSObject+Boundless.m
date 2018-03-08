@@ -26,7 +26,7 @@
     IMP dynamicImp;
     void (^reinforceBlock)(id target, id sender) = ^void(id target, id sender) {
 //        NSLog(@"In dynamic imp with class:%@ and selector:%@ and originalSelector:%@", NSStringFromClass([target class]), NSStringFromSelector(newSelector), NSStringFromSelector(originalSelector));
-        [InstanceMethodNotification postWithTargetInstance:target selector:originalSelector parameter:sender];
+        [InstanceSelectorNotificationCenter postWithInstance:target selector:originalSelector parameter:sender];
     };
     
     if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithNoParam)]) {

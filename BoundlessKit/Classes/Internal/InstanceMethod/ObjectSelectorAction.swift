@@ -1,5 +1,5 @@
 //
-//  InstanceMethodAction.swift
+//  ObjectSelectorAction.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 3/6/18.
@@ -7,13 +7,13 @@
 
 import Foundation
 
-internal class InstanceMethodAction : BoundlessAction {
+internal class ObjectSelectorAction : BoundlessAction {
     
-    let target: NSObject
+    let object: NSObject
     let selector: Selector
     
     init(target: NSObject, selector: Selector, parameter: AnyObject?) {
-        self.target = target
+        self.object = target
         self.selector = selector
         super.init([NSStringFromClass(type(of: target)), NSStringFromSelector(selector)].joined(separator: "-"))
     }
