@@ -17,8 +17,11 @@ internal class BoundlessAction : NSObject {
     }
     
     static func addContext(to action: BoundlessAction) {
-        ContextGenerator.surroundingBluetooth { (bluetoothInfo) in
-            action.metadata["bluetooth"] = bluetoothInfo
+        ContextGenerator.getContext() { context in
+            for (key, value) in context {
+                action.metadata[key] = value
+            }
+            print("Action<\(action.name)> metadata:\(action.metadata as AnyObject)")
         }
     }
 }

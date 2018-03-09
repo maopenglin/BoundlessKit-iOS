@@ -26,6 +26,7 @@ class TestActionReinforcement: XCTestCase {
         let oracle = ActionOracle.init(actionID, [])
         
         XCTAssert(oracle.reinforce().name == BoundlessReinforcement.neutral(for: actionID).name)
+        sleep(1)
     }
     
     func testActionOracleWithFutureReinforcements() {
