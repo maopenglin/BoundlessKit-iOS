@@ -11,24 +11,29 @@
 import Foundation
 
 
-public protocol BoundlessKitDelegate {
+public protocol BoundlessKitDataSource {
     func kitActionIDs() -> [String]
     func kitReinforcements(for actionID: String) -> [String]
-    func kitPublishAction(actionInfo: [String:Any])
-    func kitPublishReinforcement(actionInfo: [String:Any])
+}
+public protocol BoundlessKitDelegate {
+    func kitPublish(actionInfo: [String:Any])
+    func kitPublish(reinforcementInfo: [String:Any])
 }
 
 public class BoundlessKit : NSObject {
     
     var delegate: BoundlessKitDelegate?
+    var dataSource: BoundlessKitDataSource?
     
     var actionOracles = [String: ActionOracle]()
     var codelessVisuals = [CodelessVisual]()
     
-    public func launch(delegate: BoundlessKitDelegate, arguements: [String: Any]) {
+    public func launch(delegate: BoundlessKitDelegate, dataSource: BoundlessKitDataSource, arguements: [String: Any]) {
         self.delegate = delegate
-        for actionID in delegate.kitActionIDs() {
-            let reinforcements = delegate.kitReinforcements(for: actionID).map({ (reinforcementID) -> BoundlessReinforcement in
+        self.dataSource = dataSource
+        
+        for actionID in dataSource.kitActionIDs() {
+            let reinforcements = dataSource.kitReinforcements(for: actionID).map({ (reinforcementID) -> BoundlessReinforcement in
                 return BoundlessReinforcement.init(reinforcementID, actionID)
             })
             actionOracles[actionID] = ActionOracle.init(actionID, reinforcements)

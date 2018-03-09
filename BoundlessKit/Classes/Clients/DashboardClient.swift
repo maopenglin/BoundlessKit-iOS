@@ -17,7 +17,7 @@ class DashboardClient : NSObject {
         loadCodelessReinforcements(mappings: [String : [String : Any]]())
         
         let kit = BoundlessKit()
-        kit.launch(delegate: self, arguements: [:])
+        kit.launch(delegate: self, dataSource: self, arguements: [:])
     }
     
     func loadCodelessReinforcements(mappings:[String: [String: Any]]) {
@@ -42,7 +42,7 @@ class DashboardClient : NSObject {
     
 }
 
-extension DashboardClient : BoundlessKitDelegate {
+extension DashboardClient : BoundlessKitDelegate, BoundlessKitDataSource {
     
     func kitActionIDs() -> [String] {
         return actionIDs
@@ -54,11 +54,11 @@ extension DashboardClient : BoundlessKitDelegate {
         }) ?? []
     }
     
-    func kitPublishAction(actionInfo: [String : Any]) {
+    func kitPublish(actionInfo: [String : Any]) {
         
     }
     
-    func kitPublishReinforcement(actionInfo: [String : Any]) {
+    func kitPublish(reinforcementInfo: [String : Any]) {
         
     }
 }

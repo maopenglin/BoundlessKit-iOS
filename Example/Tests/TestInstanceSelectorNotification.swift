@@ -11,139 +11,164 @@ import XCTest
 
 class TestInstanceSelectorNotification: XCTestCase {
     
-    var didReceiveNotification = false
-    @objc func receiveNotification(notification: Notification) {
-        didReceiveNotification = true
-        print("Received notification <\(notification.name)>")
-    }
-    
-    var didReceiveNotification2 = false
-    @objc func receiveNotification(notification2: Notification) {
-        didReceiveNotification2 = true
-        print("Received notification2 <\(notification2.name)>")
-    }
-    
     override func setUp() {
         super.setUp()
     }
     
     override func tearDown() {
-        didReceiveNotification = false
-        didReceiveNotification2 = false
         super.tearDown()
     }
     
     
     func testReceivingAllNotifications() {
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification:)), name: nil, object: nil)
+        let notificationReceiver = NotificationReceiver()
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: nil, object: nil)
         
         InstanceSelectorNotificationCenter.default.post(name: NSNotification.Name.init("aNotification"), object: nil)
-        XCTAssert(self.didReceiveNotification)
+        XCTAssert(notificationReceiver.didReceiveNotification)
     }
     
     func testPostNotification() {
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification:)), name: nil, object: nil)
+        let notificationReceiver = NotificationReceiver()
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: nil, object: nil)
         
         InstanceSelectorNotificationCenter.post(instance: self, selector: #selector(testPostNotification), parameter: nil)
-        XCTAssert(self.didReceiveNotification)
+        XCTAssert(notificationReceiver.didReceiveNotification)
     }
     
     func testPostNotificationFail() {
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification:)), name: nil, object: nil)
+        let notificationReceiver = NotificationReceiver()
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: nil, object: nil)
         
         InstanceSelectorNotificationCenter.post(instance: self, selector: #selector(UIViewController.viewDidAppear(_:)), parameter: nil)
-        XCTAssert(!self.didReceiveNotification)
+        XCTAssert(!notificationReceiver.didReceiveNotification)
     }
     
     func testNotificationForSelectorWithNoParam() {
-        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printSomething))!
+        let notificationReceiver = NotificationReceiver()
         let sut = MockViewController()
+        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printSomething))!
         
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
         sut.printSomething()
         
-        XCTAssert(self.didReceiveNotification)
+        XCTAssert(notificationReceiver.didReceiveNotification)
     }
     
     func testNotificationForSelectorWithBoolParam() {
-        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.viewDidAppear(_:)))!
+        let notificationReceiver = NotificationReceiver()
         let sut = MockViewController()
+        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.viewDidAppear(_:)))!
         
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
         sut.viewDidAppear(true)
         
-        XCTAssert(self.didReceiveNotification)
+        XCTAssert(notificationReceiver.didReceiveNotification)
     }
     
     func testNotificationForSelectorWithObjectParam() {
-        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printA(string:)))!
+        let notificationReceiver = NotificationReceiver()
         let sut = MockViewController()
+        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printA(string:)))!
         
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
         sut.printA(string: "string")
         
-        XCTAssert(self.didReceiveNotification)
+        XCTAssert(notificationReceiver.didReceiveNotification)
     }
     
     func testFailNotificationForSelectorWithMultipleParams() {
-        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printA(string:and:)))!
+        let notificationReceiver = NotificationReceiver()
         let sut = MockViewController()
+        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printA(string:and:)))!
         
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
         sut.printA(string: "string", and: "string2")
         
-        XCTAssert(!self.didReceiveNotification)
+        XCTAssert(!notificationReceiver.didReceiveNotification)
     }
     
     
     
     func testNotificationAddAndRemove() {
-        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printSomething))!
+        let notificationReceiver = NotificationReceiver()
         let sut = MockViewController()
+        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printSomething))!
         
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
         sut.printSomething()
         
-        XCTAssert(self.didReceiveNotification)
-        self.didReceiveNotification = false
+        XCTAssert(notificationReceiver.didReceiveNotification)
+        notificationReceiver.didReceiveNotification = false
         
         InstanceSelectorNotificationCenter.default.removeObserver(self, name: selectorInstance.notification, object: nil)
         sut.printSomething()
         
-        XCTAssert(!self.didReceiveNotification)
+        XCTAssert(!notificationReceiver.didReceiveNotification)
     }
     
-    func testNotificationAddAndRemoveAndAdd() {
-        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printSomething))!
+    func testNotificationAddTwiceAndRemoveAndAdd() {
+        let notificationReceiver = NotificationReceiver()
+        let notificationReceiver2 = NotificationReceiver()
         let sut = MockViewController()
+        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printSomething))!
         
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
         sut.printSomething()
         
-        XCTAssert(self.didReceiveNotification)
-        self.didReceiveNotification = false
+        XCTAssert(notificationReceiver.didReceiveNotification)
+        notificationReceiver.didReceiveNotification = false
         
-        InstanceSelectorNotificationCenter.default.removeObserver(self, name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver2, selector: #selector(notificationReceiver2.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
         sut.printSomething()
         
-        XCTAssert(!self.didReceiveNotification)
+        XCTAssert(notificationReceiver.didReceiveNotification)
+        XCTAssert(notificationReceiver2.didReceiveNotification)
+        notificationReceiver.didReceiveNotification = false
+        notificationReceiver2.didReceiveNotification = false
         
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver, name: selectorInstance.notification, object: nil)
         sut.printSomething()
         
-        XCTAssert(self.didReceiveNotification)
+        XCTAssert(!notificationReceiver.didReceiveNotification)
+        XCTAssert(notificationReceiver2.didReceiveNotification)
+        notificationReceiver2.didReceiveNotification = false
+        
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
+        sut.printSomething()
+        
+        XCTAssert(notificationReceiver.didReceiveNotification)
+        XCTAssert(notificationReceiver2.didReceiveNotification)
     }
     
-    func testNotificationForMultipleObservers() {
-        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printSomething))!
+    func testNotificationAddTwiceAndRemoveThriceAndAdd() {
+        let notificationReceiver = NotificationReceiver()
+        let notificationReceiver2 = NotificationReceiver()
         let sut = MockViewController()
+        let selectorInstance = InstanceSelector(MockViewController.self, #selector(MockViewController.printSomething))!
         
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.receiveNotification(notification2:)), name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver2, selector: #selector(notificationReceiver2.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
         sut.printSomething()
         
-        XCTAssert(self.didReceiveNotification)
-        XCTAssert(self.didReceiveNotification2)
+        XCTAssert(notificationReceiver.didReceiveNotification)
+        XCTAssert(notificationReceiver2.didReceiveNotification)
+        notificationReceiver.didReceiveNotification = false
+        notificationReceiver2.didReceiveNotification = false
+        
+        InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver, name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver2, name: selectorInstance.notification, object: nil)
+        InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver2, name: selectorInstance.notification, object: nil)
+        sut.printSomething()
+        
+        XCTAssert(!notificationReceiver.didReceiveNotification)
+        XCTAssert(!notificationReceiver2.didReceiveNotification)
+        
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: selectorInstance.notification, object: nil)
+        sut.printSomething()
+        
+        XCTAssert(notificationReceiver.didReceiveNotification)
+        XCTAssert(!notificationReceiver2.didReceiveNotification)
     }
     
 }

@@ -9,13 +9,16 @@ import Foundation
 
 internal class BoundlessAction : NSObject {
     let name: String
-    init(_ name: String) {
+    var metadata: [String: Any]
+    
+    init(_ name: String, _ metadata: [String:Any] = [:]) {
         self.name = name
+        self.metadata = metadata
     }
     
     static func addContext(to action: BoundlessAction) {
-        let _ = {[weak action] in
-            
-        }()
+        ContextGenerator.surroundingBluetooth { (bluetoothInfo) in
+            action.metadata["bluetooth"] = bluetoothInfo
+        }
     }
 }

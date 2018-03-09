@@ -12,7 +12,7 @@ class ManualClient : NSObject {
     
 }
 
-extension ManualClient : BoundlessKitDelegate {
+extension ManualClient : BoundlessKitDataSource, BoundlessKitDelegate {
     func kitActionIDs() -> [String] {
         return ["action1"]
     }
@@ -21,11 +21,11 @@ extension ManualClient : BoundlessKitDelegate {
         return ["reward1", "reward2"]
     }
     
-    func kitPublishAction(actionInfo: [String : Any]) {
+    func kitPublish(actionInfo: [String : Any]) {
         
     }
     
-    func kitPublishReinforcement(actionInfo: [String : Any]) {
+    func kitPublish(reinforcementInfo: [String : Any]) {
         
     }
     

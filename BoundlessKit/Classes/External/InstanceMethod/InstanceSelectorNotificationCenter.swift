@@ -31,10 +31,6 @@ internal struct InstanceSelector {
             return nil
         }
     }
-    
-    func swizzle(with other: InstanceSelector) {
-        SwizzleHelper.injectSelector(other.classType, other.selector, self.classType, self.selector)
-    }
 }
 
 @objc
@@ -45,9 +41,7 @@ public class InstanceSelectorNotificationCenter : NotificationCenter {
         return _default
     }
     
-    fileprivate var activeNotifications = [Notification.Name: InstanceSelector]()
-    
-    fileprivate var inactiveNotifications = [Notification.Name: InstanceSelector]()
+    fileprivate var notifiers = [Notification.Name: InstanceSelectorNotifier]()
     
     override public func addObserver(_ observer: Any, selector aSelector: Selector, name aName: NSNotification.Name?, object anObject: Any?) {
         guard let aName = aName else {
@@ -56,27 +50,16 @@ public class InstanceSelectorNotificationCenter : NotificationCenter {
             return
         }
         
-        if let _ = activeNotifications[aName] {
-            // already swizzled
+        if let notifier = notifiers[aName] {
+            notifier.addObserver()
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
             return
         }
         
-        if let instanceSelector = InstanceSelector(aName),
-            let activatedNotification = inactiveNotifications.removeValue(forKey: aName) {
-            // reswizzle
-            instanceSelector.swizzle(with: activatedNotification)
-            activeNotifications[aName] = activatedNotification
-            super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
-            return
-        }
-        
-        if let instanceSelector = InstanceSelector(aName),
-            let notificationSelector = BoundlessObject.createNotificationMethod(for: instanceSelector.classType, instanceSelector.selector, instanceSelector.selector.withRandomString()),
-            let newInstanceSelector = InstanceSelector.init(instanceSelector.classType, notificationSelector) {
-            // add method and swizzle for the first time
-            instanceSelector.swizzle(with: newInstanceSelector)
-            activeNotifications[aName] = newInstanceSelector
+        if let instanceSelector = InstanceSelector.init(aName.rawValue),
+            let notifier = InstanceSelectorNotifier.init(instanceSelector) {
+            notifiers[aName] = notifier
+            notifier.addObserver()
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
             return
         }
@@ -88,16 +71,13 @@ public class InstanceSelectorNotificationCenter : NotificationCenter {
         defer {
             super.removeObserver(observer, name: aName, object: anObject)
         }
-        
-        // for now, unswizzle when observer removed
-        if let aName = aName,
-            let instanceSelector = InstanceSelector(aName),
-            let inactivedNotification = activeNotifications.removeValue(forKey: aName) {
-            instanceSelector.swizzle(with: inactivedNotification)
-            inactiveNotifications[aName] = inactivedNotification
+        if let aName = aName {
+            notifiers[aName]?.removeObserver()
         }
     }
-    
+}
+
+extension InstanceSelectorNotificationCenter {
     @objc
     public static func post(instance: NSObject, selector: Selector, parameter: AnyObject?) {
         guard let instanceSelector = InstanceSelector(type(of: instance), selector) else {
@@ -105,13 +85,45 @@ public class InstanceSelectorNotificationCenter : NotificationCenter {
             return
         }
         
-        InstanceSelectorNotificationCenter.default.post(name: instanceSelector.notification, object: instance)
-        print("Posted instance method notification with name:\(instanceSelector.notification.rawValue)")
+        let notification = Notification.Name.init(instanceSelector.name)
+        InstanceSelectorNotificationCenter.default.post(name: notification, object: instance)
+        print("Posted instance method notification with name:\(notification.rawValue)")
     }
-    
 }
 
 
+
+internal class InstanceSelectorNotifier : NSObject {
+    
+    let instanceSelector: InstanceSelector
+    let notificationSelector: InstanceSelector
+    private var numberOfObservers = 0
+    
+    init?(_ instanceSelector: InstanceSelector) {
+        if let notificationSelector = BoundlessObject.createNotificationMethod(for: instanceSelector.classType, instanceSelector.selector, instanceSelector.selector.withRandomString()),
+            let newInstanceSelector = InstanceSelector.init(instanceSelector.classType, notificationSelector) {
+            self.instanceSelector = instanceSelector
+            self.notificationSelector = newInstanceSelector
+            super.init()
+        } else {
+            return nil
+        }
+    }
+    
+    func addObserver() {
+        if numberOfObservers == 0 {
+            instanceSelector.swizzle(with: notificationSelector)
+        }
+        numberOfObservers += 1
+    }
+    
+    func removeObserver() {
+        numberOfObservers -= 1
+        if numberOfObservers == 0 {
+            instanceSelector.swizzle(with: notificationSelector)
+        }
+    }
+}
 
 extension InstanceSelector {
     init?(_ notification: Notification.Name) {
@@ -119,6 +131,11 @@ extension InstanceSelector {
     }
     
     var notification: Notification.Name {
-        return Notification.Name.init(name)
+        return Notification.Name.init(self.name)
+    }
+    
+    func swizzle(with other: InstanceSelector) {
+        SwizzleHelper.injectSelector(other.classType, other.selector, self.classType, self.selector)
     }
 }
+

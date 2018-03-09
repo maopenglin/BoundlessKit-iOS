@@ -21,6 +21,7 @@
 		84CBF2802051E5D400FE49B9 /* TestInstanceSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF27F2051E5D400FE49B9 /* TestInstanceSelector.swift */; };
 		84CBF2822051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2812051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift */; };
 		84CBF2842051EA1500FE49B9 /* TestActionReinforcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2832051EA1500FE49B9 /* TestActionReinforcement.swift */; };
+		84CBF289205213F500FE49B9 /* NotificationReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2872052137300FE49B9 /* NotificationReceiver.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,7 @@
 		84CBF27F2051E5D400FE49B9 /* TestInstanceSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInstanceSelector.swift; sourceTree = "<group>"; };
 		84CBF2812051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInstanceSelectorNotification.swift; sourceTree = "<group>"; };
 		84CBF2832051EA1500FE49B9 /* TestActionReinforcement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestActionReinforcement.swift; sourceTree = "<group>"; };
+		84CBF2872052137300FE49B9 /* NotificationReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationReceiver.swift; sourceTree = "<group>"; };
 		8C5896EE6F40C3937CF30FD8 /* Pods_BoundlessKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoundlessKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		938D580BBCCFD0A22693C187 /* Pods-BoundlessKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoundlessKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BoundlessKit_Tests/Pods-BoundlessKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		A6E23EE403314927A4B43AC3 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				84CBF27A2051D31800FE49B9 /* MockViewController.swift */,
+				84CBF2872052137300FE49B9 /* NotificationReceiver.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -416,6 +419,7 @@
 				84CBF2842051EA1500FE49B9 /* TestActionReinforcement.swift in Sources */,
 				84CBF2822051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift in Sources */,
 				842661E5204E05B3001FEA2F /* Tests.swift in Sources */,
+				84CBF289205213F500FE49B9 /* NotificationReceiver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
