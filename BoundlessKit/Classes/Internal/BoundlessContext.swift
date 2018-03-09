@@ -1,5 +1,5 @@
 //
-//  ContextGenerator.swift
+//  BoundlessContext.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 3/8/18.
@@ -7,10 +7,9 @@
 
 import Foundation
 
-
-class ContextGenerator : NSObject {
+class BoundlessContext : NSObject {
     
-    static let queue = DispatchQueue.init(label: NSStringFromClass(ContextGenerator.self), attributes: .concurrent)
+    static let queue = DispatchQueue.init(label: NSStringFromClass(BoundlessContext.self), attributes: .concurrent)
     
     static func getContext(completion:@escaping([String:Any]) -> Void) {
         queue.async {

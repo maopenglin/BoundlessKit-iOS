@@ -12,8 +12,8 @@ import Foundation
 
 
 public protocol BoundlessKitDataSource {
-    func kitActionIDs() -> [String]
-    func kitReinforcements(for actionID: String) -> [String]
+    func kitActions() -> [String]
+    func kitReinforcements(for action: String) -> [String]
 }
 public protocol BoundlessKitDelegate {
     func kitPublish(actionInfo: [String:Any])
@@ -26,30 +26,33 @@ public class BoundlessKit : NSObject {
     var dataSource: BoundlessKitDataSource?
     
     var actionOracles = [String: ActionOracle]()
-    var codelessVisuals = [CodelessVisual]()
     
     public func launch(delegate: BoundlessKitDelegate, dataSource: BoundlessKitDataSource, arguements: [String: Any]) {
         self.delegate = delegate
         self.dataSource = dataSource
         
-        for actionID in dataSource.kitActionIDs() {
-            let reinforcements = dataSource.kitReinforcements(for: actionID).map({ (reinforcementID) -> BoundlessReinforcement in
-                return BoundlessReinforcement.init(reinforcementID, actionID)
+        for actionID in dataSource.kitActions() {
+            let reinforcements = dataSource.kitReinforcements(for: actionID).map({ (reinforcementID) -> BoundlessDecision in
+                return BoundlessDecision.init(reinforcementID, actionID)
             })
             actionOracles[actionID] = ActionOracle.init(actionID, reinforcements)
         }
     }
     
     @objc
-    public func track(actionID: String) {
-        let action = BoundlessAction(actionID)
-        BoundlessAction.addContext(to: action)
+    public func track(actionID: String, metadata: [String: Any] = [:]) {
+        let action = BoundlessAction(actionID, metadata)
+        BoundlessContext.getContext() { contextInfo in
+            for (key, value) in contextInfo {
+                action.metadata[key] = value
+            }
+            self.delegate?.kitPublish(actionInfo: action.toJSONType())
+        }
     }
     
     @objc
     public func reinforce(actionID: String) -> String {
         let action = BoundlessAction(actionID)
-        BoundlessAction.addContext(to: action)
         return reinforce(action: action).name
     }
     internal func reinforce(action: BoundlessAction) -> BoundlessReinforcement {
@@ -60,7 +63,15 @@ public class BoundlessKit : NSObject {
             oracle = ActionOracle(action.name, [])
             actionOracles[action.name] = oracle
         }
-        return oracle.reinforce()
+        let reinforcement = oracle.reinforce()
+        BoundlessContext.getContext() { contextInfo in
+            for (key, value) in contextInfo {
+                reinforcement.metadata[key] = value
+            }
+            self.delegate?.kitPublish(reinforcementInfo: reinforcement.toJSONType())
+        }
+        
+        return reinforcement
     }
     
     

@@ -13,7 +13,7 @@ class ManualClient : NSObject {
 }
 
 extension ManualClient : BoundlessKitDataSource, BoundlessKitDelegate {
-    func kitActionIDs() -> [String] {
+    func kitActions() -> [String] {
         return ["action1"]
     }
     

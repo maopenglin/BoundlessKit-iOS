@@ -11,24 +11,25 @@ import Foundation
 internal class ActionOracle : NSObject {
     
     let actionID: String
-    var futureReinforcements: [BoundlessReinforcement]
+    var reinforcementDecisions: [BoundlessDecision]
     
-    init(_ actionID: String, _ futureReinforcements: [BoundlessReinforcement]) {
+    init(_ actionID: String, _ reinforcementDecisions: [BoundlessDecision]) {
         self.actionID = actionID
-        self.futureReinforcements = futureReinforcements
+        self.reinforcementDecisions = reinforcementDecisions
     }
 
     func reinforce() -> BoundlessReinforcement {
-        let reinforcement: BoundlessReinforcement
+        let decision: BoundlessDecision
         
-        if let futureReinforcement = futureReinforcements.first {
-            futureReinforcements.remove(at: 0)
-            reinforcement = futureReinforcement
+        if let reinforcementDecision = reinforcementDecisions.first {
+            reinforcementDecisions.remove(at: 0)
+            decision = reinforcementDecision
         } else {
-            reinforcement = BoundlessReinforcement.neutral(for: actionID)
+            decision = BoundlessDecision.neutral(for: actionID)
         }
         
-        reinforcement.notifyObservers()
-        return reinforcement
+        decision.notifyObservers(userInfo: nil)
+        return decision.asReinforcement
     }
+    
 }

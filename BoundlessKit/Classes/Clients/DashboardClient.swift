@@ -10,7 +10,7 @@ import Foundation
 class DashboardClient : NSObject {
     
     var actionIDs = ["action1"]
-    var futureReinforcements = [String: [BoundlessReinforcement]]()
+    var futureReinforcements = [String: [BoundlessDecision]]()
     
     func loadKit() {
         
@@ -26,7 +26,7 @@ class DashboardClient : NSObject {
                 let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
                 for reinforcementDict in reinforcements {
                     if let codelessVisual = CodelessVisual.convert(from: reinforcementDict) {
-                        let reinforcement = BoundlessReinforcement.init(actionID, codelessVisual.primitive)
+                        let reinforcement = BoundlessDecision.init(actionID, codelessVisual.primitive)
                         print("Future reinforcement:\(reinforcement.notification.rawValue)")
                         codelessVisual.register(for: reinforcement.notification)
                         if futureReinforcements[actionID] == nil {
@@ -44,7 +44,7 @@ class DashboardClient : NSObject {
 
 extension DashboardClient : BoundlessKitDelegate, BoundlessKitDataSource {
     
-    func kitActionIDs() -> [String] {
+    func kitActions() -> [String] {
         return actionIDs
     }
     

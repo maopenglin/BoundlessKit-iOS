@@ -25,7 +25,7 @@ class TestActionReinforcement: XCTestCase {
         
         let oracle = ActionOracle.init(actionID, [])
         
-        XCTAssert(oracle.reinforce().name == BoundlessReinforcement.neutral(for: actionID).name)
+        XCTAssert(oracle.reinforce().name == BoundlessDecision.neutral(for: actionID).name)
         sleep(1)
     }
     
@@ -35,8 +35,8 @@ class TestActionReinforcement: XCTestCase {
         let reinforcementID2 = "testReinforcement2"
         
         let oracle = ActionOracle.init(actionID, [
-            BoundlessReinforcement.init(reinforcementID1, actionID),
-            BoundlessReinforcement.init(reinforcementID2, actionID)
+            BoundlessDecision.init(reinforcementID1, actionID),
+            BoundlessDecision.init(reinforcementID2, actionID)
             ])
         
         XCTAssert(oracle.reinforce().name == reinforcementID1)
