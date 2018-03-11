@@ -9,7 +9,11 @@ import Foundation
 
 public class SynchronizedArray<Element> {
     fileprivate let queue = DispatchQueue(label: "SynchronizedArray", attributes: .concurrent)
-    fileprivate var array = [Element]()
+    fileprivate var array: [Element]
+    
+    init(_ array: [Element] = []) {
+        self.array = array
+    }
 }
 
 // MARK: - Properties
@@ -36,12 +40,12 @@ public extension SynchronizedArray {
         return result
     }
     
-    /// A Boolean value indicating whether the collection is empty.
-    var isEmpty: Bool {
-        var result = false
-        queue.sync { result = self.array.isEmpty }
-        return result
-    }
+//    /// A Boolean value indicating whether the collection is empty.
+//    var isEmpty: Bool {
+//        var result = false
+//        queue.sync { result = self.array.isEmpty }
+//        return result
+//    }
     
 //    /// A textual representation of the array and its elements.
 //    var description: String {
@@ -184,19 +188,29 @@ public extension SynchronizedArray {
 //        }
 //    }
     
-    /// Removes all elements from the array.
+    /// Removes the specified number of elements.
     ///
-    /// - Parameter completion: The handler with the removed elements.
-    func removeAll(completion: (([Element]) -> Void)? = nil) {
+    /// - Parameters:
+    ///     - n: The number of elements to remove from the collection.
+    ///         `n` must be greater than or equal to zero and must not exceed the
+    ///         number of elements in the collection.
+    func removeFirst(_ n: Int, completion: (() -> Void)? = nil) {
         queue.async(flags: .barrier) {
-            let elements = self.array
-            self.array.removeAll()
-            
-            self.queue.async {
-                completion?(elements)
-            }
+            self.array.removeFirst(n)
+            completion?()
         }
     }
+    
+//    /// Removes all elements from the array.
+//    ///
+//    /// - Parameter completion: The handler with the removed elements.
+//    func removeAll(completion: (([Element]) -> Void)? = nil) {
+//        queue.async(flags: .barrier) {
+//            let elements = self.array
+//            self.array.removeAll()
+//            completion?(elements)
+//        }
+//    }
 }
 
 //public extension SynchronizedArray {
@@ -227,19 +241,19 @@ public extension SynchronizedArray {
 //}
 
 
-// MARK: - Equatable
-public extension SynchronizedArray where Element: Equatable {
-    
-    /// Returns a Boolean value indicating whether the sequence contains the given element.
-    ///
-    /// - Parameter element: The element to find in the sequence.
-    /// - Returns: true if the element was found in the sequence; otherwise, false.
-    func contains(_ element: Element) -> Bool {
-        var result = false
-        queue.sync { result = self.array.contains(element) }
-        return result
-    }
-}
+//// MARK: - Equatable
+//public extension SynchronizedArray where Element: Equatable {
+//    
+//    /// Returns a Boolean value indicating whether the sequence contains the given element.
+//    ///
+//    /// - Parameter element: The element to find in the sequence.
+//    /// - Returns: true if the element was found in the sequence; otherwise, false.
+//    func contains(_ element: Element) -> Bool {
+//        var result = false
+//        queue.sync { result = self.array.contains(element) }
+//        return result
+//    }
+//}
 
 // MARK: - Infix operators
 public extension SynchronizedArray {

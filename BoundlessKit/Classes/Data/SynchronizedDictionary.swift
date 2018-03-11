@@ -28,6 +28,15 @@ public extension SynchronizedDictionary {
     }
 }
 
+// MARK: - Mutable
+public extension SynchronizedDictionary {
+    func removeValue(forKey key: Key) {
+        queue.async(flags: .barrier) {
+            self.dict.removeValue(forKey: key)
+        }
+    }
+}
+
 public extension SynchronizedDictionary {
     var keys: [Key] {
         var keys: [Key] = []

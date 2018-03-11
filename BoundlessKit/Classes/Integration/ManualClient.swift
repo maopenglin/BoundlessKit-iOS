@@ -18,9 +18,11 @@ open class ManualClient : NSObject {
     open var reportedActions = SynchronizedArray<[String : Any]>()
     open var cartridgeReinforcements = SynchronizedDictionary<String, SynchronizedArray<String>>()
     
-    public override init() {
+    var boundlessAPI: BoundlessAPI?
+    
+    init(boundlessAPI: BoundlessAPI?) {
+        self.boundlessAPI = boundlessAPI
         super.init()
-        loadData()
     }
     
     func loadData() {
@@ -44,6 +46,58 @@ open class ManualClient : NSObject {
         UserDefaults.boundless.archive(cartridgeReinforcements.flatMap({ (actionID, cartridge) -> (String, [String])? in
             return (actionID, cartridge.filter({ _ in return true }))
         }), forKey: cartridgeReinforcementsKey)
+    }
+    
+    func clearData() {
+        UserDefaults.boundless.archive(nil, forKey: trackedActionsKey)
+        UserDefaults.boundless.archive(nil, forKey: reportedActionsKey)
+        UserDefaults.boundless.archive(nil, forKey: cartridgeReinforcementsKey)
+        trackedActions = SynchronizedArray()
+        reportedActions = SynchronizedArray()
+        cartridgeReinforcements = SynchronizedDictionary()
+    }
+    
+    func syncTrackedActions(completion: @escaping ()->Void = {}) {
+        let actions = trackedActions.filter({ _ in return true })
+        boundlessAPI?.send(actions: actions) { response in
+            if let status = response["status"] as? Int {
+                if status == 200 {
+                    self.trackedActions.removeFirst(actions.count)
+                    print("Cleared tracked actions.")
+                }
+            }
+            completion()
+        }
+    }
+    
+    func syncReportedActions(completion: @escaping ()->Void = {}) {
+        let actions = trackedActions.filter({ _ in return true })
+        boundlessAPI?.send(actions: actions) { response in
+            if let status = response["status"] as? Int {
+                if status == 200 {
+                    self.trackedActions.removeFirst(actions.count)
+                    print("Cleared tracked actions.")
+                }
+            }
+            completion()
+        }
+    }
+    
+    func syncReinforcementDecisions(for action: String, completion: @escaping ()->Void = {}) {
+        boundlessAPI?.refresh(actionID: action) { response in
+            if let responseStatusCode = response["status"] as? Int {
+                if responseStatusCode == 200,
+                    let cartridgeDecisions = response["reinforcementCartridge"] as? [String],
+                    let expiresIn = response["expiresIn"] as? Int {
+                    self.cartridgeReinforcements[action] = SynchronizedArray(cartridgeDecisions)
+                    print("\(action) refreshed!")
+                } else if responseStatusCode == 400 {
+                    print("Cartridge contained outdated actionID. Flushing.")
+                    self.cartridgeReinforcements.removeValue(forKey: action)
+                }
+            }
+            completion()
+        }
     }
     
 }

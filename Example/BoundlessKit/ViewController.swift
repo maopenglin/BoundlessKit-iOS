@@ -68,7 +68,9 @@ class ViewController: UIViewController {
     }
     
     @objc func action2Performed(){
-        kit.reinforce(actionID: "action1")
+        kit.reinforce(actionID: "action1") { reinforcement in
+            
+        }
         ////        // Tracking call is sent asynchronously
         //////        BoundlessKit.track("action2", metaData: ["key":"value", "calories":9000])
         //        locationManager.delegate = self

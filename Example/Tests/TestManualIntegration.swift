@@ -22,7 +22,8 @@ class TestManualIntegration: XCTestCase {
     }
     
     func testAddAction() {
-        let client = MockManualClient()
+        let client = MockManualClient(boundlessAPI: nil)
+        client.clearData()
         let kit = BoundlessKit.init()
         
         let promise = expectation(description: "added 2 tracks")
@@ -36,15 +37,16 @@ class TestManualIntegration: XCTestCase {
             }
         }
         
-        kit.launch(delegate: client, dataSource: client, arguements: [:])
+        kit.launch(delegate: client, dataSource: client)
         kit.track(actionID: "track1")
         kit.track(actionID: "track2")
         
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations(timeout: 3)
     }
     
     func testSavedData() {
-        let client = MockManualClient()
+        let client = MockManualClient(boundlessAPI: nil)
+        client.clearData()
         let kit = BoundlessKit.init()
         
         let didTrackAction = expectation(description: "tracked action")
@@ -53,15 +55,83 @@ class TestManualIntegration: XCTestCase {
             didTrackAction.fulfill()
         }
         
-        kit.launch(delegate: client, dataSource: client, arguements: [:])
+        kit.launch(delegate: client, dataSource: client)
         kit.track(actionID: "track1")
         
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations(timeout: 3)
         
         
-        let client2 = MockManualClient()
+        let client2 = MockManualClient(boundlessAPI: nil)
+        client2.loadData()
         XCTAssert(client2.trackedActions.count == client.trackedActions.count)
         
+    }
+    
+    
+    func testTrackAPICallMock() {
+        let properites = BoundlessProperties.fromFile!
+        let api = MockBoundlessAPI.init(properties: properites)
+        let promise = expectation(description: "reached track api callback")
+        api.send(actions: [[String : Any]]()) { (result) in
+            print("In here with result:\(result)")
+            promise.fulfill()
+        }
+        
+        waitForExpectations(timeout: 3)
+    }
+    
+    func testReportAPICallMock() {
+        let properites = BoundlessProperties.fromFile!
+        let api = MockBoundlessAPI.init(properties: properites)
+        let promise = expectation(description: "reached report api callback")
+        api.send(reinforcements: [[String : Any]]()) { (result) in
+            print("In here with result:\(result)")
+            promise.fulfill()
+        }
+        
+        waitForExpectations(timeout: 3)
+    }
+    
+    func testAPIRefreshCall() {
+        let properites = BoundlessProperties.fromFile!
+        let api = BoundlessAPI.init(properties: properites)
+        
+        let promise = expectation(description: "did get to send function")
+        api.refresh(actionID: "a1") { result in
+            print("Got result:\(result)")
+            promise.fulfill()
+        }
+        
+        waitForExpectations(timeout: 3)
+    }
+    
+    func testRefreshAndReinforce() {
+        let properites = BoundlessProperties.fromFile!
+        let api = BoundlessAPI.init(properties: properites)
+        let client = ManualClient.init(boundlessAPI: api)
+        let kit = BoundlessKit()
+        
+        let promise = expectation(description: "Different reinforcements")
+        var reinforcement1: String?
+        var reinforcement2: String?
+        
+        client.syncReinforcementDecisions(for: "a1") {
+            kit.launch(delegate: client, dataSource: client)
+            
+            kit.reinforce(actionID: "a1") { reinforcement in
+                reinforcement1 = reinforcement
+                print("Got reinforcmement1:\(reinforcement)")
+                kit.reinforce(actionID: "a1") { reinforcement in
+                    reinforcement2 = reinforcement
+                    print("Got reinforcmement2:\(reinforcement)")
+                    if reinforcement1 != reinforcement2 {
+                        promise.fulfill()
+                    }
+                }
+            }
+        }
+        
+        waitForExpectations(timeout: 3)
     }
     
 }

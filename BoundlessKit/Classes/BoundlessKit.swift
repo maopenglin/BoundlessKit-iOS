@@ -27,7 +27,7 @@ public class BoundlessKit : NSObject {
     
     var actionOracles = [String: ActionOracle]()
     
-    public func launch(delegate: BoundlessKitDelegate, dataSource: BoundlessKitDataSource, arguements: [String: Any]) {
+    public func launch(delegate: BoundlessKitDelegate, dataSource: BoundlessKitDataSource) {
         self.delegate = delegate
         self.dataSource = dataSource
         
@@ -53,9 +53,10 @@ public class BoundlessKit : NSObject {
     }
     
     @objc
-    public func reinforce(actionID: String) -> String {
+    public func reinforce(actionID: String, completion: @escaping (String)->Void ) {
         let action = BoundlessAction(actionID)
-        return reinforce(action: action).name
+        let reinforcementID = reinforce(action: action).name
+        completion(reinforcementID)
     }
     internal func reinforce(action: BoundlessAction) -> BoundlessReinforcement {
         let oracle: ActionOracle

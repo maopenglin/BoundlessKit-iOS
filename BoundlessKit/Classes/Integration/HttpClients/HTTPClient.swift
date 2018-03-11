@@ -11,7 +11,7 @@ internal class HTTPClient {
     
     internal static var logAPIResponses = true
     
-    internal enum CallType{
+    internal enum CallType {
         case track, report, refresh
         
         func url() -> URL! { return URL(string: path)! }

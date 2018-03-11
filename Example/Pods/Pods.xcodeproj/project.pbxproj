@@ -33,6 +33,7 @@
 		84CBF297205243A000FE49B9 /* UserDefaults+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF296205243A000FE49B9 /* UserDefaults+Extensions.swift */; };
 		84CBF2992054CD5000FE49B9 /* SynchronizedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2982054CD5000FE49B9 /* SynchronizedArray.swift */; };
 		84CBF29B2054D25900FE49B9 /* SynchronizedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF29A2054D25900FE49B9 /* SynchronizedDictionary.swift */; };
+		84CBF2A02054E74A00FE49B9 /* BoundlessProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF29F2054E74A00FE49B9 /* BoundlessProperties.swift */; };
 		898E7841049CC49AB76D3A2DF47C7B6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 		B71C1AAF532FEA71E6553ADF0C3D9551 /* BoundlessAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4769BC3F806A95665B75247282988C81 /* BoundlessAPI.swift */; };
 		B9E1117A3660625944C35C367FA10A65 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C56673BB3C40F400BA2956C5B5F321 /* HTTPClient.swift */; };
@@ -94,6 +95,7 @@
 		84CBF296205243A000FE49B9 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
 		84CBF2982054CD5000FE49B9 /* SynchronizedArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedArray.swift; sourceTree = "<group>"; };
 		84CBF29A2054D25900FE49B9 /* SynchronizedDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedDictionary.swift; sourceTree = "<group>"; };
+		84CBF29F2054E74A00FE49B9 /* BoundlessProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundlessProperties.swift; sourceTree = "<group>"; };
 		86201458BCE3C24B3C9ACA38CFB4D621 /* SwizzleHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = SwizzleHelper.m; sourceTree = "<group>"; };
 		885A207BE79903395EBB64C6A622BDF8 /* BoundlessKit.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = BoundlessKit.xcconfig; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -228,6 +230,7 @@
 			children = (
 				C4C837C833683F12621E3704E8B11F6C /* DashboardClient.swift */,
 				A4B7FA0B28A18E553B941B2AB72A296E /* ManualClient.swift */,
+				84CBF29F2054E74A00FE49B9 /* BoundlessProperties.swift */,
 				84CBF2932052429F00FE49B9 /* Storage */,
 				8012695E81362BAC731995A6C14D80D3 /* Codeless */,
 				747A3D981D65CF3A31D76E970E1FCCC2 /* HttpClients */,
@@ -578,6 +581,7 @@
 				C3632043BFBBB1201C1F8FBFF8CCE183 /* Extensions.swift in Sources */,
 				84CBF2992054CD5000FE49B9 /* SynchronizedArray.swift in Sources */,
 				148790515E5E482E89CA65DA7748FA1E /* Helper.swift in Sources */,
+				84CBF2A02054E74A00FE49B9 /* BoundlessProperties.swift in Sources */,
 				B9E1117A3660625944C35C367FA10A65 /* HTTPClient.swift in Sources */,
 				3DCFA9C049B830D81914DDDAC40A56C8 /* InstanceSelectorNotificationCenter.swift in Sources */,
 				EEA69F6E5709EC2116E2092896A38F7B /* ManualClient.swift in Sources */,

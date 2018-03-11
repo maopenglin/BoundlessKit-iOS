@@ -18,7 +18,7 @@ class DashboardClient : NSObject {
         
         loadCodelessReinforcements(mappings: [String : [String : Any]]())
         
-        kit.launch(delegate: self, dataSource: self, arguements: [:])
+        kit.launch(delegate: self, dataSource: self)
     }
     
     func loadCodelessReinforcements(mappings:[String: [String: Any]]) {
@@ -42,8 +42,9 @@ class DashboardClient : NSObject {
     
     @objc
     func selectorInstance(notification: Notification) {
-        let reinforcement = kit.reinforce(actionID: notification.name.rawValue)
-        print("Got selector reinforcement:\(reinforcement)")
+        kit.reinforce(actionID: notification.name.rawValue) { reinforcement in
+            print("Got selector reinforcement:\(reinforcement)")
+        }
     }
     
 }
