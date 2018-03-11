@@ -7,13 +7,13 @@
 
 import Foundation
 
-public class SynchronizedDictionary<Key, Value> where Key : Hashable {
+internal class SynchronizedDictionary<Key, Value> where Key : Hashable {
     fileprivate let queue = DispatchQueue(label: "SynchronizedDictionary", attributes: .concurrent)
     fileprivate var dict = [Key:Value]()
 }
 
 
-public extension SynchronizedDictionary {
+extension SynchronizedDictionary {
 //    func filter(_ isIncluded: (Key, Value) -> Bool) -> [Key : Value] {
 //        var result = [Key:Value]()
 //        queue.sync {
@@ -29,7 +29,28 @@ public extension SynchronizedDictionary {
 }
 
 // MARK: - Mutable
-public extension SynchronizedDictionary {
+extension SynchronizedDictionary {
+    /// Accesses the element at the specified position if it exists.
+    ///
+    /// - Parameter index: The position of the element to access.
+    /// - Returns: optional element if it exists.
+    subscript(key: Key) -> Value? {
+        get {
+            var value: Value?
+            
+            queue.sync {
+                value = dict[key]
+            }
+            
+            return value
+        }
+        set {
+            queue.async(flags: .barrier) {
+                self.dict[key] = newValue
+            }
+        }
+    }
+    
     func removeValue(forKey key: Key) {
         queue.async(flags: .barrier) {
             self.dict.removeValue(forKey: key)
@@ -37,7 +58,8 @@ public extension SynchronizedDictionary {
     }
 }
 
-public extension SynchronizedDictionary {
+// MARK: - Immutable
+extension SynchronizedDictionary {
     var keys: [Key] {
         var keys: [Key] = []
         queue.sync {
@@ -52,26 +74,5 @@ public extension SynchronizedDictionary {
             values = Array(dict.values)
         }
         return values
-    }
-
-    /// Accesses the element at the specified position if it exists.
-    ///
-    /// - Parameter index: The position of the element to access.
-    /// - Returns: optional element if it exists.
-    subscript(key: Key) -> Value? {
-        get {
-            var value: Value?
-
-            queue.sync {
-                value = dict[key]
-            }
-
-            return value
-        }
-        set {
-            queue.async(flags: .barrier) {
-                self.dict[key] = newValue
-            }
-        }
     }
 }

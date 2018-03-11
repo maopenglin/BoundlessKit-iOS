@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class SynchronizedArray<Element> {
+internal class SynchronizedArray<Element> {
     fileprivate let queue = DispatchQueue(label: "SynchronizedArray", attributes: .concurrent)
     fileprivate var array: [Element]
     
@@ -17,7 +17,7 @@ public class SynchronizedArray<Element> {
 }
 
 // MARK: - Properties
-public extension SynchronizedArray {
+extension SynchronizedArray {
     
 //    /// The first element of the collection.
 //    var first: Element? {
@@ -56,7 +56,7 @@ public extension SynchronizedArray {
 }
 
 // MARK: - Immutable
-public extension SynchronizedArray {
+extension SynchronizedArray {
 //    /// Returns the first element of the sequence that satisfies the given predicate or nil if no such element is found.
 //    ///
 //    /// - Parameter predicate: A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element is a match.
@@ -126,7 +126,7 @@ public extension SynchronizedArray {
 }
 
 // MARK: - Mutable
-public extension SynchronizedArray {
+extension SynchronizedArray {
     
     /// Adds a new element at the end of the array.
     ///
@@ -256,7 +256,7 @@ public extension SynchronizedArray {
 //}
 
 // MARK: - Infix operators
-public extension SynchronizedArray {
+extension SynchronizedArray {
     
     static func +=(left: inout SynchronizedArray, right: Element) {
         left.append(right)

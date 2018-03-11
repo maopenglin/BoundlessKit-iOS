@@ -1,5 +1,5 @@
 //
-//  MockManualClient.swift
+//  MockBoundlessKitClient.swift
 //  BoundlessKit_Example
 //
 //  Created by Akash Desai on 3/10/18.
@@ -9,7 +9,7 @@
 import Foundation
 @testable import BoundlessKit
 
-class MockManualClient : ManualClient {
+class MockBoundlessKitClient : BoundlessKitClient {
     var onPublishTrack: (() -> Void)?
     
     override func kitPublish(actionInfo: [String : Any]) {

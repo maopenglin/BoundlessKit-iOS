@@ -26,6 +26,7 @@
 		84CBF29120523F9D00FE49B9 /* TestManualIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF29020523F9D00FE49B9 /* TestManualIntegration.swift */; };
 		84CBF29E2054D91900FE49B9 /* MockManualClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF29C2054D88400FE49B9 /* MockManualClient.swift */; };
 		84CBF2A62055053700FE49B9 /* MockHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2A42055034000FE49B9 /* MockHTTPClient.swift */; };
+		84CBF2A82055105600FE49B9 /* TestHTTPCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2A72055105600FE49B9 /* TestHTTPCalls.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,7 @@
 		84CBF29020523F9D00FE49B9 /* TestManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestManualIntegration.swift; sourceTree = "<group>"; };
 		84CBF29C2054D88400FE49B9 /* MockManualClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockManualClient.swift; sourceTree = "<group>"; };
 		84CBF2A42055034000FE49B9 /* MockHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockHTTPClient.swift; sourceTree = "<group>"; };
+		84CBF2A72055105600FE49B9 /* TestHTTPCalls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHTTPCalls.swift; sourceTree = "<group>"; };
 		8C5896EE6F40C3937CF30FD8 /* Pods_BoundlessKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoundlessKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		938D580BBCCFD0A22693C187 /* Pods-BoundlessKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoundlessKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BoundlessKit_Tests/Pods-BoundlessKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		A6E23EE403314927A4B43AC3 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				84CBF2A72055105600FE49B9 /* TestHTTPCalls.swift */,
 				84CBF29020523F9D00FE49B9 /* TestManualIntegration.swift */,
 				84CBF28C20521DF200FE49B9 /* TestBoundlessKit.swift */,
 				84CBF2832051EA1500FE49B9 /* TestActionReinforcement.swift */,
@@ -435,6 +438,7 @@
 				84CBF2822051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift in Sources */,
 				842661E5204E05B3001FEA2F /* Tests.swift in Sources */,
 				84CBF2A62055053700FE49B9 /* MockHTTPClient.swift in Sources */,
+				84CBF2A82055105600FE49B9 /* TestHTTPCalls.swift in Sources */,
 				84CBF289205213F500FE49B9 /* NotificationReceiver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

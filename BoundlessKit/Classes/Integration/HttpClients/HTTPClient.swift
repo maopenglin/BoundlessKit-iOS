@@ -12,6 +12,19 @@ internal class HTTPClient {
     internal var logRequests = true
     internal var logResponses = true
     
+    internal enum BoundlessAPI {
+        case track, report, refresh
+        
+        var url: URL! { return URL(string: path)! }
+        
+        var path:String{ switch self{
+        case .track: return "https://api.usedopamine.com/v4/app/track/"
+        case .report: return "https://api.usedopamine.com/v4/app/report/"
+        case .refresh: return "https://api.usedopamine.com/v4/app/refresh/"
+            }
+        }
+    }
+    
     
     private let session: URLSessionProtocol
     

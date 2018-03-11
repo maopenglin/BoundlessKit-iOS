@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct BoundlessProperties {
+internal struct BoundlessProperties {
     
     let clientOS = "iOS"
     let clientOSVersion = UIDevice.current.systemVersion
@@ -21,25 +21,21 @@ struct BoundlessProperties {
     let productionSecret: String
     private let primaryIdentity:String
     
-    init(_ appID: String, _ versionID: String?, _ inProduction: Bool, _ developmentSecret: String, _ productionSecret: String) {
-        let id: String
-        if let vid = UIDevice.current.identifierForVendor?.uuidString {
-            print("set identifierForVendor for primaryIdentity:(\(vid))")
-            id = vid
-        } else {
-            print("set IDUnavailable for primaryIdentity")
-            id = "IDUnavailable"
-        }
-        self.init(id, appID, versionID, inProduction, developmentSecret, productionSecret)
-    }
-    
-    init(_ primaryIdentity: String, _ appID: String, _ versionID: String?, _ inProduction: Bool, _ developmentSecret: String, _ productionSecret: String) {
-        self.primaryIdentity = primaryIdentity
+    init(_ primaryIdentity: String? = nil, _ appID: String, _ versionID: String?, _ inProduction: Bool, _ developmentSecret: String, _ productionSecret: String) {
         self.appID = appID
         self.versionID = versionID
         self.inProduction = inProduction
         self.developmentSecret = developmentSecret
         self.productionSecret = productionSecret
+        if let primaryIdentity = primaryIdentity {
+            self.primaryIdentity = primaryIdentity
+        } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
+            print("set identifierForVendor for primaryIdentity:(\(vid))")
+            self.primaryIdentity = vid
+        } else {
+            print("set IDUnavailable for primaryIdentity")
+            self.primaryIdentity = "IDUnavailable"
+        }
     }
     
     var apiCredentials: [String: Any] {
@@ -66,14 +62,14 @@ extension BoundlessProperties {
         return BoundlessProperties.convert(from: propertiesDictionary)
     }
     
-    static func convert(from propertiesDictionary: [String: Any]?) -> BoundlessProperties? {
-        guard let propertiesDictionary = propertiesDictionary else { return nil }
+    static func convert(from propertiesDictionary: [String: Any]) -> BoundlessProperties? {
         guard let appID = propertiesDictionary["appID"] as? String else { print("Bad parameter"); return nil }
         guard let inProduction = propertiesDictionary["inProduction"] as? Bool else { print("Bad parameter"); return nil }
         guard let productionSecret = propertiesDictionary["productionSecret"] as? String else { print("Bad parameter"); return nil }
         guard let developmentSecret = propertiesDictionary["developmentSecret"] as? String else { print("Bad parameter"); return nil }
         
         return BoundlessProperties.init(
+            propertiesDictionary["primaryIdentity"] as? String,
             appID,
             propertiesDictionary["versionID"] as? String,
             inProduction,
