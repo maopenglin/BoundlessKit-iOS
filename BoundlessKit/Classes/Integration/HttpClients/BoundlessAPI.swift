@@ -11,14 +11,25 @@ import Foundation
 @objc
 internal class BoundlessAPI : NSObject{
     
+    internal enum CallType {
+        case track, report, refresh
+        
+        var url: URL! { return URL(string: path)! }
+        
+        var path:String{ switch self{
+        case .track: return "https://api.usedopamine.com/v4/app/track/"
+        case .report: return "https://api.usedopamine.com/v4/app/report/"
+        case .refresh: return "https://api.usedopamine.com/v4/app/refresh/"
+            }
+        }
+    }
+    
     let properties: BoundlessProperties
     internal var httpClient = HTTPClient()
-    var logCalls = false
     
-    init(properties: BoundlessProperties, httpClient: HTTPClient = HTTPClient(), logCalls: Bool = false) {
+    init(properties: BoundlessProperties, httpClient: HTTPClient = HTTPClient()) {
         self.properties = properties
         self.httpClient = httpClient
-        self.logCalls = logCalls
     }
     
     /// Send an array of actions to the `/track` path
@@ -33,7 +44,9 @@ internal class BoundlessAPI : NSObject{
         
         payload["actions"] = actions
         
-        send(call: .track, with: payload, completion: completion)
+        httpClient.post(url: CallType.track.url, jsonObject: payload) { response in
+            completion(response ?? [:])
+        }.start()
     }
 
     /// Send an array of actions to the `/report` path
@@ -47,7 +60,9 @@ internal class BoundlessAPI : NSObject{
         
         payload["actions"] = reinforcements
         
-        send(call: .report, with: payload, completion: completion)
+        httpClient.post(url: CallType.report.url, jsonObject: payload) { response in
+            completion(response ?? [:])
+        }.start()
     }
     
     /// Send an actionID to the `/refresh` path to generate a new cartridge of reinforcement decisions
@@ -61,29 +76,9 @@ internal class BoundlessAPI : NSObject{
         payload["actionID"] = actionID
         
         print("Refreshing \(actionID)...")
-        send(call: .refresh, with: payload, completion: completion)
-    }
-    
-    
-    /// This function sends a request to BoundlessAI
-    ///
-    /// - parameters:
-    ///     - callType: The type of call to send.
-    ///     - payload: A JSON compatible dictionary to send.
-    ///     - timeout: A timeout, in seconds, for the request. Defaults to 3 seconds.
-    ///     - completion: A closure with a JSON formatted dictionary.
-    ///
-    internal func send(call type: HTTPClient.CallType, with payload: [String:Any], timeout:TimeInterval = 3.0, completion: @escaping ([String: Any]) -> Void) {
-        let task = httpClient.post(type: type, jsonObject: payload) { response in
-            
+        httpClient.post(url: CallType.refresh.url, jsonObject: payload) { response in
             completion(response ?? [:])
-            
-            if self.logCalls { print("got response:\(response as AnyObject)") }
-        }
-        
-        // send request
-        if logCalls { print("with payload: \(payload as AnyObject)") }
-        task.start()
+        }.start()
     }
     
 }

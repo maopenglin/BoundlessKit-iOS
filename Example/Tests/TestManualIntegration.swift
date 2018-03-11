@@ -70,7 +70,7 @@ class TestManualIntegration: XCTestCase {
     
     func testTrackAPICallMock() {
         let properites = BoundlessProperties.fromFile!
-        let api = MockBoundlessAPI.init(properties: properites)
+        let api = BoundlessAPI.init(properties: properites, httpClient: MockHTTPClient())
         let promise = expectation(description: "reached track api callback")
         api.send(actions: [[String : Any]]()) { (result) in
             print("In here with result:\(result)")
@@ -82,7 +82,7 @@ class TestManualIntegration: XCTestCase {
     
     func testReportAPICallMock() {
         let properites = BoundlessProperties.fromFile!
-        let api = MockBoundlessAPI.init(properties: properites)
+        let api = BoundlessAPI.init(properties: properites, httpClient: MockHTTPClient())
         let promise = expectation(description: "reached report api callback")
         api.send(reinforcements: [[String : Any]]()) { (result) in
             print("In here with result:\(result)")
