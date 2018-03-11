@@ -7,35 +7,40 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		042DC81FA90C305F760C9E0721CA1E5F /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C705776CAB7DBB3243D43760269C2264 /* Helper.swift */; };
 		0C7AE6FAD413A93CB70109E686F3705A /* Pods-BoundlessKit_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = E8AB9D0E037CA92A25A502A607CA70A5 /* Pods-BoundlessKit_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		148790515E5E482E89CA65DA7748FA1E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D95FC2B46158C290B0694A8ECF0CD66 /* Helper.swift */; };
+		15D266C18FAD987BB5D7283DA6C4E10E /* CodelessReinforcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4869FB7F0E5179F4656D904314F7EA80 /* CodelessReinforcement.swift */; };
 		1A6CC81FFC026F9BD7D8FDBD305B8EBA /* Pods-BoundlessKit_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = FDE75EAE6AE630A6CE4E0C07B6A0ECA7 /* Pods-BoundlessKit_Tests-dummy.m */; };
-		1D91970FF6020526C4754AE177B2F88E /* BoundlessAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE2F8CEBBE83CAAF8A7F91F09F5C85C /* BoundlessAction.swift */; };
+		1A6F1F008CC847A4DD1493F03C3F28F0 /* BoundlessKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C720DB946AA4BC9E34BC5BF99D20136 /* BoundlessKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1F25DAFB86BF14643CD27537B11CB436 /* SwizzleHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 86201458BCE3C24B3C9ACA38CFB4D621 /* SwizzleHelper.m */; };
 		23247FC52193F99579099183FAFA3271 /* Pods-BoundlessKit_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 43EB6881309A54751991B81C3DCD44F7 /* Pods-BoundlessKit_Example-dummy.m */; };
-		241A999ADC077A53B7305221D052B2BE /* BoundlessKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 771E96CE3F123A104C1808DE703C62D9 /* BoundlessKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		286F72179E83E338EEDB2DB7ED607540 /* ActionOracle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2987C52481198E538960A08D53E9DBC2 /* ActionOracle.swift */; };
-		2C21FDC145D6639EB16C83DB3E72AD50 /* BoundlessDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7E9B33368CD5D4EAAD8FBEB968F294 /* BoundlessDataController.swift */; };
-		2C5951FB4513067812A1ABC4BAB92FEE /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296535E9180FAD0FF148144AF7B39A81 /* Extensions.swift */; };
+		2CD83A922BA5E62D4D5609ACF8C6EDAD /* ObjectSelectorAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCC9BAD789395A74FA4888E50B7AA980 /* ObjectSelectorAction.swift */; };
 		36308C624D7B8FB71CDF5899B73317BF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
-		4875AF8F66CD7701715E28EFB18BCF6B /* BoundlessKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 270C45CEB17A646A4E0918714E582B51 /* BoundlessKit-dummy.m */; };
-		4A532DDD60DDA4AEBD7FB117FDE1069B /* sheen.png in Resources */ = {isa = PBXBuildFile; fileRef = 2751A0ACC0C70FB8C0C2139B28A04072 /* sheen.png */; };
-		4B8CE41565F5DAF8E4DB57050920BD1F /* DashboardClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F2D849A9F0665EAFD234384D76C301 /* DashboardClient.swift */; };
-		57CA99DBF4A12ED87E4B70E652185A17 /* ManualClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD0D8ADB930AFBF23C091155B858B4EF /* ManualClient.swift */; };
-		6F7DE8CD3DCA8E00B93369633A4BAA18 /* BoundlessKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A6199B44E39C3BD14DA7ECA9034252 /* BoundlessKit.swift */; };
-		728F21D2A883FEC3563038D204913096 /* SwizzleHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A5D7FD599944F14F33858D89238487C /* SwizzleHelper.m */; };
-		7BD5B982EE93F4E4D61B33BE3B0FF275 /* BoundlessKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D1D25FAF9E953F98A63B38F39C571134 /* BoundlessKit.bundle */; };
+		384A5F237ACC4C8D645F077365D8BD22 /* NSObject+Boundless.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C8371FCEAE94986F3025F30D90CD81F /* NSObject+Boundless.m */; };
+		3DCFA9C049B830D81914DDDAC40A56C8 /* InstanceSelectorNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC3D26DC3851862EE2511EF79AD88FF /* InstanceSelectorNotificationCenter.swift */; };
+		4370E9F488677C33435D0159782BDDC0 /* ActionOracle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0520E7B34406344D685D8AEF0F973AD /* ActionOracle.swift */; };
+		44901C1814B90CB5338EF1E0A788DEAD /* BoundlessKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F9C4A53AC740891973EB08775789A0 /* BoundlessKit.swift */; };
+		5180D9AED05F2F24DD5402FB1631F0A7 /* sheen.png in Resources */ = {isa = PBXBuildFile; fileRef = D9CD33D52D54AD3CCF04704C7A0569A9 /* sheen.png */; };
+		62C4477D5DA680CFC8005021F157739D /* BoundlessDecision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06AFC647CB8A50A1D4E3C1213842ED20 /* BoundlessDecision.swift */; };
+		64488650AB074C796D5F72F00C7196B9 /* BoundlessKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 78209D0C7CBA3AB52E181D5B780EBA92 /* BoundlessKit-dummy.m */; };
+		72031339B86C2F43490E01AFB5D8ADDD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
+		749B06F90F023A362DB6B667CA4E4F5B /* BoundlessContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09457CD1D94CB3C6E879F4F6C100F70 /* BoundlessContext.swift */; };
+		76A78D1B9F3A48848B74769E40F08618 /* DashboardClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C837C833683F12621E3704E8B11F6C /* DashboardClient.swift */; };
+		7C79469D1568A270303D6447805F6573 /* SwizzleHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 73232654F273A2DBEF53747D541A1B27 /* SwizzleHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7FC15D9B49BC7BDB91427EA2E7F70221 /* NSObject+Boundless.h in Headers */ = {isa = PBXBuildFile; fileRef = 39E28E5AA1AB903D10EDB7F4C064759D /* NSObject+Boundless.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7FFDA2846FB752CAD1D925F90AF11BB3 /* BoundlessReinforcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDDF78E34A429EADC049381013D0898 /* BoundlessReinforcement.swift */; };
+		84CBF295205242D600FE49B9 /* BoundlessDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF294205242D600FE49B9 /* BoundlessDefaults.swift */; };
+		84CBF297205243A000FE49B9 /* UserDefaults+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF296205243A000FE49B9 /* UserDefaults+Extensions.swift */; };
+		84CBF2992054CD5000FE49B9 /* SynchronizedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2982054CD5000FE49B9 /* SynchronizedArray.swift */; };
+		84CBF29B2054D25900FE49B9 /* SynchronizedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF29A2054D25900FE49B9 /* SynchronizedDictionary.swift */; };
 		898E7841049CC49AB76D3A2DF47C7B6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
-		93E62583DE0EA147540891C800B1B7E4 /* NSObject+Boundless.h in Headers */ = {isa = PBXBuildFile; fileRef = 03E4A449DA89665948CEE83070AE7B06 /* NSObject+Boundless.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		98729F53EFF0BB41445A97CD4F4A9BBA /* InstanceSelectorNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F3856036B5901675F3DDF5725BD118 /* InstanceSelectorNotificationCenter.swift */; };
-		A7AB18546800E3DEC70B9EEA6465E0D5 /* SwizzleHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF2B42E40651A55800A382701C0E116 /* SwizzleHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		AA0BFCAC8F0537D1B37ED38756BB6DB8 /* NSObject+Boundless.m in Sources */ = {isa = PBXBuildFile; fileRef = 7579EA8F70B59E35D40F77FE7E6C5383 /* NSObject+Boundless.m */; };
-		B6CCD69E965F36B775BFF2C9F1F5152B /* BoundlessContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5912C0A79C4260A62165174CA99D171 /* BoundlessContext.swift */; };
-		BD5C466294DA743B6FA90521B31DCA4B /* CodelessVisual.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518F18B6152C12EEFA4892B674A630B1 /* CodelessVisual.swift */; };
+		B71C1AAF532FEA71E6553ADF0C3D9551 /* BoundlessAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4769BC3F806A95665B75247282988C81 /* BoundlessAPI.swift */; };
+		B9E1117A3660625944C35C367FA10A65 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C56673BB3C40F400BA2956C5B5F321 /* HTTPClient.swift */; };
+		C3632043BFBBB1201C1F8FBFF8CCE183 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97DCCE853C5AFC88E5C43E2B65CE65E /* Extensions.swift */; };
+		C737392574641DD6875D976D41B0E8B5 /* BoundlessKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D1D25FAF9E953F98A63B38F39C571134 /* BoundlessKit.bundle */; };
+		CC1B2DF2CEAA885071975AC2E09B9168 /* BoundlessAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 082E56EFDE7C2C42A291966EFEE573C7 /* BoundlessAction.swift */; };
 		DD86F20231A5511557A9C9BC48E76010 /* Pods-BoundlessKit_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 65253BB8AA4445E78F658C9353EB9E96 /* Pods-BoundlessKit_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F140219B80174E2978A91E4FBFBFACCF /* BoundlessDecision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA7D139802D08FABC7330B51D4DAC08 /* BoundlessDecision.swift */; };
-		F7B0803E28D31105927DC29652926437 /* ObjectSelectorAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBC9F17CF4C28D253E931155D8D7F9D /* ObjectSelectorAction.swift */; };
-		F9A46D25FE573E362929F38615F5A5FE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
-		FED5925684DE77AEC3651E949FA70260 /* BoundlessReinforcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B04810578B925A778FF4194F5967B5D /* BoundlessReinforcement.swift */; };
+		EEA69F6E5709EC2116E2092896A38F7B /* ManualClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B7FA0B28A18E553B941B2AB72A296E /* ManualClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,82 +48,87 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 699C406CDB282A081963912B18755087;
+			remoteGlobalIDString = FFDA5BF37E3021D36EF4AF856A4404D7;
 			remoteInfo = BoundlessKit;
 		};
-		E07FF05F3500814CFD3BE9572BD89311 /* PBXContainerItemProxy */ = {
+		B00C7F1AF7DDAB21E2EDDE001AA16F2A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = DFFBBFD84959F74531845B6627FF3851;
+			remoteGlobalIDString = 6716A9519C08023BC5EB34F8E5052841;
 			remoteInfo = "BoundlessKit-BoundlessKit";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		023C996178AD50062F4C6D3E4F29210E /* BoundlessKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = BoundlessKit.modulemap; sourceTree = "<group>"; };
+		01C56673BB3C40F400BA2956C5B5F321 /* HTTPClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
 		03C5DFA7791CE3D4AB3AAE7500683A21 /* Pods-BoundlessKit_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-BoundlessKit_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
-		03E4A449DA89665948CEE83070AE7B06 /* NSObject+Boundless.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "NSObject+Boundless.h"; sourceTree = "<group>"; };
 		0532F105A1D8E2C7CD16B34BC5CB1AE9 /* Pods-BoundlessKit_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-BoundlessKit_Example-frameworks.sh"; sourceTree = "<group>"; };
-		07F2D849A9F0665EAFD234384D76C301 /* DashboardClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DashboardClient.swift; sourceTree = "<group>"; };
-		0AF2B42E40651A55800A382701C0E116 /* SwizzleHelper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SwizzleHelper.h; sourceTree = "<group>"; };
+		06AFC647CB8A50A1D4E3C1213842ED20 /* BoundlessDecision.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessDecision.swift; sourceTree = "<group>"; };
+		082E56EFDE7C2C42A291966EFEE573C7 /* BoundlessAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessAction.swift; sourceTree = "<group>"; };
+		0DEB065E177D4D16047C6FB79C28718E /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		137CEB9999A78941A9091331A5F00042 /* Pods-BoundlessKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-BoundlessKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		1E1356A0B16A22B0C5DD40601BF5C32B /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		1EBC62DC34B693E6B494F74C26483884 /* Pods-BoundlessKit_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-BoundlessKit_Example-acknowledgements.plist"; sourceTree = "<group>"; };
-		270C45CEB17A646A4E0918714E582B51 /* BoundlessKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "BoundlessKit-dummy.m"; sourceTree = "<group>"; };
-		2751A0ACC0C70FB8C0C2139B28A04072 /* sheen.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = sheen.png; path = BoundlessKit/Assets/sheen.png; sourceTree = "<group>"; };
 		291BB40D09373A3704A0368A02A22DF8 /* Pods-BoundlessKit_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-BoundlessKit_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
-		296535E9180FAD0FF148144AF7B39A81 /* Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = BoundlessKit/Classes/Extensions.swift; sourceTree = "<group>"; };
-		2987C52481198E538960A08D53E9DBC2 /* ActionOracle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ActionOracle.swift; sourceTree = "<group>"; };
-		39A3BF6C8E56765A2DE39AF1D451F143 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		3A5D7FD599944F14F33858D89238487C /* SwizzleHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = SwizzleHelper.m; sourceTree = "<group>"; };
+		2E7EFDC74DF3F193A404C56C6CFB7F4B /* BoundlessKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = BoundlessKit.modulemap; sourceTree = "<group>"; };
+		2E9D8AE0B23A765C9CF3E1FCE050BCA4 /* ResourceBundle-BoundlessKit-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-BoundlessKit-Info.plist"; sourceTree = "<group>"; };
+		39E28E5AA1AB903D10EDB7F4C064759D /* NSObject+Boundless.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "NSObject+Boundless.h"; sourceTree = "<group>"; };
+		3C8371FCEAE94986F3025F30D90CD81F /* NSObject+Boundless.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Boundless.m"; sourceTree = "<group>"; };
 		43EB6881309A54751991B81C3DCD44F7 /* Pods-BoundlessKit_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-BoundlessKit_Example-dummy.m"; sourceTree = "<group>"; };
-		518F18B6152C12EEFA4892B674A630B1 /* CodelessVisual.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CodelessVisual.swift; sourceTree = "<group>"; };
+		45964AAAF09E6039CE57AD974955B87E /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4769BC3F806A95665B75247282988C81 /* BoundlessAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessAPI.swift; sourceTree = "<group>"; };
+		4869FB7F0E5179F4656D904314F7EA80 /* CodelessReinforcement.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CodelessReinforcement.swift; sourceTree = "<group>"; };
 		5214C4C40A16BD4FC74241568B64D815 /* Pods-BoundlessKit_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-BoundlessKit_Example.modulemap"; sourceTree = "<group>"; };
+		57BE88D1B3D5810F03F4302C1910A719 /* BoundlessKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "BoundlessKit-prefix.pch"; sourceTree = "<group>"; };
 		57F3AAE3A80A6DDAFAE750219D9D4A16 /* Pods-BoundlessKit_Tests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-BoundlessKit_Tests-frameworks.sh"; sourceTree = "<group>"; };
+		5C720DB946AA4BC9E34BC5BF99D20136 /* BoundlessKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "BoundlessKit-umbrella.h"; sourceTree = "<group>"; };
+		5D95FC2B46158C290B0694A8ECF0CD66 /* Helper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Helper.swift; path = BoundlessKit/Classes/Helper.swift; sourceTree = "<group>"; };
 		5EE0CD4602D0BFD24F5440228716B8C0 /* Pods-BoundlessKit_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-BoundlessKit_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		65253BB8AA4445E78F658C9353EB9E96 /* Pods-BoundlessKit_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-BoundlessKit_Example-umbrella.h"; sourceTree = "<group>"; };
 		6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		6DBC9F17CF4C28D253E931155D8D7F9D /* ObjectSelectorAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ObjectSelectorAction.swift; sourceTree = "<group>"; };
-		7579EA8F70B59E35D40F77FE7E6C5383 /* NSObject+Boundless.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Boundless.m"; sourceTree = "<group>"; };
-		75F3856036B5901675F3DDF5725BD118 /* InstanceSelectorNotificationCenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = InstanceSelectorNotificationCenter.swift; sourceTree = "<group>"; };
-		771E96CE3F123A104C1808DE703C62D9 /* BoundlessKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "BoundlessKit-umbrella.h"; sourceTree = "<group>"; };
-		7A7E9B33368CD5D4EAAD8FBEB968F294 /* BoundlessDataController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessDataController.swift; sourceTree = "<group>"; };
+		73232654F273A2DBEF53747D541A1B27 /* SwizzleHelper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SwizzleHelper.h; sourceTree = "<group>"; };
+		78209D0C7CBA3AB52E181D5B780EBA92 /* BoundlessKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "BoundlessKit-dummy.m"; sourceTree = "<group>"; };
 		7F415CED8EA5C68960FF7082DC07F7AB /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		891E1474F610988B9B0F597B9039B5FA /* ResourceBundle-BoundlessKit-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-BoundlessKit-Info.plist"; sourceTree = "<group>"; };
-		8B04810578B925A778FF4194F5967B5D /* BoundlessReinforcement.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessReinforcement.swift; sourceTree = "<group>"; };
-		8C82DEBB75B2F851EE7BE079B70CD158 /* BoundlessKit.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; path = BoundlessKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		8DAF3568923A191BDB2EFE71717F91A9 /* BoundlessKit.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = BoundlessKit.xcconfig; sourceTree = "<group>"; };
-		914D5E15852E61D5F9947DBAF4BDED8C /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		84CBF294205242D600FE49B9 /* BoundlessDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundlessDefaults.swift; sourceTree = "<group>"; };
+		84CBF296205243A000FE49B9 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
+		84CBF2982054CD5000FE49B9 /* SynchronizedArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedArray.swift; sourceTree = "<group>"; };
+		84CBF29A2054D25900FE49B9 /* SynchronizedDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedDictionary.swift; sourceTree = "<group>"; };
+		86201458BCE3C24B3C9ACA38CFB4D621 /* SwizzleHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = SwizzleHelper.m; sourceTree = "<group>"; };
+		885A207BE79903395EBB64C6A622BDF8 /* BoundlessKit.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = BoundlessKit.xcconfig; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		9BE2F8CEBBE83CAAF8A7F91F09F5C85C /* BoundlessAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessAction.swift; sourceTree = "<group>"; };
-		9E6F6DA85AA31F9856AA33F01979C033 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		9EA7D139802D08FABC7330B51D4DAC08 /* BoundlessDecision.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessDecision.swift; sourceTree = "<group>"; };
-		A8CDCBB2E02A074612EBD639535014DD /* BoundlessKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "BoundlessKit-prefix.pch"; sourceTree = "<group>"; };
-		B5912C0A79C4260A62165174CA99D171 /* BoundlessContext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessContext.swift; sourceTree = "<group>"; };
+		A0520E7B34406344D685D8AEF0F973AD /* ActionOracle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ActionOracle.swift; sourceTree = "<group>"; };
+		A4B7FA0B28A18E553B941B2AB72A296E /* ManualClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ManualClient.swift; sourceTree = "<group>"; };
+		ACC3D26DC3851862EE2511EF79AD88FF /* InstanceSelectorNotificationCenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = InstanceSelectorNotificationCenter.swift; sourceTree = "<group>"; };
+		AEDDF78E34A429EADC049381013D0898 /* BoundlessReinforcement.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessReinforcement.swift; sourceTree = "<group>"; };
+		B5F9C4A53AC740891973EB08775789A0 /* BoundlessKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundlessKit.swift; path = BoundlessKit/Classes/BoundlessKit.swift; sourceTree = "<group>"; };
 		B741236F5EFAEF28FBB15F149A56D255 /* Pods_BoundlessKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoundlessKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BD0D8ADB930AFBF23C091155B858B4EF /* ManualClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ManualClient.swift; sourceTree = "<group>"; };
-		C705776CAB7DBB3243D43760269C2264 /* Helper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Helper.swift; path = BoundlessKit/Classes/Helper.swift; sourceTree = "<group>"; };
+		BCC9BAD789395A74FA4888E50B7AA980 /* ObjectSelectorAction.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ObjectSelectorAction.swift; sourceTree = "<group>"; };
+		C09457CD1D94CB3C6E879F4F6C100F70 /* BoundlessContext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessContext.swift; sourceTree = "<group>"; };
+		C4C837C833683F12621E3704E8B11F6C /* DashboardClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DashboardClient.swift; sourceTree = "<group>"; };
+		C8158D98EEE0CD1C4AB6D31AA7585832 /* BoundlessKit.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; path = BoundlessKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		C82CDACD5A55D5EB502CC9F6E44FA172 /* Pods-BoundlessKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-BoundlessKit_Tests.modulemap"; sourceTree = "<group>"; };
 		C9A79D72AF49A8373848578DFFD7A758 /* Pods_BoundlessKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoundlessKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEA6463920D0397FA5B128FD152976FE /* BoundlessKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BoundlessKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D07AF6F83E258EA039C8C18D8B147A64 /* Pods-BoundlessKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-BoundlessKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		D1D25FAF9E953F98A63B38F39C571134 /* BoundlessKit.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoundlessKit.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9CD33D52D54AD3CCF04704C7A0569A9 /* sheen.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = sheen.png; path = BoundlessKit/Assets/sheen.png; sourceTree = "<group>"; };
 		DBC887FE18C56167B646795426072B50 /* Pods-BoundlessKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-BoundlessKit_Example-resources.sh"; sourceTree = "<group>"; };
 		DC8BBA4004A8E5855C332E8BED60454F /* Pods-BoundlessKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-BoundlessKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		E0E0B42BA13929BEE8C53748C422D796 /* Pods-BoundlessKit_Tests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-BoundlessKit_Tests-resources.sh"; sourceTree = "<group>"; };
-		E1A6199B44E39C3BD14DA7ECA9034252 /* BoundlessKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundlessKit.swift; path = BoundlessKit/Classes/BoundlessKit.swift; sourceTree = "<group>"; };
 		E8AB9D0E037CA92A25A502A607CA70A5 /* Pods-BoundlessKit_Tests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-BoundlessKit_Tests-umbrella.h"; sourceTree = "<group>"; };
+		F97DCCE853C5AFC88E5C43E2B65CE65E /* Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = BoundlessKit/Classes/Extensions.swift; sourceTree = "<group>"; };
 		FDE75EAE6AE630A6CE4E0C07B6A0ECA7 /* Pods-BoundlessKit_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-BoundlessKit_Tests-dummy.m"; sourceTree = "<group>"; };
 		FEB37E1EB11E89F5453825BACB250B24 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FFE92A06BC532E69C03528DA7F822E6C /* Pods-BoundlessKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-BoundlessKit_Example.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		63F45CFF894E6C7E43242B4B91408E86 /* Frameworks */ = {
+		2EEEA0924F3B6F308CA118763BC1FF61 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F9A46D25FE573E362929F38615F5A5FE /* Foundation.framework in Frameworks */,
+				72031339B86C2F43490E01AFB5D8ADDD /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,7 +140,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		829117EA4E52B289BE41CED887AEACBE /* Frameworks */ = {
+		F09775B4D452BB3C877B6E3855371469 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -148,35 +158,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1AE50D22FF2F6248F140AE5224F4D138 /* BoundlessKit */ = {
+		0CBC4A881C3B2B13755ACF8E11234A56 /* Pod */ = {
 			isa = PBXGroup;
 			children = (
-				E1A6199B44E39C3BD14DA7ECA9034252 /* BoundlessKit.swift */,
-				296535E9180FAD0FF148144AF7B39A81 /* Extensions.swift */,
-				C705776CAB7DBB3243D43760269C2264 /* Helper.swift */,
-				800CC91975CB764B2A00AFE4A4E1DF37 /* Clients */,
-				78B3C4C88207FC0595563B2034C0A91E /* Data */,
-				BCC10AA1A1A0367F1A8CB79208667531 /* External */,
-				21F203973BC93766F9E8383828376BBB /* Internal */,
-				F5A17512F084F9934A05B57F5E226AEC /* Pod */,
-				D44AFB375478EE22366E6D00D8D652A6 /* Resources */,
-				54871A7F3262D5767E6EA219066C0B4C /* Support Files */,
+				C8158D98EEE0CD1C4AB6D31AA7585832 /* BoundlessKit.podspec */,
+				0DEB065E177D4D16047C6FB79C28718E /* LICENSE */,
+				1E1356A0B16A22B0C5DD40601BF5C32B /* README.md */,
 			);
-			name = BoundlessKit;
-			path = ../..;
-			sourceTree = "<group>";
-		};
-		21F203973BC93766F9E8383828376BBB /* Internal */ = {
-			isa = PBXGroup;
-			children = (
-				2987C52481198E538960A08D53E9DBC2 /* ActionOracle.swift */,
-				9BE2F8CEBBE83CAAF8A7F91F09F5C85C /* BoundlessAction.swift */,
-				9EA7D139802D08FABC7330B51D4DAC08 /* BoundlessDecision.swift */,
-				8B04810578B925A778FF4194F5967B5D /* BoundlessReinforcement.swift */,
-				B5912C0A79C4260A62165174CA99D171 /* BoundlessContext.swift */,
-			);
-			name = Internal;
-			path = BoundlessKit/Classes/Internal;
+			name = Pod;
 			sourceTree = "<group>";
 		};
 		23A1E9F05F985B39C18B868A66762155 /* Pods-BoundlessKit_Example */ = {
@@ -197,48 +186,32 @@
 			path = "Target Support Files/Pods-BoundlessKit_Example";
 			sourceTree = "<group>";
 		};
+		2E12D0BC81C27BC4FE5D324D7930F3B5 /* External */ = {
+			isa = PBXGroup;
+			children = (
+				D0F925719D7036CE666A64302D6DFDA6 /* InstanceMethod */,
+			);
+			name = External;
+			path = BoundlessKit/Classes/External;
+			sourceTree = "<group>";
+		};
 		39CD7AABC6BE6AD425B068F22F681BF4 /* Development Pods */ = {
 			isa = PBXGroup;
 			children = (
-				1AE50D22FF2F6248F140AE5224F4D138 /* BoundlessKit */,
+				7DA352C8E9142E712D148F5B35CEC19B /* BoundlessKit */,
 			);
 			name = "Development Pods";
 			sourceTree = "<group>";
 		};
-		4643BC609FD9933D80ECA2A0E9C545E6 /* MethodSwizzling */ = {
+		5318D995062CFCC9BE8EA2AA0EB6233D /* MethodSwizzling */ = {
 			isa = PBXGroup;
 			children = (
-				03E4A449DA89665948CEE83070AE7B06 /* NSObject+Boundless.h */,
-				7579EA8F70B59E35D40F77FE7E6C5383 /* NSObject+Boundless.m */,
-				0AF2B42E40651A55800A382701C0E116 /* SwizzleHelper.h */,
-				3A5D7FD599944F14F33858D89238487C /* SwizzleHelper.m */,
+				39E28E5AA1AB903D10EDB7F4C064759D /* NSObject+Boundless.h */,
+				3C8371FCEAE94986F3025F30D90CD81F /* NSObject+Boundless.m */,
+				73232654F273A2DBEF53747D541A1B27 /* SwizzleHelper.h */,
+				86201458BCE3C24B3C9ACA38CFB4D621 /* SwizzleHelper.m */,
 			);
 			path = MethodSwizzling;
-			sourceTree = "<group>";
-		};
-		54871A7F3262D5767E6EA219066C0B4C /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				023C996178AD50062F4C6D3E4F29210E /* BoundlessKit.modulemap */,
-				8DAF3568923A191BDB2EFE71717F91A9 /* BoundlessKit.xcconfig */,
-				270C45CEB17A646A4E0918714E582B51 /* BoundlessKit-dummy.m */,
-				A8CDCBB2E02A074612EBD639535014DD /* BoundlessKit-prefix.pch */,
-				771E96CE3F123A104C1808DE703C62D9 /* BoundlessKit-umbrella.h */,
-				914D5E15852E61D5F9947DBAF4BDED8C /* Info.plist */,
-				891E1474F610988B9B0F597B9039B5FA /* ResourceBundle-BoundlessKit-Info.plist */,
-			);
-			name = "Support Files";
-			path = "Example/Pods/Target Support Files/BoundlessKit";
-			sourceTree = "<group>";
-		};
-		638459387AC1999631256855D72BAE32 /* InstanceMethod */ = {
-			isa = PBXGroup;
-			children = (
-				75F3856036B5901675F3DDF5725BD118 /* InstanceSelectorNotificationCenter.swift */,
-				6DBC9F17CF4C28D253E931155D8D7F9D /* ObjectSelectorAction.swift */,
-				4643BC609FD9933D80ECA2A0E9C545E6 /* MethodSwizzling */,
-			);
-			path = InstanceMethod;
 			sourceTree = "<group>";
 		};
 		6727043A2755911CD5AD2A34FF1AD5D3 /* Targets Support Files */ = {
@@ -250,13 +223,44 @@
 			name = "Targets Support Files";
 			sourceTree = "<group>";
 		};
-		78B3C4C88207FC0595563B2034C0A91E /* Data */ = {
+		68843BFFB58BFD1F66560FDD91BFFC63 /* Integration */ = {
 			isa = PBXGroup;
 			children = (
-				7A7E9B33368CD5D4EAAD8FBEB968F294 /* BoundlessDataController.swift */,
+				C4C837C833683F12621E3704E8B11F6C /* DashboardClient.swift */,
+				A4B7FA0B28A18E553B941B2AB72A296E /* ManualClient.swift */,
+				84CBF2932052429F00FE49B9 /* Storage */,
+				8012695E81362BAC731995A6C14D80D3 /* Codeless */,
+				747A3D981D65CF3A31D76E970E1FCCC2 /* HttpClients */,
 			);
-			name = Data;
-			path = BoundlessKit/Classes/Data;
+			name = Integration;
+			path = BoundlessKit/Classes/Integration;
+			sourceTree = "<group>";
+		};
+		747A3D981D65CF3A31D76E970E1FCCC2 /* HttpClients */ = {
+			isa = PBXGroup;
+			children = (
+				4769BC3F806A95665B75247282988C81 /* BoundlessAPI.swift */,
+				01C56673BB3C40F400BA2956C5B5F321 /* HTTPClient.swift */,
+			);
+			path = HttpClients;
+			sourceTree = "<group>";
+		};
+		7DA352C8E9142E712D148F5B35CEC19B /* BoundlessKit */ = {
+			isa = PBXGroup;
+			children = (
+				B5F9C4A53AC740891973EB08775789A0 /* BoundlessKit.swift */,
+				F97DCCE853C5AFC88E5C43E2B65CE65E /* Extensions.swift */,
+				5D95FC2B46158C290B0694A8ECF0CD66 /* Helper.swift */,
+				D3264DF4C0A8B097BF7AA95EC9018DAF /* Data */,
+				2E12D0BC81C27BC4FE5D324D7930F3B5 /* External */,
+				68843BFFB58BFD1F66560FDD91BFFC63 /* Integration */,
+				8036B1D5083B518F854FC526BD7DB439 /* Internal */,
+				0CBC4A881C3B2B13755ACF8E11234A56 /* Pod */,
+				ED0450F7D1E2C68C9AE09DD9CB2FB77C /* Resources */,
+				A4C6788495DA9AD71E52D0CA5CCBE1D3 /* Support Files */,
+			);
+			name = BoundlessKit;
+			path = ../..;
 			sourceTree = "<group>";
 		};
 		7DB346D0F39D3F0E887471402A8071AB = {
@@ -270,15 +274,49 @@
 			);
 			sourceTree = "<group>";
 		};
-		800CC91975CB764B2A00AFE4A4E1DF37 /* Clients */ = {
+		8012695E81362BAC731995A6C14D80D3 /* Codeless */ = {
 			isa = PBXGroup;
 			children = (
-				518F18B6152C12EEFA4892B674A630B1 /* CodelessVisual.swift */,
-				07F2D849A9F0665EAFD234384D76C301 /* DashboardClient.swift */,
-				BD0D8ADB930AFBF23C091155B858B4EF /* ManualClient.swift */,
+				4869FB7F0E5179F4656D904314F7EA80 /* CodelessReinforcement.swift */,
 			);
-			name = Clients;
-			path = BoundlessKit/Classes/Clients;
+			path = Codeless;
+			sourceTree = "<group>";
+		};
+		8036B1D5083B518F854FC526BD7DB439 /* Internal */ = {
+			isa = PBXGroup;
+			children = (
+				A0520E7B34406344D685D8AEF0F973AD /* ActionOracle.swift */,
+				082E56EFDE7C2C42A291966EFEE573C7 /* BoundlessAction.swift */,
+				C09457CD1D94CB3C6E879F4F6C100F70 /* BoundlessContext.swift */,
+				06AFC647CB8A50A1D4E3C1213842ED20 /* BoundlessDecision.swift */,
+				AEDDF78E34A429EADC049381013D0898 /* BoundlessReinforcement.swift */,
+			);
+			name = Internal;
+			path = BoundlessKit/Classes/Internal;
+			sourceTree = "<group>";
+		};
+		84CBF2932052429F00FE49B9 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				84CBF294205242D600FE49B9 /* BoundlessDefaults.swift */,
+				84CBF296205243A000FE49B9 /* UserDefaults+Extensions.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		A4C6788495DA9AD71E52D0CA5CCBE1D3 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				2E7EFDC74DF3F193A404C56C6CFB7F4B /* BoundlessKit.modulemap */,
+				885A207BE79903395EBB64C6A622BDF8 /* BoundlessKit.xcconfig */,
+				78209D0C7CBA3AB52E181D5B780EBA92 /* BoundlessKit-dummy.m */,
+				57BE88D1B3D5810F03F4302C1910A719 /* BoundlessKit-prefix.pch */,
+				5C720DB946AA4BC9E34BC5BF99D20136 /* BoundlessKit-umbrella.h */,
+				45964AAAF09E6039CE57AD974955B87E /* Info.plist */,
+				2E9D8AE0B23A765C9CF3E1FCE050BCA4 /* ResourceBundle-BoundlessKit-Info.plist */,
+			);
+			name = "Support Files";
+			path = "Example/Pods/Target Support Files/BoundlessKit";
 			sourceTree = "<group>";
 		};
 		B298D5ED7DDF9097695E5277C751F5A6 /* Pods-BoundlessKit_Tests */ = {
@@ -307,13 +345,24 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		BCC10AA1A1A0367F1A8CB79208667531 /* External */ = {
+		D0F925719D7036CE666A64302D6DFDA6 /* InstanceMethod */ = {
 			isa = PBXGroup;
 			children = (
-				638459387AC1999631256855D72BAE32 /* InstanceMethod */,
+				ACC3D26DC3851862EE2511EF79AD88FF /* InstanceSelectorNotificationCenter.swift */,
+				BCC9BAD789395A74FA4888E50B7AA980 /* ObjectSelectorAction.swift */,
+				5318D995062CFCC9BE8EA2AA0EB6233D /* MethodSwizzling */,
 			);
-			name = External;
-			path = BoundlessKit/Classes/External;
+			path = InstanceMethod;
+			sourceTree = "<group>";
+		};
+		D3264DF4C0A8B097BF7AA95EC9018DAF /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				84CBF2982054CD5000FE49B9 /* SynchronizedArray.swift */,
+				84CBF29A2054D25900FE49B9 /* SynchronizedDictionary.swift */,
+			);
+			name = Data;
+			path = BoundlessKit/Classes/Data;
 			sourceTree = "<group>";
 		};
 		D35AF013A5F0BAD4F32504907A52519E /* iOS */ = {
@@ -322,14 +371,6 @@
 				6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */,
 			);
 			name = iOS;
-			sourceTree = "<group>";
-		};
-		D44AFB375478EE22366E6D00D8D652A6 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				2751A0ACC0C70FB8C0C2139B28A04072 /* sheen.png */,
-			);
-			name = Resources;
 			sourceTree = "<group>";
 		};
 		DF6F5C7D192FE961A6A612B16A112363 /* Products */ = {
@@ -343,19 +384,27 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		F5A17512F084F9934A05B57F5E226AEC /* Pod */ = {
+		ED0450F7D1E2C68C9AE09DD9CB2FB77C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				8C82DEBB75B2F851EE7BE079B70CD158 /* BoundlessKit.podspec */,
-				9E6F6DA85AA31F9856AA33F01979C033 /* LICENSE */,
-				39A3BF6C8E56765A2DE39AF1D451F143 /* README.md */,
+				D9CD33D52D54AD3CCF04704C7A0569A9 /* sheen.png */,
 			);
-			name = Pod;
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		07E593171E24DF9A606E27B1C4BD4ADD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A6F1F008CC847A4DD1493F03C3F28F0 /* BoundlessKit-umbrella.h in Headers */,
+				7FC15D9B49BC7BDB91427EA2E7F70221 /* NSObject+Boundless.h in Headers */,
+				7C79469D1568A270303D6447805F6573 /* SwizzleHelper.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3A82F11FE0B257EAABF6C63FD9754F54 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -369,16 +418,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DD86F20231A5511557A9C9BC48E76010 /* Pods-BoundlessKit_Example-umbrella.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		90502A3673FCB22EBD641D4B1560A5B6 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				241A999ADC077A53B7305221D052B2BE /* BoundlessKit-umbrella.h in Headers */,
-				93E62583DE0EA147540891C800B1B7E4 /* NSObject+Boundless.h in Headers */,
-				A7AB18546800E3DEC70B9EEA6465E0D5 /* SwizzleHelper.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -402,24 +441,22 @@
 			productReference = B741236F5EFAEF28FBB15F149A56D255 /* Pods_BoundlessKit_Tests.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		699C406CDB282A081963912B18755087 /* BoundlessKit */ = {
+		6716A9519C08023BC5EB34F8E5052841 /* BoundlessKit-BoundlessKit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 318D81C0518017FA95E58172F4CFE9D6 /* Build configuration list for PBXNativeTarget "BoundlessKit" */;
+			buildConfigurationList = 4ED19E63121280CB055746AA7C6B7BF5 /* Build configuration list for PBXNativeTarget "BoundlessKit-BoundlessKit" */;
 			buildPhases = (
-				FB4FBB6754E4EB8E93385D5B9CEA7B2C /* Sources */,
-				63F45CFF894E6C7E43242B4B91408E86 /* Frameworks */,
-				9BACB929AD66D7ABA62443C56B5E162E /* Resources */,
-				90502A3673FCB22EBD641D4B1560A5B6 /* Headers */,
+				375A20A50FFE5E7FE2087971344F6707 /* Sources */,
+				F09775B4D452BB3C877B6E3855371469 /* Frameworks */,
+				11F2D190304C75B0057E911160E23562 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				7AF2901052D22832525F29F5A3CC57CE /* PBXTargetDependency */,
 			);
-			name = BoundlessKit;
-			productName = BoundlessKit;
-			productReference = CEA6463920D0397FA5B128FD152976FE /* BoundlessKit.framework */;
-			productType = "com.apple.product-type.framework";
+			name = "BoundlessKit-BoundlessKit";
+			productName = "BoundlessKit-BoundlessKit";
+			productReference = D1D25FAF9E953F98A63B38F39C571134 /* BoundlessKit.bundle */;
+			productType = "com.apple.product-type.bundle";
 		};
 		7C1C54B651F2BA1264F56C3921B46585 /* Pods-BoundlessKit_Example */ = {
 			isa = PBXNativeTarget;
@@ -439,22 +476,24 @@
 			productReference = C9A79D72AF49A8373848578DFFD7A758 /* Pods_BoundlessKit_Example.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		DFFBBFD84959F74531845B6627FF3851 /* BoundlessKit-BoundlessKit */ = {
+		FFDA5BF37E3021D36EF4AF856A4404D7 /* BoundlessKit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7DE1C3A88D4B73642F45BE26BD6C2622 /* Build configuration list for PBXNativeTarget "BoundlessKit-BoundlessKit" */;
+			buildConfigurationList = 5594826DE34C37D7E69DA774D5AC6083 /* Build configuration list for PBXNativeTarget "BoundlessKit" */;
 			buildPhases = (
-				75D37002EEAE53E4ABA21D1C7C4F52B5 /* Sources */,
-				829117EA4E52B289BE41CED887AEACBE /* Frameworks */,
-				FC18DA60D6ADBD6D052F81E170F1F605 /* Resources */,
+				8751AF804C868C860119D6DA84742E9B /* Sources */,
+				2EEEA0924F3B6F308CA118763BC1FF61 /* Frameworks */,
+				4B9F32B47EC73B00B0E17F923A71EEED /* Resources */,
+				07E593171E24DF9A606E27B1C4BD4ADD /* Headers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				923F6A77BFB92CF5C41CA3692BFD6E9E /* PBXTargetDependency */,
 			);
-			name = "BoundlessKit-BoundlessKit";
-			productName = "BoundlessKit-BoundlessKit";
-			productReference = D1D25FAF9E953F98A63B38F39C571134 /* BoundlessKit.bundle */;
-			productType = "com.apple.product-type.bundle";
+			name = BoundlessKit;
+			productName = BoundlessKit;
+			productReference = CEA6463920D0397FA5B128FD152976FE /* BoundlessKit.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
 
@@ -477,8 +516,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				699C406CDB282A081963912B18755087 /* BoundlessKit */,
-				DFFBBFD84959F74531845B6627FF3851 /* BoundlessKit-BoundlessKit */,
+				FFDA5BF37E3021D36EF4AF856A4404D7 /* BoundlessKit */,
+				6716A9519C08023BC5EB34F8E5052841 /* BoundlessKit-BoundlessKit */,
 				7C1C54B651F2BA1264F56C3921B46585 /* Pods-BoundlessKit_Example */,
 				440B43B5CF4E26BA8A26A4A5FA929041 /* Pods-BoundlessKit_Tests */,
 			);
@@ -486,25 +525,32 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		9BACB929AD66D7ABA62443C56B5E162E /* Resources */ = {
+		11F2D190304C75B0057E911160E23562 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7BD5B982EE93F4E4D61B33BE3B0FF275 /* BoundlessKit.bundle in Resources */,
+				5180D9AED05F2F24DD5402FB1631F0A7 /* sheen.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FC18DA60D6ADBD6D052F81E170F1F605 /* Resources */ = {
+		4B9F32B47EC73B00B0E17F923A71EEED /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4A532DDD60DDA4AEBD7FB117FDE1069B /* sheen.png in Resources */,
+				C737392574641DD6875D976D41B0E8B5 /* BoundlessKit.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		375A20A50FFE5E7FE2087971344F6707 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6ADA6B1013F701B7C8F2309ECAFA4638 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -513,10 +559,32 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		75D37002EEAE53E4ABA21D1C7C4F52B5 /* Sources */ = {
+		8751AF804C868C860119D6DA84742E9B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4370E9F488677C33435D0159782BDDC0 /* ActionOracle.swift in Sources */,
+				84CBF29B2054D25900FE49B9 /* SynchronizedDictionary.swift in Sources */,
+				CC1B2DF2CEAA885071975AC2E09B9168 /* BoundlessAction.swift in Sources */,
+				B71C1AAF532FEA71E6553ADF0C3D9551 /* BoundlessAPI.swift in Sources */,
+				749B06F90F023A362DB6B667CA4E4F5B /* BoundlessContext.swift in Sources */,
+				84CBF297205243A000FE49B9 /* UserDefaults+Extensions.swift in Sources */,
+				62C4477D5DA680CFC8005021F157739D /* BoundlessDecision.swift in Sources */,
+				64488650AB074C796D5F72F00C7196B9 /* BoundlessKit-dummy.m in Sources */,
+				44901C1814B90CB5338EF1E0A788DEAD /* BoundlessKit.swift in Sources */,
+				7FFDA2846FB752CAD1D925F90AF11BB3 /* BoundlessReinforcement.swift in Sources */,
+				15D266C18FAD987BB5D7283DA6C4E10E /* CodelessReinforcement.swift in Sources */,
+				76A78D1B9F3A48848B74769E40F08618 /* DashboardClient.swift in Sources */,
+				C3632043BFBBB1201C1F8FBFF8CCE183 /* Extensions.swift in Sources */,
+				84CBF2992054CD5000FE49B9 /* SynchronizedArray.swift in Sources */,
+				148790515E5E482E89CA65DA7748FA1E /* Helper.swift in Sources */,
+				B9E1117A3660625944C35C367FA10A65 /* HTTPClient.swift in Sources */,
+				3DCFA9C049B830D81914DDDAC40A56C8 /* InstanceSelectorNotificationCenter.swift in Sources */,
+				EEA69F6E5709EC2116E2092896A38F7B /* ManualClient.swift in Sources */,
+				384A5F237ACC4C8D645F077365D8BD22 /* NSObject+Boundless.m in Sources */,
+				84CBF295205242D600FE49B9 /* BoundlessDefaults.swift in Sources */,
+				2CD83A922BA5E62D4D5609ACF8C6EDAD /* ObjectSelectorAction.swift in Sources */,
+				1F25DAFB86BF14643CD27537B11CB436 /* SwizzleHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -528,80 +596,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FB4FBB6754E4EB8E93385D5B9CEA7B2C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				286F72179E83E338EEDB2DB7ED607540 /* ActionOracle.swift in Sources */,
-				1D91970FF6020526C4754AE177B2F88E /* BoundlessAction.swift in Sources */,
-				2C21FDC145D6639EB16C83DB3E72AD50 /* BoundlessDataController.swift in Sources */,
-				F140219B80174E2978A91E4FBFBFACCF /* BoundlessDecision.swift in Sources */,
-				4875AF8F66CD7701715E28EFB18BCF6B /* BoundlessKit-dummy.m in Sources */,
-				6F7DE8CD3DCA8E00B93369633A4BAA18 /* BoundlessKit.swift in Sources */,
-				FED5925684DE77AEC3651E949FA70260 /* BoundlessReinforcement.swift in Sources */,
-				BD5C466294DA743B6FA90521B31DCA4B /* CodelessVisual.swift in Sources */,
-				B6CCD69E965F36B775BFF2C9F1F5152B /* BoundlessContext.swift in Sources */,
-				4B8CE41565F5DAF8E4DB57050920BD1F /* DashboardClient.swift in Sources */,
-				2C5951FB4513067812A1ABC4BAB92FEE /* Extensions.swift in Sources */,
-				042DC81FA90C305F760C9E0721CA1E5F /* Helper.swift in Sources */,
-				98729F53EFF0BB41445A97CD4F4A9BBA /* InstanceSelectorNotificationCenter.swift in Sources */,
-				57CA99DBF4A12ED87E4B70E652185A17 /* ManualClient.swift in Sources */,
-				AA0BFCAC8F0537D1B37ED38756BB6DB8 /* NSObject+Boundless.m in Sources */,
-				F7B0803E28D31105927DC29652926437 /* ObjectSelectorAction.swift in Sources */,
-				728F21D2A883FEC3563038D204913096 /* SwizzleHelper.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
 		0A97B6D783FA7E0F3116ACF7E65411CF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = BoundlessKit;
-			target = 699C406CDB282A081963912B18755087 /* BoundlessKit */;
+			target = FFDA5BF37E3021D36EF4AF856A4404D7 /* BoundlessKit */;
 			targetProxy = 08B1F6452983A3B606BE5D9899BDDB39 /* PBXContainerItemProxy */;
 		};
-		7AF2901052D22832525F29F5A3CC57CE /* PBXTargetDependency */ = {
+		923F6A77BFB92CF5C41CA3692BFD6E9E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "BoundlessKit-BoundlessKit";
-			target = DFFBBFD84959F74531845B6627FF3851 /* BoundlessKit-BoundlessKit */;
-			targetProxy = E07FF05F3500814CFD3BE9572BD89311 /* PBXContainerItemProxy */;
+			target = 6716A9519C08023BC5EB34F8E5052841 /* BoundlessKit-BoundlessKit */;
+			targetProxy = B00C7F1AF7DDAB21E2EDDE001AA16F2A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		186695963E0450956343B72AF4FCE8C5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8DAF3568923A191BDB2EFE71717F91A9 /* BoundlessKit.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/BoundlessKit/BoundlessKit-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/BoundlessKit/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/BoundlessKit/BoundlessKit.modulemap";
-				PRODUCT_NAME = BoundlessKit;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
 		26F954BA177A9A46FFFD4E23ED11D67A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -660,9 +672,9 @@
 			};
 			name = Release;
 		};
-		3813478A14F3BB2A87FD2E0820C72768 /* Debug */ = {
+		415A796B66A8BE9AC5BFECAB17931B95 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8DAF3568923A191BDB2EFE71717F91A9 /* BoundlessKit.xcconfig */;
+			baseConfigurationReference = 885A207BE79903395EBB64C6A622BDF8 /* BoundlessKit.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/BoundlessKit";
@@ -674,7 +686,7 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = bundle;
 			};
-			name = Debug;
+			name = Release;
 		};
 		7E95C54D2CA09CC6AAF6E5372FE0A988 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -775,9 +787,41 @@
 			};
 			name = Debug;
 		};
-		CE8138DD754D6EAF85D0FDB534D5D2E5 /* Debug */ = {
+		9046407F4691BC9FCD53187253B32330 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8DAF3568923A191BDB2EFE71717F91A9 /* BoundlessKit.xcconfig */;
+			baseConfigurationReference = 885A207BE79903395EBB64C6A622BDF8 /* BoundlessKit.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/BoundlessKit/BoundlessKit-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/BoundlessKit/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/BoundlessKit/BoundlessKit.modulemap";
+				PRODUCT_NAME = BoundlessKit;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		B735BD37672C97EDB8A1875C07D61CA4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 885A207BE79903395EBB64C6A622BDF8 /* BoundlessKit.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -804,6 +848,22 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		C90386EA1C796B951B910FAB379B1BAD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 885A207BE79903395EBB64C6A622BDF8 /* BoundlessKit.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/BoundlessKit";
+				INFOPLIST_FILE = "Target Support Files/BoundlessKit/ResourceBundle-BoundlessKit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				PRODUCT_NAME = BoundlessKit;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
 			};
 			name = Debug;
 		};
@@ -904,22 +964,6 @@
 			};
 			name = Debug;
 		};
-		FA0396D33E16EF111A583AFA29C13D75 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8DAF3568923A191BDB2EFE71717F91A9 /* BoundlessKit.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/BoundlessKit";
-				INFOPLIST_FILE = "Target Support Files/BoundlessKit/ResourceBundle-BoundlessKit-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				PRODUCT_NAME = BoundlessKit;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -941,11 +985,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		318D81C0518017FA95E58172F4CFE9D6 /* Build configuration list for PBXNativeTarget "BoundlessKit" */ = {
+		4ED19E63121280CB055746AA7C6B7BF5 /* Build configuration list for PBXNativeTarget "BoundlessKit-BoundlessKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CE8138DD754D6EAF85D0FDB534D5D2E5 /* Debug */,
-				186695963E0450956343B72AF4FCE8C5 /* Release */,
+				C90386EA1C796B951B910FAB379B1BAD /* Debug */,
+				415A796B66A8BE9AC5BFECAB17931B95 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5594826DE34C37D7E69DA774D5AC6083 /* Build configuration list for PBXNativeTarget "BoundlessKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B735BD37672C97EDB8A1875C07D61CA4 /* Debug */,
+				9046407F4691BC9FCD53187253B32330 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -955,15 +1008,6 @@
 			buildConfigurations = (
 				DDA484E3C5F2889E4086F69625364C3B /* Debug */,
 				7E95C54D2CA09CC6AAF6E5372FE0A988 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		7DE1C3A88D4B73642F45BE26BD6C2622 /* Build configuration list for PBXNativeTarget "BoundlessKit-BoundlessKit" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3813478A14F3BB2A87FD2E0820C72768 /* Debug */,
-				FA0396D33E16EF111A583AFA29C13D75 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

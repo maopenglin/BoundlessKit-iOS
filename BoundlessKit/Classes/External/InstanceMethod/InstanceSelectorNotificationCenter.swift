@@ -93,7 +93,7 @@ extension InstanceSelectorNotificationCenter {
 
 
 
-internal class InstanceSelectorNotifier : NSObject {
+fileprivate class InstanceSelectorNotifier : NSObject {
     
     let instanceSelector: InstanceSelector
     let notificationSelector: InstanceSelector

@@ -28,7 +28,7 @@ internal class ActionOracle : NSObject {
             decision = BoundlessDecision.neutral(for: actionID)
         }
         
-        decision.notifyObservers(userInfo: nil)
+//        decision.notifyObservers(userInfo: nil)
         return decision.asReinforcement
     }
     

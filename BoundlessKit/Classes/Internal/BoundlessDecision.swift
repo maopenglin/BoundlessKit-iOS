@@ -27,15 +27,16 @@ internal class BoundlessDecision : NSObject {
     }
 }
 
-extension BoundlessDecision {
-    
-    var notification: Notification.Name {
-        return NSNotification.Name.init(actionID + name)
-    }
-    
-    func notifyObservers(userInfo: [AnyHashable : Any]?) {
-        NotificationCenter.default.post(name: notification, object: nil, userInfo: userInfo)
-        print("Posted notification with name:\(notification.rawValue)")
-    }
-    
-}
+//extension BoundlessDecision {
+//    
+//    var notification: Notification.Name {
+//        return NSNotification.Name.init(actionID + name)
+//    }
+//    
+//    func notifyObservers(userInfo: [AnyHashable : Any]?) {
+//        NotificationCenter.default.post(name: notification, object: nil, userInfo: userInfo)
+//        print("Posted notification with name:\(notification.rawValue)")
+//    }
+//    
+//}
+

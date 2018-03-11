@@ -42,10 +42,12 @@ public class BoundlessKit : NSObject {
     @objc
     public func track(actionID: String, metadata: [String: Any] = [:]) {
         let action = BoundlessAction(actionID, metadata)
+        print("Adding context to tracked action <\(actionID)>")
         BoundlessContext.getContext() { contextInfo in
             for (key, value) in contextInfo {
                 action.metadata[key] = value
             }
+            print("Publishing tracked action <\(actionID)>...")
             self.delegate?.kitPublish(actionInfo: action.toJSONType())
         }
     }
