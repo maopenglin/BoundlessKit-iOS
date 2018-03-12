@@ -16,7 +16,8 @@ internal class BoundlessReinforcement : NSObject {
     let timezoneOffset:Int64
     
     
-    init(_ name: String, _ actionID: String,
+    init(_ name: String,
+         _ actionID: String,
          _ metadata: [String:Any] = [:],
          _ utc:Int64 = Int64( 1000*Date().timeIntervalSince1970 ),
          _ timezoneOffset: Int64 = Int64( 1000*NSTimeZone.default.secondsFromGMT() )) {

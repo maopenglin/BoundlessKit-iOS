@@ -8,7 +8,7 @@
 import Foundation
 
 internal class SynchronizedArray<Element> {
-    fileprivate let queue = DispatchQueue(label: "SynchronizedArray", attributes: .concurrent)
+    internal let queue = DispatchQueue(label: "SynchronizedArray", attributes: .concurrent)
     fileprivate var array: [Element]
     
     init(_ array: [Element] = []) {
@@ -19,12 +19,12 @@ internal class SynchronizedArray<Element> {
 // MARK: - Properties
 extension SynchronizedArray {
     
-//    /// The first element of the collection.
-//    var first: Element? {
-//        var result: Element?
-//        queue.sync { result = self.array.first }
-//        return result
-//    }
+    /// The first element of the collection.
+    var first: Element? {
+        var result: Element?
+        queue.sync { result = self.array.first }
+        return result
+    }
 //
 //    /// The last element of the collection.
 //    var last: Element? {
@@ -67,13 +67,19 @@ extension SynchronizedArray {
 //        return result
 //    }
     
-    /// Returns an array containing, in order, the elements of the sequence that satisfy the given predicate.
-    ///
-    /// - Parameter isIncluded: A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be included in the returned array.
-    /// - Returns: An array of the elements that includeElement allowed.
-    func filter(_ isIncluded: (Element) -> Bool) -> [Element] {
+//    /// Returns an array containing, in order, the elements of the sequence that satisfy the given predicate.
+//    ///
+//    /// - Parameter isIncluded: A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be included in the returned array.
+//    /// - Returns: An array of the elements that includeElement allowed.
+//    func filter(_ isIncluded: (Element) -> Bool) -> [Element] {
+//        var result = [Element]()
+//        queue.sync { result = self.array.filter(isIncluded) }
+//        return result
+//    }
+    
+    var values: [Element] {
         var result = [Element]()
-        queue.sync { result = self.array.filter(isIncluded) }
+        queue.sync { result = self.array }
         return result
     }
     
@@ -187,7 +193,7 @@ extension SynchronizedArray {
 //            }
 //        }
 //    }
-    
+
     /// Removes the specified number of elements.
     ///
     /// - Parameters:
@@ -198,6 +204,13 @@ extension SynchronizedArray {
         queue.async(flags: .barrier) {
             self.array.removeFirst(n)
             completion?()
+        }
+    }
+    
+    func removeFirst(completion: ((Element?) -> Void)? = nil) {
+        queue.async(flags: .barrier) {
+            let value = self.array.removeFirst()
+            completion?(value)
         }
     }
     

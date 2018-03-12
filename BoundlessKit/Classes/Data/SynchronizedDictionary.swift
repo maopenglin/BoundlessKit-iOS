@@ -21,7 +21,7 @@ extension SynchronizedDictionary {
 //        }
 //        return result
 //    }
-    func flatMap<ElementOfResult>(_ transform: ((Key, Value)) -> ElementOfResult?) -> [ElementOfResult] {
+    func flatMap<ElementOfResult>(_ transform: (Key, Value) -> ElementOfResult?) -> [ElementOfResult] {
         var result = [ElementOfResult]()
         queue.sync { result = self.dict.flatMap(transform) }
         return result
@@ -37,11 +37,9 @@ extension SynchronizedDictionary {
     subscript(key: Key) -> Value? {
         get {
             var value: Value?
-            
             queue.sync {
                 value = dict[key]
             }
-            
             return value
         }
         set {
@@ -60,6 +58,15 @@ extension SynchronizedDictionary {
 
 // MARK: - Immutable
 extension SynchronizedDictionary {
+    
+    var count: Int {
+        var count = 0
+        queue.sync {
+            count = dict.count
+        }
+        return count
+    }
+    
     var keys: [Key] {
         var keys: [Key] = []
         queue.sync {

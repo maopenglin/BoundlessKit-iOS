@@ -38,15 +38,18 @@ internal struct BoundlessProperties {
         }
     }
     
-    var apiCredentials: [String: Any] {
+    var apiCredentials: [String: Any]? {
         get {
+            guard let versionID = versionID else {
+                return nil
+            }
             return [ "clientOS": clientOS,
                      "clientOSVersion": clientOSVersion,
                      "clientSDKVersion": clientSDKVersion,
                      "clientBuild": clientBuild,
                      "primaryIdentity": primaryIdentity,
                      "appID": appID,
-                     "versionID": versionID ?? "nil",
+                     "versionID": versionID,
                      "secret": inProduction ? productionSecret : developmentSecret,
                      "utc": NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000),
                      "timezoneOffset": NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)

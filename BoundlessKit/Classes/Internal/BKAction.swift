@@ -1,5 +1,5 @@
 //
-//  BoundlessAction.swift
+//  BKAction.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 3/6/18.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class BoundlessAction : NSObject {
+public class BKAction : NSObject {
     
     let name: String
     var metadata: [String: Any]
@@ -26,7 +26,7 @@ internal class BoundlessAction : NSObject {
     
 }
 
-extension BoundlessAction {
+extension BKAction {
     func toJSONType() -> [String : Any] {
         var jsonObject: [String:Any] = [:]
         

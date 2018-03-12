@@ -9,7 +9,7 @@
 import Foundation
 @testable import BoundlessKit
 
-class MockBoundlessKitClient : BoundlessKitClient {
+class MockBoundlessKitClient : BoundlessKitDelegate {
     var onPublishTrack: (() -> Void)?
     
     override func kitPublish(actionInfo: [String : Any]) {

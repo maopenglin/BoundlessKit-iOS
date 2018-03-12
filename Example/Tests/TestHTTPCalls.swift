@@ -23,13 +23,11 @@ class TestHTTPCalls: XCTestCase {
     
     
     func testTrackAPICallMock() {
-        let properites = BoundlessProperties.fromFile!
-        let api = BoundlessAPI.init(properties: properites, httpClient: MockHTTPClient())
-        let client = BoundlessKitClient.init(properties: BoundlessProperties.fromFile!)
-        client.syncTrackedActions()
+        let client = BoundlessKitDelegate.init(properties: BoundlessProperties.fromFile!)
+        client.httpClient = MockHTTPClient()
         let promise = expectation(description: "reached track api callback")
-        api.send(actions: [[String : Any]]()) { (result) in
-            print("In here with result:\(result)")
+        
+        client.syncTrackedActions {
             promise.fulfill()
         }
         
@@ -37,24 +35,23 @@ class TestHTTPCalls: XCTestCase {
     }
     
     func testReportAPICallMock() {
-        let properites = BoundlessProperties.fromFile!
-        let api = BoundlessAPI.init(properties: properites, httpClient: MockHTTPClient())
+        let client = BoundlessKitDelegate.init(properties: BoundlessProperties.fromFile!)
+        client.httpClient = MockHTTPClient()
         let promise = expectation(description: "reached report api callback")
-        api.send(reinforcements: [[String : Any]]()) { (result) in
-            print("In here with result:\(result)")
+        
+        client.syncReportedActions {
             promise.fulfill()
         }
         
         waitForExpectations(timeout: 3)
     }
     
-    func testAPIRefreshCall() {
-        let properites = BoundlessProperties.fromFile!
-        let api = BoundlessAPI.init(properties: properites)
-        
+    func testAPIRefreshCallMock() {
+        let client = BoundlessKitDelegate.init(properties: BoundlessProperties.fromFile!)
+        client.httpClient = MockHTTPClient()
         let promise = expectation(description: "did get to send function")
-        api.refresh(actionID: "a1") { result in
-            print("Got result:\(result)")
+        
+        client.syncReinforcementDecisions(for: "a1") {
             promise.fulfill()
         }
         
@@ -62,17 +59,14 @@ class TestHTTPCalls: XCTestCase {
     }
     
     func testRefreshAndReinforce() {
-        let properites = BoundlessProperties.fromFile!
-        let api = BoundlessAPI.init(properties: properites)
-        let client = BoundlessKitClient.init(boundlessAPI: api)
+        let client = BoundlessKitDelegate.init(properties: BoundlessProperties.fromFile!)
         let kit = BoundlessKit()
-        
         let promise = expectation(description: "Different reinforcements")
+        
         var reinforcement1: String?
         var reinforcement2: String?
-        
         client.syncReinforcementDecisions(for: "a1") {
-            kit.launch(delegate: client, dataSource: client)
+            kit.launch(delegate: client)
             
             kit.reinforce(actionID: "a1") { reinforcement in
                 reinforcement1 = reinforcement

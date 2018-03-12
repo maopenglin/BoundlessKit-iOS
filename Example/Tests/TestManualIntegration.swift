@@ -38,7 +38,7 @@ class TestManualIntegration: XCTestCase {
             }
         }
         
-        kit.launch(delegate: client, dataSource: client)
+        kit.launch(delegate: client)
         kit.track(actionID: "track1")
         kit.track(actionID: "track2")
         
@@ -56,7 +56,7 @@ class TestManualIntegration: XCTestCase {
             didTrackAction.fulfill()
         }
         
-        kit.launch(delegate: client, dataSource: client)
+        kit.launch(delegate: client)
         kit.track(actionID: "track1")
         
         waitForExpectations(timeout: 3)
