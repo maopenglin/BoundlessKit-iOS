@@ -24,8 +24,6 @@
 		84CBF289205213F500FE49B9 /* NotificationReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2872052137300FE49B9 /* NotificationReceiver.swift */; };
 		84CBF28D20521DF200FE49B9 /* TestBoundlessKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF28C20521DF200FE49B9 /* TestBoundlessKit.swift */; };
 		84CBF29120523F9D00FE49B9 /* TestManualIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF29020523F9D00FE49B9 /* TestManualIntegration.swift */; };
-		84CBF29E2054D91900FE49B9 /* MockManualClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF29C2054D88400FE49B9 /* MockManualClient.swift */; };
-		84CBF2A62055053700FE49B9 /* MockHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2A42055034000FE49B9 /* MockHTTPClient.swift */; };
 		84CBF2A82055105600FE49B9 /* TestHTTPCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2A72055105600FE49B9 /* TestHTTPCalls.swift */; };
 /* End PBXBuildFile section */
 
@@ -429,7 +427,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84CBF29E2054D91900FE49B9 /* MockManualClient.swift in Sources */,
 				84CBF29120523F9D00FE49B9 /* TestManualIntegration.swift in Sources */,
 				84CBF27B2051D31800FE49B9 /* MockViewController.swift in Sources */,
 				84CBF28D20521DF200FE49B9 /* TestBoundlessKit.swift in Sources */,
@@ -437,7 +434,6 @@
 				84CBF2842051EA1500FE49B9 /* TestActionReinforcement.swift in Sources */,
 				84CBF2822051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift in Sources */,
 				842661E5204E05B3001FEA2F /* Tests.swift in Sources */,
-				84CBF2A62055053700FE49B9 /* MockHTTPClient.swift in Sources */,
 				84CBF2A82055105600FE49B9 /* TestHTTPCalls.swift in Sources */,
 				84CBF289205213F500FE49B9 /* NotificationReceiver.swift in Sources */,
 			);

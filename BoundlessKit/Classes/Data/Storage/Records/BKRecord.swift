@@ -7,7 +7,6 @@
 
 import Foundation
 
-typealias BKRecordData = Data
 internal struct BKRecord {
     
     let recordType: String
@@ -15,9 +14,9 @@ internal struct BKRecord {
     var recordValues: [String: Any]
     
     init(type: String, id: String, values: [String: Any] = [:]) {
-        self.recordType = recordType
-        self.recordID = recordID
-        self.recordValues = recordValues
+        self.recordType = type
+        self.recordID = id
+        self.recordValues = values
     }
     
     subscript(key: String) -> Any? {
@@ -49,7 +48,7 @@ extension BKRecord {
         guard let recordType = unarchiver.decodeObject(forKey: "recordType") as? String else { return nil }
         guard let recordID = unarchiver.decodeObject(forKey: "recordID") as? String else { return nil }
         guard let recordValues = unarchiver.decodeObject(forKey: "recordValues") as? [String: Any] else { return nil }
-        self.init(recordType: recordType, recordID: recordID)
+        self.init(type: recordType, id: recordID)
         self.recordValues = recordValues
     }
 }

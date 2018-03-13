@@ -7,42 +7,62 @@
 
 import Foundation
 
-internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<BKRecord>> {
+internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<BoundlessReinforcement>>, NSCoding {
     
-    var desiredMaxTimeUntilSync: Int64 = 86400000
-    var desiredMaxSizeUntilSync: Int32 = 10
+    var desiredMaxTimeUntilSync: Int64
+    var desiredMaxSizeUntilSync: Int
+    
+    init(timeUntilSync: Int64 = 86400000,
+         sizeUntilSync: Int = 10,
+         dict: [String: [BoundlessReinforcement]] = [:]) {
+        self.desiredMaxTimeUntilSync = timeUntilSync
+        self.desiredMaxSizeUntilSync = sizeUntilSync
+        super.init(dict.mapValues({ (reinforcements) -> SynchronizedArray<BoundlessReinforcement> in
+            return SynchronizedArray(reinforcements)
+        }))
+    }
+    
+    required convenience init?(coder aDecoder: NSCoder) {
+        guard let dictData = aDecoder.decodeObject(forKey: "dictValues") as? Data,
+            let dictValues = NSKeyedUnarchiver.unarchiveObject(with: dictData) as? [String: [BoundlessReinforcement]] else {
+                return nil
+        }
+        let desiredMaxTimeUntilSync = aDecoder.decodeInt64(forKey: "desiredMaxTimeUntilSync")
+        let desiredMaxSizeUntilSync = aDecoder.decodeInteger(forKey: "desiredMaxSizeUntilSync")
+        self.init(timeUntilSync: desiredMaxTimeUntilSync,
+                  sizeUntilSync: desiredMaxSizeUntilSync,
+                  dict: dictValues)
+    }
+    
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(desiredMaxSizeUntilSync, forKey: "desiredMaxSizeUntilSync")
+        aCoder.encode(desiredMaxSizeUntilSync, forKey: "desiredMaxSizeUntilSync")
+        aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: copy()), forKey: "dictValues")
+    }
     
     var needsSync: Bool {
-        if count >= desiredMaxSizeUntilSync {
+        if values.map({ report -> Int in
+            return report.count
+        }).reduce(0, +) >= desiredMaxSizeUntilSync {
             return true
         }
         
-        let timeNow = Int64(1000*NSDate().timeIntervalSince1970)
+        let timeNow = Int64(1000*Date().timeIntervalSince1970)
         for reports in values {
-            guard let firstReportTimeInfo = reports.first?.recordValues["time"] as? [String: Any],
-                let timeTypes = firstReportTimeInfo["timeType"] as? [[String: Any]]
-                else {
-                    return false
-            }
-            for timeType in timeTypes {
-                if timeType["timeType"] as? String == "utc",
-                    let utc = timeType["value"] as? Int64
-                {
-                    return timeNow >= (utc + desiredMaxTimeUntilSync)
-                }
+            if let startTime = reports.first?.utc,
+                startTime + desiredMaxTimeUntilSync <= timeNow {
+                return true
             }
         }
         
         return false
     }
     
-    func addReport(actionID: String, reportInfo: [String: Any]) {
-        var record = BKRecord.init(recordType: "reportedActions", recordID: "")
-        record.recordValues = reportInfo
-        if self[actionID] == nil {
-            self[actionID] = SynchronizedArray()
+    func add(reinforcement: BoundlessReinforcement) {
+        if self[reinforcement.actionID] == nil {
+            self[reinforcement.actionID] = SynchronizedArray()
         }
-        self[actionID]?.append(record)
+        self[reinforcement.actionID]?.append(reinforcement)
     }
     
 }

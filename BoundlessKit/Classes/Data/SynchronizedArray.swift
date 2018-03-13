@@ -40,12 +40,12 @@ extension SynchronizedArray {
         return result
     }
     
-//    /// A Boolean value indicating whether the collection is empty.
-//    var isEmpty: Bool {
-//        var result = false
-//        queue.sync { result = self.array.isEmpty }
-//        return result
-//    }
+    /// A Boolean value indicating whether the collection is empty.
+    var isEmpty: Bool {
+        var result = false
+        queue.sync { result = self.array.isEmpty }
+        return result
+    }
     
 //    /// A textual representation of the array and its elements.
 //    var description: String {

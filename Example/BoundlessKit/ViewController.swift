@@ -13,7 +13,7 @@ import CoreLocation
 class ViewController: UIViewController {
     
     @objc var someCounter: Float = 0
-    let kit = BoundlessKit()
+//    let kit = BoundlessKit()
     
     @objc func action1Performed(){
 //        kit.launch(arguements: Helper.versionMappings)
@@ -68,9 +68,7 @@ class ViewController: UIViewController {
     }
     
     @objc func action2Performed(){
-        kit.reinforce(actionID: "action1") { reinforcement in
-            
-        }
+//        kit.reinforce(actionID: "action1") { reinforcement in }
         ////        // Tracking call is sent asynchronously
         //////        BoundlessKit.track("action2", metaData: ["key":"value", "calories":9000])
         //        locationManager.delegate = self

@@ -7,34 +7,52 @@
 
 import Foundation
 
-internal class BKTrackBatch : SynchronizedArray<BKRecord> {
+internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding {
     
-    var desiredTimeUntilSync: Int64 = 86400000
-    var desiredSizeUntilSync: Int32 = 10
+    var desiredMaxTimeUntilSync: Int64
+    var desiredMaxSizeUntilSync: Int
+    
+    init(timeUntilSync: Int64 = 86400000,
+         sizeUntilSync: Int = 10,
+         values: [BKAction] = []) {
+        self.desiredMaxTimeUntilSync = timeUntilSync
+        self.desiredMaxSizeUntilSync = sizeUntilSync
+        super.init(values)
+    }
+    
+    required convenience init?(coder aDecoder: NSCoder) {
+        guard let arrayData = aDecoder.decodeObject(forKey: "arrayValues") as? Data,
+            let arrayValues = NSKeyedUnarchiver.unarchiveObject(with: arrayData) as? [BKAction] else {
+                return nil
+        }
+        let desiredMaxTimeUntilSync = aDecoder.decodeInt64(forKey: "desiredMaxTimeUntilSync")
+        let desiredMaxSizeUntilSync = aDecoder.decodeInteger(forKey: "desiredMaxSizeUntilSync")
+        self.init(timeUntilSync: desiredMaxTimeUntilSync,
+                  sizeUntilSync: desiredMaxSizeUntilSync,
+                  values: arrayValues)
+    }
+    
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(desiredMaxSizeUntilSync, forKey: "desiredMaxSizeUntilSync")
+        aCoder.encode(desiredMaxSizeUntilSync, forKey: "desiredMaxSizeUntilSync")
+        aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: values), forKey: "arrayValues")
+    }
     
     var needsSync: Bool {
-        if count >= desiredSizeUntilSync {
+        if count >= desiredMaxSizeUntilSync {
             return true
         }
         
-        guard let firstTrackTimeInfo = self.first?.recordValues["time"] as? [String: Any],
-            let timeTypes = firstTrackTimeInfo["timeType"] as? [[String: Any]]
-            else {
-                return false
+        if let startTime = self.first?.utc {
+            return Int64(1000*NSDate().timeIntervalSince1970) >= (startTime + desiredMaxTimeUntilSync)
         }
-        for timeType in timeTypes {
-            if timeType["timeType"] as? String == "utc",
-                let utc = timeType["value"] as? Int64
-            {
-                return Int64(1000*NSDate().timeIntervalSince1970) >= (utc + desiredTimeUntilSync)
-            }
-        }
+        
         return false
     }
     
-    func addAction(actionInfo: [String: Any]) {
-        var record = BKRecord.init(recordType: "trackedActions", recordID: "")
-        record.recordValues = actionInfo
-        self.append(record)
-    }
+//    func add(action: BKAction) {
+//        self.append(action)
+//    }
+    
+    
 }

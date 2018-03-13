@@ -10,6 +10,10 @@ import Foundation
 internal class SynchronizedDictionary<Key, Value> where Key : Hashable {
     fileprivate let queue = DispatchQueue(label: "SynchronizedDictionary", attributes: .concurrent)
     fileprivate var dict = [Key:Value]()
+    
+    init(_ dict: [Key:Value] = [:]) {
+        self.dict = dict
+    }
 }
 
 
@@ -25,6 +29,12 @@ extension SynchronizedDictionary {
         var result = [ElementOfResult]()
         queue.sync { result = self.dict.flatMap(transform) }
         return result
+    }
+    
+    func copy() -> [Key: Value] {
+        var copy = [Key: Value]()
+        queue.sync { copy = self.dict }
+        return copy
     }
 }
 

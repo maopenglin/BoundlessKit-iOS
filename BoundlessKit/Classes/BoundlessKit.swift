@@ -27,17 +27,17 @@ public class BoundlessKit : NSObject {
     
     var trackedActions: BKTrackBatch
     var reportedActions: BKReportBatch
-    var cartridgeReinforcements: BKRefreshCartridge
+    var cartridgeReinforcements: BKRefreshCartridges
     
     init(properties: BoundlessProperties? = BoundlessProperties.fromFile,
-         database: BKDatabase = BKDatabase.init("boundless.kit.database"),
+         database: BKDatabase = BKDatabase.init(suiteName: "boundless.kit.database")!,
          delegate: BoundlessKitDelegateProtocol) {
         self.properties = properties
         self.database = database
         self.delegate = delegate
         self.trackedActions = BKTrackBatch()
         self.reportedActions = BKReportBatch()
-        self.cartridgeReinforcements = BKRefreshCartridge()
+        self.cartridgeReinforcements = BKRefreshCartridges()
     }
     
     @objc
@@ -48,22 +48,20 @@ public class BoundlessKit : NSObject {
             for (key, value) in contextInfo {
                 action.metadata[key] = value
             }
-            
-            self.trackedActions.append(BKRecord.init(recordType: "track", recordID: action.hash))
-            self.delegate.kitPublish(actionInfo: action.toJSONType())
+            self.trackedActions.append(action)
+            self.database.archive(self.trackedActions, forKey: "trackedActions")
         }
     }
     
     @objc
     public func reinforce(actionID: String, completion: ((String)->Void)?) {
-        let action = BKAction(actionID)
-        delegate.kitReinforcement(for: action.name) { reinforcementDecision in
-            let reinforcement = BoundlessReinforcement.init(reinforcementDecision, action.name)
+        cartridgeReinforcements.decision(forActionID: actionID) { reinforcementDecision in
+            let reinforcement = reinforcementDecision.asReinforcement
             BoundlessContext.getContext() { contextInfo in
                 for (key, value) in contextInfo {
                     reinforcement.metadata[key] = value
                 }
-                self.delegate.kitPublish(reinforcementInfo: reinforcement.toJSONType())
+                self.reportedActions.add(reinforcement: reinforcement)
             }
         }
     }
@@ -73,7 +71,7 @@ public class BoundlessKit : NSObject {
 
 // MARK: - BoundlessAPI Synchronization
 extension BoundlessKit {
-    func syncTrackedActions(completion: @escaping ()->Void = {}) {
+    func syncTrack(completion: @escaping ()->Void = {}) {
         guard var payload = properties?.apiCredentials else {
             completion()
             return
@@ -92,23 +90,23 @@ extension BoundlessKit {
             }.start()
     }
     
-    func syncReportedActions(completion: @escaping ()->Void = {}) {
+    func syncReport(completion: @escaping ()->Void = {}) {
         guard var payload = properties?.apiCredentials else {
             completion()
             return
         }
         
-        let actions = reportedActions.values
-        payload["actions"] = actions
-        httpClient.post(url: HTTPClient.BoundlessAPI.track.url, jsonObject: payload) { response in
-            if let status = response?["status"] as? Int {
-                if status == 200 {
-                    self.reportedActions.removeFirst(actions.count)
-                    print("Cleared reported actions.")
-                }
-            }
-            completion()
-            }.start()
+//        let actions = reportedActions.values
+//        payload["actions"] = actions
+//        httpClient.post(url: HTTPClient.BoundlessAPI.track.url, jsonObject: payload) { response in
+//            if let status = response?["status"] as? Int {
+//                if status == 200 {
+//                    self.reportedActions.removeFirst(actions.count)
+//                    print("Cleared reported actions.")
+//                }
+//            }
+//            completion()
+//            }.start()
     }
     
     func syncReinforcementDecisions(for actionID: String, completion: @escaping ()->Void = {}) {
@@ -122,9 +120,13 @@ extension BoundlessKit {
         httpClient.post(url: HTTPClient.BoundlessAPI.refresh.url, jsonObject: payload) { response in
             if let responseStatusCode = response?["status"] as? Int {
                 if responseStatusCode == 200,
-                    let cartridgeDecisions = response?["reinforcementCartridge"] as? [String],
+                    let reinforcementCartridge = response?["reinforcementCartridge"] as? [String],
                     let expiresIn = response?["expiresIn"] as? Int {
-                    self.cartridgeReinforcements[actionID] = SynchronizedArray(cartridgeDecisions)
+                    let values = reinforcementCartridge.map({ (reinforcementDecision) -> BoundlessDecision in
+                        BoundlessDecision.init(reinforcementDecision, actionID)
+                    })
+                    let expirationUTC = Int64(Date().addingTimeInterval(TimeInterval(1000*expiresIn)).timeIntervalSince1970)
+                    self.cartridgeReinforcements[actionID] = BKRefreshCartridge.init(expirationUTC: expirationUTC, values: values)
                     print("\(actionID) refreshed!")
                 } else if responseStatusCode == 400 {
                     print("Cartridge contained outdated actionID. Flushing.")

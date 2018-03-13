@@ -9,7 +9,7 @@ import Foundation
 
 internal extension UserDefaults {
     
-    func archive(_ value: Any?, forKey key: String) {
+    func archive<T: NSCoding>(_ value: T?, forKey key: String) {
         if let value = value {
             self.set(NSKeyedArchiver.archivedData(withRootObject: value), forKey: key)
         } else {
@@ -17,7 +17,7 @@ internal extension UserDefaults {
         }
     }
     
-    func unarchive<T>(_ key: String) -> T? {
+    func unarchive<T: NSCoding>(_ key: String) -> T? {
         if let data = self.object(forKey: key) as? Data,
             let t = NSKeyedUnarchiver.unarchiveObject(with: data) as? T {
             return t

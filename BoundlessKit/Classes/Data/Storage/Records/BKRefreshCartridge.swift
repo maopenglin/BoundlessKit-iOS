@@ -7,45 +7,40 @@
 
 import Foundation
 
-internal class BKRefreshCartridge : SynchronizedDictionary<String, SynchronizedArray<BoundlessDecision>> {
+internal class BKRefreshCartridge : SynchronizedArray<BoundlessDecision>, NSCoding {
     
-//    var desiredMinSizeUntilSync: Int32 = 2
+    let expirationUTC: Int64
+    var desiredMinSizeUntilSync: Int
     
-    func removeDecision(for actionID: String, completion: ((BoundlessDecision?)->Void)?) {
-        if self[actionID] == nil {
-            self[actionID] = SynchronizedArray()
-        }
-        self[actionID]?.removeFirst(completion: completion)
+    init(expirationUTC: Int64 = Int64(Date().timeIntervalSince1970),
+         sizeUntilSync: Int = 2,
+         values: [BoundlessDecision] = []) {
+        self.expirationUTC = expirationUTC
+        self.desiredMinSizeUntilSync = sizeUntilSync
+        super.init(values)
     }
     
-//    var needsSync: [String] {
-//
-//        var
-//        for cartridge in values {
-//
-//        }
-//        if count >= desiredSizeUntilSync {
-//            return true
-//        }
-//
-//        let timeNow = Int64(1000*NSDate().timeIntervalSince1970)
-//        for reports in values {
-//            guard let firstReportTimeInfo = reports.first?.recordValues["time"] as? [String: Any],
-//                let timeTypes = firstReportTimeInfo["timeType"] as? [[String: Any]]
-//                else {
-//                    return false
-//            }
-//            for timeType in timeTypes {
-//                if timeType["timeType"] as? String == "utc",
-//                    let utc = timeType["value"] as? Int64
-//                {
-//                    return timeNow >= (utc + desiredTimeUntilSync)
-//                }
-//            }
-//        }
-//
-//        return false
-//    }
+    required convenience init?(coder aDecoder: NSCoder) {
+        guard let arrayData = aDecoder.decodeObject(forKey: "arrayValues") as? Data,
+            let arrayValues = NSKeyedUnarchiver.unarchiveObject(with: arrayData) as? [BoundlessDecision] else {
+                return nil
+        }
+        let expirationUTC = aDecoder.decodeInt64(forKey: "expirationUTC")
+        let desiredMinSizeUntilSync = aDecoder.decodeInteger(forKey: "desiredMinSizeUntilSync")
+        self.init(expirationUTC: expirationUTC,
+                  sizeUntilSync: desiredMinSizeUntilSync,
+                  values: arrayValues)
+    }
+    
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(expirationUTC, forKey: "expirationUTC")
+        aCoder.encode(desiredMinSizeUntilSync, forKey: "desiredMinSizeUntilSync")
+        aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: values), forKey: "arrayValues")
+    }
+    
+    var needsSync: Bool {
+        return count <= desiredMinSizeUntilSync || Int64(1000*Date().timeIntervalSince1970) >= expirationUTC
+    }
     
 }
 

@@ -24,6 +24,16 @@ public class BKAction : NSObject {
         self.timezoneOffset = timezoneOffset
     }
     
+    
+    public required convenience init?(coder aDecoder: NSCoder) {
+        return nil
+    }
+}
+
+extension BKAction : NSCoding {
+    public func encode(with aCoder: NSCoder) {
+        
+    }
 }
 
 extension BKAction {

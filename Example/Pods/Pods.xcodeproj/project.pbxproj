@@ -29,6 +29,7 @@
 		844585AE2055F2B700939DEF /* BKRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844585AD2055F2B700939DEF /* BKRecord.swift */; };
 		844585B02056F40200939DEF /* BKReportBatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844585AF2056F40200939DEF /* BKReportBatch.swift */; };
 		844585B22056FC5D00939DEF /* BKRefreshCartridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844585B12056FC5D00939DEF /* BKRefreshCartridge.swift */; };
+		844585B4205796F800939DEF /* BKRefreshCartridges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844585B3205796F800939DEF /* BKRefreshCartridges.swift */; };
 		84BA20116450BFD5E8DCCAE96620858F /* BoundlessKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D1D25FAF9E953F98A63B38F39C571134 /* BoundlessKit.bundle */; };
 		862D25ACB32E69D34E12BD147C01237C /* ObjectSelectorAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CF82ED69AE1AF9B61522B760C84013 /* ObjectSelectorAction.swift */; };
 		87FCB07C5E636EEAAEA93B6C649E4BB3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
@@ -109,6 +110,7 @@
 		844585AD2055F2B700939DEF /* BKRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKRecord.swift; sourceTree = "<group>"; };
 		844585AF2056F40200939DEF /* BKReportBatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKReportBatch.swift; sourceTree = "<group>"; };
 		844585B12056FC5D00939DEF /* BKRefreshCartridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKRefreshCartridge.swift; sourceTree = "<group>"; };
+		844585B3205796F800939DEF /* BKRefreshCartridges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKRefreshCartridges.swift; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		971B124EE51CFE60F24CA4BA396198DE /* BoundlessKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = BoundlessKit.modulemap; sourceTree = "<group>"; };
 		A9507429941CA3F5F93F35748E5637CD /* Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = BoundlessKit/Classes/Extensions.swift; sourceTree = "<group>"; };
@@ -303,6 +305,7 @@
 				842DF7E2205530930066B9A9 /* BKTrackBatch.swift */,
 				844585AF2056F40200939DEF /* BKReportBatch.swift */,
 				844585B12056FC5D00939DEF /* BKRefreshCartridge.swift */,
+				844585B3205796F800939DEF /* BKRefreshCartridges.swift */,
 				844585AD2055F2B700939DEF /* BKRecord.swift */,
 			);
 			path = Records;
@@ -610,6 +613,7 @@
 				9C17077D867ED82B78CD1B835CB7578D /* CodelessReinforcement.swift in Sources */,
 				1F8AE4E0BF3E51EBF7CECE0488578A7C /* DashboardClient.swift in Sources */,
 				A89DE5FC3978AC8F2EB9364634D3527F /* Extensions.swift in Sources */,
+				844585B4205796F800939DEF /* BKRefreshCartridges.swift in Sources */,
 				F8D42DEAA381FB0124CBCE1774F25AC3 /* Helper.swift in Sources */,
 				3F168B7B2BA4EB73D58183D8BA594294 /* HTTPClient.swift in Sources */,
 				2D88A526B02605E135CCF35257724CA9 /* InstanceSelectorNotificationCenter.swift in Sources */,
