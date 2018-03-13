@@ -9,6 +9,8 @@ import Foundation
 
 internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding {
     
+    var delegate: BKSyncAPIDelegate?
+    
     var desiredMaxTimeUntilSync: Int64
     var desiredMaxSizeUntilSync: Int
     
@@ -50,9 +52,24 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding {
         return false
     }
     
-//    func add(action: BKAction) {
-//        self.append(action)
-//    }
-    
-    
+    func sync(completion: @escaping ()->Void = {}) {
+        guard var payload = delegate?.properties.apiCredentials else {
+            completion()
+            return
+        }
+        
+        let actions = self.values
+        payload["actions"] = actions.map({ (action) -> [String: Any] in
+            action.toJSONType()
+        })
+        delegate?.httpClient.post(url: HTTPClient.BoundlessAPI.track.url, jsonObject: payload) { response in
+            if let status = response?["status"] as? Int {
+                if status == 200 {
+                    self.removeFirst(actions.count)
+                    print("Cleared tracked actions.")
+                }
+            }
+            completion()
+        }.start()
+    }
 }

@@ -9,6 +9,8 @@ import Foundation
 
 internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<BoundlessReinforcement>>, NSCoding {
     
+    var delegate: BKSyncAPIDelegate?
+    
     var desiredMaxTimeUntilSync: Int64
     var desiredMaxSizeUntilSync: Int
     
@@ -40,6 +42,13 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: copy()), forKey: "dictValues")
     }
     
+    func store(_ reinforcement: BoundlessReinforcement) {
+        if self[reinforcement.actionID] == nil {
+            self[reinforcement.actionID] = SynchronizedArray()
+        }
+        self[reinforcement.actionID]?.append(reinforcement)
+    }
+    
     var needsSync: Bool {
         if values.map({ report -> Int in
             return report.count
@@ -58,11 +67,26 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         return false
     }
     
-    func add(reinforcement: BoundlessReinforcement) {
-        if self[reinforcement.actionID] == nil {
-            self[reinforcement.actionID] = SynchronizedArray()
+    func syncReport(forActionID actionID: String, completion: @escaping ()->Void = {}) {
+        guard var payload = delegate?.properties.apiCredentials,
+            let actions = self[actionID]?.values else {
+                completion()
+                return
         }
-        self[reinforcement.actionID]?.append(reinforcement)
+        
+        
+        payload["actions"] = actions.map({ (reinforcement) -> [String: Any] in
+            reinforcement.toJSONType()
+        })
+        delegate?.httpClient.post(url: HTTPClient.BoundlessAPI.track.url, jsonObject: payload) { response in
+            if let status = response?["status"] as? Int {
+                if status == 200 || status == 400 {
+                    self.removeValue(forKey: actionID)
+                    print("Cleared reported actions.")
+                }
+            }
+            completion()
+        }.start()
     }
     
 }

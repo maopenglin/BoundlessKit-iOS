@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class SynchronizedDictionary<Key, Value> where Key : Hashable {
+internal class SynchronizedDictionary<Key, Value> : NSObject where Key : Hashable {
     fileprivate let queue = DispatchQueue(label: "SynchronizedDictionary", attributes: .concurrent)
     fileprivate var dict = [Key:Value]()
     
