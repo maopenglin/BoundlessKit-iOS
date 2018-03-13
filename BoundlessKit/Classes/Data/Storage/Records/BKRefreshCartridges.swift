@@ -7,11 +7,6 @@
 
 import Foundation
 
-protocol BKSyncAPIDelegate {
-    var properties: BoundlessProperties {get}
-    var httpClient: HTTPClient {get}
-}
-
 internal class BKRefreshCartridges : SynchronizedDictionary<String, BKRefreshCartridge>, NSCoding {
     
     var delegate: BKSyncAPIDelegate?

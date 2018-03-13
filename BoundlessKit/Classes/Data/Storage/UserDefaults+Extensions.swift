@@ -7,8 +7,12 @@
 
 import Foundation
 
-internal extension UserDefaults {
-    
+protocol BKDatabase {
+    func archive<T: NSCoding>(_ value: T?, forKey key: String)
+    func unarchive<T: NSCoding>(_ key: String) -> T?
+}
+
+extension UserDefaults : BKDatabase {
     func archive<T: NSCoding>(_ value: T?, forKey key: String) {
         if let value = value {
             self.set(NSKeyedArchiver.archivedData(withRootObject: value), forKey: key)
@@ -25,7 +29,6 @@ internal extension UserDefaults {
             return nil
         }
     }
-
 }
 
 

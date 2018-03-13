@@ -47,6 +47,11 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
             self[reinforcement.actionID] = SynchronizedArray()
         }
         self[reinforcement.actionID]?.append(reinforcement)
+        BoundlessContext.getContext() { contextInfo in
+            for (key, value) in contextInfo {
+                reinforcement.metadata[key] = value
+            }
+        }
     }
     
     var needsSync: Bool {

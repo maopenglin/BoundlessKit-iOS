@@ -40,6 +40,15 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding {
         aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: values), forKey: "arrayValues")
     }
     
+    func store(_ action: BKAction) {
+        self.append(action)
+        BoundlessContext.getContext() { contextInfo in
+            for (key, value) in contextInfo {
+                action.metadata[key] = value
+            }
+        }
+    }
+    
     var needsSync: Bool {
         if count >= desiredMaxSizeUntilSync {
             return true

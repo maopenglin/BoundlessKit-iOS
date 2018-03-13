@@ -7,6 +7,13 @@
 
 import Foundation
 
+protocol BKSyncAPIDelegate {
+    var properties: BoundlessProperties {get}
+    var httpClient: HTTPClient {get}
+}
+
+extension BoundlessKit : BKSyncAPIDelegate {}
+
 internal class HTTPClient {
     
     internal var logRequests = true

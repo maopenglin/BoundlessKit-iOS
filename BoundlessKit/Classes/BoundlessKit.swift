@@ -19,7 +19,7 @@ public protocol BoundlessKitDelegateProtocol {
 
 public class BoundlessKit : NSObject {
     
-    let properties: BoundlessProperties?
+    let properties: BoundlessProperties
     var httpClient = HTTPClient()
     
     let database: BKDatabase
@@ -29,8 +29,8 @@ public class BoundlessKit : NSObject {
     var reportedActions: BKReportBatch
     var cartridgeReinforcements: BKRefreshCartridges
     
-    init(properties: BoundlessProperties? = BoundlessProperties.fromFile,
-         database: BKDatabase = BKDatabase.init(suiteName: "boundless.kit.database")!,
+    init(properties: BoundlessProperties = BoundlessProperties.fromFile!,
+         database: BKDatabase = UserDefaults.init(suiteName: "boundless.kit.database")!,
          delegate: BoundlessKitDelegateProtocol) {
         self.properties = properties
         self.database = database
@@ -38,33 +38,28 @@ public class BoundlessKit : NSObject {
         self.trackedActions = BKTrackBatch()
         self.reportedActions = BKReportBatch()
         self.cartridgeReinforcements = BKRefreshCartridges()
+        super.init()
+        self.trackedActions.delegate = self
+        self.reportedActions.delegate = self
+        self.cartridgeReinforcements.delegate = self
     }
     
     @objc
     public func track(actionID: String, metadata: [String: Any] = [:]) {
         let action = BKAction(actionID, metadata)
-        print("Adding context to tracked action <\(actionID)>")
-        BoundlessContext.getContext() { contextInfo in
-            for (key, value) in contextInfo {
-                action.metadata[key] = value
-            }
-            self.trackedActions.append(action)
-            self.database.archive(self.trackedActions, forKey: "trackedActions")
-        }
+        self.trackedActions.store(action)
+        print("Tracked action <\(actionID)>")
+        self.database.archive(self.trackedActions, forKey: "trackedActions")
     }
     
     @objc
-    public func reinforce(actionID: String, completion: ((String)->Void)?) {
+    public func reinforce(actionID: String, completion: @escaping (String)->Void) {
         cartridgeReinforcements.decision(forActionID: actionID) { reinforcementDecision in
             let reinforcement = reinforcementDecision.asReinforcement
-            BoundlessContext.getContext() { contextInfo in
-                for (key, value) in contextInfo {
-                    reinforcement.metadata[key] = value
-                }
-                self.reportedActions.store(reinforcement)
-            }
+            completion(reinforcement.name)
+            self.reportedActions.store(reinforcement)
+            print("Reported action <\(actionID)> with reinforcement <\(reinforcement.name)>")
+            self.database.archive(self.reportedActions, forKey: "reportedActions")
         }
     }
-    
-    
 }
