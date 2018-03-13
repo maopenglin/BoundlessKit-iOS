@@ -9,9 +9,9 @@
 import Foundation
 @testable import BoundlessKit
 
-class MockHTTPClient : HTTPClient {
+class MockBoundlessAPIClient : BoundlessAPIClient {
     init() {
-        super.init(session: MockURLSession())
+        super.init(properties: BoundlessProperties.fromTestFile!, session: MockURLSession())
         logRequests = true
         logResponses = true
     }

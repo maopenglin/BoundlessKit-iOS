@@ -7,26 +7,31 @@
 
 import Foundation
 
-internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<BoundlessReinforcement>>, NSCoding {
+internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<BKReinforcement>>, NSCoding {
     
-    var delegate: BKSyncAPIDelegate?
+    static let registerWithNSKeyed: Void = {
+        NSKeyedUnarchiver.setClass(BKReportBatch.self, forClassName: "BKReportBatch")
+        NSKeyedArchiver.setClassName("BKReportBatch", for: BKReportBatch.self)
+    }()
+    
+    var apiClient: BoundlessAPIClient?
     
     var desiredMaxTimeUntilSync: Int64
     var desiredMaxSizeUntilSync: Int
     
     init(timeUntilSync: Int64 = 86400000,
          sizeUntilSync: Int = 10,
-         dict: [String: [BoundlessReinforcement]] = [:]) {
+         dict: [String: [BKReinforcement]] = [:]) {
         self.desiredMaxTimeUntilSync = timeUntilSync
         self.desiredMaxSizeUntilSync = sizeUntilSync
-        super.init(dict.mapValues({ (reinforcements) -> SynchronizedArray<BoundlessReinforcement> in
+        super.init(dict.mapValues({ (reinforcements) -> SynchronizedArray<BKReinforcement> in
             return SynchronizedArray(reinforcements)
         }))
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
         guard let dictData = aDecoder.decodeObject(forKey: "dictValues") as? Data,
-            let dictValues = NSKeyedUnarchiver.unarchiveObject(with: dictData) as? [String: [BoundlessReinforcement]] else {
+            let dictValues = NSKeyedUnarchiver.unarchiveObject(with: dictData) as? [String: [BKReinforcement]] else {
                 return nil
         }
         let desiredMaxTimeUntilSync = aDecoder.decodeInt64(forKey: "desiredMaxTimeUntilSync")
@@ -37,12 +42,14 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
     }
     
     func encode(with aCoder: NSCoder) {
+        aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: self.valuesForKeys.mapValues({ (synchronizedArray) -> [BKReinforcement] in
+            return synchronizedArray.values
+        })), forKey: "dictValues")
+        aCoder.encode(desiredMaxTimeUntilSync, forKey: "desiredMaxTimeUntilSync")
         aCoder.encode(desiredMaxSizeUntilSync, forKey: "desiredMaxSizeUntilSync")
-        aCoder.encode(desiredMaxSizeUntilSync, forKey: "desiredMaxSizeUntilSync")
-        aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: copy()), forKey: "dictValues")
     }
     
-    func store(_ reinforcement: BoundlessReinforcement) {
+    func store(_ reinforcement: BKReinforcement) {
         if self[reinforcement.actionID] == nil {
             self[reinforcement.actionID] = SynchronizedArray()
         }
@@ -72,27 +79,48 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         return false
     }
     
-    func syncReport(forActionID actionID: String, completion: @escaping ()->Void = {}) {
-        guard var payload = delegate?.properties.apiCredentials,
-            let actions = self[actionID]?.values else {
+    func sync(completion: @escaping ()->Void = {}) {
+        guard var payload = apiClient?.properties.apiCredentials else {
                 completion()
                 return
         }
         
-        
-        payload["actions"] = actions.map({ (reinforcement) -> [String: Any] in
-            reinforcement.toJSONType()
-        })
-        delegate?.httpClient.post(url: HTTPClient.BoundlessAPI.track.url, jsonObject: payload) { response in
+        let reportCopy = self.valuesForKeys
+        payload["actions"] = reportCopy.values.flatMap({$0.values}).map({$0.toJSONType()})
+        apiClient?.post(url: BoundlessAPIEndpoint.track.url, jsonObject: payload) { response in
             if let status = response?["status"] as? Int {
                 if status == 200 || status == 400 {
-                    self.removeValue(forKey: actionID)
+                    for (actionID, actions) in reportCopy {
+                        self[actionID]?.removeFirst(actions.count)
+                    }
                     print("Cleared reported actions.")
                 }
             }
             completion()
         }.start()
     }
+    
+//    func syncReport(forActionID actionID: String, completion: @escaping ()->Void = {}) {
+//        guard var payload = apiClient?.properties.apiCredentials,
+//            let actions = self[actionID]?.values else {
+//                completion()
+//                return
+//        }
+//
+//
+//        payload["actions"] = actions.map({ (reinforcement) -> [String: Any] in
+//            reinforcement.toJSONType()
+//        })
+//        apiClient?.httpClient.post(url: BoundlessAPI.track.url, jsonObject: payload) { response in
+//            if let status = response?["status"] as? Int {
+//                if status == 200 || status == 400 {
+//                    self.removeValue(forKey: actionID)
+//                    print("Cleared reported actions.")
+//                }
+//            }
+//            completion()
+//        }.start()
+//    }
     
 }
 

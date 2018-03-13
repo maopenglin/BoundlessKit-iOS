@@ -9,7 +9,12 @@ import Foundation
 
 internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding {
     
-    var delegate: BKSyncAPIDelegate?
+    static let registerWithNSKeyed: Void = {
+        NSKeyedUnarchiver.setClass(BKTrackBatch.self, forClassName: "BKTrackBatch")
+        NSKeyedArchiver.setClassName("BKTrackBatch", for: BKTrackBatch.self)
+    }()
+    
+    var apiClient: BoundlessAPIClient?
     
     var desiredMaxTimeUntilSync: Int64
     var desiredMaxSizeUntilSync: Int
@@ -27,17 +32,15 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding {
             let arrayValues = NSKeyedUnarchiver.unarchiveObject(with: arrayData) as? [BKAction] else {
                 return nil
         }
-        let desiredMaxTimeUntilSync = aDecoder.decodeInt64(forKey: "desiredMaxTimeUntilSync")
-        let desiredMaxSizeUntilSync = aDecoder.decodeInteger(forKey: "desiredMaxSizeUntilSync")
-        self.init(timeUntilSync: desiredMaxTimeUntilSync,
-                  sizeUntilSync: desiredMaxSizeUntilSync,
+        self.init(timeUntilSync: aDecoder.decodeInt64(forKey: "desiredMaxTimeUntilSync"),
+                  sizeUntilSync: aDecoder.decodeInteger(forKey: "desiredMaxSizeUntilSync"),
                   values: arrayValues)
     }
     
     func encode(with aCoder: NSCoder) {
-        aCoder.encode(desiredMaxSizeUntilSync, forKey: "desiredMaxSizeUntilSync")
-        aCoder.encode(desiredMaxSizeUntilSync, forKey: "desiredMaxSizeUntilSync")
         aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: values), forKey: "arrayValues")
+        aCoder.encode(desiredMaxTimeUntilSync, forKey: "desiredMaxTimeUntilSync")
+        aCoder.encode(desiredMaxSizeUntilSync, forKey: "desiredMaxSizeUntilSync")
     }
     
     func store(_ action: BKAction) {
@@ -62,7 +65,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding {
     }
     
     func sync(completion: @escaping ()->Void = {}) {
-        guard var payload = delegate?.properties.apiCredentials else {
+        guard var payload = apiClient?.properties.apiCredentials else {
             completion()
             return
         }
@@ -71,7 +74,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding {
         payload["actions"] = actions.map({ (action) -> [String: Any] in
             action.toJSONType()
         })
-        delegate?.httpClient.post(url: HTTPClient.BoundlessAPI.track.url, jsonObject: payload) { response in
+        apiClient?.post(url: BoundlessAPIEndpoint.track.url, jsonObject: payload) { response in
             if let status = response?["status"] as? Int {
                 if status == 200 {
                     self.removeFirst(actions.count)

@@ -1,5 +1,5 @@
 //
-//  BoundlessReinforcement.swift
+//  BKReinforcement.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 3/6/18.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class BoundlessReinforcement : NSObject {
+internal class BKReinforcement : NSObject, NSCoding {
     
     let name: String
     let actionID: String
@@ -27,10 +27,31 @@ internal class BoundlessReinforcement : NSObject {
         self.metadata = metadata
         self.timezoneOffset = timezoneOffset
     }
+    
+    public required convenience init?(coder aDecoder: NSCoder) {
+        guard let name = aDecoder.decodeObject(forKey: "name") as? String,
+            let actionID = aDecoder.decodeObject(forKey: "actionID") as? String,
+            let metadata = aDecoder.decodeObject(forKey: "metadata") as? [String: Any] else {
+                return nil
+        }
+        self.init(name,
+                  actionID,
+                  metadata,
+                  aDecoder.decodeInt64(forKey: "utc"),
+                  aDecoder.decodeInt64(forKey: "timezoneOffset"))
+    }
+    
+    public func encode(with aCoder: NSCoder) {
+        aCoder.encode(name, forKey: "name")
+        aCoder.encode(actionID, forKey: "actionID")
+        aCoder.encode(metadata, forKey: "metadata")
+        aCoder.encode(utc, forKey: "utc")
+        aCoder.encode(timezoneOffset, forKey: "timezoneOffset")
+    }
 }
 
 
-extension BoundlessReinforcement {
+extension BKReinforcement {
     func toJSONType() -> [String : Any] {
         var jsonObject: [String:Any] = [:]
         

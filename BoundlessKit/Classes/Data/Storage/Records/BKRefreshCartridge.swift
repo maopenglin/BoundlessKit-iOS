@@ -7,14 +7,19 @@
 
 import Foundation
 
-internal class BKRefreshCartridge : SynchronizedArray<BoundlessDecision>, NSCoding {
+internal class BKRefreshCartridge : SynchronizedArray<BKDecision>, NSCoding {
+    
+    static let registerWithNSKeyed: Void = {
+        NSKeyedUnarchiver.setClass(BKRefreshCartridge.self, forClassName: "BKRefreshCartridge")
+        NSKeyedArchiver.setClassName("BKRefreshCartridge", for: BKRefreshCartridge.self)
+    }()
     
     let expirationUTC: Int64
     var desiredMinSizeUntilSync: Int
     
     init(expirationUTC: Int64 = Int64(Date().timeIntervalSince1970),
          sizeUntilSync: Int = 2,
-         values: [BoundlessDecision] = []) {
+         values: [BKDecision] = []) {
         self.expirationUTC = expirationUTC
         self.desiredMinSizeUntilSync = sizeUntilSync
         super.init(values)
@@ -22,7 +27,7 @@ internal class BKRefreshCartridge : SynchronizedArray<BoundlessDecision>, NSCodi
     
     required convenience init?(coder aDecoder: NSCoder) {
         guard let arrayData = aDecoder.decodeObject(forKey: "arrayValues") as? Data,
-            let arrayValues = NSKeyedUnarchiver.unarchiveObject(with: arrayData) as? [BoundlessDecision] else {
+            let arrayValues = NSKeyedUnarchiver.unarchiveObject(with: arrayData) as? [BKDecision] else {
                 return nil
         }
         let expirationUTC = aDecoder.decodeInt64(forKey: "expirationUTC")
@@ -33,9 +38,9 @@ internal class BKRefreshCartridge : SynchronizedArray<BoundlessDecision>, NSCodi
     }
     
     func encode(with aCoder: NSCoder) {
+        aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: values), forKey: "arrayValues")
         aCoder.encode(expirationUTC, forKey: "expirationUTC")
         aCoder.encode(desiredMinSizeUntilSync, forKey: "desiredMinSizeUntilSync")
-        aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: values), forKey: "arrayValues")
     }
     
     var needsSync: Bool {

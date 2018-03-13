@@ -25,7 +25,7 @@
 //        
 //        let oracle = ActionOracle.init(actionID, [])
 //        
-//        XCTAssert(oracle.reinforce().name == BoundlessDecision.neutral(for: actionID).name)
+//        XCTAssert(oracle.reinforce().name == BKDecision.neutral(for: actionID).name)
 //        sleep(1)
 //    }
 //    

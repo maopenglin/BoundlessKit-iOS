@@ -30,12 +30,6 @@ extension SynchronizedDictionary {
         queue.sync { result = self.dict.flatMap(transform) }
         return result
     }
-    
-    func copy() -> [Key: Value] {
-        var copy = [Key: Value]()
-        queue.sync { copy = self.dict }
-        return copy
-    }
 }
 
 // MARK: - Mutable
@@ -92,4 +86,11 @@ extension SynchronizedDictionary {
         }
         return values
     }
+    
+    var valuesForKeys: [Key: Value] {
+        var copy = [Key: Value]()
+        queue.sync { copy = self.dict }
+        return copy
+    }
+    
 }

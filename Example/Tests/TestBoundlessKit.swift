@@ -23,7 +23,7 @@
 //    func testTrack() {
 //        let actionID = "testTrack1"
 //        
-//        let kit = BoundlessKit.init()
+//        let kit = BoundlessKit()
 //        kit.track(actionID: actionID)
 //        
 //        sleep(1)
@@ -31,4 +31,4 @@
 //    }
 //    
 //}
-
+//

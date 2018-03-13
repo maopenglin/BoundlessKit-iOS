@@ -203,14 +203,18 @@ extension SynchronizedArray {
     func removeFirst(_ n: Int, completion: (() -> Void)? = nil) {
         queue.async(flags: .barrier) {
             self.array.removeFirst(n)
-            completion?()
+            DispatchQueue.main.async {
+                completion?()
+            }
         }
     }
     
     func removeFirst(completion: ((Element?) -> Void)? = nil) {
         queue.async(flags: .barrier) {
             let value = self.array.removeFirst()
-            completion?(value)
+            DispatchQueue.main.async {
+                completion?(value)
+            }
         }
     }
     

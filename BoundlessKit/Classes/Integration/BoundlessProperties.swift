@@ -60,9 +60,12 @@ internal struct BoundlessProperties {
 
 extension BoundlessProperties {
     static var fromFile: BoundlessProperties? {
-        let propertiesFile = Bundle.main.path(forResource: "BoundlessProperties", ofType: "plist")!
-        let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as! [String: Any]
-        return BoundlessProperties.convert(from: propertiesDictionary)
+        if let propertiesFile = Bundle.main.path(forResource: "BoundlessProperties", ofType: "plist"),
+            let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as? [String: Any] {
+            return BoundlessProperties.convert(from: propertiesDictionary)
+        } else {
+            return nil
+        }
     }
     
     static func convert(from propertiesDictionary: [String: Any]) -> BoundlessProperties? {

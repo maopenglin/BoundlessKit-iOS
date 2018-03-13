@@ -1,5 +1,5 @@
 //
-//  UserDefaults+Extensions.swift
+//  BKDatabase.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 3/8/18.
@@ -12,7 +12,22 @@ protocol BKDatabase {
     func unarchive<T: NSCoding>(_ key: String) -> T?
 }
 
-extension UserDefaults : BKDatabase {
+class BKUserDefaults : UserDefaults, BKDatabase {
+    
+    override class var standard: BKUserDefaults {
+        get {
+            return BKUserDefaults.init(suiteName: "boundless.kit")!
+        }
+    }
+    
+    override init?(suiteName suitename: String?) {
+        BKTrackBatch.registerWithNSKeyed
+        BKReportBatch.registerWithNSKeyed
+        BKRefreshCartridge.registerWithNSKeyed
+        BKRefreshCartridgeContainer.registerWithNSKeyed
+        super.init(suiteName: suitename)
+    }
+    
     func archive<T: NSCoding>(_ value: T?, forKey key: String) {
         if let value = value {
             self.set(NSKeyedArchiver.archivedData(withRootObject: value), forKey: key)
@@ -29,6 +44,7 @@ extension UserDefaults : BKDatabase {
             return nil
         }
     }
+    
 }
 
 

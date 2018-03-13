@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class BKAction : NSObject {
+public class BKAction : NSObject, NSCoding {
     
     let name: String
     var metadata: [String: Any]
@@ -24,15 +24,22 @@ public class BKAction : NSObject {
         self.timezoneOffset = timezoneOffset
     }
     
-    
     public required convenience init?(coder aDecoder: NSCoder) {
-        return nil
+        guard let name = aDecoder.decodeObject(forKey: "name") as? String,
+            let metadata = aDecoder.decodeObject(forKey: "metadata") as? [String: Any] else {
+                return nil
+        }
+        self.init(name,
+                  metadata,
+                  aDecoder.decodeInt64(forKey: "utc"),
+                  aDecoder.decodeInt64(forKey: "timezoneOffset"))
     }
-}
-
-extension BKAction : NSCoding {
+    
     public func encode(with aCoder: NSCoder) {
-        
+        aCoder.encode(name, forKey: "name")
+        aCoder.encode(metadata, forKey: "metadata")
+        aCoder.encode(utc, forKey: "utc")
+        aCoder.encode(timezoneOffset, forKey: "timezoneOffset")
     }
 }
 
