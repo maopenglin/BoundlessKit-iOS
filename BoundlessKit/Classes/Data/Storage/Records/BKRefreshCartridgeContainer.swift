@@ -1,5 +1,5 @@
 //
-//  BKRefreshCartridges.swift
+//  BKRefreshCartridgeContainer.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 3/12/18.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class BKRefreshCartridges : SynchronizedDictionary<String, BKRefreshCartridge>, NSCoding {
+internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRefreshCartridge>, NSCoding {
     
     var delegate: BKSyncAPIDelegate?
     
@@ -29,11 +29,14 @@ internal class BKRefreshCartridges : SynchronizedDictionary<String, BKRefreshCar
         }
         self[actionID]?.removeFirst(completion: { (decision) in
             completion(decision ?? BoundlessDecision.neutral(for: actionID))
+            if self[actionID]?.needsSync ?? false {
+                self.sync(for: actionID)
+            }
         })
     }
 }
 
-extension BKRefreshCartridges {
+extension BKRefreshCartridgeContainer {
     func sync(for actionID: String, completion: @escaping ()->Void = {}) {
         guard var payload = delegate?.properties.apiCredentials else {
             completion()

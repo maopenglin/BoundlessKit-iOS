@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class SynchronizedArray<Element> {
+internal class SynchronizedArray<Element> : NSObject {
     internal let queue = DispatchQueue(label: "SynchronizedArray", attributes: .concurrent)
     fileprivate var array: [Element]
     

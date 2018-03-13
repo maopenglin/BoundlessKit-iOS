@@ -27,7 +27,7 @@ public class BoundlessKit : NSObject {
     
     var trackedActions: BKTrackBatch
     var reportedActions: BKReportBatch
-    var cartridgeReinforcements: BKRefreshCartridges
+    var cartridgeReinforcements: BKRefreshCartridgeContainer
     
     init(properties: BoundlessProperties = BoundlessProperties.fromFile!,
          database: BKDatabase = UserDefaults.init(suiteName: "boundless.kit.database")!,
@@ -37,7 +37,7 @@ public class BoundlessKit : NSObject {
         self.delegate = delegate
         self.trackedActions = BKTrackBatch()
         self.reportedActions = BKReportBatch()
-        self.cartridgeReinforcements = BKRefreshCartridges()
+        self.cartridgeReinforcements = BKRefreshCartridgeContainer()
         super.init()
         self.trackedActions.delegate = self
         self.reportedActions.delegate = self
