@@ -17,9 +17,20 @@ import Foundation
 
 public class BoundlessKit : NSObject {
     
-//    let delegate: BoundlessKitDelegateProtocol
+    internal static var _standard: BoundlessKit?
+    public class var standard: BoundlessKit {
+        if let _ = _standard {
+            return _standard!
+        }
+        guard let properties = BoundlessProperties.fromFile else {
+            fatalError("Missing <BoundlessProperties.plist> file")
+        }
+        _standard = BoundlessKit.init(apiClient: BoundlessAPIClient.init(properties: properties),
+                                      database: BKUserDefaults.standard)
+        return _standard!
+    }
     
-    let database: BKDatabase
+    
     var apiClient: BoundlessAPIClient {
         didSet {
             apiClient.trackBatch = trackBatch
@@ -27,13 +38,13 @@ public class BoundlessKit : NSObject {
             apiClient.refreshContainer = refreshContainer
         }
     }
+    let database: BKDatabase
     
     var trackBatch: BKTrackBatch
     var reportBatch: BKReportBatch
     var refreshContainer: BKRefreshCartridgeContainer
     
-    init(apiClient: BoundlessAPIClient = BoundlessAPIClient.init(properties: BoundlessProperties.fromFile!),
-         database: BKDatabase = BKUserDefaults.standard) {
+    init(apiClient: BoundlessAPIClient, database: BKDatabase) {
         self.apiClient = apiClient
         self.database = database
         self.trackBatch = database.unarchive("trackBatch") ?? BKTrackBatch()

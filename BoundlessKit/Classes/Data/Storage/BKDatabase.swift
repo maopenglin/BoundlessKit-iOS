@@ -49,6 +49,16 @@ class BKUserDefaults : UserDefaults, BKDatabase {
         }
     }
     
+    open var initialBootDate: Date? {
+        get {
+            let date = object(forKey: "initialBootDate") as? Date
+            if date == nil {
+                set(Date(), forKey: "initialBootDate")
+            }
+            return date
+        }
+    }
+    
 }
 
 

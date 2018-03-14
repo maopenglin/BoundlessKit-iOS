@@ -118,11 +118,15 @@ fileprivate class InstanceSelectorNotifier : NSObject {
     }
     
     func removeObserver() {
+        guard numberOfObservers > 0 else {
+            return
+        }
         numberOfObservers -= 1
         if numberOfObservers == 0 {
             instanceSelector.swizzle(with: notificationSelector)
         }
     }
+    
 }
 
 extension InstanceSelector {

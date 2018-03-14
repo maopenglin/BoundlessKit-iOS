@@ -113,6 +113,48 @@ extension BoundlessConfiguration {
                   applicationViews: unarchiver.decodeBool(forKey: "applicationViews"),
                   customViews: customViews,
                   customEvents: customEvents,
-                  consoleLoggingEnabled: unarchiver.decodeBool(forKey: "consoleLoggingEnabled"))
+                  consoleLoggingEnabled: unarchiver.decodeBool(forKey: "consoleLoggingEnabled")
+        )
+    }
+}
+
+extension BoundlessConfiguration {
+    static func convert(from dict: [String: Any]) -> BoundlessConfiguration? {
+        guard let configID = dict["configID"] as? String? else { print("Bad parameter"); return nil }
+        guard let reinforcementEnabled = dict["reinforcementEnabled"] as? Bool else { print("Bad parameter"); return nil }
+        guard let triggerEnabled = dict["triggerEnabled"] as? Bool else { print("Bad parameter"); return nil }
+        guard let trackingEnabled = dict["trackingEnabled"] as? Bool else { print("Bad parameter"); return nil }
+        guard let trackingCapabilities = dict["trackingCapabilities"] as? [String: Any] else { print("Bad parameter"); return nil }
+        guard let applicationState = trackingCapabilities["applicationState"] as? Bool else { print("Bad parameter"); return nil }
+        guard let applicationViews = trackingCapabilities["applicationViews"] as? Bool else { print("Bad parameter"); return nil }
+        guard let customViews = trackingCapabilities["customViews"] as? [String: Any] else { print("Bad parameter"); return nil }
+        guard let customEvents = trackingCapabilities["customEvents"] as? [String: Any] else { print("Bad parameter"); return nil }
+        guard let notificationObservations = trackingCapabilities["notificationObservations"] as? Bool else { print("Bad parameter"); return nil }
+        guard let storekitObservations = trackingCapabilities["storekitObservations"] as? Bool else { print("Bad parameter"); return nil }
+        guard let locationObservations = trackingCapabilities["locationObservations"] as? Bool else { print("Bad parameter"); return nil }
+        guard let batchSize = dict["batchSize"] as? [String: Any] else { print("Bad parameter"); return nil }
+        guard let trackBatchSize = batchSize["track"] as? Int else { print("Bad parameter"); return nil }
+        guard let reportBatchSize = batchSize["report"] as? Int else { print("Bad parameter"); return nil }
+        guard let integrationMethod = dict["integrationMethod"] as? String else { print("Bad parameter"); return nil }
+        guard let advertiserID = dict["advertiserID"] as? Bool else { print("Bad parameter"); return nil }
+        guard let consoleLoggingEnabled = dict["consoleLoggingEnabled"] as? Bool else { print("Bad parameter"); return nil }
+        
+        return BoundlessConfiguration.init(configID: configID,
+                                           integrationMethod: integrationMethod,
+                                           reinforcementEnabled: reinforcementEnabled,
+                                           reportBatchSize: reportBatchSize,
+                                           triggerEnabled: triggerEnabled,
+                                           trackingEnabled: trackingEnabled,
+                                           trackBatchSize: trackBatchSize,
+                                           advertiserID: advertiserID,
+                                           notificationObservations: notificationObservations,
+                                           storekitObservations: storekitObservations,
+                                           locationObservations: locationObservations,
+                                           applicationState: applicationState,
+                                           applicationViews: applicationViews,
+                                           customViews: customViews,
+                                           customEvents: customEvents,
+                                           consoleLoggingEnabled: consoleLoggingEnabled
+        )
     }
 }

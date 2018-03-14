@@ -137,7 +137,7 @@ class TestBoundlessAPIObjects: XCTestCase {
     }
     
     func testSync() {
-        let kit = BoundlessKit()
+        let kit = BoundlessKit.standard
         
         let numConcurrentReports = 5
         let numConcurrentReinforcementsPerAction = 3

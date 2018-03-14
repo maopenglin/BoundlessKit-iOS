@@ -22,7 +22,8 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
         self.init(dictValues)
     }
     
-    func encode(with aCoder: NSCoder) {aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: self.valuesForKeys), forKey: "dictValues")
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: self.valuesForKeys), forKey: "dictValues")
     }
     
     func decision(forActionID actionID: String, completion: @escaping ((BKDecision)->Void)) {
@@ -32,13 +33,6 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
         self[actionID]?.removeFirst(completion: { (decision) in
             completion(decision ?? BKDecision.neutral(for: actionID))
         })
-    }
-    
-    var needsSync : Bool {
-        for cartridge in values {
-            if cartridge.needsSync { return true }
-        }
-        return false
     }
     
     func commit(actionID: String, with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
@@ -51,6 +45,13 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
         } else {
             successful(true)
         }
+    }
+    
+    var needsSync : Bool {
+        for cartridge in values {
+            if cartridge.needsSync { return true }
+        }
+        return false
     }
     
     let syncQueue = DispatchQueue(label: "boundless.kit.cartridgecontainer")
