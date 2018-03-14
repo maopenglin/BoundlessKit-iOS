@@ -20,6 +20,10 @@ class BKUserDefaults : UserDefaults, BKDatabase {
         }
     }
     
+    func removePersistentDomain() {
+        removePersistentDomain(forName: "boundless.kit")
+    }
+    
     override init?(suiteName suitename: String?) {
         BKTrackBatch.registerWithNSKeyed
         BKReportBatch.registerWithNSKeyed

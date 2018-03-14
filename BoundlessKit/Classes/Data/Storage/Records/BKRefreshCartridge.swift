@@ -14,39 +14,44 @@ internal class BKRefreshCartridge : SynchronizedArray<BKDecision>, NSCoding {
         NSKeyedArchiver.setClassName("BKRefreshCartridge", for: BKRefreshCartridge.self)
     }()
     
-    let expirationUTC: Int64
-    var desiredMinSizeUntilSync: Int
+    let actionID: String
+    var expirationUTC: Int64
+    var desiredMinCountUntilSync: Int
     
-    init(expirationUTC: Int64 = Int64(Date().timeIntervalSince1970),
+    init(actionID: String,
+         expirationUTC: Int64 = Int64(Date().timeIntervalSince1970),
          sizeUntilSync: Int = 2,
          values: [BKDecision] = []) {
+        self.actionID = actionID
         self.expirationUTC = expirationUTC
-        self.desiredMinSizeUntilSync = sizeUntilSync
+        self.desiredMinCountUntilSync = sizeUntilSync
         super.init(values)
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
-        guard let arrayData = aDecoder.decodeObject(forKey: "arrayValues") as? Data,
+        guard let actionID = aDecoder.decodeObject(forKey: "actionID") as? String,
+            let arrayData = aDecoder.decodeObject(forKey: "arrayValues") as? Data,
             let arrayValues = NSKeyedUnarchiver.unarchiveObject(with: arrayData) as? [BKDecision] else {
                 return nil
         }
         let expirationUTC = aDecoder.decodeInt64(forKey: "expirationUTC")
-        let desiredMinSizeUntilSync = aDecoder.decodeInteger(forKey: "desiredMinSizeUntilSync")
-        self.init(expirationUTC: expirationUTC,
-                  sizeUntilSync: desiredMinSizeUntilSync,
+        let desiredMinCountUntilSync = aDecoder.decodeInteger(forKey: "desiredMinCountUntilSync")
+        self.init(actionID: actionID,
+                  expirationUTC: expirationUTC,
+                  sizeUntilSync: desiredMinCountUntilSync,
                   values: arrayValues)
     }
     
     func encode(with aCoder: NSCoder) {
+        aCoder.encode(actionID, forKey: "actionID")
         aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: values), forKey: "arrayValues")
         aCoder.encode(expirationUTC, forKey: "expirationUTC")
-        aCoder.encode(desiredMinSizeUntilSync, forKey: "desiredMinSizeUntilSync")
+        aCoder.encode(desiredMinCountUntilSync, forKey: "desiredMinCountUntilSync")
     }
     
     var needsSync: Bool {
-        return count <= desiredMinSizeUntilSync || Int64(1000*Date().timeIntervalSince1970) >= expirationUTC
+        return count <= desiredMinCountUntilSync || Int64(1000*Date().timeIntervalSince1970) >= expirationUTC
     }
-    
 }
 
 

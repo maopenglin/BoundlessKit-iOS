@@ -21,15 +21,17 @@ public class BoundlessKit : NSObject {
     
     let database: BKDatabase
     
+    var apiClient: BoundlessAPIClient? {
+        didSet {
+            apiClient?.trackBatch = trackBatch
+            apiClient?.reportBatch = reportBatch
+            apiClient?.refreshContainer = refreshContainer
+        }
+    }
+    
     var trackBatch: BKTrackBatch
     var reportBatch: BKReportBatch
     var refreshContainer: BKRefreshCartridgeContainer
-    
-    func set(apiClient: BoundlessAPIClient?) {
-        self.trackBatch.apiClient = apiClient
-        self.reportBatch.apiClient = apiClient
-        self.refreshContainer.apiClient = apiClient
-    }
     
     init(apiClient: BoundlessAPIClient? = BoundlessAPIClient.init(properties: BoundlessProperties.fromFile!),
          database: BKDatabase = BKUserDefaults.standard) {
@@ -37,8 +39,11 @@ public class BoundlessKit : NSObject {
         self.trackBatch = database.unarchive("trackBatch") ?? BKTrackBatch()
         self.reportBatch = database.unarchive("reportBatch") ?? BKReportBatch()
         self.refreshContainer = database.unarchive("refreshContainer") ?? BKRefreshCartridgeContainer()
+        self.apiClient = apiClient
         super.init()
-        set(apiClient: apiClient)
+        apiClient?.trackBatch = trackBatch
+        apiClient?.reportBatch = reportBatch
+        apiClient?.refreshContainer = refreshContainer
     }
     
     @objc
@@ -61,11 +66,11 @@ public class BoundlessKit : NSObject {
         }
     }
     
-    @objc
-    public func refreshReinforcements(forActionID actionID: String, completion: @escaping ()->Void = {}) {
-        refreshContainer.refresh(actionID: actionID) {
-            self.database.archive(self.refreshContainer, forKey: "refreshContainer")
-            completion()
-        }
-    }
+//    @objc
+//    public func refreshReinforcements(forActionID actionID: String, completion: @escaping ()->Void = {}) {
+//        refreshContainer.commit(forActionID: actionID) {
+//            self.database.archive(self.refreshContainer, forKey: "refreshContainer")
+//            completion()
+//        }
+//    }
 }

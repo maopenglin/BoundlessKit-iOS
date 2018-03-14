@@ -30,7 +30,7 @@ internal struct BoundlessConfiguration {
     let consoleLoggingEnabled: Bool
     
     init(configID: String? = nil,
-         integrationMethod: String = "codeless",
+         integrationMethod: String = "manual",
          reinforcementEnabled: Bool = true,
          reportBatchSize: Int = 10,
          triggerEnabled: Bool = false,

@@ -211,23 +211,30 @@ extension SynchronizedArray {
     
     func removeFirst(completion: ((Element?) -> Void)? = nil) {
         queue.async(flags: .barrier) {
-            let value = self.array.removeFirst()
+            let value: Element?
+            if let _ = self.array.first {
+                value = self.array.removeFirst()
+            } else {
+                value = nil
+            }
             DispatchQueue.main.async {
                 completion?(value)
             }
         }
     }
     
-//    /// Removes all elements from the array.
-//    ///
-//    /// - Parameter completion: The handler with the removed elements.
-//    func removeAll(completion: (([Element]) -> Void)? = nil) {
-//        queue.async(flags: .barrier) {
-//            let elements = self.array
-//            self.array.removeAll()
-//            completion?(elements)
-//        }
-//    }
+    /// Removes all elements from the array.
+    ///
+    /// - Parameter completion: The handler with the removed elements.
+    func removeAll(completion: (([Element]) -> Void)? = nil) {
+        queue.async(flags: .barrier) {
+            let elements = self.array
+            self.array.removeAll()
+            DispatchQueue.main.async {
+                completion?(elements)
+            }
+        }
+    }
 }
 
 //public extension SynchronizedArray {

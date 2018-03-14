@@ -9,6 +9,14 @@
 import Foundation
 @testable import BoundlessKit
 
+extension BKUserDefaults {
+    class var standardTest: BKUserDefaults {
+        get {
+            return BKUserDefaults.init(suiteName: "boundless.kittest")!
+        }
+    }
+}
+
 class MockBKDatabase : BKDatabase {
     
     var data = [String: Any]()

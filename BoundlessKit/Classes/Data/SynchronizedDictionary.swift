@@ -8,11 +8,17 @@
 import Foundation
 
 internal class SynchronizedDictionary<Key, Value> : NSObject where Key : Hashable {
-    fileprivate let queue = DispatchQueue(label: "SynchronizedDictionary", attributes: .concurrent)
+    internal let queue = DispatchQueue(label: "SynchronizedDictionary", attributes: .concurrent)
     fileprivate var dict = [Key:Value]()
     
     init(_ dict: [Key:Value] = [:]) {
         self.dict = dict
+    }
+    
+    var count: Int {
+        var count = 0
+        queue.sync { count = dict.count }
+        return count
     }
 }
 
@@ -25,11 +31,11 @@ extension SynchronizedDictionary {
 //        }
 //        return result
 //    }
-    func flatMap<ElementOfResult>(_ transform: (Key, Value) -> ElementOfResult?) -> [ElementOfResult] {
-        var result = [ElementOfResult]()
-        queue.sync { result = self.dict.flatMap(transform) }
-        return result
-    }
+//    func flatMap<ElementOfResult>(_ transform: (Key, Value) -> ElementOfResult?) -> [ElementOfResult] {
+//        var result = [ElementOfResult]()
+//        queue.sync { result = self.dict.flatMap(transform) }
+//        return result
+//    }
 }
 
 // MARK: - Mutable
@@ -62,28 +68,18 @@ extension SynchronizedDictionary {
 
 // MARK: - Immutable
 extension SynchronizedDictionary {
-    
-    var count: Int {
-        var count = 0
-        queue.sync {
-            count = dict.count
-        }
-        return count
-    }
-    
-    var keys: [Key] {
-        var keys: [Key] = []
-        queue.sync {
-            keys = Array(dict.keys)
-        }
-        return keys
-    }
-    
+//
+//    var keys: [Key] {
+//        var keys: [Key] = []
+//        queue.sync {
+//            keys = Array(dict.keys)
+//        }
+//        return keys
+//    }
+//    
     var values: [Value] {
         var values: [Value] = []
-        queue.sync {
-            values = Array(dict.values)
-        }
+        queue.sync { values = Array(dict.values) }
         return values
     }
     

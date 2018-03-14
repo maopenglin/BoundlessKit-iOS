@@ -14,16 +14,14 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         NSKeyedArchiver.setClassName("BKReportBatch", for: BKReportBatch.self)
     }()
     
-    var apiClient: BoundlessAPIClient?
-    
     var desiredMaxTimeUntilSync: Int64
-    var desiredMaxSizeUntilSync: Int
+    var desiredMaxCountUntilSync: Int
     
     init(timeUntilSync: Int64 = 86400000,
          sizeUntilSync: Int = 10,
          dict: [String: [BKReinforcement]] = [:]) {
         self.desiredMaxTimeUntilSync = timeUntilSync
-        self.desiredMaxSizeUntilSync = sizeUntilSync
+        self.desiredMaxCountUntilSync = sizeUntilSync
         super.init(dict.mapValues({ (reinforcements) -> SynchronizedArray<BKReinforcement> in
             return SynchronizedArray(reinforcements)
         }))
@@ -35,9 +33,9 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
                 return nil
         }
         let desiredMaxTimeUntilSync = aDecoder.decodeInt64(forKey: "desiredMaxTimeUntilSync")
-        let desiredMaxSizeUntilSync = aDecoder.decodeInteger(forKey: "desiredMaxSizeUntilSync")
+        let desiredMaxCountUntilSync = aDecoder.decodeInteger(forKey: "desiredMaxCountUntilSync")
         self.init(timeUntilSync: desiredMaxTimeUntilSync,
-                  sizeUntilSync: desiredMaxSizeUntilSync,
+                  sizeUntilSync: desiredMaxCountUntilSync,
                   dict: dictValues)
     }
     
@@ -46,7 +44,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
             return synchronizedArray.values
         })), forKey: "dictValues")
         aCoder.encode(desiredMaxTimeUntilSync, forKey: "desiredMaxTimeUntilSync")
-        aCoder.encode(desiredMaxSizeUntilSync, forKey: "desiredMaxSizeUntilSync")
+        aCoder.encode(desiredMaxCountUntilSync, forKey: "desiredMaxCountUntilSync")
     }
     
     func store(_ reinforcement: BKReinforcement) {
@@ -62,9 +60,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
     }
     
     var needsSync: Bool {
-        if values.map({ report -> Int in
-            return report.count
-        }).reduce(0, +) >= desiredMaxSizeUntilSync {
+        if count >= desiredMaxCountUntilSync {
             return true
         }
         
@@ -79,24 +75,26 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         return false
     }
     
-    func sync(completion: @escaping ()->Void = {}) {
-        guard var payload = apiClient?.properties.apiCredentials else {
-                completion()
+    func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
+        guard var payload = apiClient.properties.apiCredentials else {
+                successful(false)
                 return
         }
         
         let reportCopy = self.valuesForKeys
         payload["actions"] = reportCopy.values.flatMap({$0.values}).map({$0.toJSONType()})
-        apiClient?.post(url: BoundlessAPIEndpoint.track.url, jsonObject: payload) { response in
+        apiClient.post(url: BoundlessAPIEndpoint.track.url, jsonObject: payload) { response in
+            var success = false
+            defer { successful(success) }
             if let status = response?["status"] as? Int {
                 if status == 200 || status == 400 {
                     for (actionID, actions) in reportCopy {
                         self[actionID]?.removeFirst(actions.count)
                     }
                     print("Cleared reported actions.")
+                    success = true
                 }
             }
-            completion()
         }.start()
     }
     
@@ -121,7 +119,14 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
 //            completion()
 //        }.start()
 //    }
-    
+
+    override var count: Int {
+        var count = 0
+        queue.sync {
+            count = values.reduce(0, { $0 + $1.count})
+        }
+        return count
+    }
 }
 
 
