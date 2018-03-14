@@ -14,8 +14,6 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding, BoundlessAP
         NSKeyedArchiver.setClassName("BKTrackBatch", for: BKTrackBatch.self)
     }()
     
-    var apiClient
-    
     var desiredMaxTimeUntilSync: Int64
     var desiredMaxCountUntilSync: Int
     

@@ -10,7 +10,7 @@ import Foundation
 @testable import BoundlessKit
 
 class MockBoundlessKit : BoundlessKit {
-    override init(apiClient: BoundlessAPIClient? = MockBoundlessAPIClient(), database: BKDatabase = MockBKDatabase()) {
+    override init(apiClient: BoundlessAPIClient = MockBoundlessAPIClient(), database: BKDatabase = MockBKDatabase()) {
         super.init(apiClient: apiClient, database: database)
     }
 }

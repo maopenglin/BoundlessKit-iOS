@@ -165,12 +165,12 @@ class TestBoundlessAPIObjects: XCTestCase {
         
         let promise = expectation(description: "Synced")
         let startTime = Date()
-        kit.apiClient?.synchronize() { success in
+        kit.apiClient.synchronize() { success in
             promise.fulfill()
             print("\(Date().timeIntervalSince(startTime))")
         }
         DispatchQueue.concurrentPerform(iterations: numConcurrentReports) { actionCount in
-            kit.apiClient?.synchronize() { success in
+            kit.apiClient.synchronize() { success in
                 print("Success count:\(success)")
             }
         }
