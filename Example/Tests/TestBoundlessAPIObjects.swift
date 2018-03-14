@@ -164,7 +164,7 @@ class TestBoundlessAPIObjects: XCTestCase {
         sleep(1)
         
         let promise = expectation(description: "Synced")
-        var startTime = Date()
+        let startTime = Date()
         kit.apiClient?.synchronize() { success in
             promise.fulfill()
             print("\(Date().timeIntervalSince(startTime))")

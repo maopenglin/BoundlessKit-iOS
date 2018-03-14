@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRefreshCartridge>, NSCoding {
+internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRefreshCartridge>, NSCoding, BoundlessAPISynchronizable {
     
     static let registerWithNSKeyed: Void = {
         NSKeyedUnarchiver.setClass(BKRefreshCartridgeContainer.self, forClassName: "BKRefreshCartridgeContainer")

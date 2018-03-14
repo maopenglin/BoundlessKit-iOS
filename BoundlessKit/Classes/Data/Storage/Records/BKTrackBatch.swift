@@ -7,12 +7,14 @@
 
 import Foundation
 
-internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding {
+internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding, BoundlessAPISynchronizable {
     
     static let registerWithNSKeyed: Void = {
         NSKeyedUnarchiver.setClass(BKTrackBatch.self, forClassName: "BKTrackBatch")
         NSKeyedArchiver.setClassName("BKTrackBatch", for: BKTrackBatch.self)
     }()
+    
+    var apiClient
     
     var desiredMaxTimeUntilSync: Int64
     var desiredMaxCountUntilSync: Int

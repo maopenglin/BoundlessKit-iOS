@@ -20,6 +20,11 @@ internal enum BoundlessAPIEndpoint {
     }
 }
 
+internal protocol BoundlessAPISynchronizable {
+    var needsSync: Bool { get }
+    func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void)
+}
+
 internal class BoundlessAPIClient : HTTPClient {
     
     var properties: BoundlessProperties
@@ -28,9 +33,9 @@ internal class BoundlessAPIClient : HTTPClient {
     var coordinationWork: DispatchWorkItem?
     var coordinationWorkSuccessHandlers = [(Bool)->Void]()
     
-    var trackBatch: BKTrackBatch?
-    var reportBatch: BKReportBatch?
-    var refreshContainer: BKRefreshCartridgeContainer?
+    var trackBatch: BoundlessAPISynchronizable?
+    var reportBatch: BoundlessAPISynchronizable?
+    var refreshContainer: BoundlessAPISynchronizable?
     var timeDelayAfterTrack: UInt32 = 1
     var timeDelayAfterReport: UInt32 = 5
     var timeDelayAfterRefresh: UInt32 = 3

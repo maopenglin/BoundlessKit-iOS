@@ -20,12 +20,11 @@ public class BoundlessKit : NSObject {
 //    let delegate: BoundlessKitDelegateProtocol
     
     let database: BKDatabase
-    
-    var apiClient: BoundlessAPIClient? {
+    var apiClient: BoundlessAPIClient {
         didSet {
-            apiClient?.trackBatch = trackBatch
-            apiClient?.reportBatch = reportBatch
-            apiClient?.refreshContainer = refreshContainer
+            apiClient.trackBatch = trackBatch
+            apiClient.reportBatch = reportBatch
+            apiClient.refreshContainer = refreshContainer
         }
     }
     
@@ -33,17 +32,18 @@ public class BoundlessKit : NSObject {
     var reportBatch: BKReportBatch
     var refreshContainer: BKRefreshCartridgeContainer
     
-    init(apiClient: BoundlessAPIClient? = BoundlessAPIClient.init(properties: BoundlessProperties.fromFile!),
+    init(apiClient: BoundlessAPIClient = BoundlessAPIClient.init(properties: BoundlessProperties.fromFile!),
          database: BKDatabase = BKUserDefaults.standard) {
+        self.apiClient = apiClient
         self.database = database
         self.trackBatch = database.unarchive("trackBatch") ?? BKTrackBatch()
         self.reportBatch = database.unarchive("reportBatch") ?? BKReportBatch()
         self.refreshContainer = database.unarchive("refreshContainer") ?? BKRefreshCartridgeContainer()
         self.apiClient = apiClient
         super.init()
-        apiClient?.trackBatch = trackBatch
-        apiClient?.reportBatch = reportBatch
-        apiClient?.refreshContainer = refreshContainer
+        apiClient.trackBatch = trackBatch
+        apiClient.reportBatch = reportBatch
+        apiClient.refreshContainer = refreshContainer
     }
     
     @objc
@@ -52,6 +52,7 @@ public class BoundlessKit : NSObject {
         self.trackBatch.store(action)
         print("Tracked action <\(actionID)>")
         self.database.archive(self.trackBatch, forKey: "trackBatch")
+        self.apiClient.syncIfNeeded()
     }
     
     @objc
@@ -63,14 +64,7 @@ public class BoundlessKit : NSObject {
             self.reportBatch.store(reinforcement)
             print("Reported action <\(actionID)> with reinforcement <\(reinforcement.name)>")
             self.database.archive(self.reportBatch, forKey: "reportBatch")
+            self.apiClient.syncIfNeeded()
         }
     }
-    
-//    @objc
-//    public func refreshReinforcements(forActionID actionID: String, completion: @escaping ()->Void = {}) {
-//        refreshContainer.commit(forActionID: actionID) {
-//            self.database.archive(self.refreshContainer, forKey: "refreshContainer")
-//            completion()
-//        }
-//    }
 }

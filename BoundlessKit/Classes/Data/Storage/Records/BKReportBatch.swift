@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<BKReinforcement>>, NSCoding {
+internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<BKReinforcement>>, NSCoding, BoundlessAPISynchronizable {
     
     static let registerWithNSKeyed: Void = {
         NSKeyedUnarchiver.setClass(BKReportBatch.self, forClassName: "BKReportBatch")
