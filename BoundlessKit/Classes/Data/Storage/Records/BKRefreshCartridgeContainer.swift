@@ -57,6 +57,11 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
     let syncQueue = DispatchQueue(label: "boundless.kit.cartridgecontainer")
     func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
         syncQueue.async {
+            for actionID in apiClient.properties.version.mappings.keys {
+                if self[actionID] == nil {
+                    self[actionID] = BKRefreshCartridge(actionID: actionID)
+                }
+            }
             let group = DispatchGroup()
             var completeSuccess = true
             for cartridge in self.values where cartridge.needsSync {

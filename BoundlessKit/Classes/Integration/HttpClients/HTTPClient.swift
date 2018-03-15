@@ -1,6 +1,6 @@
 //
 //  HTTPClient.swift
-//  DopamineKit
+//  BoundlessKit
 //
 //  Created by Akash Desai on 2/21/18.
 //

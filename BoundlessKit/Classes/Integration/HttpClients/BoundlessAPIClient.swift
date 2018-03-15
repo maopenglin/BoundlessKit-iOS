@@ -27,7 +27,11 @@ internal protocol BoundlessAPISynchronizable {
 
 internal class BoundlessAPIClient : HTTPClient {
     
-    var properties: BoundlessProperties
+    var properties: BoundlessProperties {
+        didSet {
+            syncIfNeeded()
+        }
+    }
     
     let coordinationQueue = DispatchQueue(label: "boundless.kit.api")
     var coordinationWork: DispatchWorkItem?

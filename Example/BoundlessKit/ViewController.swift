@@ -16,6 +16,7 @@ class ViewController: UIViewController {
 //    let kit = BoundlessKit()
     
     @objc func action1Performed(){
+        print("Selector name:\(NSStringFromClass(ViewController.self))")
 //        kit.launch(arguements: Helper.versionMappings)
         // Reinforce the action to make it sticky!!
         //        BoundlessKit.reinforce("a1", metaData: ["key":"value"], completion: {

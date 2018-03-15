@@ -122,77 +122,53 @@ internal class CodelessAPIClient : HTTPClient {
         guard var payload = properties.apiCredentials else {
             return
         }
-
         payload["deviceName"] = UIDevice.current.name
 
         post(url: CodelessAPIEndpoint.identify.url, jsonObject: payload) { response in
-            if let response = response,
-                let status = response["status"] as? Int {
-                switch status {
-                case 202:
-                    DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
-                        self.promptPairing()
-                    }
-                    break
-                    
-                case 200:
-                    if let adminName = response["adminName"] as? String,
-                        let connectionUUID = response["connectionUUID"] as? String {
-                        
-                        let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
-                        pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
-                            guard var payload = self.properties.apiCredentials else {
-                                return
-                            }
-                            payload["deviceName"] = UIDevice.current.name
-                            payload["connectionUUID"] = connectionUUID
-                            self.post(url: CodelessAPIEndpoint.accept.url, jsonObject: payload) { response in
-                                if response?["status"] as? Int == 200 {
-                                    self.visualizerSession = CodelssVisualizerSession(adminName: adminName, connectionUUID: connectionUUID, mappings: [:])
-                                }
-                            }.start()
-                        }))
-                        
-                        pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
-                            //                            CodelessIntegrationController.shared.connectionInfo = nil
-                        }))
-                        
-                        UIWindow.presentTopLevelAlert(alertController: pairingAlert)
-                    } else {
-                        //                        CodelessIntegrationController.shared.connectionInfo = nil
-                    }
-                    
-                case 208:
-                    if let connectionID = response["connectionUUID"] as? String {
-                        //                        CodelessIntegrationController.shared.connectionInfo = ("reconnected", connectionID)
-                    }
-                    
-                case 204:
-                    //                    CodelessIntegrationController.shared.connectionInfo = nil
-                    break
-                case 500:
-                    //                    CodelessIntegrationController.shared.connectionInfo = nil
-                    break
-                    
-                default:
-                    break
+            switch response?["status"] as? Int ?? nil {
+            case 202?:
+                DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+                    self.promptPairing()
                 }
+                break
+                
+            case 200?:
+                guard let adminName = response?["adminName"] as? String,
+                    let connectionUUID = response?["connectionUUID"] as? String else {
+                        self.visualizerSession = nil
+                        return
+                }
+                
+                let pairingAlert = UIAlertController(title: "Visualizer Pairing", message: "Accept pairing request from \(adminName)?", preferredStyle: UIAlertControllerStyle.alert)
+                pairingAlert.addAction( UIAlertAction( title: "Yes", style: .default, handler: { _ in
+                    payload["connectionUUID"] = connectionUUID
+                    self.post(url: CodelessAPIEndpoint.accept.url, jsonObject: payload) { response in
+                        if response?["status"] as? Int == 200 {
+                            self.visualizerSession = CodelssVisualizerSession(adminName: adminName, connectionUUID: connectionUUID, mappings: [:])
+                        } else {
+                            self.visualizerSession = nil
+                        }
+                    }.start()
+                }))
+                pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
+                    self.visualizerSession = nil
+                }))
+                UIWindow.presentTopLevelAlert(alertController: pairingAlert)
+                
+            case 208?:
+                if let connectionUUID = response?["connectionUUID"] as? String {
+                    self.visualizerSession = CodelssVisualizerSession(adminName: "reconnected", connectionUUID: connectionUUID, mappings: [:])
+                } else {
+                    self.visualizerSession = nil
+                }
+                
+            default:
+                self.visualizerSession = nil
+                break
             }
         }.start()
     }
     
     
-}
-
-internal extension UIWindow {
-    static func presentTopLevelAlert(alertController:UIAlertController, completion:(() -> Void)? = nil) {
-        DispatchQueue.main.async {
-            let alertWindow = UIWindow(frame: UIScreen.main.bounds)
-            alertWindow.rootViewController = UIViewController()
-            alertWindow.windowLevel = UIWindowLevelAlert + 1;
-            alertWindow.makeKeyAndVisible()
-            alertWindow.rootViewController?.present(alertController, animated: true, completion: completion)
-        }
-    }
 }
 
