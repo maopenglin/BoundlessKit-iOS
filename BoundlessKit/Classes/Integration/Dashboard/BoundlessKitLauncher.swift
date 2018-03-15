@@ -1,5 +1,5 @@
 //
-//  DashboardClient.swift
+//  BoundlessKitLauncher.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 3/7/18.
@@ -7,44 +7,48 @@
 
 import Foundation
 
-class DashboardClient : NSObject {
+public class BoundlessKitLauncherObjc : NSObject {
+    @objc
+    public static var launch: Bool = {
+        let launcher = BoundlessKitLauncher()
+        BoundlessKit.standard.launcher = launcher
+        return true
+    }()
+}
+
+class BoundlessKitLauncher : NSObject {
     
     var apiClient: CodelessAPIClient
-    var dashboardSession: CodelessDashboardSession?
     let database = BKUserDefaults.standard
     
     var codelessReinforcers = [String: CodelessReinforcer]()
     
     override init() {
         let boundlessProperties: BoundlessProperties
-        let boundlessVersion: BoundlessVersion
         let boundlessConfig: BoundlessConfiguration
-        var visualizerConnection: CodelessDashboardSession?
+        let session: CodelssVisualizerSession?
         
-        if let versionData = database.object(forKey: "codelessversion") as? Data,
+        if let versionData = database.object(forKey: "codelessVersion") as? Data,
             let version = BoundlessVersion(data: versionData) {
-            BoundlessKit.standard.apiClient.properties.versionID = version.versionID
-            boundlessVersion = version
-        } else {
-            let versionID = BoundlessKit.standard.apiClient.properties.versionID
-            boundlessVersion = BoundlessVersion(versionID)
+            BoundlessKit.standard.apiClient.properties.version = version
         }
-        if let configData = database.object(forKey: "codelessconfig") as? Data,
+        boundlessProperties = BoundlessKit.standard.apiClient.properties
+        if let configData = database.object(forKey: "codelessConfig") as? Data,
             let config = BoundlessConfiguration.init(data: configData) {
             boundlessConfig = config
         } else {
             boundlessConfig = BoundlessConfiguration()
         }
-        if let savedConnection: CodelessDashboardSession = database.unarchive("visualizerconnection") {
-            visualizerConnection = savedConnection
+        if let sessionData = database.object(forKey: "codelssSession") as? Data,
+            let savedSession = CodelssVisualizerSession(data: sessionData) {
+            session = savedSession
+        } else {
+            session = nil
         }
-        boundlessProperties = BoundlessKit.standard.apiClient.properties
         
         self.apiClient = CodelessAPIClient.init(properties: boundlessProperties,
-                                                boundlessVersion: boundlessVersion,
                                                 boundlessConfig: boundlessConfig,
-                                                visualizerConnection: visualizerConnection)
-        self.dashboardSession = visualizerConnection
+                                                visualizerSession: session)
         super.init()
         
         loadVersion()
@@ -54,7 +58,11 @@ class DashboardClient : NSObject {
     }
     
     func loadVersion() {
-        for (actionID, value) in apiClient.boundlessVersion.mappings {
+        var mappings = apiClient.properties.version.mappings
+        for (actionID, value) in apiClient.visualizerSession?.mappings ?? [:] {
+            mappings[actionID] = value
+        }
+        for (actionID, value) in mappings {
             BoundlessKit.standard.refreshContainer.commit(actionID: actionID, with: BoundlessKit.standard.apiClient)
             if let codeless = value["codeless"] as? [String: Any],
                 let reinforcements = codeless["reinforcements"] as? [[String: Any]] {

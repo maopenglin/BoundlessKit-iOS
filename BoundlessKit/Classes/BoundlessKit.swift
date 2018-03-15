@@ -17,7 +17,7 @@ import Foundation
 
 public class BoundlessKit : NSObject {
     
-    internal static var _standard: BoundlessKit?
+    fileprivate static var _standard: BoundlessKit?
     public class var standard: BoundlessKit {
         if let _ = _standard {
             return _standard!
@@ -31,18 +31,19 @@ public class BoundlessKit : NSObject {
     }
     
     
-    var apiClient: BoundlessAPIClient {
+    internal var launcher: BoundlessKitLauncher?
+    internal var apiClient: BoundlessAPIClient {
         didSet {
             apiClient.trackBatch = trackBatch
             apiClient.reportBatch = reportBatch
             apiClient.refreshContainer = refreshContainer
         }
     }
-    let database: BKDatabase
+    internal let database: BKDatabase
     
-    var trackBatch: BKTrackBatch
-    var reportBatch: BKReportBatch
-    var refreshContainer: BKRefreshCartridgeContainer
+    internal var trackBatch: BKTrackBatch
+    internal var reportBatch: BKReportBatch
+    internal var refreshContainer: BKRefreshCartridgeContainer
     
     init(apiClient: BoundlessAPIClient, database: BKDatabase) {
         self.apiClient = apiClient

@@ -16,14 +16,14 @@ internal struct BoundlessProperties {
     
     let appID: String
     let inProduction: Bool
-    var versionID: String?
+    var version: BoundlessVersion
     let developmentSecret: String
     let productionSecret: String
     private let primaryIdentity:String
     
-    init(_ primaryIdentity: String? = nil, _ appID: String, _ versionID: String?, _ inProduction: Bool, _ developmentSecret: String, _ productionSecret: String) {
+    init(_ primaryIdentity: String? = nil, _ appID: String, _ version: BoundlessVersion, _ inProduction: Bool, _ developmentSecret: String, _ productionSecret: String) {
         self.appID = appID
-        self.versionID = versionID
+        self.version = version
         self.inProduction = inProduction
         self.developmentSecret = developmentSecret
         self.productionSecret = productionSecret
@@ -40,7 +40,7 @@ internal struct BoundlessProperties {
     
     var apiCredentials: [String: Any]? {
         get {
-            guard let versionID = versionID else {
+            guard let versionID = version.versionID else {
                 return nil
             }
             return [ "clientOS": clientOS,
@@ -50,6 +50,22 @@ internal struct BoundlessProperties {
                      "primaryIdentity": primaryIdentity,
                      "appID": appID,
                      "versionID": versionID,
+                     "secret": inProduction ? productionSecret : developmentSecret,
+                     "utc": NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000),
+                     "timezoneOffset": NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+            ]
+        }
+    }
+    
+    var bootCredentials: [String: Any] {
+        get {
+            return [ "clientOS": clientOS,
+                     "clientOSVersion": clientOSVersion,
+                     "clientSDKVersion": clientSDKVersion,
+                     "clientBuild": clientBuild,
+                     "primaryIdentity": primaryIdentity,
+                     "appID": appID,
+                     "versionID": version.versionID ?? "nil",
                      "secret": inProduction ? productionSecret : developmentSecret,
                      "utc": NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000),
                      "timezoneOffset": NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
@@ -77,7 +93,7 @@ extension BoundlessProperties {
         return BoundlessProperties.init(
             propertiesDictionary["primaryIdentity"] as? String,
             appID,
-            propertiesDictionary["versionID"] as? String,
+            BoundlessVersion.init(propertiesDictionary["versionID"] as? String, [:]),
             inProduction,
             developmentSecret,
             productionSecret
