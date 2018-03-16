@@ -136,7 +136,7 @@ class TestBoundlessAPIObjects: XCTestCase {
         waitForExpectations(timeout: 3)
     }
     
-    func testSync() {
+    func longtestSync() {
         let kit = BoundlessKit.standard
         
         let numConcurrentReports = 5

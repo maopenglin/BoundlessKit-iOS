@@ -55,6 +55,20 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
             }
         }
     }
+    
+    public func removeAllObservers(name aName: NSNotification.Name?) {
+        if let aName = aName {
+            for observer in notifiers[aName]?.removeAllObservers() ?? [] {
+                super.removeObserver(observer, name: aName, object: nil)
+            }
+        } else {
+            for (notification, notifier) in notifiers {
+                for observer in notifier.removeAllObservers() {
+                    super.removeObserver(observer, name: notification, object: nil)
+                }
+            }
+        }
+    }
 }
 
 extension InstanceSelectorNotificationCenter {
@@ -79,7 +93,6 @@ extension InstanceSelectorNotificationCenter {
         return InstanceSelector.init(UIViewController.self, #selector(UIViewController.viewDidAppear(_:)))!.notification
     }()
 }
-
 
 fileprivate class InstanceSelectorNotifier : NSObject {
     
@@ -113,6 +126,15 @@ fileprivate class InstanceSelectorNotifier : NSObject {
         }
     }
     
+    func removeAllObservers() -> [AnyObject] {
+        if observers.count != 0 {
+            instanceSelector.swizzle(with: notificationSelector)
+        }
+        let oldObservers = observers.flatMap({$0.value})
+        observers = []
+        return oldObservers
+    }
+    
     static var postInstanceSelectorNotificationBlock: SelectorTrampolineBlock { return { target, selector, sender in
         guard let targetInstance = target as? NSObject,
             let targetSelector = selector,
@@ -126,7 +148,6 @@ fileprivate class InstanceSelectorNotifier : NSObject {
         }
     }
 }
-
 
 fileprivate struct InstanceSelector {
     let classType: AnyClass
@@ -166,3 +187,9 @@ fileprivate struct InstanceSelector {
     }
 }
 
+fileprivate struct WeakObject {
+    weak var value: AnyObject?
+    init (value: AnyObject) {
+        self.value = value
+    }
+}

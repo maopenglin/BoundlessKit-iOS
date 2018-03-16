@@ -16,6 +16,7 @@ class TestInstanceSelectorNotification: XCTestCase {
     }
     
     override func tearDown() {
+        InstanceSelectorNotificationCenter.default.removeAllObservers(name: nil)
         super.tearDown()
     }
     
