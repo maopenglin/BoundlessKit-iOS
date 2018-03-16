@@ -7,9 +7,10 @@
 
 import Foundation
 
+protocol BKData : NSCoding {}
 protocol BKDatabase {
-    func archive<T: NSCoding>(_ value: T?, forKey key: String)
-    func unarchive<T: NSCoding>(_ key: String) -> T?
+    func archive<T: BKData>(_ value: T?, forKey key: String)
+    func unarchive<T: BKData>(_ key: String) -> T?
 }
 
 class BKUserDefaults : UserDefaults, BKDatabase {
@@ -32,7 +33,7 @@ class BKUserDefaults : UserDefaults, BKDatabase {
         super.init(suiteName: suitename)
     }
     
-    func archive<T: NSCoding>(_ value: T?, forKey key: String) {
+    func archive<T: BKData>(_ value: T?, forKey key: String) {
         if let value = value {
             self.set(NSKeyedArchiver.archivedData(withRootObject: value), forKey: key)
         } else {
@@ -40,7 +41,7 @@ class BKUserDefaults : UserDefaults, BKDatabase {
         }
     }
     
-    func unarchive<T: NSCoding>(_ key: String) -> T? {
+    func unarchive<T: BKData>(_ key: String) -> T? {
         if let data = self.object(forKey: key) as? Data,
             let t = NSKeyedUnarchiver.unarchiveObject(with: data) as? T {
             return t

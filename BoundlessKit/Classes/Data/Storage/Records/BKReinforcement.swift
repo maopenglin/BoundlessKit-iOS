@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class BKReinforcement : NSObject, NSCoding {
+internal class BKReinforcement : NSObject, BKData {
     
     let name: String
     let actionID: String
@@ -15,6 +15,10 @@ internal class BKReinforcement : NSObject, NSCoding {
     let utc:Int64
     let timezoneOffset:Int64
     
+    convenience init(_ decision: BKDecision,
+                     _ metadata: [String: Any] = [:]) {
+        self.init(decision.name, decision.actionID, metadata)
+    }
     
     init(_ name: String,
          _ actionID: String,
@@ -23,8 +27,8 @@ internal class BKReinforcement : NSObject, NSCoding {
          _ timezoneOffset: Int64 = Int64( 1000*NSTimeZone.default.secondsFromGMT() )) {
         self.name = name
         self.actionID = actionID
-        self.utc = utc
         self.metadata = metadata
+        self.utc = utc
         self.timezoneOffset = timezoneOffset
     }
     

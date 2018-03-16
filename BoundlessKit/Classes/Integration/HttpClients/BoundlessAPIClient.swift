@@ -20,7 +20,7 @@ internal enum BoundlessAPIEndpoint {
     }
 }
 
-internal protocol BoundlessAPISynchronizable {
+internal protocol BoundlessAPISynchronizable: class {
     var needsSync: Bool { get }
     func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void)
 }
@@ -35,11 +35,10 @@ internal class BoundlessAPIClient : HTTPClient {
     
     let coordinationQueue = DispatchQueue(label: "boundless.kit.api")
     var coordinationWork: DispatchWorkItem?
-    var coordinationWorkSuccessHandlers = [(Bool)->Void]()
     
-    var trackBatch: BoundlessAPISynchronizable?
-    var reportBatch: BoundlessAPISynchronizable?
-    var refreshContainer: BoundlessAPISynchronizable?
+    weak var trackBatch: BoundlessAPISynchronizable?
+    weak var reportBatch: BoundlessAPISynchronizable?
+    weak var refreshContainer: BoundlessAPISynchronizable?
     var timeDelayAfterTrack: UInt32 = 1
     var timeDelayAfterReport: UInt32 = 5
     var timeDelayAfterRefresh: UInt32 = 3
@@ -49,28 +48,22 @@ internal class BoundlessAPIClient : HTTPClient {
         super.init(session: session)
     }
     
-    func syncIfNeeded(successful: @escaping (Bool)->Void = {_ in}) {
-        if coordinationWork != nil {
-            coordinationWorkSuccessHandlers.append(successful)
-        } else if refreshContainer?.needsSync ?? false || reportBatch?.needsSync ?? false || trackBatch?.needsSync ?? false {
-            synchronize(successful: successful)
-        } else {
-            successful(true)
+    func syncIfNeeded() {
+        if coordinationWork != nil,
+            refreshContainer?.needsSync ?? false || reportBatch?.needsSync ?? false || trackBatch?.needsSync ?? false {
+            synchronize()
         }
     }
     
     func synchronize(successful: @escaping (Bool)->Void = {_ in}) {
-        coordinationWorkSuccessHandlers.append(successful)
         guard coordinationWork == nil else {
+            successful(false)
             return
         }
         let work = DispatchWorkItem() {
             var goodProgress = true
             defer {
-                for handler in self.coordinationWorkSuccessHandlers {
-                    handler(goodProgress)
-                }
-                self.coordinationWorkSuccessHandlers.removeAll()
+                successful(goodProgress)
             }
             
             let sema = DispatchSemaphore(value: 0)

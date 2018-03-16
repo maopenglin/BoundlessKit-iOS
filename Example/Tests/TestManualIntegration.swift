@@ -13,7 +13,8 @@ class TestManualIntegration: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        
+        BKUserDefaults.standard.removePersistentDomain()
+        BKUserDefaults.standardTest.removePersistentDomain()
     }
     
     override func tearDown() {

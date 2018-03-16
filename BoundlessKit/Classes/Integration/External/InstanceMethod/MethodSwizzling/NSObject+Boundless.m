@@ -11,9 +11,10 @@
 
 @implementation BoundlessObject
 
-+ (SEL) createNotificationMethodFor :(Class) targetClass :(SEL) targetSelector :(SEL) newSelector {
-    if (class_getInstanceMethod(targetClass, newSelector)) {
-        return newSelector;
++ (SEL) createNotificationMethodForClass:(Class)targetClass selector:(SEL)targetSelector {
+    SEL notificationSelector = NSSelectorFromString([NSString stringWithFormat:@"notifyBefore__%@", NSStringFromSelector(targetSelector)]);
+    if (class_getInstanceMethod(targetClass, notificationSelector)) {
+        return notificationSelector;
     }
     
     Method originalMethod = class_getInstanceMethod(targetClass, targetSelector);
@@ -26,21 +27,21 @@
     IMP dynamicImp;
     void (^postNotificationBlock)(id target, id sender) = ^void(id target, id sender) {
 //        NSLog(@"In dynamic imp with class:%@ and selector:%@ and originalSelector:%@", NSStringFromClass([target class]), NSStringFromSelector(newSelector), NSStringFromSelector(originalSelector));
-        [InstanceSelectorNotificationCenter postWithInstance:target selector:targetSelector parameter:sender];
+        [InstanceSelectorNotificationCenter postSelectionWithTargetInstance:target selector:targetSelector senderInstance:sender];
     };
     
     if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithNoParam)]) {
-        dynamicImp = [BoundlessObject createImpWithNoParam:newSelector :postNotificationBlock];
+        dynamicImp = [BoundlessObject createImpWithNoParam:notificationSelector :postNotificationBlock];
     } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithObjectParam:)]) {
-        dynamicImp = [BoundlessObject createImpWithObjectParam:newSelector :postNotificationBlock];
+        dynamicImp = [BoundlessObject createImpWithObjectParam:notificationSelector :postNotificationBlock];
     } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithBoolParam:)]) {
-        dynamicImp = [BoundlessObject createImpWithBoolParam:newSelector :postNotificationBlock];
+        dynamicImp = [BoundlessObject createImpWithBoolParam:notificationSelector :postNotificationBlock];
     } else {
         NSLog(@"Unsupported encoding:%@", methodTypeEncodingString);
         return nil;
     }
     
-    class_addMethod(targetClass, newSelector, dynamicImp, methodTypeEncoding);
+    class_addMethod(targetClass, notificationSelector, dynamicImp, methodTypeEncoding);
     
     Method newMethod = class_getInstanceMethod(targetClass, targetSelector);
     if (newMethod == nil) {
@@ -52,7 +53,7 @@
         return nil;
     }
     
-    return newSelector;
+    return notificationSelector;
 }
 
 - (void) templateMethodWithNoParam { }
@@ -98,5 +99,5 @@
     NSString* templateMethodTypeEncodingString = [NSString stringWithUTF8String:templateMethodTypeEncoding];
     return [templateMethodTypeEncodingString isEqualToString:candidate];
 }
-
+    
 @end

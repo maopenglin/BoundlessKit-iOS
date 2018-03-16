@@ -26,7 +26,7 @@ class BoundlessKitLauncher : NSObject {
     override init() {
         let boundlessProperties: BoundlessProperties
         let boundlessConfig: BoundlessConfiguration
-        let session: CodelssVisualizerSession?
+        let session: CodelessVisualizerSession?
         
         if let versionData = database.object(forKey: "codelessVersion") as? Data,
             let version = BoundlessVersion(data: versionData) {
@@ -39,32 +39,32 @@ class BoundlessKitLauncher : NSObject {
         } else {
             boundlessConfig = BoundlessConfiguration()
         }
-        if let sessionData = database.object(forKey: "codelssSession") as? Data,
-            let savedSession = CodelssVisualizerSession(data: sessionData) {
+        if let sessionData = database.object(forKey: "codelessSession") as? Data,
+            let savedSession = CodelessVisualizerSession(data: sessionData) {
             session = savedSession
         } else {
             session = nil
         }
         
         self.apiClient = CodelessAPIClient.init(properties: boundlessProperties,
-                                                boundlessConfig: boundlessConfig,
-                                                visualizerSession: session)
+                                                boundlessConfig: boundlessConfig)
         super.init()
         
-        loadVersion()
+        apiClient.visualizerSession = session
+        self.didUpdate(session: session)
+        apiClient.delegate = self
+        
         apiClient.boot {
             BoundlessKit.standard.apiClient.properties = self.apiClient.properties
             BoundlessKit.standard.apiClient.syncIfNeeded()
             self.apiClient.promptPairing()
         }
+        
+        refreshKit()
     }
     
-    func loadVersion() {
-        var mappings = apiClient.properties.version.mappings
-        for (actionID, value) in apiClient.visualizerSession?.mappings ?? [:] {
-            mappings[actionID] = value
-        }
-        for (actionID, value) in mappings {
+    func refreshKit() {
+        for (actionID, value) in apiClient.properties.version.mappings {
             BoundlessKit.standard.refreshContainer.commit(actionID: actionID, with: BoundlessKit.standard.apiClient)
             if let codeless = value["codeless"] as? [String: Any],
                 let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
@@ -84,5 +84,42 @@ class BoundlessKitLauncher : NSObject {
             }
         }
     }
+}
+
+extension BoundlessKitLauncher : CodelessApiClientDelegate {
+    func didUpdate(session: CodelessVisualizerSession?) {
+        guard let session = session else {
+            CodelessReinforcer.showOption = .reinforcement
+            return
+        }
+        CodelessReinforcer.showOption = .random
+        
+        for (actionID, value) in codelessReinforcers.filter({ (actionID, _) -> Bool in
+            return session.mappings[actionID] == nil && apiClient.properties.version.mappings[actionID] == nil
+        }) {
+            InstanceSelectorNotificationCenter.default.removeObserver(value, name: Notification.Name(actionID), object: nil)
+            codelessReinforcers.removeValue(forKey: actionID)
+        }
+        for (actionID, value) in session.mappings {
+            if let codeless = value["codeless"] as? [String: Any],
+                let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
+                let reinforcer: CodelessReinforcer
+                if let r = codelessReinforcers[actionID] {
+                    reinforcer = r
+                } else {
+                    reinforcer = CodelessReinforcer(forActionID: actionID)
+                    InstanceSelectorNotificationCenter.default.addObserver(reinforcer, selector: #selector(reinforcer.receive(notification:)), name: NSNotification.Name(actionID), object: nil)
+                    codelessReinforcers[actionID] = reinforcer
+                }
+                for reinforcementDict in reinforcements {
+                    if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
+                        reinforcer.reinforcements[codelessReinforcement.primitive] = codelessReinforcement
+                    }
+                }
+            }
+        }
+        
+    }
+    
 }
 

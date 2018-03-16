@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<BKReinforcement>>, NSCoding, BoundlessAPISynchronizable {
+internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<BKReinforcement>>, BKData, BoundlessAPISynchronizable {
     
     static let registerWithNSKeyed: Void = {
         NSKeyedUnarchiver.setClass(BKReportBatch.self, forClassName: "BKReportBatch")
@@ -25,6 +25,19 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         super.init(dict.mapValues({ (reinforcements) -> SynchronizedArray<BKReinforcement> in
             return SynchronizedArray(reinforcements)
         }))
+    }
+    
+    var storage: (BKDatabase, String)?
+    
+    static func initWith(database: BKDatabase, forKey key: String) -> BKReportBatch {
+        let batch: BKReportBatch
+        if let archived: BKReportBatch = database.unarchive(key) {
+            batch = archived
+        } else {
+            batch = BKReportBatch()
+        }
+        batch.storage = (database, key)
+        return batch
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
@@ -52,10 +65,13 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
             self[reinforcement.actionID] = SynchronizedArray()
         }
         self[reinforcement.actionID]?.append(reinforcement)
-        BoundlessContext.getContext() { contextInfo in
+        self.storage?.0.archive(self, forKey: self.storage!.1)
+        BoundlessContext.getContext() { [weak reinforcement] contextInfo in
+            guard let reinforcement = reinforcement else { return }
             for (key, value) in contextInfo {
                 reinforcement.metadata[key] = value
             }
+            self.storage?.0.archive(self, forKey: self.storage!.1)
         }
     }
     
@@ -76,6 +92,10 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
     }
     
     func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
+        guard count > 0 else {
+            successful(true)
+            return
+        }
         guard var payload = apiClient.properties.apiCredentials else {
                 successful(false)
                 return
@@ -91,6 +111,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
                     for (actionID, actions) in reportCopy {
                         self[actionID]?.removeFirst(actions.count)
                     }
+                    self.storage?.0.archive(self, forKey: self.storage!.1)
                     print("Cleared reported actions.")
                     success = true
                 }

@@ -15,8 +15,8 @@ class ViewController: UIViewController {
     @objc var someCounter: Float = 0
 //    let kit = BoundlessKit()
     
-    @objc func action1Performed(){
-        print("Selector name:\(NSStringFromClass(ViewController.self))")
+    @objc dynamic func action1Performed(button: UIButton){
+        print("Action 1 performed")
 //        kit.launch(arguements: Helper.versionMappings)
         // Reinforce the action to make it sticky!!
         //        BoundlessKit.reinforce("a1", metaData: ["key":"value"], completion: {
@@ -69,6 +69,7 @@ class ViewController: UIViewController {
     }
     
     @objc func action2Performed(){
+        print("Action 2 performed")
 //        kit.reinforce(actionID: "action1") { reinforcement in }
         ////        // Tracking call is sent asynchronously
         //////        BoundlessKit.track("action2", metaData: ["key":"value", "calories":9000])
@@ -146,7 +147,7 @@ class ViewController: UIViewController {
         action1Button.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
         action1Button.titleLabel?.textAlignment = NSTextAlignment.center
         action1Button.backgroundColor = UIColor.init(red: 51/255.0, green: 153/255.0, blue: 51/255.0, alpha: 1.0)
-        action1Button.addTarget(self, action: #selector(ViewController.action1Performed), for: UIControlEvents.touchUpInside)
+        action1Button.addTarget(self, action: #selector(ViewController.action1Performed(button:)), for: UIControlEvents.touchUpInside)
         self.view.addSubview(action1Button)
         
         // Button to represent some user action to Track

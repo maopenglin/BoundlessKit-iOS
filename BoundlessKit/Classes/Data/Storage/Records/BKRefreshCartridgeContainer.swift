@@ -7,12 +7,25 @@
 
 import Foundation
 
-internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRefreshCartridge>, NSCoding, BoundlessAPISynchronizable {
+internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRefreshCartridge>, BKData, BoundlessAPISynchronizable {
     
     static let registerWithNSKeyed: Void = {
         NSKeyedUnarchiver.setClass(BKRefreshCartridgeContainer.self, forClassName: "BKRefreshCartridgeContainer")
         NSKeyedArchiver.setClassName("BKRefreshCartridgeContainer", for: BKRefreshCartridgeContainer.self)
     }()
+    
+    var storage: (BKDatabase, String)?
+    
+    static func initWith(database: BKDatabase, forKey key: String) -> BKRefreshCartridgeContainer {
+        let container: BKRefreshCartridgeContainer
+        if let archived: BKRefreshCartridgeContainer = database.unarchive(key) {
+            container = archived
+        } else {
+            container = BKRefreshCartridgeContainer()
+        }
+        container.storage = (database, key)
+        return container
+    }
     
     required convenience init?(coder aDecoder: NSCoder) {
         guard let dictData = aDecoder.decodeObject(forKey: "dictValues") as? Data,
@@ -27,23 +40,31 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
     }
     
     func decision(forActionID actionID: String, completion: @escaping ((BKDecision)->Void)) {
-        if self[actionID] == nil {
-            self[actionID] = BKRefreshCartridge(actionID: actionID)
+        let cartridge: BKRefreshCartridge
+        if let c = self[actionID] {
+            cartridge = c
+        } else {
+            cartridge = BKRefreshCartridge(actionID: actionID)
+            self[actionID] = cartridge
         }
-        self[actionID]?.removeFirst(completion: { (decision) in
+        cartridge.removeFirst(completion: { (decision) in
+            
             completion(decision ?? BKDecision.neutral(for: actionID))
+            self.storage?.0.archive(self, forKey: self.storage!.1)
         })
     }
     
-    func commit(actionID: String, with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
+    func commit(actionID: String, with apiClient: BoundlessAPIClient) {
         if self[actionID] == nil {
             self[actionID] = BKRefreshCartridge(actionID: actionID)
         }
         if self[actionID]?.needsSync ?? false {
             self.synchronize(forActionID: actionID, with:
-                apiClient, successful: successful)
+            apiClient) { success in
+                self.storage?.0.archive(self, forKey: self.storage!.1)
+            }
         } else {
-            successful(true)
+            self.storage?.0.archive(self, forKey: self.storage!.1)
         }
     }
     
@@ -72,12 +93,14 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
                 }
             }
             group.notify(queue: .global()) {
+                self.storage?.0.archive(self, forKey: self.storage!.1)
                 successful(completeSuccess)
             }
         }
     }
     
     func synchronize(forActionID actionID: String, with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
+        
         if self[actionID] == nil {
             self[actionID] = BKRefreshCartridge(actionID: actionID)
         }
@@ -95,13 +118,13 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
             if let responseStatusCode = response?["status"] as? Int {
                 if responseStatusCode == 200,
                     let reinforcementCartridge = response?["reinforcementCartridge"] as? [String],
-                    let expiresIn = response?["expiresIn"] as? Int {
+                    let expiresIn = response?["expiresIn"] as? TimeInterval {
                     let values = reinforcementCartridge.map({ (reinforcementDecision) -> BKDecision in
                         BKDecision.init(reinforcementDecision, cartridge.actionID)
                     })
                     cartridge.removeAll()
                     cartridge.append(values)
-                    cartridge.expirationUTC = Int64(Date().addingTimeInterval(TimeInterval(1000*expiresIn)).timeIntervalSince1970)
+                    cartridge.expirationUTC = Int64( 1000*Date().addingTimeInterval(expiresIn).timeIntervalSince1970 )
                     print("\(cartridge.actionID) refreshed!")
                     success = true
                 } else if responseStatusCode == 400 {

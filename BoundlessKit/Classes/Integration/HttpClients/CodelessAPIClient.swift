@@ -21,40 +21,13 @@ internal enum CodelessAPIEndpoint {
     }
 }
 
-internal struct CodelssVisualizerSession {
-    var adminName: String
-    var connectionUUID: String
-    var mappings: [String: [String: Any]]
-    
-    init(adminName: String, connectionUUID: String, mappings: [String: [String: Any]]) {
-        self.adminName = adminName
-        self.connectionUUID = connectionUUID
-        self.mappings = mappings
-    }
-    
-    init?(data: Data) {
-        let unarchiver = NSKeyedUnarchiver(forReadingWith: data)
-        defer {
-            unarchiver.finishDecoding()
-        }
-        guard let adminName = unarchiver.decodeObject(forKey: "adminName") as? String else { return nil }
-        guard let connectionUUID = unarchiver.decodeObject(forKey: "connectionUUID") as? String else { return nil }
-        guard let mappings = unarchiver.decodeObject(forKey: "mappings") as? [String: [String: Any]] else { return nil }
-        self.init(adminName: adminName, connectionUUID: connectionUUID, mappings: mappings)
-    }
-    
-    func encode() -> Data {
-        let data = NSMutableData()
-        let archiver = NSKeyedArchiver(forWritingWith: data)
-        archiver.encode(adminName, forKey: "adminName")
-        archiver.encode(connectionUUID, forKey: "connectionUUID")
-        archiver.encode(mappings, forKey: "mappings")
-        archiver.finishEncoding()
-        return data as Data
-    }
+internal protocol CodelessApiClientDelegate {
+    func didUpdate(session: CodelessVisualizerSession?)
 }
 
 internal class CodelessAPIClient : HTTPClient {
+    
+    var delegate: CodelessApiClientDelegate?
     
     var properties: BoundlessProperties {
         didSet {
@@ -66,26 +39,24 @@ internal class CodelessAPIClient : HTTPClient {
             BKUserDefaults.standard.set(boundlessConfig.encode(), forKey: "codelessConfig")
         }
     }
-    var visualizerSession: CodelssVisualizerSession? {
+    var visualizerSession: CodelessVisualizerSession? {
         didSet {
             BKUserDefaults.standard.set(visualizerSession?.encode(), forKey: "codelessSession")
+            if oldValue == nil && visualizerSession != nil {
+                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: InstanceSelectorNotificationCenter.actionMessagesNotification, object: nil)
+            } else if oldValue != nil && visualizerSession == nil {
+                InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.actionMessagesNotification, object: nil)
+            }
+            delegate?.didUpdate(session: visualizerSession)
         }
     }
     
-    fileprivate lazy var submitQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 1
-        queue.isSuspended = true
-        return queue
-    }()
-    
     init(properties: BoundlessProperties,
          boundlessConfig: BoundlessConfiguration,
-         visualizerSession: CodelssVisualizerSession?,
          session: URLSessionProtocol = URLSession.shared) {
         self.properties = properties
         self.boundlessConfig = boundlessConfig
-        self.visualizerSession = visualizerSession
+        self.visualizerSession = nil
         super.init(session: session)
     }
     
@@ -144,7 +115,7 @@ internal class CodelessAPIClient : HTTPClient {
                     payload["connectionUUID"] = connectionUUID
                     self.post(url: CodelessAPIEndpoint.accept.url, jsonObject: payload) { response in
                         if response?["status"] as? Int == 200 {
-                            self.visualizerSession = CodelssVisualizerSession(adminName: adminName, connectionUUID: connectionUUID, mappings: [:])
+                            self.visualizerSession = CodelessVisualizerSession(adminName: adminName, connectionUUID: connectionUUID, mappings: [:])
                         } else {
                             self.visualizerSession = nil
                         }
@@ -157,7 +128,7 @@ internal class CodelessAPIClient : HTTPClient {
                 
             case 208?:
                 if let connectionUUID = response?["connectionUUID"] as? String {
-                    self.visualizerSession = CodelssVisualizerSession(adminName: "reconnected", connectionUUID: connectionUUID, mappings: [:])
+                    self.visualizerSession = CodelessVisualizerSession(adminName: "reconnected", connectionUUID: connectionUUID, mappings: [:])
                 } else {
                     self.visualizerSession = nil
                 }
@@ -170,5 +141,75 @@ internal class CodelessAPIClient : HTTPClient {
     }
     
     
+    fileprivate lazy var submitQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
+    
+    @objc
+    func submitToDashboard(notification: Notification) {
+        submitQueue.addOperation {
+            guard let session = self.visualizerSession,
+                let actionID = notification.userInfo?["actionID"] as? String,
+                let target = notification.userInfo?["target"] as? String,
+                let selector = notification.userInfo?["selector"] as? String,
+            var payload = self.properties.apiCredentials else {
+                return
+            }
+            payload["connectionUUID"] = session.connectionUUID
+            payload["sender"] = ""
+            payload["target"] = target
+            payload["selector"] = selector
+            payload["actionID"] = actionID
+            payload["senderImage"] = ""
+            let sema = DispatchSemaphore(value: 0)
+            self.post(url: CodelessAPIEndpoint.submit.url, jsonObject: payload) { response in
+                defer { sema.signal() }
+                guard response?["status"] as? Int == 200 else {
+                    self.visualizerSession = nil
+                    return
+                }
+                if let visualizerMappings = response?["mappings"] as? [String: [String: Any]] {
+                    self.visualizerSession?.mappings = visualizerMappings
+                }
+            }.start()
+            _ = sema.wait(timeout: .now() + 2)
+        }
+    }
+    
+}
+
+internal struct CodelessVisualizerSession {
+    var adminName: String
+    var connectionUUID: String
+    var mappings: [String: [String: Any]]
+    
+    init(adminName: String, connectionUUID: String, mappings: [String: [String: Any]]) {
+        self.adminName = adminName
+        self.connectionUUID = connectionUUID
+        self.mappings = mappings
+    }
+    
+    init?(data: Data) {
+        let unarchiver = NSKeyedUnarchiver(forReadingWith: data)
+        defer {
+            unarchiver.finishDecoding()
+        }
+        guard let adminName = unarchiver.decodeObject(forKey: "adminName") as? String else { return nil }
+        guard let connectionUUID = unarchiver.decodeObject(forKey: "connectionUUID") as? String else { return nil }
+        guard let mappings = unarchiver.decodeObject(forKey: "mappings") as? [String: [String: Any]] else { return nil }
+        self.init(adminName: adminName, connectionUUID: connectionUUID, mappings: mappings)
+    }
+    
+    func encode() -> Data {
+        let data = NSMutableData()
+        let archiver = NSKeyedArchiver(forWritingWith: data)
+        archiver.encode(adminName, forKey: "adminName")
+        archiver.encode(connectionUUID, forKey: "connectionUUID")
+        archiver.encode(mappings, forKey: "mappings")
+        archiver.finishEncoding()
+        return data as Data
+    }
 }
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class BKDecision : NSObject, NSCoding {
+internal class BKDecision : NSObject, BKData {
     
     static func neutral(for actionID: String) -> BKDecision {
         return BKDecision.init("neutralResponse", actionID)
@@ -34,10 +34,6 @@ internal class BKDecision : NSObject, NSCoding {
     public func encode(with aCoder: NSCoder) {
         aCoder.encode(name, forKey: "name")
         aCoder.encode(actionID, forKey: "actionID")
-    }
-    
-    var asReinforcement: BKReinforcement {
-        return BKReinforcement.init(name, actionID)
     }
 }
 

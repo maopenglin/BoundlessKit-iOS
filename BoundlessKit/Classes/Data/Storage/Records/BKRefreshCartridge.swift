@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class BKRefreshCartridge : SynchronizedArray<BKDecision>, NSCoding {
+internal class BKRefreshCartridge : SynchronizedArray<BKDecision>, BKData {
     
     static let registerWithNSKeyed: Void = {
         NSKeyedUnarchiver.setClass(BKRefreshCartridge.self, forClassName: "BKRefreshCartridge")

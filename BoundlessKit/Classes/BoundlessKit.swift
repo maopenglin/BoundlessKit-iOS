@@ -25,20 +25,13 @@ public class BoundlessKit : NSObject {
         guard let properties = BoundlessProperties.fromFile else {
             fatalError("Missing <BoundlessProperties.plist> file")
         }
-        _standard = BoundlessKit.init(apiClient: BoundlessAPIClient.init(properties: properties),
-                                      database: BKUserDefaults.standard)
+        _standard = BoundlessKit.init(apiClient: BoundlessAPIClient.init(properties: properties), database: BKUserDefaults.standard)
         return _standard!
     }
     
     
     internal var launcher: BoundlessKitLauncher?
-    internal var apiClient: BoundlessAPIClient {
-        didSet {
-            apiClient.trackBatch = trackBatch
-            apiClient.reportBatch = reportBatch
-            apiClient.refreshContainer = refreshContainer
-        }
-    }
+    internal let apiClient: BoundlessAPIClient
     internal let database: BKDatabase
     
     internal var trackBatch: BKTrackBatch
@@ -48,34 +41,30 @@ public class BoundlessKit : NSObject {
     init(apiClient: BoundlessAPIClient, database: BKDatabase) {
         self.apiClient = apiClient
         self.database = database
-        self.trackBatch = database.unarchive("trackBatch") ?? BKTrackBatch()
-        self.reportBatch = database.unarchive("reportBatch") ?? BKReportBatch()
-        self.refreshContainer = database.unarchive("refreshContainer") ?? BKRefreshCartridgeContainer()
-        self.apiClient = apiClient
+        self.trackBatch = BKTrackBatch.initWith(database: database, forKey: "trackBatch")
+        self.reportBatch = BKReportBatch.initWith(database: database, forKey: "reportBatch")
+        self.refreshContainer = BKRefreshCartridgeContainer.initWith(database: database, forKey: "refreshContainer")
         super.init()
-        apiClient.trackBatch = trackBatch
-        apiClient.reportBatch = reportBatch
-        apiClient.refreshContainer = refreshContainer
+        apiClient.trackBatch = self.trackBatch
+        apiClient.reportBatch = self.reportBatch
+        apiClient.refreshContainer = self.refreshContainer
     }
     
     @objc
     public func track(actionID: String, metadata: [String: Any] = [:]) {
         let action = BKAction(actionID, metadata)
-        self.trackBatch.store(action)
+        trackBatch.store(action)
         print("Tracked action <\(actionID)>")
-        self.database.archive(self.trackBatch, forKey: "trackBatch")
-        self.apiClient.syncIfNeeded()
+        apiClient.syncIfNeeded()
     }
     
     @objc
-    public func reinforce(actionID: String, completion: @escaping (String)->Void) {
+    public func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
         refreshContainer.decision(forActionID: actionID) { reinforcementDecision in
-            self.database.archive(self.refreshContainer, forKey: "refreshContainer")
-            let reinforcement = reinforcementDecision.asReinforcement
+            let reinforcement = BKReinforcement.init(reinforcementDecision, metadata)
             completion(reinforcement.name)
             self.reportBatch.store(reinforcement)
             print("Reported action <\(actionID)> with reinforcement <\(reinforcement.name)>")
-            self.database.archive(self.reportBatch, forKey: "reportBatch")
             self.apiClient.syncIfNeeded()
         }
     }

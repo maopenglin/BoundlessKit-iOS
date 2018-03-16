@@ -13,4 +13,8 @@ public extension Selector {
         components[0] += String.random(length: length)
         return NSSelectorFromString(components.joined(separator: ":"))
     }
+    
+    func prependBy(_ str: String) -> Selector {
+        return NSSelectorFromString(str + NSStringFromSelector(self))
+    }
 }

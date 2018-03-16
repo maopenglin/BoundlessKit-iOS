@@ -16,7 +16,11 @@ internal struct BoundlessProperties {
     
     let appID: String
     let inProduction: Bool
-    var version: BoundlessVersion
+    var version: BoundlessVersion {
+        didSet {
+            print("DId set version")
+        }
+    }
     let developmentSecret: String
     let productionSecret: String
     private let primaryIdentity:String

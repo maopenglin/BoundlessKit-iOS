@@ -14,6 +14,7 @@
 @implementation SwizzleHelper
 
 + (BOOL) injectSelector:(Class) swizzledClass :(SEL) swizzledSelector :(Class) originalClass :(SEL) orignalSelector {
+    NSLog(@"Injecting selector %@ with %@", NSStringFromSelector(orignalSelector), NSStringFromSelector(swizzledSelector));
     Method newMeth = class_getInstanceMethod(swizzledClass, swizzledSelector);
     IMP imp = method_getImplementation(newMeth);
     const char* methodTypeEncoding = method_getTypeEncoding(newMeth);

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class BKAction : NSObject, NSCoding {
+public class BKAction : NSObject, BKData {
     
     let name: String
     var metadata: [String: Any]

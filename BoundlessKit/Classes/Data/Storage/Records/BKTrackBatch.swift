@@ -7,12 +7,13 @@
 
 import Foundation
 
-internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding, BoundlessAPISynchronizable {
+internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPISynchronizable {
     
     static let registerWithNSKeyed: Void = {
         NSKeyedUnarchiver.setClass(BKTrackBatch.self, forClassName: "BKTrackBatch")
         NSKeyedArchiver.setClassName("BKTrackBatch", for: BKTrackBatch.self)
     }()
+    
     
     var desiredMaxTimeUntilSync: Int64
     var desiredMaxCountUntilSync: Int
@@ -23,6 +24,19 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding, BoundlessAP
         self.desiredMaxTimeUntilSync = timeUntilSync
         self.desiredMaxCountUntilSync = sizeUntilSync
         super.init(values)
+    }
+    
+    var storage: (BKDatabase, String)?
+    
+    static func initWith(database: BKDatabase, forKey key: String) -> BKTrackBatch {
+        let batch: BKTrackBatch
+        if let archived: BKTrackBatch = database.unarchive(key) {
+            batch = archived
+        } else {
+            batch = BKTrackBatch()
+        }
+        batch.storage = (database, key)
+        return batch
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
@@ -43,10 +57,13 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding, BoundlessAP
     
     func store(_ action: BKAction) {
         self.append(action)
-        BoundlessContext.getContext() { contextInfo in
+        self.storage?.0.archive(self, forKey: self.storage!.1)
+        BoundlessContext.getContext() {[weak action] contextInfo in
+            guard let action = action else { return }
             for (key, value) in contextInfo {
                 action.metadata[key] = value
             }
+            self.storage?.0.archive(self, forKey: self.storage!.1)
         }
     }
     
@@ -63,6 +80,10 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding, BoundlessAP
     }
     
     func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
+        guard count > 0 else {
+            successful(true)
+            return
+        }
         guard var payload = apiClient.properties.apiCredentials else {
             successful(false)
             return
@@ -78,6 +99,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, NSCoding, BoundlessAP
             if let status = response?["status"] as? Int {
                 if status == 200 {
                     self.removeFirst(actions.count)
+                    self.storage?.0.archive(self, forKey: self.storage!.1)
                     print("Cleared tracked actions.")
                     success = true
                 }
