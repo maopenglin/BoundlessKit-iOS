@@ -49,6 +49,10 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
         if let aName = aName {
             notifiers[aName]?.removeObserver(observer as AnyObject)
             print("Removed observer for notification:\(aName.rawValue)")
+        } else {
+            for notifier in notifiers.values {
+                notifier.removeObserver(observer as AnyObject)
+            }
         }
     }
 }
@@ -102,8 +106,9 @@ fileprivate class InstanceSelectorNotifier : NSObject {
     }
     
     func removeObserver(_ observer: AnyObject) {
+        let oldCount = observers.count
         observers = observers.filter({$0.value != nil && $0.value !== observer})
-        if observers.count == 0 {
+        if observers.count == 0 && oldCount != 0 {
             instanceSelector.swizzle(with: notificationSelector)
         }
     }
