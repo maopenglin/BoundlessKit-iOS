@@ -13,3 +13,16 @@ extension Array {
         return self[Int(arc4random_uniform(UInt32(self.count)))]
     }
 }
+
+internal class WeakObject {
+    weak var value: AnyObject?
+    init (value: AnyObject) {
+        self.value = value
+    }
+}
+
+extension Array where Element:WeakObject {
+    mutating func compact() {
+        self = self.filter { $0.value != nil }
+    }
+}

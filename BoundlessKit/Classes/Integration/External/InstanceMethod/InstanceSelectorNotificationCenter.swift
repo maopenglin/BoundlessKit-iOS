@@ -24,7 +24,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
         }
         
         if let notifier = notifiers[aName] {
-            notifier.addObserver()
+            notifier.addObserver(observer as AnyObject)
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
             print("Added observer for notification:\(aName.rawValue)")
             return
@@ -33,7 +33,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
         if let instanceSelector = InstanceSelector.init(aName.rawValue),
             let notifier = InstanceSelectorNotifier.init(instanceSelector) {
             notifiers[aName] = notifier
-            notifier.addObserver()
+            notifier.addObserver(observer as AnyObject)
             print("Added new observer for notification:\(aName.rawValue)")
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
             return
@@ -47,7 +47,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
             super.removeObserver(observer, name: aName, object: anObject)
         }
         if let aName = aName {
-            notifiers[aName]?.removeObserver()
+            notifiers[aName]?.removeObserver(observer as AnyObject)
             print("Removed observer for notification:\(aName.rawValue)")
         }
     }
@@ -81,7 +81,7 @@ fileprivate class InstanceSelectorNotifier : NSObject {
     
     let instanceSelector: InstanceSelector
     let notificationSelector: InstanceSelector
-    private var numberOfObservers = 0
+    private var observers = [WeakObject]()
     
     init?(_ instanceSelector: InstanceSelector) {
         if let notificationMethod = BoundlessObject.createTrampoline(for: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorNotifier.postInstanceSelectorNotificationBlock),
@@ -94,19 +94,16 @@ fileprivate class InstanceSelectorNotifier : NSObject {
         }
     }
     
-    func addObserver() {
-        if numberOfObservers == 0 {
+    func addObserver(_ observer: AnyObject) {
+        if observers.count == 0 {
             instanceSelector.swizzle(with: notificationSelector)
         }
-        numberOfObservers += 1
+        observers.append(WeakObject(value: observer))
     }
     
-    func removeObserver() {
-        guard numberOfObservers > 0 else {
-            return
-        }
-        numberOfObservers -= 1
-        if numberOfObservers == 0 {
+    func removeObserver(_ observer: AnyObject) {
+        observers = observers.filter({$0.value != nil && $0.value !== observer})
+        if observers.count == 0 {
             instanceSelector.swizzle(with: notificationSelector)
         }
     }
