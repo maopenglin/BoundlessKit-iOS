@@ -44,6 +44,7 @@ internal class CodelessAPIClient : HTTPClient {
             BKUserDefaults.standard.set(visualizerSession?.encode(), forKey: "codelessSession")
             if oldValue == nil && visualizerSession != nil {
                 InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: InstanceSelectorNotificationCenter.actionMessagesNotification, object: nil)
+                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: InstanceSelectorNotificationCenter.actionMessagesNotification, object: nil)
             } else if oldValue != nil && visualizerSession == nil {
                 InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.actionMessagesNotification, object: nil)
             }
@@ -58,6 +59,7 @@ internal class CodelessAPIClient : HTTPClient {
         self.boundlessConfig = boundlessConfig
         self.visualizerSession = nil
         super.init(session: session)
+        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: InstanceSelectorNotificationCenter.actionMessagesNotification, object: nil)
     }
     
     func boot(completion: @escaping () -> () = {}) {

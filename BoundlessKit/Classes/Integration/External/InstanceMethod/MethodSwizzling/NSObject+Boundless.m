@@ -6,15 +6,17 @@
 //
 
 #import "NSObject+Boundless.h"
+
 #import <BoundlessKit/BoundlessKit-Swift.h>
-#import <SwizzleHelper.h>
+#import <objc/runtime.h>
+#import <UIKit/UIKit.h>
 
 @implementation BoundlessObject
 
-+ (SEL) createNotificationMethodForClass:(Class)targetClass selector:(SEL)targetSelector {
-    SEL notificationSelector = NSSelectorFromString([NSString stringWithFormat:@"notifyBefore__%@", NSStringFromSelector(targetSelector)]);
-    if (class_getInstanceMethod(targetClass, notificationSelector)) {
-        return notificationSelector;
++ (SEL) createTrampolineForClass:(Class)targetClass selector:(SEL)targetSelector withBlock:(SelectorTrampolineBlock) block {
+    SEL trampolineSelector = NSSelectorFromString([NSString stringWithFormat:@"notifyBefore__%@", NSStringFromSelector(targetSelector)]);
+    if (class_getInstanceMethod(targetClass, trampolineSelector)) {
+        return trampolineSelector;
     }
     
     Method originalMethod = class_getInstanceMethod(targetClass, targetSelector);
@@ -25,23 +27,20 @@
     NSString* methodTypeEncodingString = [NSString stringWithUTF8String:methodTypeEncoding];
     
     IMP dynamicImp;
-    void (^postNotificationBlock)(id target, id sender) = ^void(id target, id sender) {
-//        NSLog(@"In dynamic imp with class:%@ and selector:%@ and originalSelector:%@", NSStringFromClass([target class]), NSStringFromSelector(newSelector), NSStringFromSelector(originalSelector));
-        [InstanceSelectorNotificationCenter postSelectionWithTargetInstance:target selector:targetSelector senderInstance:sender];
-    };
-    
-    if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithNoParam)]) {
-        dynamicImp = [BoundlessObject createImpWithNoParam:notificationSelector :postNotificationBlock];
-    } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithObjectParam:)]) {
-        dynamicImp = [BoundlessObject createImpWithObjectParam:notificationSelector :postNotificationBlock];
-    } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :@selector(templateMethodWithBoolParam:)]) {
-        dynamicImp = [BoundlessObject createImpWithBoolParam:notificationSelector :postNotificationBlock];
+    if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :[UIApplication self] :@selector(sendAction:to:from:forEvent:)]) {
+        dynamicImp = [BoundlessObject createImpForSendAction:targetSelector :trampolineSelector :block];
+    } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :[BoundlessObject self] :@selector(templateMethodWithNoParam)]) {
+        dynamicImp = [BoundlessObject createImpWithNoParam:targetSelector :trampolineSelector :block];
+    } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :[BoundlessObject self] :@selector(templateMethodWithObjectParam:)]) {
+        dynamicImp = [BoundlessObject createImpWithObjectParam:targetSelector :trampolineSelector :block];
+    } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :[BoundlessObject self] :@selector(templateMethodWithBoolParam:)]) {
+        dynamicImp = [BoundlessObject createImpWithBoolParam:targetSelector :trampolineSelector :block];
     } else {
-        NSLog(@"Unsupported encoding:%@", methodTypeEncodingString);
+        NSLog(@"Unsupported encoding:%@ other:%@", methodTypeEncodingString, [NSString stringWithUTF8String: method_getTypeEncoding(class_getInstanceMethod(UIApplication.self, @selector(sendAction:to:from:forEvent:)))]);
         return nil;
     }
     
-    class_addMethod(targetClass, notificationSelector, dynamicImp, methodTypeEncoding);
+    class_addMethod(targetClass, trampolineSelector, dynamicImp, methodTypeEncoding);
     
     Method newMethod = class_getInstanceMethod(targetClass, targetSelector);
     if (newMethod == nil) {
@@ -53,14 +52,24 @@
         return nil;
     }
     
-    return notificationSelector;
+    return trampolineSelector;
+}
+
++ (IMP) createImpForSendAction :(SEL) targetSelector :(SEL) selector :(SelectorTrampolineBlock) trampBlock {
+    IMP dynamicImp = imp_implementationWithBlock(^(id self, SEL action, id target, id sender, UIEvent* event) {
+        if (!self || ![self respondsToSelector:selector]) {return;}
+        trampBlock(target, action, sender);
+        ((BOOL (*)(id, SEL, SEL, id, id, UIEvent*))[self methodForSelector:selector])(self, selector, action, target, sender, event);
+    });
+    
+    return dynamicImp;
 }
 
 - (void) templateMethodWithNoParam { }
-+ (IMP) createImpWithNoParam :(SEL) selector :(void (^)(id,id)) blockBefore {
++ (IMP) createImpWithNoParam :(SEL) targetSelector :(SEL) selector :(SelectorTrampolineBlock) trampBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self) {
         if (!self || ![self respondsToSelector:selector]) {return;}
-        blockBefore(self, nil);
+        trampBlock(self, targetSelector, nil);
         ((void (*)(id, SEL))[self methodForSelector:selector])(self, selector);
     });
     
@@ -68,10 +77,10 @@
 }
 
 - (void) templateMethodWithObjectParam :(id) param1 { }
-+ (IMP) createImpWithObjectParam :(SEL) selector :(void (^)(id,id)) blockBefore {
++ (IMP) createImpWithObjectParam :(SEL) targetSelector :(SEL) selector :(SelectorTrampolineBlock) trampBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self, id param) {
         if (!self || ![self respondsToSelector:selector]) {return;}
-        blockBefore(self, param);
+        trampBlock(self, targetSelector, param);
         ((void (*)(id, SEL, id))[self methodForSelector:selector])(self, selector, param);
     });
     
@@ -79,18 +88,18 @@
 }
 
 - (void) templateMethodWithBoolParam :(bool) param1 { }
-+ (IMP) createImpWithBoolParam :(SEL) selector :(void (^)(id,id)) blockBefore {
++ (IMP) createImpWithBoolParam :(SEL) targetSelector :(SEL) selector :(SelectorTrampolineBlock) trampBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self, bool param) {
         if (!self || ![self respondsToSelector:selector]) {return;}
-        blockBefore(self, nil);
+        trampBlock(self, targetSelector, nil);
         ((void (*)(id, SEL, bool))[self methodForSelector:selector])(self, selector, param);
     });
     
     return dynamicImp;
 }
 
-+ (BOOL) compareMethodCreationTypeEncodings :(NSString*) candidate :(SEL) templateSelector {
-    Method templateMethod = class_getInstanceMethod([BoundlessObject self], templateSelector);
++ (BOOL) compareMethodCreationTypeEncodings :(NSString*) candidate :(Class) templateClass :(SEL) templateSelector {
+    Method templateMethod = class_getInstanceMethod(templateClass, templateSelector);
     if (templateMethod == nil) {
         return false;
     }

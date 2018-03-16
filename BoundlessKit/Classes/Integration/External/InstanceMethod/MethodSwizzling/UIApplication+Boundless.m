@@ -9,9 +9,6 @@
 
 #import <UIApplication+Boundless.h>
 
-#import <BoundlessKit/BoundlessKit-Swift.h>
-#import <SwizzleHelper.h>
-
 @implementation BoundlessApp
 
 - (BOOL)notifyMessages__sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event {
@@ -21,7 +18,7 @@
         
         // Sometimes this method proxies through to its internal method. We want to ignore those calls.
         if (![selectorName isEqualToString:@"_sendAction:withEvent:"]) {
-            [InstanceSelectorNotificationCenter postMessageWithClassType:[target class] selector:action];
+//            [InstanceSelectorNotificationCenterObjc postMessageWithClassType:[target class] selector:action];
         }
     }
     

@@ -7,12 +7,7 @@
 
 import Foundation
 
-@objc
-public class InstanceSelectorNotificationCenter : NotificationCenter {
-    
-    internal static var actionMessagesNotification: Notification.Name = {
-        return InstanceSelector.init(UIApplication.self, #selector(UIApplication.sendAction(_:to:from:for:)))!.notification
-    }()
+internal class InstanceSelectorNotificationCenter : NotificationCenter {
     
     static let _default = InstanceSelectorNotificationCenter()
     override public static var `default`: InstanceSelectorNotificationCenter {
@@ -59,22 +54,10 @@ public class InstanceSelectorNotificationCenter : NotificationCenter {
 }
 
 extension InstanceSelectorNotificationCenter {
-    @objc
-    public static func postSelection(targetInstance: NSObject, selector: Selector, senderInstance: AnyObject?) {
-        guard let instanceSelector = InstanceSelector(type(of: targetInstance), selector) else {
-            print("Not posting because <\(type(of: targetInstance))-\(selector)> is not a valid instance selector")
-            return
-        }
-        let notification = Notification.Name.init(instanceSelector.name)
-        InstanceSelectorNotificationCenter.default.post(name: notification, object: targetInstance, userInfo: ["senderInstance":senderInstance as Any ])
-        print("Posted instance method notification with name:\(notification.rawValue)")
-    }
-    
-    @objc
-    public static func postMessage(classType: AnyClass, selector: Selector) {
+    static func postMessage(classType: AnyClass, selector: Selector) {
         guard let instanceSelector = InstanceSelector(classType, selector) else { return }
         let notification = Notification.Name.init(instanceSelector.name)
-        InstanceSelectorNotificationCenter.default.post(name: actionMessagesNotification,
+        InstanceSelectorNotificationCenter.default.post(name: InstanceSelectorNotificationCenter.actionMessagesNotification,
                                                         object: nil,
                                                         userInfo: ["actionID": instanceSelector.name,
                                                                    "target": NSStringFromClass(instanceSelector.classType),
@@ -84,6 +67,14 @@ extension InstanceSelectorNotificationCenter {
     }
 }
 
+extension InstanceSelectorNotificationCenter {
+    internal static var actionMessagesNotification: Notification.Name = {
+        return InstanceSelector.init(UIApplication.self, #selector(UIApplication.sendAction(_:to:from:for:)))!.notification
+    }()
+    internal static var viewControllerDidAppearNotification: Notification.Name = {
+        return InstanceSelector.init(UIViewController.self, #selector(UIViewController.viewDidAppear(_:)))!.notification
+    }()
+}
 
 
 fileprivate class InstanceSelectorNotifier : NSObject {
@@ -93,12 +84,7 @@ fileprivate class InstanceSelectorNotifier : NSObject {
     private var numberOfObservers = 0
     
     init?(_ instanceSelector: InstanceSelector) {
-        if instanceSelector.classType == UIApplication.self && instanceSelector.selector == #selector(UIApplication.sendAction(_:to:from:for:)),
-            let notificationSelector = InstanceSelector.init(BoundlessApp.self, #selector(BoundlessApp.notifyMessages__sendAction(_:to:from:for:))) {
-            self.instanceSelector = instanceSelector
-            self.notificationSelector = notificationSelector
-            super.init()
-        } else if let notificationMethod = BoundlessObject.createNotificationMethod(for: instanceSelector.classType, selector: instanceSelector.selector),
+        if let notificationMethod = BoundlessObject.createTrampoline(for: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorNotifier.postInstanceSelectorNotificationBlock),
             let notificationSelector = InstanceSelector.init(instanceSelector.classType, notificationMethod) {
             self.instanceSelector = instanceSelector
             self.notificationSelector = notificationSelector
@@ -125,6 +111,18 @@ fileprivate class InstanceSelectorNotifier : NSObject {
         }
     }
     
+    static var postInstanceSelectorNotificationBlock: SelectorTrampolineBlock { return { target, selector, sender in
+        guard let targetInstance = target as? NSObject,
+            let targetSelector = selector,
+            let instanceSelector = InstanceSelector(type(of: targetInstance), targetSelector) else {
+                print("Not posting because <\(String(describing: target))-\(String(describing: selector))> is not a valid instance selector")
+                return
+        }
+        let notification = Notification.Name.init(instanceSelector.name)
+        InstanceSelectorNotificationCenter.default.post(name: notification, object: targetInstance, userInfo: ["senderInstance":sender as Any])
+        print("Posted instance method notification with name:\(notification.rawValue)")
+        }
+    }
 }
 
 

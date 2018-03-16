@@ -9,8 +9,8 @@
 #define NSObject_Boundless_h
 
 @interface BoundlessObject : NSObject
-
-+ (SEL) createNotificationMethodForClass:(Class)targetClass selector:(SEL)targetSelector;
+typedef void (^ SelectorTrampolineBlock)(id target, SEL targetSelector, id sender);
++ (SEL) createTrampolineForClass:(Class)targetClass selector:(SEL)targetSelector withBlock:(SelectorTrampolineBlock) block;
 
 @end
 
