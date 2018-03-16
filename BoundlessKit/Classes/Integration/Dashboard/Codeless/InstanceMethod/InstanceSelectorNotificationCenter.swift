@@ -34,7 +34,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
             let notifier = InstanceSelectorNotifier.init(instanceSelector) {
             notifiers[aName] = notifier
             notifier.addObserver(observer as AnyObject)
-            print("Added new observer for notification:\(aName.rawValue)")
+            print("Added observer for new notification:\(aName.rawValue)")
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
             return
         }

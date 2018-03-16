@@ -158,13 +158,14 @@ class TestInstanceSelectorNotification: XCTestCase {
         XCTAssert(notificationReceiver2.didReceiveNotification)
     }
     
-    func testNotificationAddTwiceAndRemoveThriceAndAdd() {
+    func testNotificationAddMultipleAndRemoveExtra() {
         let notificationReceiver = NotificationReceiver()
         let notificationReceiver2 = NotificationReceiver()
         let sut = MockViewController()
         let selectorInstanceActionID = "\(NSStringFromClass(MockViewController.self))-\(NSStringFromSelector(#selector(MockViewController.printSomething)))"
         
         InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: Notification.Name(rawValue: selectorInstanceActionID), object: nil)
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver2, selector: #selector(notificationReceiver2.receiveNotification(notification:)), name: Notification.Name(rawValue: selectorInstanceActionID), object: nil)
         InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver2, selector: #selector(notificationReceiver2.receiveNotification(notification:)), name: Notification.Name(rawValue: selectorInstanceActionID), object: nil)
         sut.printSomething()
         
@@ -174,7 +175,13 @@ class TestInstanceSelectorNotification: XCTestCase {
         notificationReceiver2.didReceiveNotification = false
         
         InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver, name: Notification.Name(rawValue: selectorInstanceActionID), object: nil)
-        InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver2, name: Notification.Name(rawValue: selectorInstanceActionID), object: nil)
+        sut.printSomething()
+        
+        XCTAssert(!notificationReceiver.didReceiveNotification)
+        XCTAssert(notificationReceiver2.didReceiveNotification)
+        notificationReceiver2.didReceiveNotification = false
+        
+        InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver, name: Notification.Name(rawValue: selectorInstanceActionID), object: nil)
         InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver2, name: Notification.Name(rawValue: selectorInstanceActionID), object: nil)
         sut.printSomething()
         
@@ -182,6 +189,7 @@ class TestInstanceSelectorNotification: XCTestCase {
         XCTAssert(!notificationReceiver2.didReceiveNotification)
         
         InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: Notification.Name(rawValue: selectorInstanceActionID), object: nil)
+        InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver2, name: Notification.Name(rawValue: selectorInstanceActionID), object: nil)
         sut.printSomething()
         
         XCTAssert(notificationReceiver.didReceiveNotification)
