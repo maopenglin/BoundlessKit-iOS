@@ -1,6 +1,6 @@
 {
   "name": "BoundlessKit",
-  "version": "5.2.12",
+  "version": "5.2.13",
   "summary": "A framework to use BoundlessAI reinforcement for iOS",
   "homepage": "https://github.com/BoundlessAI/BoundlessKit-iOS",
   "social_media_url": "https://twitter.com/boundlessAI",
@@ -14,7 +14,7 @@
   },
   "source": {
     "git": "https://github.com/BoundlessAI/BoundlessKit-iOS.git",
-    "tag": "5.2.12"
+    "tag": "5.2.13"
   },
   "platforms": {
     "ios": "9.0"
