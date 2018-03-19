@@ -15,6 +15,8 @@
 		842661C3204DE3C5001FEA2F /* BoundlessProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 842661C2204DE3C5001FEA2F /* BoundlessProperties.plist */; };
 		842661E5204E05B3001FEA2F /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		842661E6204E05BA001FEA2F /* BoundlessDemoProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 842661C4204DFE50001FEA2F /* BoundlessDemoProperties.plist */; };
+		84E53785205F6A3300F2315C /* Reward.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E53783205F6A3300F2315C /* Reward.swift */; };
+		84E53786205F6A3300F2315C /* RewardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E53784205F6A3300F2315C /* RewardsViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +45,8 @@
 		842661C2204DE3C5001FEA2F /* BoundlessProperties.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BoundlessProperties.plist; sourceTree = "<group>"; };
 		842661C4204DFE50001FEA2F /* BoundlessDemoProperties.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BoundlessDemoProperties.plist; sourceTree = "<group>"; };
 		842661DB204E03E8001FEA2F /* BoundlessKit_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoundlessKit_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		84E53783205F6A3300F2315C /* Reward.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reward.swift; sourceTree = "<group>"; };
+		84E53784205F6A3300F2315C /* RewardsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RewardsViewController.swift; sourceTree = "<group>"; };
 		938D580BBCCFD0A22693C187 /* Pods-BoundlessKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoundlessKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BoundlessKit_Tests/Pods-BoundlessKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		A6E23EE403314927A4B43AC3 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		BDC562A41F51EDFEEBDD96AE /* Pods-BoundlessKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoundlessKit_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-BoundlessKit_Example/Pods-BoundlessKit_Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -100,6 +104,8 @@
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
+				84E53783205F6A3300F2315C /* Reward.swift */,
+				84E53784205F6A3300F2315C /* RewardsViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
@@ -375,6 +381,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				84E53786205F6A3300F2315C /* RewardsViewController.swift in Sources */,
+				84E53785205F6A3300F2315C /* Reward.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
