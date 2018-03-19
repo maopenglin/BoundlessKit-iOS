@@ -216,6 +216,15 @@ public class CodelessAPI : NSObject {
     public static func recordAppEvent(name: String) {
         DispatchQueue.global().async {
             let appEvent = CustomCodelessEvent(target: "AppEvent", action: name)
+            submit { payload in
+                payload["sender"] = appEvent.sender
+                payload["target"] = appEvent.target
+                payload["selector"] = appEvent.action
+                payload["actionID"] = [appEvent.sender, appEvent.target, appEvent.action].joined(separator: "-")
+                payload["senderImage"] = ""
+                payload["utc"] = NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000)
+                payload["timezoneOffset"] = NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+            }
             appEvent.attemptReinforcement()
         }
     }
