@@ -129,7 +129,7 @@ internal class BoundlessProperties : UserDefaultsSingleton {
             
             if BoundlessProperties._primaryIdentity == nil {
                 if BoundlessConfiguration.current.advertiserID,
-                    let aid = ASIdentifierManager.shared().adId()?.uuidString,
+                    let aid = ASIdHelper.adId()?.uuidString,
                     aid != "00000000-0000-0000-0000-000000000000" {
                     BoundlessLog.debug("set ASIdentifierManager for primaryIdentity:(\(aid))")
                     BoundlessProperties._primaryIdentity = aid

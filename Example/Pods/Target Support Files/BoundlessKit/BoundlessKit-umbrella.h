@@ -10,7 +10,7 @@
 #endif
 #endif
 
-#import "ASIdentifierManager+ASIdentifierManagerHelper.h"
+#import "ASIdHelper.h"
 #import "SKPaymentTransactionObserver+Boundless.h"
 #import "SwizzleHelper.h"
 #import "UIApplication+Boundless.h"
