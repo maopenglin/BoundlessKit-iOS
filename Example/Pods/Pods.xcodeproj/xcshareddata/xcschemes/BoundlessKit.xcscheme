@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B292DC734178D75440033E45EF54007B"
-               BuildableName = "BoundlessKit.bundle"
-               BlueprintName = "BoundlessKit-BoundlessKit"
+               BlueprintIdentifier = "15CA5EEB718D8D60FEAF370A51E21B41"
+               BuildableName = "BoundlessKit.framework"
+               BlueprintName = "BoundlessKit"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -47,9 +47,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B292DC734178D75440033E45EF54007B"
-            BuildableName = "BoundlessKit.bundle"
-            BlueprintName = "BoundlessKit-BoundlessKit"
+            BlueprintIdentifier = "15CA5EEB718D8D60FEAF370A51E21B41"
+            BuildableName = "BoundlessKit.framework"
+            BlueprintName = "BoundlessKit"
             ReferencedContainer = "container:Pods.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
