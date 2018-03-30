@@ -33,6 +33,10 @@
         dynamicImp = [BoundlessObject createImpWithNoParam:targetSelector :trampolineSelector :block];
     } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :[BoundlessObject self] :@selector(templateMethodWithObjectParam:)]) {
         dynamicImp = [BoundlessObject createImpWithObjectParam:targetSelector :trampolineSelector :block];
+    } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :[BoundlessObject self] :@selector(templateMethodWithObjectObjectParam::)]) {
+        dynamicImp = [BoundlessObject createImpWithObjectObjectParam:targetSelector :trampolineSelector :block];
+    } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :[BoundlessObject self] :@selector(templateMethodWithObjectBoolObjectParam:::)]) {
+        dynamicImp = [BoundlessObject createImpWithObjectBoolObjectParam:targetSelector :trampolineSelector :block];
     } else if ([self compareMethodCreationTypeEncodings:methodTypeEncodingString :[BoundlessObject self] :@selector(templateMethodWithBoolParam:)]) {
         dynamicImp = [BoundlessObject createImpWithBoolParam:targetSelector :trampolineSelector :block];
     } else {
@@ -57,8 +61,8 @@
 
 + (IMP) createImpForSendAction :(SEL) targetSelector :(SEL) selector :(SelectorTrampolineBlock) trampBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self, SEL action, id target, id sender, UIEvent* event) {
-        if (!self || ![self respondsToSelector:selector]) {return;}
         trampBlock(target, action, sender);
+        if (!self || ![self respondsToSelector:selector]) {return;}
         ((BOOL (*)(id, SEL, SEL, id, id, UIEvent*))[self methodForSelector:selector])(self, selector, action, target, sender, event);
     });
     
@@ -68,8 +72,8 @@
 - (void) templateMethodWithNoParam { }
 + (IMP) createImpWithNoParam :(SEL) targetSelector :(SEL) selector :(SelectorTrampolineBlock) trampBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self) {
-        if (!self || ![self respondsToSelector:selector]) {return;}
         trampBlock(self, targetSelector, nil);
+        if (!self || ![self respondsToSelector:selector]) {return;}
         ((void (*)(id, SEL))[self methodForSelector:selector])(self, selector);
     });
     
@@ -79,9 +83,31 @@
 - (void) templateMethodWithObjectParam :(id) param1 { }
 + (IMP) createImpWithObjectParam :(SEL) targetSelector :(SEL) selector :(SelectorTrampolineBlock) trampBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self, id param) {
-        if (!self || ![self respondsToSelector:selector]) {return;}
         trampBlock(self, targetSelector, param);
+        if (!self || ![self respondsToSelector:selector]) {return;}
         ((void (*)(id, SEL, id))[self methodForSelector:selector])(self, selector, param);
+    });
+    
+    return dynamicImp;
+}
+
+- (void) templateMethodWithObjectObjectParam :(id) param1 :(id) param2 { }
++ (IMP) createImpWithObjectObjectParam :(SEL) targetSelector :(SEL) selector :(SelectorTrampolineBlock) trampBlock {
+    IMP dynamicImp = imp_implementationWithBlock(^(id self, id param1, id param2) {
+        trampBlock(self, targetSelector, param1);
+        if (!self || ![self respondsToSelector:selector]) {return;}
+        ((void (*)(id, SEL, id, id))[self methodForSelector:selector])(self, selector, param1, param2);
+    });
+    
+    return dynamicImp;
+}
+
+- (void) templateMethodWithObjectBoolObjectParam :(id) param1 :(BOOL) param2 :(id) param3 { }
++ (IMP) createImpWithObjectBoolObjectParam :(SEL) targetSelector :(SEL) selector :(SelectorTrampolineBlock) trampBlock {
+    IMP dynamicImp = imp_implementationWithBlock(^(id self, id param1, BOOL param2, id param3) {
+        trampBlock(self, targetSelector, nil);
+        if (!self || ![self respondsToSelector:selector]) {return;}
+        ((void (*)(id, SEL, id, bool, id))[self methodForSelector:selector])(self, selector, param1, param2, param3);
     });
     
     return dynamicImp;
@@ -90,8 +116,8 @@
 - (void) templateMethodWithBoolParam :(bool) param1 { }
 + (IMP) createImpWithBoolParam :(SEL) targetSelector :(SEL) selector :(SelectorTrampolineBlock) trampBlock {
     IMP dynamicImp = imp_implementationWithBlock(^(id self, bool param) {
-        if (!self || ![self respondsToSelector:selector]) {return;}
         trampBlock(self, targetSelector, nil);
+        if (!self || ![self respondsToSelector:selector]) {return;}
         ((void (*)(id, SEL, bool))[self methodForSelector:selector])(self, selector, param);
     });
     

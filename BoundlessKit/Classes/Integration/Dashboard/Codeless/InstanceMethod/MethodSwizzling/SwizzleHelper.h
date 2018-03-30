@@ -12,6 +12,8 @@
 @interface SwizzleHelper : NSObject
 
 + (BOOL) injectSelector:(Class) swizzledClass :(SEL) swizzledSelector :(Class) originalClass :(SEL) orignalSelector;
++ (NSArray*) classesConforming: (Protocol*) protocol;
++ (NSArray*) classesInheriting: (Class) parentClass;
 
 @end
 
