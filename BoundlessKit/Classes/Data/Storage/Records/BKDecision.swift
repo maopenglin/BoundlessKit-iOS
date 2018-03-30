@@ -36,17 +36,3 @@ internal class BKDecision : NSObject, BKData {
         aCoder.encode(actionID, forKey: "actionID")
     }
 }
-
-//extension BKDecision {
-//    
-//    var notification: Notification.Name {
-//        return NSNotification.Name.init(actionID + name)
-//    }
-//    
-//    func notifyObservers(userInfo: [AnyHashable : Any]?) {
-//        NotificationCenter.default.post(name: notification, object: nil, userInfo: userInfo)
-//        print("Posted notification with name:\(notification.rawValue)")
-//    }
-//    
-//}
-

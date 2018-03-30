@@ -104,7 +104,7 @@ internal class BoundlessAPIClient : HTTPClient {
                 }
             }
             self.coordinationWork = nil
-            print("Done boundlessapi sync coordination")
+            BKLog.debug("Done boundlessapi sync coordination")
         }
         coordinationWork = work
         coordinationQueue.async(execute: work)

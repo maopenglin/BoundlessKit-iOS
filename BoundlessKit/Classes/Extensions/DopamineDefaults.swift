@@ -77,9 +77,9 @@ open class DopamineDefaults : UserDefaults {
     
     
     open func clear() {
-        BKLog.print("In clear")
         removePersistentDomain(forName: DopamineDefaults.suiteName)
         synchronize()
+        BKLog.print("Defaults cleared")
     }
 
 }

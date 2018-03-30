@@ -23,8 +23,8 @@ internal class CodelessReinforcer : NSObject {
     
     @objc
     func receive(notification: Notification) {
-        print("Got notification:\(notification.name.rawValue)")
         let actionID = notification.name.rawValue
+        BKLog.print("Action peformed with actionID <\(actionID)>")
         guard let target = notification.userInfo?["target"] as? NSObject else { return }
         let sender = notification.userInfo?["sender"] as AnyObject?
         
@@ -32,15 +32,15 @@ internal class CodelessReinforcer : NSObject {
         case .reinforcement:
             BoundlessKit.standard.reinforce(actionID: actionID) { reinforcementID in
                 self.reinforcements[reinforcementID]?.show(targetInstance: target, senderInstance: sender)
-                print("showing reinforcement for \(actionID)...")
+                BKLog.debug("showing reinforcementID <\(reinforcementID)> for actionID <\(actionID)>...")
             }
         case .random:
             guard let randomReinforcement = Array(self.reinforcements.values).randomElement else {
-                BKLog.debug("no reinforcements for \(actionID)")
+                BKLog.debug("no reinforcements for actionID <\(actionID)>")
                 return
             }
             randomReinforcement.show(targetInstance: target, senderInstance: sender)
-            BKLog.debug("showing random reinforcement for \(actionID)...")
+            BKLog.debug("randomly showing reinforcementID <\(randomReinforcement.primitive)> for actionID <\(actionID)>...")
         }
     }
     

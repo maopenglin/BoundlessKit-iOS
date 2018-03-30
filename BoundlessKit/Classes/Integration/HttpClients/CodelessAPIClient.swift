@@ -46,6 +46,7 @@ internal class CodelessAPIClient : HTTPClient {
                 if oldValue == nil && self.visualizerSession != nil {
                     for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
                         InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: visualizerNotification, object: nil)
+                        BKLog.debug("Listening for selector notification <\(visualizerNotification.rawValue)>...")
                     }
                 } else if oldValue != nil && self.visualizerSession == nil {
                     InstanceSelectorNotificationCenter.default.removeObserver(self)
@@ -62,6 +63,7 @@ internal class CodelessAPIClient : HTTPClient {
         self.boundlessConfig = boundlessConfig
         self.visualizerSession = nil
         super.init(session: session)
+        
     }
     
     func boot(completion: @escaping () -> () = {}) {
@@ -153,12 +155,13 @@ internal class CodelessAPIClient : HTTPClient {
     
     @objc
     func submitToDashboard(notification: Notification) {
-        submitQueue.addOperation {
+        self.submitQueue.addOperation {
             guard let session = self.visualizerSession,
                 let target = notification.userInfo?["target"] as? NSObject,
                 let selector = notification.userInfo?["selector"] as? Selector,
-            var payload = self.properties.apiCredentials else {
-                return
+                var payload = self.properties.apiCredentials else {
+                    BKLog.debug("Failed to send notification <\(notification.name.rawValue)> to dashboard")
+                    return
             }
             let actionID = notification.name.rawValue
             let sender = notification.userInfo?["sender"] as AnyObject?
@@ -182,7 +185,6 @@ internal class CodelessAPIClient : HTTPClient {
             _ = sema.wait(timeout: .now() + 2)
         }
     }
-    
 }
 
 internal struct CodelessVisualizerSession {

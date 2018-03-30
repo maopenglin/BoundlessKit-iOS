@@ -109,7 +109,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
                 successful(false)
                 return
         }
-        print("Refreshing \(cartridge.actionID)...")
+        BKLog.print("Refreshing cartridge for actionID <\(cartridge.actionID)>...")
         
         payload["actionID"] = cartridge.actionID
         apiClient.post(url: BoundlessAPIEndpoint.refresh.url, jsonObject: payload) { response in
@@ -125,11 +125,11 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
                     cartridge.removeAll()
                     cartridge.append(values)
                     cartridge.expirationUTC = Int64( 1000*Date().addingTimeInterval(expiresIn).timeIntervalSince1970 )
-                    print("\(cartridge.actionID) refreshed!")
+                    BKLog.print("Cartridge refresh for actionID <\(cartridge.actionID)> succeeded!")
                     success = true
                 } else if responseStatusCode == 400 {
-                    print("Cartridge contained outdated actionID. Removing cartridge.")
                     self.removeValue(forKey: actionID)
+                    BKLog.print("Cartridge refresh determined actionID<\(cartridge.actionID)> is no longer a valid actionID. Cartridge deleted.")
                     success = true
                 }
             }

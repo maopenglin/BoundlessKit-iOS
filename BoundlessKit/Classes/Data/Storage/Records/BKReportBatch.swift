@@ -112,7 +112,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
                         self[actionID]?.removeFirst(actions.count)
                     }
                     self.storage?.0.archive(self, forKey: self.storage!.1)
-                    print("Cleared reported actions.")
+                    BKLog.debug("Cleared reported actions.")
                     success = true
                 }
             }
@@ -134,7 +134,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
 //            if let status = response?["status"] as? Int {
 //                if status == 200 || status == 400 {
 //                    self.removeValue(forKey: actionID)
-//                    print("Cleared reported actions.")
+//                    BKLog.debug("Cleared reported actions.")
 //                }
 //            }
 //            completion()

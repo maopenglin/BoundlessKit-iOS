@@ -18,7 +18,7 @@ internal struct BoundlessProperties {
     let inProduction: Bool
     var version: BoundlessVersion {
         didSet {
-            print("DId set version")
+            BKLog.print("Set BoundlessProperties version with versionID <\(version.versionID ?? "nil")>")
         }
     }
     let developmentSecret: String
@@ -34,10 +34,10 @@ internal struct BoundlessProperties {
         if let primaryIdentity = primaryIdentity {
             self.primaryIdentity = primaryIdentity
         } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
-            print("set identifierForVendor for primaryIdentity:(\(vid))")
+//            BKLog.print("set identifierForVendor for primaryIdentity:(\(vid))")
             self.primaryIdentity = vid
         } else {
-            print("set IDUnavailable for primaryIdentity")
+//            BKLog.print("set IDUnavailable for primaryIdentity")
             self.primaryIdentity = "IDUnavailable"
         }
     }
@@ -89,10 +89,10 @@ extension BoundlessProperties {
     }
     
     static func convert(from propertiesDictionary: [String: Any]) -> BoundlessProperties? {
-        guard let appID = propertiesDictionary["appID"] as? String else { print("Bad parameter"); return nil }
-        guard let inProduction = propertiesDictionary["inProduction"] as? Bool else { print("Bad parameter"); return nil }
-        guard let productionSecret = propertiesDictionary["productionSecret"] as? String else { print("Bad parameter"); return nil }
-        guard let developmentSecret = propertiesDictionary["developmentSecret"] as? String else { print("Bad parameter"); return nil }
+        guard let appID = propertiesDictionary["appID"] as? String else { BKLog.error("Bad parameter"); return nil }
+        guard let inProduction = propertiesDictionary["inProduction"] as? Bool else { BKLog.error("Bad parameter"); return nil }
+        guard let productionSecret = propertiesDictionary["productionSecret"] as? String else { BKLog.error("Bad parameter"); return nil }
+        guard let developmentSecret = propertiesDictionary["developmentSecret"] as? String else { BKLog.error("Bad parameter"); return nil }
         
         return BoundlessProperties.init(
             propertiesDictionary["primaryIdentity"] as? String,

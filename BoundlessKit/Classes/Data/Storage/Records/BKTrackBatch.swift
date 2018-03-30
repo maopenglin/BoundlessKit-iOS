@@ -100,7 +100,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
                 if status == 200 {
                     self.removeFirst(actions.count)
                     self.storage?.0.archive(self, forKey: self.storage!.1)
-                    print("Cleared tracked actions.")
+                    BKLog.debug("Cleared tracked actions.")
                     success = true
                 }
             }

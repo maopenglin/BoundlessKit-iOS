@@ -42,8 +42,8 @@ extension BoundlessVersion {
 
 extension BoundlessVersion {
     static func convert(from dict: [String: Any]) -> BoundlessVersion? {
-        guard let versionID = dict["versionID"] as? String else { print("Bad parameter"); return nil }
-        guard let mappings = dict["mappings"] as? [String: [String: Any]] else { print("Bad parameter"); return nil }
+        guard let versionID = dict["versionID"] as? String else { BKLog.error("Bad parameter"); return nil }
+        guard let mappings = dict["mappings"] as? [String: [String: Any]] else { BKLog.error("Bad parameter"); return nil }
         
         return BoundlessVersion.init(
             versionID,

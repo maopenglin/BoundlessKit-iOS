@@ -21,7 +21,7 @@ internal class HTTPClient {
     func post(url: URL, jsonObject: [String: Any], timeout:TimeInterval = 3.0, completion: @escaping ([String: Any]?) -> Void) -> URLSessionDataTaskProtocol {
         
         if logRequests {
-            print("Send <\(url.absoluteString)> call with request\n<\(jsonObject)>...")
+            BKLog.print("Send <\(url.absoluteString)> call with request\n<\(jsonObject)>...")
         }
         
         var request = URLRequest(url:url)
@@ -32,13 +32,13 @@ internal class HTTPClient {
             request.httpBody = try JSONSerialization.data(withJSONObject: jsonObject)
         } catch {
             let message = "\(url.absoluteString) call got error while converting request to JSON"
-            print(message)
+            BKLog.error(message)
         }
         
         return session.send(request: request) { responseData, responseURL, error in
             let response = self.convertResponseToJSON(url, responseData, responseURL, error)
             if self.logResponses {
-                print("<\(request.url?.absoluteString ?? "url:nil")> with\nrequest data:<\(jsonObject as AnyObject)>\ngot response:<\(response as AnyObject)>")
+                BKLog.print("<\(request.url?.absoluteString ?? "url:nil")> with\nrequest data:<\(jsonObject as AnyObject)>\ngot response:<\(response as AnyObject)>")
             }
             completion(response)
         }
@@ -47,26 +47,26 @@ internal class HTTPClient {
     fileprivate func convertResponseToJSON(_ url: URL, _ responseData: Data?, _ responseURL: URLResponse?, _ error: Error?)  -> [String: Any]? {
         guard responseURL != nil else {
             let message = "\(url.absoluteString) call got invalid response with error:<\(error?.localizedDescription as AnyObject)>"
-            print(message)
+            BKLog.error(message)
             return nil
         }
         
         guard let response = responseData else {
             let message = "\(url.absoluteString) call got no response data"
-            print(message)
+            BKLog.debug(message)
             return nil
         }
         
         if response.isEmpty {
-            print("\(url.absoluteString) called and got empty response")
+            BKLog.debug("\(url.absoluteString) called and got empty response")
             return nil
         } else if let jsonResponse = try? JSONSerialization.jsonObject(with: response) as? [String: AnyObject] {
-            print("\(url.absoluteString) call got json response")
+            BKLog.debug("\(url.absoluteString) call got json response")
             return jsonResponse
         } else {
             let message = "\(url.absoluteString) call got invalid response"
             let dataString: String = (responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? "") as String
-            print("\(message)\n\t<\(dataString)>")
+            BKLog.error("\(message)\n\t<\(dataString)>")
             return nil
         }
     }

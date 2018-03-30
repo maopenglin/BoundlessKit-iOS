@@ -56,7 +56,7 @@ class BoundlessKitLauncher : NSObject {
         
         apiClient.boot {
             BoundlessKit.standard.apiClient.properties = self.apiClient.properties
-            BoundlessKit.standard.apiClient.syncIfNeeded()
+            self.refreshKit()
             self.apiClient.promptPairing()
         }
         
