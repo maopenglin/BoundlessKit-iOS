@@ -16,7 +16,7 @@ class TestInstanceSelectorNotification: XCTestCase {
     }
     
     override func tearDown() {
-        InstanceSelectorNotificationCenter.default.removeAllObservers(name: nil)
+        
         super.tearDown()
     }
     
@@ -28,7 +28,7 @@ class TestInstanceSelectorNotification: XCTestCase {
         InstanceSelectorNotificationCenter.default.post(name: NSNotification.Name.init("aNotification"), object: nil)
         XCTAssert(notificationReceiver.didReceiveNotification)
         
-        InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver, name: nil, object: nil)
+        InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver)
     }
     
 //    func testPostNotification() {

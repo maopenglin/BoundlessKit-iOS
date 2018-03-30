@@ -9,8 +9,8 @@ import Foundation
 
 internal class HTTPClient {
     
-    internal var logRequests = false
-    internal var logResponses = false
+    internal var logRequests = true
+    internal var logResponses = true
     
     private let session: URLSessionProtocol
     

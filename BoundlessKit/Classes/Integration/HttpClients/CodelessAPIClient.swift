@@ -42,13 +42,16 @@ internal class CodelessAPIClient : HTTPClient {
     var visualizerSession: CodelessVisualizerSession? {
         didSet {
             BKUserDefaults.standard.set(visualizerSession?.encode(), forKey: "codelessSession")
-            if oldValue == nil && visualizerSession != nil {
-                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: InstanceSelectorNotificationCenter.actionMessagesNotification, object: nil)
-                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: InstanceSelectorNotificationCenter.actionMessagesNotification, object: nil)
-            } else if oldValue != nil && visualizerSession == nil {
-                InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.actionMessagesNotification, object: nil)
+            submitQueue.addOperation {
+                if oldValue == nil && self.visualizerSession != nil {
+                    for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
+                        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: visualizerNotification, object: nil)
+                    }
+                } else if oldValue != nil && self.visualizerSession == nil {
+                    InstanceSelectorNotificationCenter.default.removeObserver(self)
+                }
+                self.delegate?.didUpdate(session: self.visualizerSession)
             }
-            delegate?.didUpdate(session: visualizerSession)
         }
     }
     
@@ -59,7 +62,6 @@ internal class CodelessAPIClient : HTTPClient {
         self.boundlessConfig = boundlessConfig
         self.visualizerSession = nil
         super.init(session: session)
-        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: InstanceSelectorNotificationCenter.actionMessagesNotification, object: nil)
     }
     
     func boot(completion: @escaping () -> () = {}) {
@@ -98,7 +100,7 @@ internal class CodelessAPIClient : HTTPClient {
         payload["deviceName"] = UIDevice.current.name
 
         post(url: CodelessAPIEndpoint.identify.url, jsonObject: payload) { response in
-            switch response?["status"] as? Int ?? nil {
+            switch response?["status"] as? Int {
             case 202?:
                 DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
                     self.promptPairing()
@@ -153,16 +155,17 @@ internal class CodelessAPIClient : HTTPClient {
     func submitToDashboard(notification: Notification) {
         submitQueue.addOperation {
             guard let session = self.visualizerSession,
-                let actionID = notification.userInfo?["actionID"] as? String,
-                let target = notification.userInfo?["target"] as? String,
-                let selector = notification.userInfo?["selector"] as? String,
+                let target = notification.userInfo?["target"] as? NSObject,
+                let selector = notification.userInfo?["selector"] as? Selector,
             var payload = self.properties.apiCredentials else {
                 return
             }
+            let actionID = notification.name.rawValue
+            let sender = notification.userInfo?["sender"] as AnyObject?
             payload["connectionUUID"] = session.connectionUUID
-            payload["sender"] = ""
-            payload["target"] = target
-            payload["selector"] = selector
+            payload["sender"] = (sender == nil) ? "nil" : NSStringFromClass(type(of: sender!))
+            payload["target"] = NSStringFromClass(type(of: target))
+            payload["selector"] = NSStringFromSelector(selector)
             payload["actionID"] = actionID
             payload["senderImage"] = ""
             let sema = DispatchSemaphore(value: 0)

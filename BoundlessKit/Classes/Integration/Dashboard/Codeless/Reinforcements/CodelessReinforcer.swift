@@ -23,25 +23,24 @@ internal class CodelessReinforcer : NSObject {
     
     @objc
     func receive(notification: Notification) {
-        print("Got notification:\(notification.debugDescription)")
+        print("Got notification:\(notification.name.rawValue)")
+        let actionID = notification.name.rawValue
+        guard let target = notification.userInfo?["target"] as? NSObject else { return }
+        let sender = notification.userInfo?["sender"] as AnyObject?
+        
         switch CodelessReinforcer.showOption {
         case .reinforcement:
             BoundlessKit.standard.reinforce(actionID: actionID) { reinforcementID in
-                if let targetInstance = notification.object as? NSObject {
-                    self.reinforcements[reinforcementID]?.show(targetInstance: targetInstance, senderInstance: notification.userInfo?["senderInstance"] as AnyObject)
-                    print("showing reinforcement...")
-                } else {
-                    print("couldn't show reinforcement!")
-                }
+                self.reinforcements[reinforcementID]?.show(targetInstance: target, senderInstance: sender)
+                print("showing reinforcement for \(actionID)...")
             }
         case .random:
-            if let targetInstance = notification.object as? NSObject {
-                Array(self.reinforcements.values).selectRandom()?.show(targetInstance: targetInstance, senderInstance: notification.userInfo?["senderInstance"] as AnyObject)
-                BKLog.debug("showing random reinforcement...")
-            } else {
-                BKLog.debug("couldn't show reinforcement!")
+            guard let randomReinforcement = Array(self.reinforcements.values).randomElement else {
+                BKLog.debug("no reinforcements for \(actionID)")
+                return
             }
-            break
+            randomReinforcement.show(targetInstance: target, senderInstance: sender)
+            BKLog.debug("showing random reinforcement for \(actionID)...")
         }
     }
     

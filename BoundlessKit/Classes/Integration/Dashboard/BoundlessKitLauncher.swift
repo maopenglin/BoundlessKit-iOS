@@ -88,19 +88,21 @@ class BoundlessKitLauncher : NSObject {
 
 extension BoundlessKitLauncher : CodelessApiClientDelegate {
     func didUpdate(session: CodelessVisualizerSession?) {
-        guard let session = session else {
+        var mappings = apiClient.properties.version.mappings
+        if let session = session {
+            for (key, value) in session.mappings {
+                mappings[key] = value
+            }
+            CodelessReinforcer.showOption = .random
+        } else {
             CodelessReinforcer.showOption = .reinforcement
-            return
         }
-        CodelessReinforcer.showOption = .random
         
-        for (actionID, value) in codelessReinforcers.filter({ (actionID, _) -> Bool in
-            return session.mappings[actionID] == nil && apiClient.properties.version.mappings[actionID] == nil
-        }) {
+        for (actionID, value) in codelessReinforcers.filter({mappings[$0.key] == nil}) {
             InstanceSelectorNotificationCenter.default.removeObserver(value, name: Notification.Name(actionID), object: nil)
             codelessReinforcers.removeValue(forKey: actionID)
         }
-        for (actionID, value) in session.mappings {
+        for (actionID, value) in mappings {
             if let codeless = value["codeless"] as? [String: Any],
                 let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
                 let reinforcer: CodelessReinforcer
@@ -111,6 +113,7 @@ extension BoundlessKitLauncher : CodelessApiClientDelegate {
                     InstanceSelectorNotificationCenter.default.addObserver(reinforcer, selector: #selector(reinforcer.receive(notification:)), name: NSNotification.Name(actionID), object: nil)
                     codelessReinforcers[actionID] = reinforcer
                 }
+                reinforcer.reinforcements.removeAll()
                 for reinforcementDict in reinforcements {
                     if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
                         reinforcer.reinforcements[codelessReinforcement.primitive] = codelessReinforcement
@@ -118,8 +121,6 @@ extension BoundlessKitLauncher : CodelessApiClientDelegate {
                 }
             }
         }
-        
     }
-    
 }
 

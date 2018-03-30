@@ -8,7 +8,7 @@
 import Foundation
 
 extension Array {
-    func selectRandom() -> Element? {
+    var randomElement: Element? {
         guard !isEmpty else { return nil }
         return self[Int(arc4random_uniform(UInt32(self.count)))]
     }
