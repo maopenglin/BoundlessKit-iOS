@@ -10,10 +10,10 @@ import Foundation
 import BoundlessKit
 
 enum Reward : String {
-    case shimmy, pulse, vibrate, rotate, glow, sheen, emojisplosion, confetti
-    static let cases:[Reward] = [.shimmy, .pulse, .vibrate, .rotate, .glow, .sheen, .emojisplosion, .confetti]
+    case shimmy, pulse, vibrate, rotate, glow, sheen, emojisplosion, confetti, popup
+    static let cases:[Reward] = [.shimmy, .pulse, .vibrate, .rotate, .glow, .sheen, .emojisplosion, .confetti, .popup]
     
-    func test(view: UIView) {
+    func test(viewController: UIViewController, view: UIView) {
         let completion = {
             print("Completed showing reward type:\(self.rawValue)")
         }
@@ -34,7 +34,9 @@ enum Reward : String {
         case .emojisplosion:
             view.superview!.showEmojiSplosion(at: view.center, completion: completion)
         case .confetti:
-            view.showConfetti(completion: completion)
+            viewController.view.showConfetti(completion: completion)
+        case .popup:
+            viewController.view.showPopup(completion: completion)
         }
     }
 }

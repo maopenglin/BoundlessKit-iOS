@@ -70,11 +70,6 @@ class ViewController: UIViewController {
     
     @objc func action2Performed(){
         print("Action 2 performed")
-        if #available(iOS 10.0, *) {
-            self.view.showPopup()
-        } else {
-            // Fallback on earlier versions
-        }
 //        kit.reinforce(actionID: "action1") { reinforcement in }
         ////        // Tracking call is sent asynchronously
         //////        BoundlessKit.track("action2", metaData: ["key":"value", "calories":9000])
@@ -149,6 +144,7 @@ class ViewController: UIViewController {
         action1Button = UIButton.init(frame: CGRect(x: 0, y: 0, width: viewSize.width/3, height: viewSize.width/6+10))
         action1Button.center = CGPoint(x: viewSize.width/4, y: viewCenter.y)
         action1Button.layer.cornerRadius = 5
+        action1Button.clipsToBounds = true
         action1Button.setTitle("Reinforce a user action", for: UIControlState())
         action1Button.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
         action1Button.titleLabel?.textAlignment = NSTextAlignment.center
@@ -160,6 +156,7 @@ class ViewController: UIViewController {
         trackedActionButton = UIButton.init(frame: CGRect(x: 0, y: 0, width: viewSize.width/3, height: viewSize.width/6+10))
         trackedActionButton.center = CGPoint(x: viewSize.width/4*3, y: viewCenter.y)
         trackedActionButton.layer.cornerRadius = 5
+        trackedActionButton.clipsToBounds = true
         trackedActionButton.setTitle("Track a user action", for: UIControlState())
         trackedActionButton.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
         trackedActionButton.titleLabel?.textAlignment = NSTextAlignment.center

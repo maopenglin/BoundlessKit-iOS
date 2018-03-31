@@ -14,20 +14,20 @@ import AVFoundation
 // call all these in main queue DispatchQueue.main
 public extension UIView {
     
-    @available(iOS 10.0, *)
     public func showPopup(content: UIImage? = "❤️".image(),
                           duration:TimeInterval = 1.0,
-                          style: UIBlurEffectStyle = UIBlurEffectStyle.regular
-                          ) {
+                          style: UIBlurEffectStyle = UIBlurEffectStyle.light,
+                          completion: @escaping ()->Void = {}
+        ) {
         let blurEffectView = UIVisualEffectView(effect: nil)
         blurEffectView.frame = self.bounds
         self.addSubview(blurEffectView)
         
         let popupView = UIImageView(image: content)
-        popupView.center = self.center
+        popupView.center = blurEffectView.center
         popupView.alpha = 0
         popupView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-        self.addSubview(popupView)
+        blurEffectView.contentView.addSubview(popupView)
         
         UIView.animate(
             withDuration: 0.3,
@@ -48,8 +48,8 @@ public extension UIView {
                         blurEffectView.effect = nil
                 },
                     completion: { _ in
-                        popupView.removeFromSuperview()
                         blurEffectView.removeFromSuperview()
+                        completion()
                 })
         })
     }

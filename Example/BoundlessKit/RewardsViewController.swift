@@ -37,6 +37,7 @@ extension RewardsViewController {
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         Reward.cases[indexPath.item].test(
+            viewController: self,
             view: collectionView.cellForItem(at: indexPath)!
         )
     }
