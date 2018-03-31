@@ -70,6 +70,11 @@ class ViewController: UIViewController {
     
     @objc func action2Performed(){
         print("Action 2 performed")
+        if #available(iOS 10.0, *) {
+            self.view.showPopup()
+        } else {
+            // Fallback on earlier versions
+        }
 //        kit.reinforce(actionID: "action1") { reinforcement in }
         ////        // Tracking call is sent asynchronously
         //////        BoundlessKit.track("action2", metaData: ["key":"value", "calories":9000])

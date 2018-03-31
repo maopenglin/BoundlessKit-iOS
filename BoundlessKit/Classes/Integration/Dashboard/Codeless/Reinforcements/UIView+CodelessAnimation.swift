@@ -14,6 +14,46 @@ import AVFoundation
 // call all these in main queue DispatchQueue.main
 public extension UIView {
     
+    @available(iOS 10.0, *)
+    public func showPopup(content: UIImage? = "❤️".image(),
+                          duration:TimeInterval = 1.0,
+                          style: UIBlurEffectStyle = UIBlurEffectStyle.regular
+                          ) {
+        let blurEffectView = UIVisualEffectView(effect: nil)
+        blurEffectView.frame = self.bounds
+        self.addSubview(blurEffectView)
+        
+        let popupView = UIImageView(image: content)
+        popupView.center = self.center
+        popupView.alpha = 0
+        popupView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+        self.addSubview(popupView)
+        
+        UIView.animate(
+            withDuration: 0.3,
+            animations: {
+                blurEffectView.effect = UIBlurEffect(style: style)
+                
+                popupView.alpha = 1
+                popupView.transform = .identity
+        },
+            completion: { _ in
+                UIView.animate(
+                    withDuration: 0.7,
+                    delay: duration,
+                    animations: {
+                        popupView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+                        popupView.alpha = 0
+                        
+                        blurEffectView.effect = nil
+                },
+                    completion: { _ in
+                        popupView.removeFromSuperview()
+                        blurEffectView.removeFromSuperview()
+                })
+        })
+    }
+    
     public func showEmojiSplosion(at location:CGPoint,
                                   content: CGImage? = "❤️".image().cgImage,
                                   scale: CGFloat = 0.6,
