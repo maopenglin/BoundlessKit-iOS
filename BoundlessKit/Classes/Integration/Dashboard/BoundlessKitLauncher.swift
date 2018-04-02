@@ -18,53 +18,30 @@ public class BoundlessKitLauncherObjc : NSObject {
 
 class BoundlessKitLauncher : NSObject {
     
-    var apiClient: CodelessAPIClient
+    var codelessAPIClient: CodelessAPIClient
     let database = BKUserDefaults.standard
     
     var codelessReinforcers = [String: CodelessReinforcer]()
     
     override init() {
-        let boundlessProperties: BoundlessProperties
-        let boundlessConfig: BoundlessConfiguration
-        let session: CodelessVisualizerSession?
-        
-        if let versionData = database.object(forKey: "codelessVersion") as? Data,
-            let version = BoundlessVersion(data: versionData) {
-            BoundlessKit.standard.apiClient.properties.version = version
-        }
-        boundlessProperties = BoundlessKit.standard.apiClient.properties
-        if let configData = database.object(forKey: "codelessConfig") as? Data,
-            let config = BoundlessConfiguration.init(data: configData) {
-            boundlessConfig = config
-        } else {
-            boundlessConfig = BoundlessConfiguration()
-        }
-        if let sessionData = database.object(forKey: "codelessSession") as? Data,
-            let savedSession = CodelessVisualizerSession(data: sessionData) {
-            session = savedSession
-        } else {
-            session = nil
-        }
-        
-        self.apiClient = CodelessAPIClient.init(properties: boundlessProperties,
-                                                boundlessConfig: boundlessConfig)
+        self.codelessAPIClient = CodelessAPIClient()
         super.init()
         
-        apiClient.visualizerSession = session
-        self.didUpdate(session: session)
-        apiClient.delegate = self
+        codelessAPIClient.delegate = self
+        // set session again to run `didSet` routine
+        codelessAPIClient.visualizerSession = codelessAPIClient.visualizerSession
         
-        apiClient.boot {
-            BoundlessKit.standard.apiClient.properties = self.apiClient.properties
+        codelessAPIClient.boot {
+            BoundlessKit.standard.apiClient.properties = self.codelessAPIClient.properties
             self.refreshKit()
-            self.apiClient.promptPairing()
+            self.codelessAPIClient.promptPairing()
         }
         
         refreshKit()
     }
     
     func refreshKit() {
-        for (actionID, value) in apiClient.properties.version.mappings {
+        for (actionID, value) in codelessAPIClient.properties.version.mappings {
             BoundlessKit.standard.refreshContainer.commit(actionID: actionID, with: BoundlessKit.standard.apiClient)
             if let codeless = value["codeless"] as? [String: Any],
                 let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
@@ -88,7 +65,7 @@ class BoundlessKitLauncher : NSObject {
 
 extension BoundlessKitLauncher : CodelessApiClientDelegate {
     func didUpdate(session: CodelessVisualizerSession?) {
-        var mappings = apiClient.properties.version.mappings
+        var mappings = codelessAPIClient.properties.version.mappings
         if let session = session {
             for (key, value) in session.mappings {
                 mappings[key] = value
@@ -101,6 +78,7 @@ extension BoundlessKitLauncher : CodelessApiClientDelegate {
         for (actionID, value) in codelessReinforcers.filter({mappings[$0.key] == nil}) {
             InstanceSelectorNotificationCenter.default.removeObserver(value, name: Notification.Name(actionID), object: nil)
             codelessReinforcers.removeValue(forKey: actionID)
+            BKLog.debug("Removed reinforcer and notification for <\(actionID)>")
         }
         for (actionID, value) in mappings {
             if let codeless = value["codeless"] as? [String: Any],
@@ -108,10 +86,12 @@ extension BoundlessKitLauncher : CodelessApiClientDelegate {
                 let reinforcer: CodelessReinforcer
                 if let r = codelessReinforcers[actionID] {
                     reinforcer = r
+                    BKLog.debug("Updating reinforcer for <\(actionID)> notification")
                 } else {
                     reinforcer = CodelessReinforcer(forActionID: actionID)
                     InstanceSelectorNotificationCenter.default.addObserver(reinforcer, selector: #selector(reinforcer.receive(notification:)), name: NSNotification.Name(actionID), object: nil)
                     codelessReinforcers[actionID] = reinforcer
+                    BKLog.debug("Created reinforcer for <\(actionID)> notification")
                 }
                 reinforcer.reinforcements.removeAll()
                 for reinforcementDict in reinforcements {

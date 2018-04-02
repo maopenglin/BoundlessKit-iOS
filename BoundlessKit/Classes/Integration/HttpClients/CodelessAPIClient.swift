@@ -29,17 +29,39 @@ internal class CodelessAPIClient : HTTPClient {
     
     var delegate: CodelessApiClientDelegate?
     
-    var properties: BoundlessProperties {
+    var properties: BoundlessProperties = {
+        var currentProperties = BoundlessKit.standard.apiClient.properties
+        if let versionData = BKUserDefaults.standard.object(forKey: "codelessVersion") as? Data,
+            let version = BoundlessVersion(data: versionData) {
+            currentProperties.version = version
+        }
+        BoundlessKit.standard.apiClient.properties = currentProperties
+        return currentProperties
+        } () {
         didSet {
             BKUserDefaults.standard.set(properties.version.encode(), forKey: "codelessVersion")
         }
     }
-    var boundlessConfig: BoundlessConfiguration {
+    var boundlessConfig: BoundlessConfiguration = {
+        if let configData = BKUserDefaults.standard.object(forKey: "codelessConfig") as? Data,
+            let config = BoundlessConfiguration.init(data: configData) {
+            return config
+        } else {
+            return BoundlessConfiguration()
+        }
+        } () {
         didSet {
             BKUserDefaults.standard.set(boundlessConfig.encode(), forKey: "codelessConfig")
         }
     }
-    var visualizerSession: CodelessVisualizerSession? {
+    var visualizerSession: CodelessVisualizerSession? = {
+        if let sessionData = BKUserDefaults.standard.object(forKey: "codelessSession") as? Data,
+            let savedSession = CodelessVisualizerSession(data: sessionData) {
+            return savedSession
+        } else {
+            return nil
+        }
+        } () {
         didSet {
             BKUserDefaults.standard.set(visualizerSession?.encode(), forKey: "codelessSession")
             submitQueue.addOperation {
@@ -54,16 +76,6 @@ internal class CodelessAPIClient : HTTPClient {
                 self.delegate?.didUpdate(session: self.visualizerSession)
             }
         }
-    }
-    
-    init(properties: BoundlessProperties,
-         boundlessConfig: BoundlessConfiguration,
-         session: URLSessionProtocol = URLSession.shared) {
-        self.properties = properties
-        self.boundlessConfig = boundlessConfig
-        self.visualizerSession = nil
-        super.init(session: session)
-        
     }
     
     func boot(completion: @escaping () -> () = {}) {
