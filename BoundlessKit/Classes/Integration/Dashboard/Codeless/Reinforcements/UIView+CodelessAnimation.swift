@@ -224,7 +224,7 @@ public extension UIView {
             ).start(view: self, animation: rotateAnimation)
     }
     
-    public func showGlow(duration: Double = 0.2, color: UIColor = UIColor(red: 153/256.0, green: 101/256.0, blue: 21/256.0, alpha: 0.8), alpha: CGFloat = 0.8, radius: CGFloat = 50, count: Float = 2, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
+    public func showGlow(duration: Double = 1.7, color: UIColor = UIColor(red: 255/256.0, green: 28/256.0, blue: 251/256.0, alpha: 0.8), alpha: CGFloat = 0.8, radius: CGFloat = 250, count: Float = 2, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
         
         UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
         
@@ -247,7 +247,7 @@ public extension UIView {
         animation.fromValue = 0
         animation.toValue = alpha
         animation.repeatCount = count
-        animation.duration = duration
+        animation.duration = duration/TimeInterval(count)
         //        animation.speed = 0.35
         animation.autoreverses = true
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)

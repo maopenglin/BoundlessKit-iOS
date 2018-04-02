@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Basic Testing-->
+        <!--BoundlessKit-->
         <scene sceneID="ufC-wZ-h7g">
             <objects>
                 <viewController storyboardIdentifier="ViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="vXZ-lx-hvc" customClass="ViewController" customModule="BoundlessKit_Example" customModuleProvider="target" sceneMemberID="viewController">
@@ -22,8 +22,8 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Basic Testing" id="bMC-cS-VG5">
-                        <barButtonItem key="rightBarButtonItem" title="Item" id="ytO-c3-bCJ" userLabel="Rewards">
+                    <navigationItem key="navigationItem" title="BoundlessKit" id="bMC-cS-VG5">
+                        <barButtonItem key="rightBarButtonItem" title="Rewards" id="ytO-c3-bCJ" userLabel="Rewards">
                             <connections>
                                 <segue destination="kyo-wN-eee" kind="show" id="N3R-8B-irS"/>
                             </connections>
