@@ -29,7 +29,10 @@ class BoundlessKitLauncher : NSObject {
         
         codelessAPIClient.delegate = self
         // set session again to run `didSet` routine
-        codelessAPIClient.visualizerSession = codelessAPIClient.visualizerSession
+        let session = codelessAPIClient.visualizerSession
+        codelessAPIClient.visualizerSession = nil
+        codelessAPIClient.visualizerSession = session
+        
         
         codelessAPIClient.boot {
             BoundlessKit.standard.apiClient.properties = self.codelessAPIClient.properties
@@ -86,6 +89,7 @@ extension BoundlessKitLauncher : CodelessApiClientDelegate {
                 let reinforcer: CodelessReinforcer
                 if let r = codelessReinforcers[actionID] {
                     reinforcer = r
+                    reinforcer.reinforcements.removeAll()
                     BKLog.debug("Updating reinforcer for <\(actionID)> notification")
                 } else {
                     reinforcer = CodelessReinforcer(forActionID: actionID)
@@ -93,7 +97,6 @@ extension BoundlessKitLauncher : CodelessApiClientDelegate {
                     codelessReinforcers[actionID] = reinforcer
                     BKLog.debug("Created reinforcer for <\(actionID)> notification")
                 }
-                reinforcer.reinforcements.removeAll()
                 for reinforcementDict in reinforcements {
                     if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
                         reinforcer.reinforcements[codelessReinforcement.primitive] = codelessReinforcement
