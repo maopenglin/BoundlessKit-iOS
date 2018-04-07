@@ -9,7 +9,7 @@
 #define NSObject_Boundless_h
 
 @interface BoundlessObject : NSObject
-typedef void (^ SelectorTrampolineBlock)(id target, SEL targetSelector, id sender);
+typedef void (^ SelectorTrampolineBlock)(Class targetClass,  SEL targetSelector, id target,id sender);
 + (SEL) createTrampolineForClass:(Class)targetClass selector:(SEL)targetSelector withBlock:(SelectorTrampolineBlock) block;
 
 @end

@@ -67,9 +67,12 @@ internal class CodelessAPIClient : HTTPClient {
             submitQueue.addOperation {
                 if oldValue == nil && self.visualizerSession != nil {
                     for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
-                        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: visualizerNotification, object: nil)
+                        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.getNotif(notification:)), name: visualizerNotification, object: nil)
                         BKLog.debug("Listening for selector notification <\(visualizerNotification.rawValue)>...")
                     }
+//                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.getNotif(notification:)), name: Notification.Name.init("BoundlessKit_Example.ViewController-viewDidAppear:"), object: nil)
+                    
+                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: nil, object: nil)
                 } else if oldValue != nil && self.visualizerSession == nil {
                     InstanceSelectorNotificationCenter.default.removeObserver(self)
                 }
@@ -166,20 +169,26 @@ internal class CodelessAPIClient : HTTPClient {
     }()
     
     @objc
+    func getNotif(notification: Notification) {
+        print("Got notification:\(notification.name.rawValue) ")//with info:\(notification.userInfo?.keys)")
+    }
+    
+    @objc
     func submitToDashboard(notification: Notification) {
         self.submitQueue.addOperation {
             guard let session = self.visualizerSession,
-                let target = notification.userInfo?["target"] as? NSObject,
+                let targetClass = notification.userInfo?["classType"] as? AnyClass,
                 let selector = notification.userInfo?["selector"] as? Selector,
                 var payload = self.properties.apiCredentials else {
                     BKLog.debug("Failed to send notification <\(notification.name.rawValue)> to dashboard")
                     return
             }
+            
             let actionID = notification.name.rawValue
-            let sender = notification.userInfo?["sender"] as AnyObject?
+            let sender = notification.userInfo?["sender"] as AnyObject
             payload["connectionUUID"] = session.connectionUUID
-            payload["sender"] = (sender == nil) ? "nil" : NSStringFromClass(type(of: sender!))
-            payload["target"] = NSStringFromClass(type(of: target))
+            payload["sender"] = (type(of: sender) == NSNull.self) ? "nil" : NSStringFromClass(type(of: sender))
+            payload["target"] = NSStringFromClass(targetClass)
             payload["selector"] = NSStringFromSelector(selector)
             payload["actionID"] = actionID
             payload["senderImage"] = ""
@@ -231,4 +240,3 @@ internal struct CodelessVisualizerSession {
         return data as Data
     }
 }
-

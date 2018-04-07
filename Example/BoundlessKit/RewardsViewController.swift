@@ -1,5 +1,5 @@
 //
-//  RewardsViewController.swift
+//  RewardsViewControllerParent.swift
 //  BoundlessKit_Example
 //
 //  Created by Akash Desai on 3/15/18.
@@ -9,17 +9,29 @@
 import Foundation
 import UIKit
 
-class RewardsViewController : UICollectionViewController {
+class RewardsViewController : RewardsViewControllerParent {
+    
+    static var current: RewardsViewController?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        RewardsViewController.current = self
+    }
+    
+//    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        super.collectionView(collectionView, didSelectItemAt: indexPath)
+//    }
+}
+
+class RewardsViewControllerParent : UICollectionViewController {
     
     fileprivate let reuseIdentifier = "RewardTypeCell"
     fileprivate let sectionInsets = UIEdgeInsets(top: 50.0, left: 20.0, bottom: 50.0, right: 20.0)
     fileprivate let itemsPerRow: CGFloat = 3
     
-    static var current: RewardsViewController?
-    
 }
 
-extension RewardsViewController {
+extension RewardsViewControllerParent {
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return Reward.cases.count
@@ -41,11 +53,6 @@ extension RewardsViewController {
             view: collectionView.cellForItem(at: indexPath)!
         )
     }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        RewardsViewController.current = self
-    }
 }
 
 
@@ -55,7 +62,7 @@ class RewardTypeCell : UICollectionViewCell {
     
 }
 
-extension RewardsViewController: UICollectionViewDelegateFlowLayout {
+extension RewardsViewControllerParent: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let paddingSpace = sectionInsets.left * (itemsPerRow + 1)
@@ -78,3 +85,4 @@ extension RewardsViewController: UICollectionViewDelegateFlowLayout {
     }
     
 }
+

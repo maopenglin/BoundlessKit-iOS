@@ -7,46 +7,44 @@
 
 import Foundation
 
+@objc
+class Nothing : NSObject {
+    
+}
+
 extension InstanceSelectorNotificationCenter {
-    internal static var visualizerNotifications: [Notification.Name] = {
-        return [actionMessagesNotification,
-                viewControllerDidAppearNotification
-            ] + collectionViewControllerDidSelectNotifications
-    }()
+    internal static var visualizerNotifications: [Notification.Name] {
+        return [actionMessagesNotification]
+            + viewControllerDidAppearNotifications
+            + collectionViewControllerDidSelectNotifications
+    }
     
-    internal static var actionMessagesNotification: Notification.Name = {
-        return InstanceSelector.init(UIApplication.self, #selector(UIApplication.sendAction(_:to:from:for:)))!.notification
-    }()
+    internal static var actionMessagesNotification: Notification.Name {
+        return InstanceSelector(UIApplication.self, #selector(UIApplication.sendAction(_:to:from:for:)))!.notification
+    }
     
-    internal static var viewControllerDidAppearNotification: Notification.Name = {
-        return InstanceSelector.init(UIViewController.self, #selector(UIViewController.viewDidAppear(_:)))!.notification
-    }()
+    internal static var viewControllerDidAppearNotifications: [Notification.Name] {
+        return forSubclasses(parentClass: UIViewController.self, #selector(UIViewController.viewDidAppear(_:)))
+    }
     
-    internal static var collectionViewControllerDidSelectNotifications: [Notification.Name] = {
-        return forSubclasses(parentClass: UICollectionViewController.self, #selector(UICollectionViewController.collectionView(_:didSelectItemAt:))).map({$0.notification})
-    }()
+    internal static var viewControllerDidAppearNotification: Notification.Name {
+        return InstanceSelector(UIViewController.self, #selector(UIViewController.viewDidAppear(_:)))!.notification
+    }
     
-    fileprivate static func forSubclasses(parentClass: AnyClass, _ selector: Selector) -> [InstanceSelector] {
+    internal static var collectionViewControllerDidSelectNotifications: [Notification.Name] {
+        return forSubclasses(parentClass: UICollectionViewController.self, #selector(UICollectionViewController.collectionView(_:didSelectItemAt:)))
+    }
+    
+    internal static func forSubclasses(parentClass: AnyClass, _ selector: Selector) -> [Notification.Name] {
         if let classes = SwizzleHelper.classesInheriting(parentClass) as? [AnyClass] {
-//            for c in classes {
-//                print("Class:\(c)")
-//            }
-//            for c in classes.flatMap({InstanceSelector.init($0, selector)}) {
-//                print("Valid class:\(c)")
-//            }
-            return classes.flatMap({InstanceSelector.init($0, selector)})
+            return classes.flatMap({InstanceSelector($0, selector)?.notification})
         }
         return []
     }
-    fileprivate static func forClassesConforming(to searchProtocol: Protocol, with selector: Selector) -> [InstanceSelector] {
+    
+    internal static func forClassesConforming(to searchProtocol: Protocol, with selector: Selector) -> [Notification.Name] {
         if let classes = SwizzleHelper.classesConforming(searchProtocol) as? [AnyClass] {
-//            for c in classes {
-//                print("Class:\(c)")
-//            }
-//            for c in classes.flatMap({InstanceSelector.init($0, selector)}) {
-//                print("Valid class:\(c)")
-//            }
-            return classes.flatMap({InstanceSelector.init($0, selector)})
+            return classes.flatMap({InstanceSelector.init($0, selector)?.notification})
         }
         return []
     }
@@ -71,7 +69,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
         if let notifier = notifiers[aName] {
             notifier.addObserver(observer as AnyObject)
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
-            BKLog.print("Added observer for actionID <\(aName.rawValue)>")
+            BKLog.print("Added observer for notification:\(aName.rawValue)")
             return
         }
         
@@ -79,46 +77,57 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
             let notifier = InstanceSelectorNotifier.init(instanceSelector) {
             notifiers[aName] = notifier
             notifier.addObserver(observer as AnyObject)
-            BKLog.print("Added observer for actionID <\(aName.rawValue)>")
+            BKLog.print("Added observer for new notification:\(aName.rawValue)")
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
             return
         }
         
-        BKLog.error("Cannot add observer actionID <\(aName)> because invalid InstanceSelector actionID <\(aName.rawValue)>")
+        BKLog.error("Cannot create instance method for notification<\(aName)>")
+    }
+    
+    override public func removeObserver(_ observer: Any) {
+        self.removeObserver(observer, name: nil, object: nil)
     }
     
     override public func removeObserver(_ observer: Any, name aName: NSNotification.Name?, object anObject: Any?) {
         if let aName = aName {
             notifiers[aName]?.removeObserver(observer as AnyObject)
-            BKLog.print("Removed observer <\(observer)> for actionID <\(aName.rawValue)>")
+            BKLog.print("Removed observer for notification:\(aName.rawValue)")
         } else {
             for notifier in notifiers.values {
                 notifier.removeObserver(observer as AnyObject)
             }
-            BKLog.print("Removed observer <\(observer)> for all actionIDs")
         }
         super.removeObserver(observer, name: aName, object: anObject)
     }
     
-    public override func removeObserver(_ observer: Any) {
-        super.removeObserver(observer)
-        for (_, notifier) in notifiers {
-            notifier.removeObserver(observer as AnyObject)
+    public func removeAllObservers(name aName: NSNotification.Name?) {
+        if let aName = aName {
+            for observer in notifiers[aName]?.removeAllObservers() ?? [] {
+                super.removeObserver(observer, name: aName, object: nil)
+            }
+        } else {
+            for (notification, notifier) in notifiers {
+                for observer in notifier.removeAllObservers() {
+                    super.removeObserver(observer, name: notification, object: nil)
+                }
+            }
         }
     }
 }
 
 fileprivate class InstanceSelectorNotifier : NSObject {
     
-    let instanceSelector: InstanceSelector
-    let notificationSelector: InstanceSelector
-    private var observers = [WeakObject]()
-    struct WeakObject {
+    private struct WeakObject {
         weak var value: AnyObject?
         init (value: AnyObject) {
             self.value = value
         }
     }
+    
+    let instanceSelector: InstanceSelector
+    let notificationSelector: InstanceSelector
+    private var observers = [WeakObject]()
     
     init?(_ instanceSelector: InstanceSelector) {
         if let notificationMethod = BoundlessObject.createTrampoline(for: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorNotifier.postInstanceSelectorNotificationBlock),
@@ -146,50 +155,58 @@ fileprivate class InstanceSelectorNotifier : NSObject {
         }
     }
     
-    private static var postInstanceSelectorNotificationBlock: SelectorTrampolineBlock {
-        return { target, selector, sender in
-            guard let targetInstance = target as? NSObject,
-                let targetSelector = selector,
-                let instanceSelector = InstanceSelector(type(of: targetInstance), targetSelector) else {
-                    BKLog.error("Not posting because <\(String(describing: target))-\(String(describing: selector))> is not a valid instance selector")
+    func removeAllObservers() -> [AnyObject] {
+        if observers.count != 0 {
+            instanceSelector.swizzle(with: notificationSelector)
+        }
+        let oldObservers = observers.flatMap({$0.value})
+        observers = []
+        return oldObservers
+    }
+    
+    static var postInstanceSelectorNotificationBlock: SelectorTrampolineBlock {
+        return { aClassType, aSelector, aTarget, aSender in
+            guard let classType = aClassType,
+                let selector = aSelector,
+                let instanceSelector = InstanceSelector(classType, selector) else {
+                    print("Not posting because <\(String(describing: aClassType))-\(String(describing: aSelector))> is not a valid instance selector")
                     return
             }
-            let notification = Notification.init(name: instanceSelector.notification, object: nil, userInfo: ["sender":sender as Any,
-                                                                                                              "target": targetInstance,
-                                                                                                              "selector": targetSelector])
-            BKLog.debug("Posting actionID notification:\(notification.name.rawValue)")
-            InstanceSelectorNotificationCenter.default.post(notification)
+            let notification = Notification.Name.init(instanceSelector.name)
+            InstanceSelectorNotificationCenter.default.post(name: notification,
+                                                            object: nil,
+                                                            userInfo: ["classType": classType,
+                                                                       "selector": selector,
+                                                                       "sender": aSender as Any,
+                                                                       "target": aTarget as Any,
+                                                                       ]
+            )
+            print("Posted instance method notification with name:\(notification.rawValue)")
         }
     }
 }
 
 fileprivate struct InstanceSelector {
-    
-    let prefix: String
     let classType: AnyClass
     let selector: Selector
-    var name: String { return [prefix, NSStringFromClass(classType), NSStringFromSelector(selector)].joined(separator: "-") }
+    
+    var name: String { return [NSStringFromClass(classType), NSStringFromSelector(selector)].joined(separator: "-") }
     
     init?(_ classType: AnyClass, _ selector: Selector) {
-        self.init("action", classType, selector)
-    }
-    init?(_ prefix: String, _ classType: AnyClass, _ selector: Selector) {
         guard classType.instancesRespond(to: selector) else {
-            BKLog.debug("class<\(classType)> does not respond to selector<\(selector)>")
+            BKLog.debug("Could not initialize InstanceSelector because class <\(classType)> does not respond to selector <\(selector)>")
             return nil
         }
-        self.prefix = prefix
         self.classType = classType
         self.selector = selector
     }
     
     init?(_ name: String) {
         let components = name.components(separatedBy: "-")
-        if components.count == 3,
-            let prefix = components.first,
-            let classType = NSClassFromString(components[1]) {
-            let selector = NSSelectorFromString(components[2])
-            self.init(prefix, classType, selector)
+        if components.count == 2,
+            let classType = NSClassFromString(components[0]) {
+            let selector = NSSelectorFromString(components[1])
+            self.init(classType, selector)
         } else {
             return nil
         }

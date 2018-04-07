@@ -14,7 +14,7 @@
 @implementation SwizzleHelper
 
 + (BOOL) injectSelector:(Class) swizzledClass :(SEL) swizzledSelector :(Class) originalClass :(SEL) orignalSelector {
-    NSLog(@"Injecting selector %@ for class %@ with %@", NSStringFromSelector(orignalSelector), NSStringFromClass(originalClass), NSStringFromSelector(swizzledSelector));
+//    NSLog(@"Injecting selector %@ for class %@ with %@", NSStringFromSelector(orignalSelector), NSStringFromClass(originalClass), NSStringFromSelector(swizzledSelector));
     Method newMeth = class_getInstanceMethod(swizzledClass, swizzledSelector);
     IMP imp = method_getImplementation(newMeth);
     const char* methodTypeEncoding = method_getTypeEncoding(newMeth);
@@ -26,8 +26,7 @@
         newMeth = class_getInstanceMethod(originalClass, swizzledSelector);
         Method orgMeth = class_getInstanceMethod(originalClass, orignalSelector);
         method_exchangeImplementations(orgMeth, newMeth);
-    }
-    else {
+    } else {
         class_addMethod(originalClass, orignalSelector, imp, methodTypeEncoding);
     }
     
@@ -64,12 +63,16 @@
     NSMutableArray *result = [NSMutableArray array];
     for (NSInteger i = 0; i < numClasses; i++) {
         Class superClass = classes[i];
-        do {
+//        if ([NSBundle bundleForClass:superClass] != [NSBundle mainBundle]) {
+//            continue;
+//        }
+        while(superClass && superClass != parentClass) {
             superClass = class_getSuperclass(superClass);
-        } while(superClass && superClass != parentClass);
+        }
         
-        if (superClass == nil) continue;
-        [result addObject:classes[i]];
+        if (superClass) {
+            [result addObject:classes[i]];
+        }
     }
     
     free(classes);
