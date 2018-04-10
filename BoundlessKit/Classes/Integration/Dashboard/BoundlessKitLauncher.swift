@@ -10,6 +10,9 @@ import Foundation
 public class BoundlessKitLauncherObjc : NSObject {
     @objc
     public static var launch: Bool = {
+        guard let _ = BoundlessProperties.fromFile else {
+            return false
+        }
         let launcher = BoundlessKitLauncher()
         BoundlessKit.standard.launcher = launcher
         return true
