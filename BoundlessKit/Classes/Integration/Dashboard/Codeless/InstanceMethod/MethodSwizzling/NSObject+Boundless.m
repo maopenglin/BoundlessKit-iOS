@@ -20,7 +20,7 @@
     }
     
     SEL trampolineSelector = NSSelectorFromString([NSString stringWithFormat:@"notifyBefore__%@", NSStringFromSelector(targetSelector)]);
-    if (class_getInstanceMethod(targetClass, trampolineSelector) && class_overridesSelector(targetClass, trampolineSelector)) {
+    if (class_inheritsInstanceSelector(targetClass, trampolineSelector)) {
         return trampolineSelector;
     }
     const char* methodTypeEncoding = method_getTypeEncoding(originalMethod);
@@ -51,7 +51,7 @@
     BOOL success = true;
     
     const char* methodEncoding = method_getTypeEncoding(class_getInstanceMethod(targetClass, targetSelector));
-    if (class_getInstanceMethod([targetClass superclass], targetSelector) != NULL && !class_overridesSelector(targetClass, targetSelector)) {
+    if (!class_inheritsInstanceSelector(targetClass, targetSelector)) {
         IMP callSuperImp = imp_implementationWithBlock(^(id self, SEL action, id target, id sender, UIEvent* event) {
             ((BOOL (*)(id, SEL, SEL, id, id, UIEvent*)) [class_getSuperclass(targetClass) instanceMethodForSelector: targetSelector]) (self, trampolineSelector, action, target, sender, event);
         });
@@ -74,7 +74,7 @@
     BOOL success = true;
     
     const char* methodEncoding = method_getTypeEncoding(class_getInstanceMethod(targetClass, targetSelector));
-    if (!class_overridesSelector(targetClass, targetSelector)) {
+    if (!class_inheritsInstanceSelector(targetClass, targetSelector)) {
         IMP callSuperImp = imp_implementationWithBlock(^(id self) {
             ((void (*)(id, SEL)) [class_getSuperclass(targetClass) instanceMethodForSelector: targetSelector]) (self, targetSelector);
         });
@@ -97,7 +97,7 @@
     BOOL success = true;
     
     const char* methodEncoding = method_getTypeEncoding(class_getInstanceMethod(targetClass, targetSelector));
-    if (!class_overridesSelector(targetClass, targetSelector)) {
+    if (!class_inheritsInstanceSelector(targetClass, targetSelector)) {
         IMP callSuperImp = imp_implementationWithBlock(^(id self, id param) {
             ((void(*) (id, SEL, id)) [class_getSuperclass(targetClass) instanceMethodForSelector: targetSelector]) (self, targetSelector, param);
         });
@@ -120,7 +120,7 @@
     BOOL success = true;
     
     const char* methodEncoding = method_getTypeEncoding(class_getInstanceMethod(targetClass, targetSelector));
-    if (!class_overridesSelector(targetClass, targetSelector)) {
+    if (!class_inheritsInstanceSelector(targetClass, targetSelector)) {
         IMP callSuperImp = imp_implementationWithBlock(^(id self, id param1, id param2) {
             ((void(*) (id, SEL, id, id)) [class_getSuperclass(targetClass) instanceMethodForSelector:targetSelector]) (self, trampolineSelector, param1, param2);
         });
@@ -143,7 +143,7 @@
     BOOL success = true;
     
     const char* methodEncoding = method_getTypeEncoding(class_getInstanceMethod(targetClass, targetSelector));
-    if (!class_overridesSelector(targetClass, targetSelector)) {
+    if (!class_inheritsInstanceSelector(targetClass, targetSelector)) {
         IMP callSuperImp = imp_implementationWithBlock(^(id self, id param1, BOOL param2, id param3) {
             ((void(*) (id, SEL, id, bool, id)) [class_getSuperclass(targetClass) instanceMethodForSelector:targetSelector]) (self, trampolineSelector, param1, param2, param3);
         });
@@ -166,7 +166,7 @@
     BOOL success = true;
     
     const char* methodEncoding = method_getTypeEncoding(class_getInstanceMethod(targetClass, targetSelector));
-    if (!class_overridesSelector(targetClass, targetSelector)) {
+    if (!class_inheritsInstanceSelector(targetClass, targetSelector)) {
 //        NSLog(@"Overriding selector <%@> for class <%@>", NSStringFromSelector(targetSelector), NSStringFromClass(targetClass));
         IMP callSuperImp = imp_implementationWithBlock(^(id self, bool param) {
             ((void (*)(id, SEL, bool))[class_getSuperclass(targetClass) instanceMethodForSelector:targetSelector])(self, targetSelector, param);
@@ -196,7 +196,10 @@ BOOL compareMethodCreationTypeEncodings(NSString* candidate, Class templateClass
     return [templateMethodTypeEncodingString isEqualToString:candidate];
 }
 
-BOOL class_overridesSelector(Class aClass, SEL aSelector) {
+BOOL class_inheritsInstanceSelector(Class aClass, SEL aSelector) {
+    if (class_getInstanceMethod(aClass, aSelector) == NULL) {
+        return false;
+    }
     Class superClass = class_getSuperclass(aClass);
     return superClass == nil || class_getInstanceMethod(superClass, aSelector) == nil || [aClass instanceMethodForSelector: aSelector] != [superClass instanceMethodForSelector: aSelector];
 }
