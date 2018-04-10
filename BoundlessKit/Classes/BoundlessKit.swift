@@ -51,11 +51,21 @@ public class BoundlessKit : NSObject {
     }
     
     @objc
+    public static func track(actionID: String, metadata: [String: Any] = [:]) {
+        standard.track(actionID: actionID, metadata: metadata)
+    }
+    
+    @objc
     public func track(actionID: String, metadata: [String: Any] = [:]) {
         let action = BKAction(actionID, metadata)
         trackBatch.store(action)
         BKLog.debug("Tracked actionID <\(actionID)>")
         apiClient.syncIfNeeded()
+    }
+    
+    @objc
+    public static func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
+        standard.reinforce(actionID: actionID, metadata: metadata, completion: completion)
     }
     
     @objc
