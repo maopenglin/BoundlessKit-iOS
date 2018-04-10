@@ -49,8 +49,8 @@ internal class BoundlessAPIClient : HTTPClient {
     }
     
     func syncIfNeeded() {
-        if coordinationWork != nil,
-            refreshContainer?.needsSync ?? false || reportBatch?.needsSync ?? false || trackBatch?.needsSync ?? false {
+        if coordinationWork == nil &&
+            (refreshContainer?.needsSync ?? false || reportBatch?.needsSync ?? false || trackBatch?.needsSync ?? false) {
             synchronize()
         }
     }
