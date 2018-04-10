@@ -11,7 +11,7 @@ class BoundlessContext : NSObject {
     
     static let queue = DispatchQueue.init(label: NSStringFromClass(BoundlessContext.self), attributes: .concurrent)
     
-    static func getContext(completion:@escaping([String:Any]) -> Void) {
+    class func getContext(completion:@escaping([String:Any]) -> Void) {
         queue.async {
             var context = [String:Any]()
             let group = DispatchGroup.init()

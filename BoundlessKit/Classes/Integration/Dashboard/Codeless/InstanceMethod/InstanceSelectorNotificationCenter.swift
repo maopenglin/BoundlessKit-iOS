@@ -53,7 +53,7 @@ extension InstanceSelectorNotificationCenter {
 internal class InstanceSelectorNotificationCenter : NotificationCenter {
     
     static let _default = InstanceSelectorNotificationCenter()
-    override public static var `default`: InstanceSelectorNotificationCenter {
+    override public class var `default`: InstanceSelectorNotificationCenter {
         return _default
     }
     

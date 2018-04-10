@@ -17,7 +17,7 @@ internal class BKLog {
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    @objc public static func print(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
+    @objc public class func print(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
         var functionSignature:String = function
         if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
             functionSignature.replaceSubrange(parameterNames, with: "()")
@@ -34,7 +34,7 @@ internal class BKLog {
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    @objc public static func debug(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
+    @objc public class func debug(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
         #if DEBUG
             var functionSignature:String = function
             if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
@@ -53,7 +53,7 @@ internal class BKLog {
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    @objc public static func error(_ message: String, visual: Bool = false, filePath: String = #file, function: String =  #function, line: Int = #line) {
+    @objc public class func error(_ message: String, visual: Bool = false, filePath: String = #file, function: String =  #function, line: Int = #line) {
         var functionSignature:String = function
         if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
             functionSignature.replaceSubrange(parameterNames, with: "()")
@@ -83,7 +83,7 @@ internal class BKLog {
     ///     - function: Used to get function name. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line. Do not use this parameter. Defaults to #line.
     ///
-    @objc public static func confirmed(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
+    @objc public class func confirmed(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
         var functionSignature:String = function
         if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
             functionSignature.replaceSubrange(parameterNames, with: "()")

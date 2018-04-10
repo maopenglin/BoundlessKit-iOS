@@ -28,7 +28,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
     
     var storage: (BKDatabase, String)?
     
-    static func initWith(database: BKDatabase, forKey key: String) -> BKTrackBatch {
+    class func initWith(database: BKDatabase, forKey key: String) -> BKTrackBatch {
         let batch: BKTrackBatch
         if let archived: BKTrackBatch = database.unarchive(key) {
             batch = archived

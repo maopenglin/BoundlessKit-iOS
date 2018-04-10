@@ -12,7 +12,7 @@ internal class BKAudio : NSObject {
     
     fileprivate static let audioQueue = DelayedSerialQueue(delayAfter: 1, dropCollisions: true)
     
-    static func play(_ systemSoundID: SystemSoundID = 0 , vibrate: Bool = false) {
+    class func play(_ systemSoundID: SystemSoundID = 0 , vibrate: Bool = false) {
         audioQueue.addOperation {
             if systemSoundID != 0 {
                 AudioServicesPlaySystemSound(systemSoundID)

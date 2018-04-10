@@ -9,7 +9,7 @@ import Foundation
 
 internal class BKDecision : NSObject, BKData {
     
-    static func neutral(for actionID: String) -> BKDecision {
+    class func neutral(for actionID: String) -> BKDecision {
         return BKDecision.init("neutralResponse", actionID)
     }
     

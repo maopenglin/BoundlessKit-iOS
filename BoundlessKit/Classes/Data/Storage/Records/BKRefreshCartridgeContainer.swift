@@ -16,7 +16,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
     
     var storage: (BKDatabase, String)?
     
-    static func initWith(database: BKDatabase, forKey key: String) -> BKRefreshCartridgeContainer {
+    class func initWith(database: BKDatabase, forKey key: String) -> BKRefreshCartridgeContainer {
         let container: BKRefreshCartridgeContainer
         if let archived: BKRefreshCartridgeContainer = database.unarchive(key) {
             container = archived

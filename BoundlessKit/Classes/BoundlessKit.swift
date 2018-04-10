@@ -51,7 +51,7 @@ public class BoundlessKit : NSObject {
     }
     
     @objc
-    public static func track(actionID: String, metadata: [String: Any] = [:]) {
+    public class func track(actionID: String, metadata: [String: Any] = [:]) {
         standard.track(actionID: actionID, metadata: metadata)
     }
     
@@ -64,7 +64,7 @@ public class BoundlessKit : NSObject {
     }
     
     @objc
-    public static func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
+    public class func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
         standard.reinforce(actionID: actionID, metadata: metadata, completion: completion)
     }
     
