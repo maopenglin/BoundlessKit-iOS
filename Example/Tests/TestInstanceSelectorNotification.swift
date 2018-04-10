@@ -92,7 +92,7 @@ class TestInstanceSelectorNotification: XCTestCase {
         XCTAssert(!notificationReceiver.didReceiveNotification)
     }
     
-    func testFailNotificationForSelectorWithMultipleParams() {
+    func testNotificationForSelectorWithMultipleParams() {
         let notificationReceiver = NotificationReceiver()
         let sut = MockViewController()
         let selectorInstanceActionID = "\(NSStringFromClass(MockViewController.self))-\(NSStringFromSelector(#selector(MockViewController.printA(string:and:))))"
@@ -100,7 +100,7 @@ class TestInstanceSelectorNotification: XCTestCase {
         InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: Notification.Name(rawValue: selectorInstanceActionID), object: nil)
         sut.printA(string: "string", and: "string2")
         
-        XCTAssert(!notificationReceiver.didReceiveNotification)
+        XCTAssert(notificationReceiver.didReceiveNotification)
         
         InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver, name: nil, object: nil)
     }
