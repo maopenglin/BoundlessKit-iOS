@@ -33,14 +33,13 @@ class BoundlessKitLauncher : NSObject {
         codelessAPIClient.visualizerSession = nil
         codelessAPIClient.visualizerSession = session
         
+        refreshKit()
         
         codelessAPIClient.boot {
             BoundlessKit.standard.apiClient.properties = self.codelessAPIClient.properties
             self.refreshKit()
             self.codelessAPIClient.promptPairing()
         }
-        
-        refreshKit()
     }
     
     func refreshKit() {
@@ -83,6 +82,7 @@ extension BoundlessKitLauncher : CodelessApiClientDelegate {
             codelessReinforcers.removeValue(forKey: actionID)
             BKLog.debug("Removed reinforcer and notification for <\(actionID)>")
         }
+        
         for (actionID, value) in mappings {
             if let codeless = value["codeless"] as? [String: Any],
                 let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
