@@ -36,6 +36,7 @@
 		75063779DB8550BA719F0765B33743B7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 		7A92BCAEB9D0A15D6F652EBD1C10AD8A /* CodelessReinforcer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C46B938E46E0975BBCA4DC0511404F /* CodelessReinforcer.swift */; };
 		82E54D63841758BE4E4AC1A665FA8117 /* NSObject+Boundless.m in Sources */ = {isa = PBXBuildFile; fileRef = 079EC3059FB30AE1D21AE251955DF2ED /* NSObject+Boundless.m */; };
+		84B584CF207BE964007A70A1 /* UIViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B584CE207BE964007A70A1 /* UIViewControllerExtensions.swift */; };
 		891E0AF25EFE1397868D8B9297B38B8C /* DopamineDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC334ADFB2137E26BB437CA331839F98 /* DopamineDefaults.swift */; };
 		898E7841049CC49AB76D3A2DF47C7B6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 		8DC30EBF8D4F109319A4CDE6811E7DE0 /* SynchronizedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA2931D0D457F67679471FCF64D303FF /* SynchronizedArray.swift */; };
@@ -119,6 +120,7 @@
 		7D1934675B2062C8E809CAA2185860FD /* CodelessReinforcement.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CodelessReinforcement.swift; sourceTree = "<group>"; };
 		7F415CED8EA5C68960FF7082DC07F7AB /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84B3D651CC672027721AAE10C59E6731 /* SelectorExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SelectorExtensions.swift; sourceTree = "<group>"; };
+		84B584CE207BE964007A70A1 /* UIViewControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerExtensions.swift; sourceTree = "<group>"; };
 		893B3F55C94A476A081E3D000C1B652C /* BoundlessAPIClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessAPIClient.swift; sourceTree = "<group>"; };
 		91D256EEB3F28514A13F690FBABC62C4 /* BoundlessContext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoundlessContext.swift; sourceTree = "<group>"; };
 		92674D2FDFC000A8EB53E4A0BD1FF73C /* ResourceBundle-BoundlessKit-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-BoundlessKit-Info.plist"; sourceTree = "<group>"; };
@@ -266,6 +268,7 @@
 				16E6DB6D5D31A34A14D83AC14D5609A0 /* UIImageExtensions.swift */,
 				406BD740422C7AE5B5E780302C24815D /* UIResponderExtensions.swift */,
 				D40E65844DE44D54A75FA99EFC48AABC /* UIViewExtensions.swift */,
+				84B584CE207BE964007A70A1 /* UIViewControllerExtensions.swift */,
 				0AFDFE2D29500FE8D627A36FDA460FB3 /* UIWindowExtensions.swift */,
 			);
 			name = Extensions;
@@ -663,6 +666,7 @@
 				B9343DE03C7C531AFCDCDCD71D993504 /* CodelessReinforcement.swift in Sources */,
 				7A92BCAEB9D0A15D6F652EBD1C10AD8A /* CodelessReinforcer.swift in Sources */,
 				69BEEB88763F665409997D5025FBE2CD /* DelayedSerialQueue.swift in Sources */,
+				84B584CF207BE964007A70A1 /* UIViewControllerExtensions.swift in Sources */,
 				891E0AF25EFE1397868D8B9297B38B8C /* DopamineDefaults.swift in Sources */,
 				74C2AAE803288A96730CE687036B7180 /* Extensions.swift in Sources */,
 				333394622F32084B5BB14675A9C0D329 /* HTTPClient.swift in Sources */,

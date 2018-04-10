@@ -150,47 +150,65 @@ struct CodelessReinforcement {
             viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
             
         case "custom":
-            var parts = viewCustom.components(separatedBy: "-")
-            if parts.count > 0 {
-                let vcClass = parts[0]
-                var parent: NSObject
-                if vcClass == "self" {
-                    parent = targetInstance
-                } else if
-                    let keyWindow = UIApplication.shared.keyWindow,
-                    let vc = keyWindow.getViewControllersWithClassname(classname: vcClass).first {
-                    parent = vc
+            // ViewOrViewControllerClassname-member-member... --> multiple views
+            // ViewOrViewControllerClassname$index-member-member... --> indexed view
+            // self-member-member... --> target's view
+            var targets: [NSObject]
+            var searchTerms = viewCustom.components(separatedBy: "-")
+            let firstTerm = searchTerms.removeFirst()
+            switch firstTerm {
+            case "self":
+                targets = [targetInstance]
+            default:
+                var classSelection = firstTerm.components(separatedBy: "$")
+                let className = classSelection.removeFirst()
+                guard let classType = NSClassFromString(className) else {
+                    BKLog.error("Invalid className <\(className)>", visual: true)
+                    return nil
+                }
+                let index: Int? = (classSelection.first != nil) ? Int(classSelection.first!) : nil as Int?
+                let possibleTargets: [NSObject]
+                
+                if classType is UIViewController.Type {
+                    possibleTargets = UIViewController.getViewControllers(ofType: classType)
+                } else if classType is UIView.Type {
+                    possibleTargets = UIView.getViews(ofType: classType)
                 } else {
-                    BKLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
+                    BKLog.error("<\(className)> must subclass UIView or UIViewController", visual: true)
                     return nil
                 }
                 
-                parts.removeFirst()
-                for childName in parts {
-                    if parent.responds(to: NSSelectorFromString(childName)),
-                        let obj = parent.value(forKey: childName) as? NSObject {
-                        parent = obj
+                if let index = index {
+                    if index >= 0 {
+                        if index < possibleTargets.count {
+                            targets = [possibleTargets[index]]
+                        } else {
+                            BKLog.error("Found <\(possibleTargets.count)> <\(className)>s, index <\(index)> out of bounds", visual: true)
+                            return nil
+                        }
+                    } else { // negative index counts backwards
+                        if -index <= possibleTargets.count {
+                            targets = [possibleTargets[possibleTargets.count + index]]
+                        } else {
+                            BKLog.error("Found <\(possibleTargets.count)> <\(className)>s, index <\(index)> out of bounds", visual: true)
+                            return nil
+                        }
                     }
-                }
-                
-                if let view = parent as? UIView {
-                    viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
                 } else {
-                    BKLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
-                    return nil
-                }
-                
-            } else if viewCustom == "self", let view = targetInstance as? UIView {
-                viewsAndLocations = [(view, view.pointWithMargins(x: viewMarginX, y: viewMarginY))]
-            } else {
-                viewsAndLocations = UIView.find(viewCustom, { (view) -> CGPoint in
-                    return view.pointWithMargins(x: viewMarginX, y: viewMarginY)
-                })
-                if viewsAndLocations?.count == 0 {
-                    BKLog.error("Could not find CustomView <\(viewCustom)>", visual: true)
-                    return nil
+                    targets = possibleTargets
                 }
             }
+            
+            var members = targets
+            for memberTerm in searchTerms {
+                members = members.flatMap({$0.responds(to: NSSelectorFromString(memberTerm)) ? $0.value(forKey: memberTerm) as? NSObject : nil
+                })
+            }
+            guard let views = members as? [UIView] else {
+                BKLog.error("Searching for <\(viewCustom)> leads to non-UIView subclass", visual: true)
+                return nil
+            }
+            viewsAndLocations = views.flatMap({($0, $0.pointWithMargins(x: viewMarginX, y: viewMarginY))})
             
         case "sender":
             if let senderInstance = senderInstance {
