@@ -166,9 +166,14 @@ struct CodelessReinforcement {
                     BKLog.error("Invalid className <\(className)>", visual: true)
                     return nil
                 }
-                let index: Int? = (classSelection.first != nil) ? Int(classSelection.first!) : nil as Int?
-                let possibleTargets: [NSObject]
+                let index: Int?
+                if let indexSelection = classSelection.first?.replacingOccurrences(of: "minus", with: "-") {
+                    index = Int(indexSelection)
+                } else {
+                    index = nil
+                }
                 
+                let possibleTargets: [NSObject]
                 if classType is UIViewController.Type {
                     possibleTargets = UIViewController.getViewControllers(ofType: classType)
                 } else if classType is UIView.Type {

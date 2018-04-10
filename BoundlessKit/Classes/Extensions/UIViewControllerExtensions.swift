@@ -15,6 +15,10 @@ internal extension UIViewController {
     func getChildViewControllers(ofType aClass: AnyClass) -> [UIViewController] {
         var vcs = [UIViewController]()
         
+        if aClass == type(of: self) {
+            vcs.append(self)
+        }
+        
         if let tabController = self as? UITabBarController,
             let tabVCs = tabController.viewControllers {
             for vc in tabVCs.reversed() {
@@ -31,10 +35,6 @@ internal extension UIViewController {
             for vc in childViewControllers.reversed() {
                 vcs += vc.getChildViewControllers(ofType: aClass)
             }
-        }
-        
-        if aClass == type(of: self) {
-            vcs.append(self)
         }
         
         return vcs

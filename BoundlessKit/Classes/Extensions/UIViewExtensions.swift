@@ -28,12 +28,12 @@ internal extension UIView {
     func getSubviews(ofType aClass: AnyClass) -> [UIView] {
         var views = [UIView]()
         
-        for subview in self.subviews.reversed() {
-            views += subview.getSubviews(ofType: aClass)
-        }
-        
         if aClass == type(of: self) {
             views.append(self)
+        }
+        
+        for subview in self.subviews {
+            views += subview.getSubviews(ofType: aClass)
         }
         
         return views
