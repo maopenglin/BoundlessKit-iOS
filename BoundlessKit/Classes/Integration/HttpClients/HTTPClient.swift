@@ -9,7 +9,7 @@ import Foundation
 
 internal class HTTPClient {
     
-    internal var logRequests = true
+    internal var logRequests = false
     internal var logResponses = true
     
     private let session: URLSessionProtocol
@@ -38,7 +38,7 @@ internal class HTTPClient {
         return session.send(request: request) { responseData, responseURL, error in
             let response = self.convertResponseToJSON(url, responseData, responseURL, error)
             if self.logResponses {
-                BKLog.print("<\(request.url?.absoluteString ?? "url:nil")> with\nrequest data:<\(jsonObject as AnyObject)>\ngot response:<\(response as AnyObject)>")
+                BKLog.print("<\(request.url?.absoluteString ?? "url:nil")> got response:<\(response as AnyObject)>")
             }
             completion(response)
         }

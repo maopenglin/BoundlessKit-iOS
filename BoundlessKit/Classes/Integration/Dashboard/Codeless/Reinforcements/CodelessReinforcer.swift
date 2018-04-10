@@ -24,7 +24,7 @@ internal class CodelessReinforcer : NSObject {
     @objc
     func receive(notification: Notification) {
         let actionID = notification.name.rawValue
-        BKLog.print("Action peformed with actionID <\(actionID)>")
+//        BKLog.print("Action peformed with actionID <\(actionID)>")
         guard let target = notification.userInfo?["target"] as? NSObject else { return }
         let sender = notification.userInfo?["sender"] as AnyObject?
         

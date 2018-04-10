@@ -105,7 +105,7 @@ class ViewController: UIViewController {
     ///////////////////////////////////////
     
     @objc var responseLabel:UILabel!
-    @objc var action1Button:UIButton!
+    @objc var reinforcedActionButton:UIButton!
     @objc var trackedActionButton:UIButton!
     
     override func viewDidLoad() {
@@ -141,22 +141,24 @@ class ViewController: UIViewController {
         self.view.addSubview(responseLabel)
         
         // Button to represent some user action to Reinforce
-        action1Button = UIButton.init(frame: CGRect(x: 0, y: 0, width: viewSize.width/3, height: viewSize.width/6+10))
-        action1Button.center = CGPoint(x: viewSize.width/4, y: viewCenter.y)
-        action1Button.layer.cornerRadius = 5
-        action1Button.clipsToBounds = true
-        action1Button.setTitle("Reinforce a user action", for: UIControlState())
-        action1Button.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-        action1Button.titleLabel?.textAlignment = NSTextAlignment.center
-        action1Button.backgroundColor = UIColor.init(red: 51/255.0, green: 153/255.0, blue: 51/255.0, alpha: 1.0)
-        action1Button.addTarget(self, action: #selector(ViewController.action1Performed(button:)), for: UIControlEvents.touchUpInside)
-        self.view.addSubview(action1Button)
+        reinforcedActionButton = UIButton.init(frame: CGRect(x: 0, y: 0, width: viewSize.width/3, height: viewSize.width/6+10))
+        reinforcedActionButton.center = CGPoint(x: viewSize.width/4, y: viewCenter.y)
+        reinforcedActionButton.layer.cornerRadius = 5
+//        reinforcedActionButton.clipsToBounds = true
+        reinforcedActionButton.showsTouchWhenHighlighted = true
+        reinforcedActionButton.setTitle("Reinforce a user action", for: UIControlState())
+        reinforcedActionButton.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
+        reinforcedActionButton.titleLabel?.textAlignment = NSTextAlignment.center
+        reinforcedActionButton.backgroundColor = UIColor.init(red: 51/255.0, green: 153/255.0, blue: 51/255.0, alpha: 1.0)
+        reinforcedActionButton.addTarget(self, action: #selector(ViewController.action1Performed(button:)), for: UIControlEvents.touchUpInside)
+        self.view.addSubview(reinforcedActionButton)
         
         // Button to represent some user action to Track
         trackedActionButton = UIButton.init(frame: CGRect(x: 0, y: 0, width: viewSize.width/3, height: viewSize.width/6+10))
         trackedActionButton.center = CGPoint(x: viewSize.width/4*3, y: viewCenter.y)
         trackedActionButton.layer.cornerRadius = 5
-        trackedActionButton.clipsToBounds = true
+//        trackedActionButton.clipsToBounds = true
+        trackedActionButton.showsTouchWhenHighlighted = true
         trackedActionButton.setTitle("Track a user action", for: UIControlState())
         trackedActionButton.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
         trackedActionButton.titleLabel?.textAlignment = NSTextAlignment.center

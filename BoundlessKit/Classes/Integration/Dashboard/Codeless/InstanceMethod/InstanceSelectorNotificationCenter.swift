@@ -181,7 +181,7 @@ fileprivate class InstanceSelectorNotifier : NSObject {
                                                                        "target": aTarget as Any,
                                                                        ]
             )
-            print("Posted instance method notification with name:\(notification.rawValue)")
+//            BKLog.print("Posted instance method notification with name:\(notification.rawValue)")
         }
     }
 }
