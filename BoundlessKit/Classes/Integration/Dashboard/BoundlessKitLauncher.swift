@@ -8,27 +8,33 @@
 import Foundation
 
 public class BoundlessKitLauncherObjc : NSObject {
+    
     @objc
-    public static var launch: Bool = {
-        guard let _ = BoundlessProperties.fromFile else {
-            return false
+    public static let shared = BoundlessKitLauncherObjc()
+    
+    @objc
+    public func appDidLaunch(_ notification: Notification) {
+        _ = BoundlessKitLauncherObjc.launchKit
+    }
+    
+    private static let launchKit: Void = {
+        if BoundlessProperties.fromFile != nil {
+            let launcher = BoundlessKitLauncher()
         }
-        let launcher = BoundlessKitLauncher()
-        BoundlessKit.standard.launcher = launcher
-        return true
+        return
     }()
 }
 
 class BoundlessKitLauncher : NSObject {
     
-    var codelessAPIClient: CodelessAPIClient
+    let codelessAPIClient = CodelessAPIClient()
     let database = BKUserDefaults.standard
     
     var codelessReinforcers = [String: CodelessReinforcer]()
     
     override init() {
-        self.codelessAPIClient = CodelessAPIClient()
         super.init()
+        BoundlessKit.standard.launcher = self
         
         codelessAPIClient.delegate = self
         // set session again to run `didSet` routine
