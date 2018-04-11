@@ -68,13 +68,15 @@ class ViewController: UIViewController {
         //        })
     }
     
+    var locationManager = CLLocationManager()
+    
     @objc func action2Performed(){
         print("Action 2 performed")
 //        kit.reinforce(actionID: "action1") { reinforcement in }
         ////        // Tracking call is sent asynchronously
         //////        BoundlessKit.track("action2", metaData: ["key":"value", "calories":9000])
-        //        locationManager.delegate = self
-        //        locationManager.requestAlwaysAuthorization()
+                locationManager.delegate = self
+                locationManager.requestAlwaysAuthorization()
         
         
         BoundlessKit.track(actionID: "action2peformed")
@@ -94,8 +96,6 @@ class ViewController: UIViewController {
         //            }
         //        }
     }
-    
-    var locationManager = CLLocationManager()
     
     
     ///////////////////////////////////////

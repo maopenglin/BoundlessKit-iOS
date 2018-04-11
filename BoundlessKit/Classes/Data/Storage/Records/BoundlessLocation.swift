@@ -13,7 +13,7 @@ class BoundlessLocation : NSObject, CLLocationManagerDelegate {
     static let shared = BoundlessLocation()
     
     public var locationManager: CLLocationManager?
-    public var enabled: Bool = true
+    public var enabled: Bool = false
     fileprivate var current: CLLocation?
     fileprivate var expiresAt = Date()
     fileprivate var timeAccuracy: TimeInterval = 60 //seconds
@@ -22,6 +22,11 @@ class BoundlessLocation : NSObject, CLLocationManagerDelegate {
     
     fileprivate override init() {
         super.init()
+        guard let infoPlist = Bundle.main.infoDictionary,
+            infoPlist["NSLocationWhenInUseUsageDescription"] != nil || infoPlist["NSLocationAlwaysAndWhenInUseUsageDescription"] != nil || infoPlist["NSLocationAlwaysUsageDescription"] != nil else {
+                return
+        }
+        enabled = true
         DispatchQueue.main.async {
             self.locationManager = CLLocationManager()
             self.locationManager?.delegate = self
@@ -64,26 +69,13 @@ class BoundlessLocation : NSObject, CLLocationManagerDelegate {
     }
     
     func forceUpdate(completion: @escaping ()->()) {
-        DispatchQueue.global().async {
-            defer {
-                self.queue.addOperation(completion)
-            }
-            
-            if self.queue.isSuspended {
-                return
-            }
+        if !self.queue.isSuspended {
             self.queue.isSuspended = true
-            
             DispatchQueue.main.async {
                 self.locationManager?.startUpdatingLocation()
             }
-            // If no location after 3 seconds unsuspend the queue
-            DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
-                if self.queue.isSuspended {
-                    self.queue.isSuspended = false
-                }
-            }
         }
+        self.queue.addOperation(completion)
     }
     
     fileprivate var locationInfo: [String: Any]? {
