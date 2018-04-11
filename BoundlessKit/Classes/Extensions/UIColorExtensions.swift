@@ -17,7 +17,7 @@ public extension UIColor {
     /// - returns:
     ///     The corresponding UIColor for valid hex strings, `UIColor.grayColor()` otherwise.
     ///
-    static func from(rgb: String, alpha: CGFloat = 1.0) -> UIColor {
+    class func from(rgb: String, alpha: CGFloat = 1.0) -> UIColor {
         var colorString:String = rgb.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines).uppercased()
         
         if (colorString.hasPrefix("#")) {
@@ -38,10 +38,5 @@ public extension UIColor {
             alpha: alpha
         )
     }
-    
-    //    var components: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)? {
-    //        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-    //        return getRed(&r, green: &g, blue: &b, alpha: &a) ? (r,g,b,a) : nil
-    //    }
 }
 

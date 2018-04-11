@@ -100,6 +100,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
                 successful(false)
                 return
         }
+        BKLog.debug("Sending report batch...")
         
         let reportCopy = self.valuesForKeys
         payload["actions"] = reportCopy.values.flatMap({$0.values}).map({$0.toJSONType()})
@@ -112,35 +113,15 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
                         self[actionID]?.removeFirst(actions.count)
                     }
                     self.storage?.0.archive(self, forKey: self.storage!.1)
-                    BKLog.debug("Cleared reported actions.")
+                    BKLog.print(confirmed: "Sent report batch!")
                     success = true
+                    return
                 }
             }
+            BKLog.print(error: "Sending report batch failed")
         }.start()
     }
     
-//    func syncReport(forActionID actionID: String, completion: @escaping ()->Void = {}) {
-//        guard var payload = apiClient?.properties.apiCredentials,
-//            let actions = self[actionID]?.values else {
-//                completion()
-//                return
-//        }
-//
-//
-//        payload["actions"] = actions.map({ (reinforcement) -> [String: Any] in
-//            reinforcement.toJSONType()
-//        })
-//        apiClient?.httpClient.post(url: BoundlessAPI.track.url, jsonObject: payload) { response in
-//            if let status = response?["status"] as? Int {
-//                if status == 200 || status == 400 {
-//                    self.removeValue(forKey: actionID)
-//                    BKLog.debug("Cleared reported actions.")
-//                }
-//            }
-//            completion()
-//        }.start()
-//    }
-
     override var count: Int {
         var count = 0
         queue.sync {

@@ -31,16 +31,16 @@ internal class CodelessReinforcer : NSObject {
         switch CodelessReinforcer.showOption {
         case .reinforcement:
             BoundlessKit.standard.reinforce(actionID: actionID) { reinforcementID in
+                BKLog.debug("Showing codeless reinforcementID <\(reinforcementID)> for actionID <\(actionID)>...")
                 self.reinforcements[reinforcementID]?.show(targetInstance: target, senderInstance: sender)
-                BKLog.debug("showing reinforcementID <\(reinforcementID)> for actionID <\(actionID)>...")
             }
         case .random:
             guard let randomReinforcement = Array(self.reinforcements.values).randomElement else {
-                BKLog.debug("no reinforcements for actionID <\(actionID)>")
+                BKLog.print(error: "No reinforcements for actionID <\(actionID)>")
                 return
             }
+            BKLog.debug("Showing random codeless reinforcementID <\(randomReinforcement.primitive)> for actionID <\(actionID)>...")
             randomReinforcement.show(targetInstance: target, senderInstance: sender)
-            BKLog.debug("randomly showing reinforcementID <\(randomReinforcement.primitive)> for actionID <\(actionID)>...")
         }
     }
     

@@ -40,7 +40,7 @@
     } else if (compareMethodCreationTypeEncodings(methodTypeEncodingString, [BoundlessObject self], @selector(templateMethodWithBoolParam:))) {
         success = [BoundlessObject addTrampolineWithBoolParam:targetClass :targetSelector :trampolineSelector :block];
     } else {
-        NSLog(@"Unsupported encoding:%@ other:%@", methodTypeEncodingString, [NSString stringWithUTF8String: method_getTypeEncoding(class_getInstanceMethod(UIApplication.self, @selector(sendAction:to:from:forEvent:)))]);
+//        NSLog(@"Unsupported encoding:%@ other:%@", methodTypeEncodingString, [NSString stringWithUTF8String: method_getTypeEncoding(class_getInstanceMethod(UIApplication.self, @selector(sendAction:to:from:forEvent:)))]);
         return nil;
     }
     

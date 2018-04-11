@@ -7,18 +7,16 @@
 
 import Foundation
 
-internal extension BoundlessKit {
-    class var frameworkBundle: Bundle? {
+internal extension Bundle {
+    class var boundlessKit: Bundle? {
         if let bundleURL = Bundle(for: BoundlessKit.classForCoder()).url(forResource: "BoundlessKit", withExtension: "bundle") {
             return Bundle(url: bundleURL)
         } else {
-            BKLog.debug("The BoundlessKit framework bundle cannot be found")
+            BKLog.print(error: "The BoundlessKit framework bundle cannot be found")
             return nil
         }
     }
 }
-
-
 
 
 

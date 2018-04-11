@@ -88,22 +88,23 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
             successful(false)
             return
         }
+        BKLog.debug("Sending track batch...")
         
-        let actions = self.values
-        payload["actions"] = actions.map({ (action) -> [String: Any] in
-            action.toJSONType()
-        })
+        let trackCopy = self.values
+        payload["actions"] = trackCopy.map({$0.toJSONType()})
         apiClient.post(url: BoundlessAPIEndpoint.track.url, jsonObject: payload) { response in
             var success = false
             defer { successful(success) }
             if let status = response?["status"] as? Int {
                 if status == 200 {
-                    self.removeFirst(actions.count)
+                    self.removeFirst(trackCopy.count)
                     self.storage?.0.archive(self, forKey: self.storage!.1)
-                    BKLog.debug("Cleared tracked actions.")
+                    BKLog.print(confirmed: "Sent track batch!")
                     success = true
+                    return
                 }
             }
+            BKLog.print(error: "Sending track batch failed")
         }.start()
     }
 }

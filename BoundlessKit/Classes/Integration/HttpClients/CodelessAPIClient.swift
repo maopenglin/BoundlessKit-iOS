@@ -66,14 +66,14 @@ internal class CodelessAPIClient : HTTPClient {
             BKUserDefaults.standard.set(visualizerSession?.encode(), forKey: "codelessSession")
             submitQueue.addOperation {
                 if oldValue == nil && self.visualizerSession != nil {
+                    BKLog.debug("Visualizer session connected")
                     for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
                         InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.getNotif(notification:)), name: visualizerNotification, object: nil)
-                        BKLog.debug("Listening for selector notification <\(visualizerNotification.rawValue)>...")
                     }
-//                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.getNotif(notification:)), name: Notification.Name.init("BoundlessKit_Example.ViewController-viewDidAppear:"), object: nil)
-                    
+                    // listen for all notifications sent
                     InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: nil, object: nil)
                 } else if oldValue != nil && self.visualizerSession == nil {
+                    BKLog.debug("Visualizer session disconnected")
                     InstanceSelectorNotificationCenter.default.removeObserver(self)
                 }
                 self.delegate?.didUpdate(session: self.visualizerSession)
@@ -170,7 +170,7 @@ internal class CodelessAPIClient : HTTPClient {
     
     @objc
     func getNotif(notification: Notification) {
-        print("Got notification:\(notification.name.rawValue) ")//with info:\(notification.userInfo?.keys)")
+        BKLog.debug("Got notification:\(notification.name.rawValue) ")
     }
     
     @objc
@@ -199,6 +199,7 @@ internal class CodelessAPIClient : HTTPClient {
                     self.visualizerSession = nil
                     return
                 }
+                BKLog.print("Sent to dashboard actionID:<\(actionID)>")
                 if let visualizerMappings = response?["mappings"] as? [String: [String: Any]] {
                     self.visualizerSession?.mappings = visualizerMappings
                 }

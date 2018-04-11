@@ -47,9 +47,16 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
             cartridge = BKRefreshCartridge(actionID: actionID)
             self[actionID] = cartridge
         }
+        
         cartridge.removeFirst(completion: { (decision) in
-            
-            completion(decision ?? BKDecision.neutral(for: actionID))
+            if let decision = decision {
+                BKLog.debug("Cartridge for actionID <\(actionID)> unloaded decision <\(decision.name)>")
+                completion(decision)
+            } else {
+                let defaultDecision = BKDecision.neutral(for: actionID)
+                BKLog.debug("Cartridge for actionID <\(actionID)> is empty! Using default decision <\(defaultDecision.name)>")
+                completion(defaultDecision)
+            }
             self.storage?.0.archive(self, forKey: self.storage!.1)
         })
     }
@@ -57,6 +64,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
     func commit(actionID: String, with apiClient: BoundlessAPIClient) {
         if self[actionID] == nil {
             self[actionID] = BKRefreshCartridge(actionID: actionID)
+            BKLog.debug("Committed actionID <\(actionID)>")
         }
         if self[actionID]?.needsSync ?? false {
             self.synchronize(forActionID: actionID, with:
@@ -99,7 +107,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
         }
     }
     
-    func synchronize(forActionID actionID: String, with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
+    private func synchronize(forActionID actionID: String, with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
         
         if self[actionID] == nil {
             self[actionID] = BKRefreshCartridge(actionID: actionID)
@@ -109,7 +117,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
                 successful(false)
                 return
         }
-        BKLog.print("Refreshing cartridge for actionID <\(cartridge.actionID)>...")
+        BKLog.debug("Refreshing cartridge for actionID <\(cartridge.actionID)>...")
         
         payload["actionID"] = cartridge.actionID
         apiClient.post(url: BoundlessAPIEndpoint.refresh.url, jsonObject: payload) { response in
@@ -125,14 +133,17 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
                     cartridge.removeAll()
                     cartridge.append(values)
                     cartridge.expirationUTC = Int64( 1000*Date().addingTimeInterval(expiresIn).timeIntervalSince1970 )
-                    BKLog.print("Cartridge refresh for actionID <\(cartridge.actionID)> succeeded!")
+                    BKLog.print(confirmed: "Cartridge refresh for actionID <\(cartridge.actionID)> succeeded!")
                     success = true
+                    return
                 } else if responseStatusCode == 400 {
                     self.removeValue(forKey: actionID)
-                    BKLog.print("Cartridge refresh determined actionID<\(cartridge.actionID)> is no longer a valid actionID. Cartridge deleted.")
+                    BKLog.print(confirmed: "Cartridge refresh determined actionID<\(cartridge.actionID)> is no longer a valid actionID. Cartridge deleted.")
                     success = true
+                    return
                 }
             }
+            BKLog.print(error: "Cartridge refresh for actionID <\(cartridge.actionID)> failed!")
         }.start()
         
     }

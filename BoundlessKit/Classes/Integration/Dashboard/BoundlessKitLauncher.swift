@@ -83,7 +83,7 @@ extension BoundlessKitLauncher : CodelessApiClientDelegate {
         for (actionID, value) in codelessReinforcers.filter({mappings[$0.key] == nil}) {
             InstanceSelectorNotificationCenter.default.removeObserver(value, name: Notification.Name(actionID), object: nil)
             codelessReinforcers.removeValue(forKey: actionID)
-            BKLog.debug("Removed reinforcer and notification for <\(actionID)>")
+            BKLog.debug("Removed codeless reinforcer for actionID <\(actionID)>")
         }
         
         for (actionID, value) in mappings {
@@ -93,12 +93,11 @@ extension BoundlessKitLauncher : CodelessApiClientDelegate {
                 if let r = codelessReinforcers[actionID] {
                     reinforcer = r
                     reinforcer.reinforcements.removeAll()
-                    BKLog.debug("Updating reinforcer for <\(actionID)> notification")
                 } else {
                     reinforcer = CodelessReinforcer(forActionID: actionID)
                     InstanceSelectorNotificationCenter.default.addObserver(reinforcer, selector: #selector(reinforcer.receive(notification:)), name: NSNotification.Name(actionID), object: nil)
                     codelessReinforcers[actionID] = reinforcer
-                    BKLog.debug("Created reinforcer for <\(actionID)> notification")
+                    BKLog.print("Created codeless reinforcer for actionID <\(actionID)>")
                 }
                 for reinforcementDict in reinforcements {
                     if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {

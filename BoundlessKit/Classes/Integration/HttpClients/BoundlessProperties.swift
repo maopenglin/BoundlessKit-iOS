@@ -18,7 +18,7 @@ internal struct BoundlessProperties {
     let inProduction: Bool
     var version: BoundlessVersion {
         didSet {
-            BKLog.print("Set BoundlessProperties version with versionID <\(version.versionID ?? "nil")>")
+            BKLog.print("BoundlessKit using versionID <\(version.versionID ?? "nil")>")
         }
     }
     let developmentSecret: String
@@ -89,10 +89,10 @@ extension BoundlessProperties {
     }
     
     static func convert(from propertiesDictionary: [String: Any]) -> BoundlessProperties? {
-        guard let appID = propertiesDictionary["appID"] as? String else { BKLog.error("Bad parameter"); return nil }
-        guard let inProduction = propertiesDictionary["inProduction"] as? Bool else { BKLog.error("Bad parameter"); return nil }
-        guard let productionSecret = propertiesDictionary["productionSecret"] as? String else { BKLog.error("Bad parameter"); return nil }
-        guard let developmentSecret = propertiesDictionary["developmentSecret"] as? String else { BKLog.error("Bad parameter"); return nil }
+        guard let appID = propertiesDictionary["appID"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
+        guard let inProduction = propertiesDictionary["inProduction"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
+        guard let productionSecret = propertiesDictionary["productionSecret"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
+        guard let developmentSecret = propertiesDictionary["developmentSecret"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
         
         return BoundlessProperties.init(
             propertiesDictionary["primaryIdentity"] as? String,

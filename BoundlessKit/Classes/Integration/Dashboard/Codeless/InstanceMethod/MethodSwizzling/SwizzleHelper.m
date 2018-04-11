@@ -45,7 +45,7 @@
         Class superClass = class_getSuperclass(class);
         if (class_conformsToProtocol(class, protocol) && (superClass == nil || !class_conformsToProtocol(superClass, protocol))) {
             [result addObject:classes[i]];
-            NSLog(@"Found for protocol:%@ class:%@", protocol, class);
+//            NSLog(@"Found for protocol:%@ class:%@", protocol, class);
         }
     }
     
@@ -63,9 +63,7 @@
     NSMutableArray *result = [NSMutableArray array];
     for (NSInteger i = 0; i < numClasses; i++) {
         Class superClass = classes[i];
-//        if ([NSBundle bundleForClass:superClass] != [NSBundle mainBundle]) {
-//            continue;
-//        }
+        
         while(superClass && superClass != parentClass) {
             superClass = class_getSuperclass(superClass);
         }

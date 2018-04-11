@@ -14,7 +14,7 @@ import AVFoundation
 // call all these in main queue DispatchQueue.main
 public extension UIView {
     
-    public func showPopup(content: UIImage? = "❤️".image(),
+    public func showPopover(content: UIImage? = "❤️".image(),
                           duration:TimeInterval = 1.0,
                           style: UIBlurEffectStyle = UIBlurEffectStyle.light,
                           completion: @escaping ()->Void = {}
@@ -75,7 +75,7 @@ public extension UIView {
                                   completion: @escaping ()->Void = {}
         ) {
         guard let content = content else {
-            BKLog.debug("❌ received nil image content!")
+            BKLog.print(error: "Received nil image content!")
             return
         }
         DispatchQueue.main.async {
@@ -268,7 +268,7 @@ public extension UIView {
     }
     
     public func showSheen(duration: Double = 2.0, color: UIColor? = nil, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
-        guard let bundle = BoundlessKit.frameworkBundle else {
+        guard let bundle = Bundle.boundlessKit else {
             return
         }
         

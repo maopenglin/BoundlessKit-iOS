@@ -15,7 +15,7 @@ import Foundation
 ////    func kitPublish(reinforcementInfo: [String:Any])
 //}
 
-public class BoundlessKit : NSObject {
+open class BoundlessKit : NSObject {
     
     fileprivate static var _standard: BoundlessKit?
     public class var standard: BoundlessKit {
@@ -72,9 +72,9 @@ public class BoundlessKit : NSObject {
     public func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
         refreshContainer.decision(forActionID: actionID) { reinforcementDecision in
             let reinforcement = BKReinforcement.init(reinforcementDecision, metadata)
+            BKLog.print(confirmed: "Reinforcing actionID <\(actionID)> with reinforcement <\(reinforcement.name)>")
             completion(reinforcement.name)
             self.reportBatch.store(reinforcement)
-            BKLog.print("Reported actionID <\(actionID)> with reinforcementID <\(reinforcement.name)>")
             self.apiClient.syncIfNeeded()
         }
     }

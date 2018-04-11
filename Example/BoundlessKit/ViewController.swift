@@ -77,7 +77,7 @@ class ViewController: UIViewController {
         //        locationManager.requestAlwaysAuthorization()
         
         
-//        BoundlessKit.track("action2peformed")
+        BoundlessKit.track(actionID: "action2peformed")
         //        BoundlessKit.reinforce("a2") { reinforcement in
         //            // Update UI to display reinforcement decision on screen for learning purposes
         //            self.responseLabel.text = reinforcement

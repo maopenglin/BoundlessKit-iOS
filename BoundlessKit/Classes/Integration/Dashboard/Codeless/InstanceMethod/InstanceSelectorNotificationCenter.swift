@@ -69,7 +69,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
         if let notifier = notifiers[aName] {
             notifier.addObserver(observer as AnyObject)
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
-            BKLog.print("Added observer for notification:\(aName.rawValue)")
+//            BKLog.debug("Added observer for notification:\(aName.rawValue)")
             return
         }
         
@@ -77,12 +77,12 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
             let notifier = InstanceSelectorNotifier.init(instanceSelector) {
             notifiers[aName] = notifier
             notifier.addObserver(observer as AnyObject)
-            BKLog.print("Added observer for new notification:\(aName.rawValue)")
+//            BKLog.debug("Added observer for new notification:\(aName.rawValue)")
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
             return
         }
         
-        BKLog.error("Cannot create instance method for notification<\(aName)>")
+        BKLog.print(error: "Cannot create instance method for notification<\(aName)>")
     }
     
     override public func removeObserver(_ observer: Any) {
@@ -92,7 +92,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
     override public func removeObserver(_ observer: Any, name aName: NSNotification.Name?, object anObject: Any?) {
         if let aName = aName {
             notifiers[aName]?.removeObserver(observer as AnyObject)
-            BKLog.print("Removed observer for notification:\(aName.rawValue)")
+            BKLog.debug("Removed observer for notification:\(aName.rawValue)")
         } else {
             for notifier in notifiers.values {
                 notifier.removeObserver(observer as AnyObject)
@@ -169,7 +169,7 @@ fileprivate class InstanceSelectorNotifier : NSObject {
             guard let classType = aClassType,
                 let selector = aSelector,
                 let instanceSelector = InstanceSelector(classType, selector) else {
-                    print("Not posting because <\(String(describing: aClassType))-\(String(describing: aSelector))> is not a valid instance selector")
+                    BKLog.debug("Not posting because <\(String(describing: aClassType))-\(String(describing: aSelector))> is not a valid instance selector")
                     return
             }
             let notification = Notification.Name.init(instanceSelector.name)

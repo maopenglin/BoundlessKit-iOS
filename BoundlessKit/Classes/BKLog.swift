@@ -7,24 +7,12 @@
 
 import Foundation
 
+open class BKLogPreferences {
+    static var debugEnabled = true
+    static var printEnabled = true
+}
+
 internal class BKLog {
-    
-    /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
-    ///
-    /// - parameters:
-    ///     - message: The debug message.
-    ///     - filePath: Used to get filename of bug. Do not use this parameter. Defaults to #file.
-    ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
-    ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
-    ///
-    @objc public class func print(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
-        var functionSignature:String = function
-        if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
-            functionSignature.replaceSubrange(parameterNames, with: "()")
-        }
-        let fileName = NSString(string: filePath).lastPathComponent
-        Swift.print("[\(fileName):\(line):\(functionSignature)] - \(message)")
-    }
     
     /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
     ///
@@ -36,6 +24,7 @@ internal class BKLog {
     ///
     @objc public class func debug(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
         #if DEBUG
+            guard BKLogPreferences.debugEnabled else { return }
             var functionSignature:String = function
             if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
                 functionSignature.replaceSubrange(parameterNames, with: "()")
@@ -53,7 +42,44 @@ internal class BKLog {
     ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
-    @objc public class func error(_ message: String, visual: Bool = false, filePath: String = #file, function: String =  #function, line: Int = #line) {
+    @objc public class func print(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
+        guard BKLogPreferences.printEnabled else { return }
+        var functionSignature:String = function
+        if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
+            functionSignature.replaceSubrange(parameterNames, with: "()")
+        }
+        let fileName = NSString(string: filePath).lastPathComponent
+        Swift.print("[\(fileName):\(line):\(functionSignature)] - \(message)")
+    }
+    
+    /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
+    ///
+    /// - parameters:
+    ///     - message: The confirmation message.
+    ///     - filePath: Used to get filename. Do not use this parameter. Defaults to #file.
+    ///     - function: Used to get function name. Do not use this parameter. Defaults to #function.
+    ///     - line: Used to get the line. Do not use this parameter. Defaults to #line.
+    ///
+    @objc public class func print(confirmed message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
+        guard BKLogPreferences.printEnabled else { return }
+        var functionSignature:String = function
+        if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
+            functionSignature.replaceSubrange(parameterNames, with: "()")
+        }
+        let fileName = NSString(string: filePath).lastPathComponent
+        Swift.print("[\(fileName):\(line):\(functionSignature)] - ✅ \(message)")
+    }
+    
+    /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
+    ///
+    /// - parameters:
+    ///     - message: The debug message.
+    ///     - filePath: Used to get filename of bug. Do not use this parameter. Defaults to #file.
+    ///     - function: Used to get function name of bug. Do not use this parameter. Defaults to #function.
+    ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
+    ///
+    @objc public class func print(error message: String, visual: Bool = false, filePath: String = #file, function: String =  #function, line: Int = #line) {
+        guard BKLogPreferences.printEnabled else { return }
         var functionSignature:String = function
         if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
             functionSignature.replaceSubrange(parameterNames, with: "()")
@@ -61,7 +87,7 @@ internal class BKLog {
         let fileName = NSString(string: filePath).lastPathComponent
         Swift.print("[\(fileName):\(line):\(functionSignature)] - ❌ \(message)")
         
-        if visual {
+        if BKLogPreferences.debugEnabled && visual {
             alert(message: "🚫 \(message)", title: "☠️")
         }
     }
@@ -73,22 +99,5 @@ internal class BKLog {
             alertController.addAction(OKAction)
             UIWindow.presentTopLevelAlert(alertController: alertController)
         }
-    }
-    
-    /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
-    ///
-    /// - parameters:
-    ///     - message: The confirmation message.
-    ///     - filePath: Used to get filename. Do not use this parameter. Defaults to #file.
-    ///     - function: Used to get function name. Do not use this parameter. Defaults to #function.
-    ///     - line: Used to get the line. Do not use this parameter. Defaults to #line.
-    ///
-    @objc public class func confirmed(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
-        var functionSignature:String = function
-        if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
-            functionSignature.replaceSubrange(parameterNames, with: "()")
-        }
-        let fileName = NSString(string: filePath).lastPathComponent
-        Swift.print("[\(fileName):\(line):\(functionSignature)] - ✅ \(message)")
     }
 }
