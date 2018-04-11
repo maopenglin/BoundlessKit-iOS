@@ -17,7 +17,7 @@ class BoundlessContext : NSObject {
             let group = DispatchGroup.init()
             
             group.enter()
-            surroundingBluetooth() { bluetoothInfo in
+            BoundlessBluetooth.shared.getBluetooth { bluetoothInfo in
                 if let bluetoothInfo = bluetoothInfo {
                     context["bluetoothInfo"] = bluetoothInfo
                 }
@@ -25,7 +25,7 @@ class BoundlessContext : NSObject {
             }
             
             group.enter()
-            estimatedLocation() { locationInfo in
+            BoundlessLocation.shared.getLocation { locationInfo in
                 if let locationInfo = locationInfo {
                     context["locationInfo"] = locationInfo
                 }
@@ -35,22 +35,6 @@ class BoundlessContext : NSObject {
             group.notify(queue: queue) {
                 completion(context)
             }
-        }
-    }
-    
-    fileprivate static func surroundingBluetooth(completion:@escaping([String:Any]?) -> Void) {
-        DispatchQueue.global().async {
-            var bluetoothInfo = [String: Any]()
-            bluetoothInfo["phone"] = ["signal": 32]
-            completion(bluetoothInfo)
-        }
-    }
-    
-    fileprivate static func estimatedLocation(completion:@escaping([String:Any]?) -> Void) {
-        DispatchQueue.global().async {
-            var locationInfo = [String: Any]()
-            locationInfo["altitude"] = 3
-            completion(locationInfo)
         }
     }
     
