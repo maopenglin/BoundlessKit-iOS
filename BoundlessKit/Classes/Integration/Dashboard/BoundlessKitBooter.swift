@@ -18,8 +18,9 @@ public class BoundlessKitBooterObjc : NSObject {
     }
     
     private static let bootKit: Void = {
+        // Set up boundlessKit if BoundlessProperties.plist found
         if BoundlessProperties.fromFile != nil {
-            _ = BoundlessKitBooter.shared
+            _ = BoundlessKitBooter.standard
         }
         return
     }()
@@ -27,7 +28,7 @@ public class BoundlessKitBooterObjc : NSObject {
 
 fileprivate class BoundlessKitBooter : NSObject {
     
-    fileprivate static let shared = BoundlessKitBooter()
+    fileprivate static let standard = BoundlessKitBooter()
     
     let codelessAPIClient = CodelessAPIClient()
     let database = BKUserDefaults.standard
