@@ -1,5 +1,5 @@
 //
-//  BoundlessKitLauncher.swift
+//  BoundlessKitBooter.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 3/7/18.
@@ -7,34 +7,35 @@
 
 import Foundation
 
-public class BoundlessKitLauncherObjc : NSObject {
+public class BoundlessKitBooterObjc : NSObject {
     
     @objc
-    public static let shared = BoundlessKitLauncherObjc()
+    public static let shared = BoundlessKitBooterObjc()
     
     @objc
     public func appDidLaunch(_ notification: Notification) {
-        _ = BoundlessKitLauncherObjc.launchKit
+        _ = BoundlessKitBooterObjc.bootKit
     }
     
-    private static let launchKit: Void = {
+    private static let bootKit: Void = {
         if BoundlessProperties.fromFile != nil {
-            let launcher = BoundlessKitLauncher()
+            _ = BoundlessKitBooter.shared
         }
         return
     }()
 }
 
-class BoundlessKitLauncher : NSObject {
+fileprivate class BoundlessKitBooter : NSObject {
+    
+    fileprivate static let shared = BoundlessKitBooter()
     
     let codelessAPIClient = CodelessAPIClient()
     let database = BKUserDefaults.standard
     
     var codelessReinforcers = [String: CodelessReinforcer]()
     
-    override init() {
+    private override init() {
         super.init()
-        BoundlessKit.standard.launcher = self
         
         codelessAPIClient.delegate = self
         // set session again to run `didSet` routine
@@ -74,7 +75,7 @@ class BoundlessKitLauncher : NSObject {
     }
 }
 
-extension BoundlessKitLauncher : CodelessApiClientDelegate {
+extension BoundlessKitBooter : CodelessApiClientDelegate {
     func didUpdate(session: CodelessVisualizerSession?) {
         var mappings = codelessAPIClient.properties.version.mappings
         if let session = session {

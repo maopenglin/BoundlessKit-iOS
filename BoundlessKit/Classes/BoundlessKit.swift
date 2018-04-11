@@ -30,7 +30,6 @@ open class BoundlessKit : NSObject {
     }
     
     
-    internal var launcher: BoundlessKitLauncher?
     internal let apiClient: BoundlessAPIClient
     internal let database: BKDatabase
     
