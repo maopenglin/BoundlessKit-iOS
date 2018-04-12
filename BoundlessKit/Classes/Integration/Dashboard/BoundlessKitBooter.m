@@ -13,7 +13,9 @@
 + (void) load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [[NSNotificationCenter defaultCenter] addObserver:[BoundlessKitBooterObjc standard] selector:@selector(appDidLaunch:) name:UIApplicationDidFinishLaunchingNotification object:nil];
+//        [[NSNotificationCenter defaultCenter] addObserver:[BoundlessKitBooterObjc standard] selector:@selector(appDidLaunch:) name:UIApplicationNotification object:nil];
+        // ^not swizzling fast enough for reinforcing first view controller
+        [[BoundlessKitBooterObjc standard] appDidLaunch: [[NSNotification alloc] initWithName:@"test" object:nil userInfo:nil]];
     });
 }
 

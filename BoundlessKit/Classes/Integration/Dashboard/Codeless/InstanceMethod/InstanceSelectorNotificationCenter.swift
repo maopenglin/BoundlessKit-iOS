@@ -69,7 +69,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
         if let notifier = notifiers[aName] {
             notifier.addObserver(observer as AnyObject)
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
-//            BKLog.debug("Added observer for notification:\(aName.rawValue)")
+            BKLog.debug("Added observer for notification:\(aName.rawValue)")
             return
         }
         
@@ -77,7 +77,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
             let notifier = InstanceSelectorNotifier.init(instanceSelector) {
             notifiers[aName] = notifier
             notifier.addObserver(observer as AnyObject)
-//            BKLog.debug("Added observer for new notification:\(aName.rawValue)")
+            BKLog.debug("Added observer for new notification:\(aName.rawValue)")
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
             return
         }
