@@ -25,19 +25,11 @@ internal protocol CodelessApiClientDelegate {
     func didUpdate(session: CodelessVisualizerSession?)
 }
 
-internal class CodelessAPIClient : HTTPClient {
+internal class CodelessAPIClient : BoundlessAPIClient {
     
     var delegate: CodelessApiClientDelegate?
     
-    var properties: BoundlessProperties = {
-        var currentProperties = BoundlessKit.standard.apiClient.properties
-        if let versionData = BKUserDefaults.standard.object(forKey: "codelessVersion") as? Data,
-            let version = BoundlessVersion(data: versionData) {
-            currentProperties.version = version
-        }
-        BoundlessKit.standard.apiClient.properties = currentProperties
-        return currentProperties
-        } () {
+    override var properties: BoundlessProperties {
         didSet {
             BKUserDefaults.standard.set(properties.version.encode(), forKey: "codelessVersion")
         }
@@ -79,6 +71,16 @@ internal class CodelessAPIClient : HTTPClient {
                 self.delegate?.didUpdate(session: self.visualizerSession)
             }
         }
+    }
+    
+    
+    override init(properties: BoundlessProperties, session: URLSessionProtocol = URLSession.shared) {
+        var currentProperties = properties
+        if let versionData = BKUserDefaults.standard.object(forKey: "codelessVersion") as? Data,
+            let version = BoundlessVersion(data: versionData) {
+            currentProperties.version = version
+        }
+        super.init(properties: properties, session: session)
     }
     
     func boot(completion: @escaping () -> () = {}) {

@@ -10,11 +10,17 @@ import Foundation
 
 open class BoundlessKit : NSObject {
     
+    internal static var _standard: BoundlessKit?
     public static var standard: BoundlessKit = {
+        if _standard != nil {
+            return _standard!
+        }
+        
         guard let properties = BoundlessProperties.fromFile else {
             fatalError("Missing <BoundlessProperties.plist> file")
         }
-        return BoundlessKit.init(apiClient: BoundlessAPIClient(properties: properties), database: BKUserDefaults.standard)
+        _standard = BoundlessKit.init(apiClient: BoundlessAPIClient(properties: properties), database: BKUserDefaults.standard)
+        return _standard!
     }()
     
     internal let apiClient: BoundlessAPIClient
@@ -63,4 +69,10 @@ open class BoundlessKit : NSObject {
         }
     }
     
+//    @objc
+//    public func setID(_ id: String) -> Bool {
+//        if !id.isEmpty && id.count <= 36 && id.range(of: "[^a-zA-Z0-9\\-]", options: .regularExpression) == nil {
+//
+//        }
+//    }
 }

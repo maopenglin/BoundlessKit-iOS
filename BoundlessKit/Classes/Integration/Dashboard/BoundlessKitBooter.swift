@@ -23,14 +23,22 @@ public class BoundlessKitBooterObjc : NSObject {
 fileprivate class BoundlessKitBooter : NSObject {
     
     fileprivate static let standard = BoundlessKitBooter()
+    private let kit: BoundlessKit
     
-    let codelessAPIClient = CodelessAPIClient()
+    let codelessAPIClient: CodelessAPIClient
     
     var codelessReinforcers = [String: CodelessReinforcer]()
     
     private override init() {
+        guard let properties = BoundlessProperties.fromFile else {
+            fatalError("Missing <BoundlessProperties.plist> file")
+        }
+        self.codelessAPIClient = CodelessAPIClient(properties: properties)
+        self.kit = BoundlessKit(apiClient: codelessAPIClient, database: BKUserDefaults.standard)
         super.init()
+        
         codelessAPIClient.delegate = self
+        BoundlessKit._standard = kit
         
         // set session again to run `didSet` routine
         let session = codelessAPIClient.visualizerSession
@@ -39,7 +47,6 @@ fileprivate class BoundlessKitBooter : NSObject {
         
         refreshKit()
         codelessAPIClient.boot {
-            BoundlessKit.standard.apiClient.properties = self.codelessAPIClient.properties
             self.refreshKit()
             self.codelessAPIClient.promptPairing()
         }
@@ -47,7 +54,7 @@ fileprivate class BoundlessKitBooter : NSObject {
     
     func refreshKit() {
         for (actionID, value) in codelessAPIClient.properties.version.mappings {
-            BoundlessKit.standard.refreshContainer.commit(actionID: actionID, with: BoundlessKit.standard.apiClient)
+            kit.refreshContainer.commit(actionID: actionID, with: codelessAPIClient)
             if let codeless = value["codeless"] as? [String: Any],
                 let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
                 let reinforcer: CodelessReinforcer
@@ -65,6 +72,7 @@ fileprivate class BoundlessKitBooter : NSObject {
                 }
             }
         }
+        self.codelessAPIClient.syncIfNeeded()
     }
     
 }
