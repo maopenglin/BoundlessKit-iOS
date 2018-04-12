@@ -15,29 +15,22 @@ open class BoundlessKit : NSObject {
         guard _standard == nil else {
             return _standard!
         }
-        
-        guard let properties = BoundlessProperties.fromFile else {
-            fatalError("Missing <BoundlessProperties.plist> file")
-        }
-        _standard = BoundlessKit.init(apiClient: BoundlessAPIClient(properties: properties), database: BKUserDefaults.standard)
+        _standard = BoundlessKit()
         return _standard!
     }()
     
-    internal let apiClient: BoundlessAPIClient
+    internal var apiClient: BoundlessAPIClient
     
-    internal var trackBatch: BKTrackBatch
-    internal var reportBatch: BKReportBatch
-    internal var refreshContainer: BKRefreshCartridgeContainer
+    private override convenience init() {
+        guard let properties = BoundlessProperties.fromFile else {
+            fatalError("Missing <BoundlessProperties.plist> file")
+        }
+        self.init(apiClient: BoundlessAPIClient(properties: properties, database: BKUserDefaults.standard))
+    }
     
-    init(apiClient: BoundlessAPIClient, database: BKDatabase) {
+    init(apiClient: BoundlessAPIClient) {
         self.apiClient = apiClient
-        self.trackBatch = BKTrackBatch.initWith(database: database, forKey: "trackBatch")
-        self.reportBatch = BKReportBatch.initWith(database: database, forKey: "reportBatch")
-        self.refreshContainer = BKRefreshCartridgeContainer.initWith(database: database, forKey: "refreshContainer")
         super.init()
-        apiClient.trackBatch = self.trackBatch
-        apiClient.reportBatch = self.reportBatch
-        apiClient.refreshContainer = self.refreshContainer
     }
     
     @objc
@@ -48,7 +41,7 @@ open class BoundlessKit : NSObject {
     @objc
     public func track(actionID: String, metadata: [String: Any] = [:]) {
         let action = BKAction(actionID, metadata)
-        trackBatch.store(action)
+        apiClient.trackBatch.store(action)
         BKLog.debug("Tracked actionID <\(actionID)>")
         apiClient.syncIfNeeded()
     }
@@ -60,11 +53,11 @@ open class BoundlessKit : NSObject {
     
     @objc
     public func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
-        refreshContainer.decision(forActionID: actionID) { reinforcementDecision in
+        apiClient.refreshContainer.decision(forActionID: actionID) { reinforcementDecision in
             let reinforcement = BKReinforcement.init(reinforcementDecision, metadata)
             BKLog.print(confirmed: "Reinforcing actionID <\(actionID)> with reinforcement <\(reinforcement.name)>")
             completion(reinforcement.name)
-            self.reportBatch.store(reinforcement)
+            self.apiClient.reportBatch.store(reinforcement)
             self.apiClient.syncIfNeeded()
         }
     }

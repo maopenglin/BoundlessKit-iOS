@@ -14,7 +14,6 @@ class TestManualIntegration: XCTestCase {
     override func setUp() {
         super.setUp()
         BKUserDefaults.standard.removePersistentDomain()
-        BKUserDefaults.standardTest.removePersistentDomain()
     }
     
     override func tearDown() {
@@ -25,22 +24,25 @@ class TestManualIntegration: XCTestCase {
     func testAddAction() {
         let kit = MockBoundlessKit()
         
-        let previousTrackCount = kit.trackBatch.count
+        let previousTrackCount = kit.apiClient.trackBatch.count
         
         kit.track(actionID: "track1")
         kit.track(actionID: "track2")
         
-        XCTAssert(kit.trackBatch.count == previousTrackCount + 2)
+        XCTAssert(kit.apiClient.trackBatch.count == previousTrackCount + 2)
     }
     
     func testSavedData() {
-        let mockDatabase = MockBKDatabase()
+        let database = MockBKuserDefaults()
         
-        let kit = MockBoundlessKit.init(database: mockDatabase)
+        let client = BoundlessAPIClient(properties: BoundlessProperties.fromTestFile!, database: database)
+        let kit = MockBoundlessKit.init(apiClient: client)
         kit.track(actionID: "track1")
         
-        let kit2 = MockBoundlessKit.init(database: mockDatabase)
-        XCTAssert(kit2.trackBatch.count == kit.trackBatch.count)
+        let client2 = BoundlessAPIClient(properties: BoundlessProperties.fromTestFile!, database: database)
+        let kit2 = MockBoundlessKit.init(apiClient: client2)
+        
+        XCTAssert(kit2.apiClient.trackBatch.count == kit.apiClient.trackBatch.count)
     }
     
     

@@ -27,7 +27,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         }))
     }
     
-    var storage: (BKDatabase, String)?
+    var storage: BKDatabase.Storage?
     
     class func initWith(database: BKDatabase, forKey key: String) -> BKReportBatch {
         let batch: BKReportBatch

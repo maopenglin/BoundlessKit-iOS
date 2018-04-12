@@ -29,7 +29,7 @@
 		84CBF28D20521DF200FE49B9 /* TestBoundlessKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF28C20521DF200FE49B9 /* TestBoundlessKit.swift */; };
 		84CBF29120523F9D00FE49B9 /* TestManualIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF29020523F9D00FE49B9 /* TestManualIntegration.swift */; };
 		84CBF2A82055105600FE49B9 /* TestBoundlessAPIObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2A72055105600FE49B9 /* TestBoundlessAPIObjects.swift */; };
-		84CE0FB5205851C900688A99 /* MockBKDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CE0FB4205851C900688A99 /* MockBKDatabase.swift */; };
+		84CE0FB5205851C900688A99 /* MockBKuserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CE0FB4205851C900688A99 /* MockBKuserDefaults.swift */; };
 		84CE0FB72058531B00688A99 /* MockBoundlessKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CE0FB62058531B00688A99 /* MockBoundlessKit.swift */; };
 		84CEB674205C48BB007AF2AF /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CEB673205C48BB007AF2AF /* Helper.swift */; };
 /* End PBXBuildFile section */
@@ -72,7 +72,7 @@
 		84CBF29C2054D88400FE49B9 /* MockManualClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockManualClient.swift; sourceTree = "<group>"; };
 		84CBF2A42055034000FE49B9 /* MockHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockHTTPClient.swift; sourceTree = "<group>"; };
 		84CBF2A72055105600FE49B9 /* TestBoundlessAPIObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestBoundlessAPIObjects.swift; sourceTree = "<group>"; };
-		84CE0FB4205851C900688A99 /* MockBKDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBKDatabase.swift; sourceTree = "<group>"; };
+		84CE0FB4205851C900688A99 /* MockBKuserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBKuserDefaults.swift; sourceTree = "<group>"; };
 		84CE0FB62058531B00688A99 /* MockBoundlessKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBoundlessKit.swift; sourceTree = "<group>"; };
 		84CEB673205C48BB007AF2AF /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		8C5896EE6F40C3937CF30FD8 /* Pods_BoundlessKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoundlessKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -201,7 +201,7 @@
 				84CBF29C2054D88400FE49B9 /* MockManualClient.swift */,
 				84CBF2A42055034000FE49B9 /* MockHTTPClient.swift */,
 				84CBF2872052137300FE49B9 /* NotificationReceiver.swift */,
-				84CE0FB4205851C900688A99 /* MockBKDatabase.swift */,
+				84CE0FB4205851C900688A99 /* MockBKuserDefaults.swift */,
 				84CE0FB62058531B00688A99 /* MockBoundlessKit.swift */,
 			);
 			path = Mocks;
@@ -451,7 +451,7 @@
 				847A3CB3205844F400F16211 /* MockManualClient.swift in Sources */,
 				84CE0FB72058531B00688A99 /* MockBoundlessKit.swift in Sources */,
 				84CBF27B2051D31800FE49B9 /* MockViewController.swift in Sources */,
-				84CE0FB5205851C900688A99 /* MockBKDatabase.swift in Sources */,
+				84CE0FB5205851C900688A99 /* MockBKuserDefaults.swift in Sources */,
 				84CBF28D20521DF200FE49B9 /* TestBoundlessKit.swift in Sources */,
 				84CBF2802051E5D400FE49B9 /* TestInstanceSelector.swift in Sources */,
 				84CBF2842051EA1500FE49B9 /* TestActionReinforcement.swift in Sources */,

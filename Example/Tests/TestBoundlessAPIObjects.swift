@@ -14,7 +14,6 @@ class TestBoundlessAPIObjects: XCTestCase {
     override func setUp() {
         super.setUp()
         BKUserDefaults.standard.removePersistentDomain()
-        BKUserDefaults.standardTest.removePersistentDomain()
     }
     
     override func tearDown() {
@@ -22,7 +21,7 @@ class TestBoundlessAPIObjects: XCTestCase {
     }
     
     func testTrackEncodeAndDecode() {
-        let database = BKUserDefaults.standardTest
+        let database = MockBKuserDefaults()
         
         let encodedBatch = BKTrackBatch(values: [BKAction.init("track1")])
         database.archive(encodedBatch, forKey: "testTrackEncodeAndDecode")
@@ -76,7 +75,7 @@ class TestBoundlessAPIObjects: XCTestCase {
     
     
     func testReportEncodeAndDecode() {
-        let database = BKUserDefaults.standardTest
+        let database = MockBKuserDefaults()
         
         let encodedBatch = BKReportBatch.init(dict: ["action1" : [BKReinforcement.init("reinforcement1", "action1")]])
         database.archive(encodedBatch, forKey: "testReportEncodeAndDecode")

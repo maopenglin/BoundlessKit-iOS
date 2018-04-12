@@ -27,26 +27,30 @@ internal protocol BoundlessAPISynchronizable: class {
 
 internal class BoundlessAPIClient : HTTPClient {
     
-    var properties: BoundlessProperties
+    internal var properties: BoundlessProperties
+    internal var database: BKUserDefaults
+    internal var trackBatch: BKTrackBatch
+    internal var reportBatch: BKReportBatch
+    internal var refreshContainer: BKRefreshCartridgeContainer
     
     let coordinationQueue = DispatchQueue(label: "boundless.kit.api")
     var coordinationWork: DispatchWorkItem?
-    
-    weak var trackBatch: BoundlessAPISynchronizable?
-    weak var reportBatch: BoundlessAPISynchronizable?
-    weak var refreshContainer: BoundlessAPISynchronizable?
     var timeDelayAfterTrack: UInt32 = 1
     var timeDelayAfterReport: UInt32 = 5
     var timeDelayAfterRefresh: UInt32 = 3
     
-    init(properties: BoundlessProperties, session: URLSessionProtocol = URLSession.shared) {
+    init(properties: BoundlessProperties, database: BKUserDefaults, session: URLSessionProtocol = URLSession.shared) {
         self.properties = properties
+        self.database = database
+        self.trackBatch = BKTrackBatch.initWith(database: database, forKey: "trackBatch")
+        self.reportBatch = BKReportBatch.initWith(database: database, forKey: "reportBatch")
+        self.refreshContainer = BKRefreshCartridgeContainer.initWith(database: database, forKey: "refreshContainer")
         super.init(session: session)
     }
     
     func syncIfNeeded() {
         if coordinationWork == nil &&
-            (refreshContainer?.needsSync ?? false || reportBatch?.needsSync ?? false || trackBatch?.needsSync ?? false) {
+            (refreshContainer.needsSync || reportBatch.needsSync || trackBatch.needsSync) {
             synchronize()
         }
     }
@@ -65,42 +69,39 @@ internal class BoundlessAPIClient : HTTPClient {
             }
             
             let sema = DispatchSemaphore(value: 0)
-            if let trackBatch = self.trackBatch {
-                trackBatch.synchronize(with: self) { success in
-                    goodProgress = goodProgress && success
-                    sema.signal()
-                }
-                _ = sema.wait(timeout: .now() + 3)
-                if goodProgress {
-                    sleep(self.timeDelayAfterTrack)
-                } else {
-                    return
-                }
+            self.trackBatch.synchronize(with: self) { success in
+                goodProgress = goodProgress && success
+                sema.signal()
             }
-            if let reportBatch = self.reportBatch {
-                reportBatch.synchronize(with: self) { success in
-                    goodProgress = goodProgress && success
-                    sema.signal()
-                }
-                _ = sema.wait(timeout: .now() + 3)
-                if goodProgress {
-                    sleep(self.timeDelayAfterReport)
-                } else {
-                    return
-                }
+            _ = sema.wait(timeout: .now() + 3)
+            if goodProgress {
+                sleep(self.timeDelayAfterTrack)
+            } else {
+                return
             }
-            if let refreshContainer = self.refreshContainer {
-                refreshContainer.synchronize(with: self) { success in
-                    goodProgress = goodProgress && success
-                    sema.signal()
-                }
-                _ = sema.wait(timeout: .now() + 3)
-                if goodProgress {
-                    sleep(self.timeDelayAfterRefresh)
-                } else {
-                    return
-                }
+            
+            self.reportBatch.synchronize(with: self) { success in
+                goodProgress = goodProgress && success
+                sema.signal()
             }
+            _ = sema.wait(timeout: .now() + 3)
+            if goodProgress {
+                sleep(self.timeDelayAfterReport)
+            } else {
+                return
+            }
+            
+            self.refreshContainer.synchronize(with: self) { success in
+                goodProgress = goodProgress && success
+                sema.signal()
+            }
+            _ = sema.wait(timeout: .now() + 3)
+            if goodProgress {
+                sleep(self.timeDelayAfterRefresh)
+            } else {
+                return
+            }
+            
             self.coordinationWork = nil
         }
         coordinationWork = work

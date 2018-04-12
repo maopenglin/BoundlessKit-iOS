@@ -23,27 +23,28 @@ public class BoundlessKitBooterObjc : NSObject {
 fileprivate class BoundlessKitBooter : NSObject {
     
     fileprivate static let standard = BoundlessKitBooter()
+    
     private let kit: BoundlessKit
-    
     let codelessAPIClient: CodelessAPIClient
-    
     var codelessReinforcers = [String: CodelessReinforcer]()
     
     private override init() {
         if let kit = BoundlessKit._standard {
-            self.codelessAPIClient = CodelessAPIClient.init(upgradeClient: kit.apiClient)
+            self.codelessAPIClient = CodelessAPIClient(upgradeClient: kit.apiClient)
             self.kit = kit
+            kit.apiClient = self.codelessAPIClient
         } else {
             guard let properties = BoundlessProperties.fromFile else {
                 fatalError("Missing <BoundlessProperties.plist> file")
             }
-            self.codelessAPIClient = CodelessAPIClient(properties: properties)
-            self.kit = BoundlessKit(apiClient: codelessAPIClient, database: BKUserDefaults.standard)
+            self.codelessAPIClient = CodelessAPIClient.init(properties: properties, database: BKUserDefaults.standard)
+            let kit = BoundlessKit(apiClient: codelessAPIClient)
+            self.kit = kit
+            BoundlessKit._standard = kit
         }
         super.init()
         
         codelessAPIClient.delegate = self
-        BoundlessKit._standard = kit
         
         // set session again to run `didSet` routine
         let session = codelessAPIClient.visualizerSession
@@ -59,7 +60,7 @@ fileprivate class BoundlessKitBooter : NSObject {
     
     func refreshKit() {
         for (actionID, value) in codelessAPIClient.properties.version.mappings {
-            kit.refreshContainer.commit(actionID: actionID, with: codelessAPIClient)
+            codelessAPIClient.refreshContainer.commit(actionID: actionID, with: codelessAPIClient)
             if let codeless = value["codeless"] as? [String: Any],
                 let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
                 let reinforcer: CodelessReinforcer
@@ -83,6 +84,7 @@ fileprivate class BoundlessKitBooter : NSObject {
 }
 
 extension BoundlessKitBooter : CodelessApiClientDelegate {
+    // set and remove notifications for CodelessReinforcers from Session+CodelessReinforcers
     func didUpdate(session: CodelessVisualizerSession?) {
         var mappings = codelessAPIClient.properties.version.mappings
         if let session = session {

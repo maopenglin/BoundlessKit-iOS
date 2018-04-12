@@ -9,6 +9,7 @@ import Foundation
 
 protocol BKData : NSCoding {}
 protocol BKDatabase {
+    typealias Storage = (BKDatabase, String)
     func archive<T: BKData>(_ value: T?, forKey key: String)
     func unarchive<T: BKData>(_ key: String) -> T?
 }

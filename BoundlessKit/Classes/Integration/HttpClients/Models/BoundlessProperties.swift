@@ -15,15 +15,15 @@ internal struct BoundlessProperties {
     let clientBuild = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     let appID: String
+    private let primaryIdentity:String
     let inProduction: Bool
+    let developmentSecret: String
+    let productionSecret: String
     var version: BoundlessVersion {
         didSet {
             BKLog.print("BoundlessKit using versionID <\(version.versionID ?? "nil")>")
         }
     }
-    let developmentSecret: String
-    let productionSecret: String
-    private let primaryIdentity:String
     
     init(_ primaryIdentity: String? = nil, _ appID: String, _ version: BoundlessVersion, _ inProduction: Bool, _ developmentSecret: String, _ productionSecret: String) {
         self.appID = appID

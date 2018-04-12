@@ -31,31 +31,17 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     
     override var properties: BoundlessProperties {
         didSet {
-            BKUserDefaults.standard.set(properties.version.encode(), forKey: "codelessVersion")
+            database.set(properties.version.encode(), forKey: "codelessVersion")
         }
     }
-    var boundlessConfig: BoundlessConfiguration = {
-        if let configData = BKUserDefaults.standard.object(forKey: "codelessConfig") as? Data,
-            let config = BoundlessConfiguration.init(data: configData) {
-            return config
-        } else {
-            return BoundlessConfiguration()
-        }
-        } () {
+    var boundlessConfig: BoundlessConfiguration {
         didSet {
-            BKUserDefaults.standard.set(boundlessConfig.encode(), forKey: "codelessConfig")
+            database.set(boundlessConfig.encode(), forKey: "codelessConfig")
         }
     }
-    var visualizerSession: CodelessVisualizerSession? = {
-        if let sessionData = BKUserDefaults.standard.object(forKey: "codelessSession") as? Data,
-            let savedSession = CodelessVisualizerSession(data: sessionData) {
-            return savedSession
-        } else {
-            return nil
-        }
-        } () {
+    var visualizerSession: CodelessVisualizerSession? {
         didSet {
-            BKUserDefaults.standard.set(visualizerSession?.encode(), forKey: "codelessSession")
+            database.set(visualizerSession?.encode(), forKey: "codelessSession")
             submitQueue.addOperation {
                 if oldValue == nil && self.visualizerSession != nil {
                     BKLog.debug("Visualizer session connected")
@@ -74,16 +60,29 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     }
     
     convenience init(upgradeClient client: BoundlessAPIClient) {
-        self.init(properties: client.properties)
+        self.init(properties: client.properties, database: client.database)
     }
     
-    override init(properties: BoundlessProperties, session: URLSessionProtocol = URLSession.shared) {
+    override init(properties: BoundlessProperties, database: BKUserDefaults, session: URLSessionProtocol = URLSession.shared) {
         var currentProperties = properties
-        if let versionData = BKUserDefaults.standard.object(forKey: "codelessVersion") as? Data,
+        if let versionData = database.object(forKey: "codelessVersion") as? Data,
             let version = BoundlessVersion(data: versionData) {
             currentProperties.version = version
         }
-        super.init(properties: properties, session: session)
+        if let configData = database.object(forKey: "codelessConfig") as? Data,
+            let config = BoundlessConfiguration.init(data: configData) {
+            self.boundlessConfig = config
+        } else {
+            self.boundlessConfig = BoundlessConfiguration()
+        }
+        if let sessionData = database.object(forKey: "codelessSession") as? Data,
+            let savedSession = CodelessVisualizerSession(data: sessionData) {
+            self.visualizerSession = savedSession
+        } else {
+            self.visualizerSession = nil
+        }
+        
+        super.init(properties: properties, database: database, session: session)
     }
     
     func boot(completion: @escaping () -> () = {}) {
@@ -91,7 +90,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         payload["inProduction"] = properties.inProduction
         payload["currentVersion"] = properties.version.versionID ?? "nil"
         payload["currentConfig"] = boundlessConfig.configID ?? "nil"
-        payload["initialBoot"] = (BKUserDefaults.standard.initialBootDate == nil)
+        payload["initialBoot"] = (database.initialBootDate == nil)
         post(url: CodelessAPIEndpoint.boot.url, jsonObject: payload) { response in
             if let status = response?["status"] as? Int {
                 if status == 205 {

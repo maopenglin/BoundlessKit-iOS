@@ -9,9 +9,20 @@
 import Foundation
 @testable import BoundlessKit
 
+extension BoundlessProperties {
+    static var fromTestFile: BoundlessProperties? {
+        if let propertiesFile = Bundle(for: MockBoundlessKit.self).path(forResource: "BoundlessTestProperties", ofType: "plist"),
+            let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as? [String: Any] {
+            return BoundlessProperties.convert(from: propertiesDictionary)
+        } else {
+            return nil
+        }
+    }
+}
+
 class MockBoundlessAPIClient : BoundlessAPIClient {
     init() {
-        super.init(properties: BoundlessProperties.fromTestFile!, session: MockURLSession())
+        super.init(properties: BoundlessProperties.fromTestFile!, database: MockBKuserDefaults(), session: MockURLSession())
         logRequests = true
         logResponses = true
     }

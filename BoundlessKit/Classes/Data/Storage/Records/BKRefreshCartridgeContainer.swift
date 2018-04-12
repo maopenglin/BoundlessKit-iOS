@@ -14,7 +14,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
         NSKeyedArchiver.setClassName("BKRefreshCartridgeContainer", for: BKRefreshCartridgeContainer.self)
     }()
     
-    var storage: (BKDatabase, String)?
+    var storage: BKDatabase.Storage?
     
     class func initWith(database: BKDatabase, forKey key: String) -> BKRefreshCartridgeContainer {
         let container: BKRefreshCartridgeContainer
