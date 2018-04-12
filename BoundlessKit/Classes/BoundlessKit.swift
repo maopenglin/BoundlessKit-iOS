@@ -12,7 +12,7 @@ open class BoundlessKit : NSObject {
     
     internal static var _standard: BoundlessKit?
     public static var standard: BoundlessKit = {
-        if _standard != nil {
+        guard _standard == nil else {
             return _standard!
         }
         
