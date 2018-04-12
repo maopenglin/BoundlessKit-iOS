@@ -8,30 +8,16 @@
 
 import Foundation
 
-//public protocol BoundlessKitDelegateProtocol {
-////    func kitActionIDs() -> [String]
-////    func kitReinforcement(for actionID: String, completion: @escaping (String)->Void)
-////    func kitPublish(actionInfo: [String:Any])
-////    func kitPublish(reinforcementInfo: [String:Any])
-//}
-
 open class BoundlessKit : NSObject {
     
-    fileprivate static var _standard: BoundlessKit?
-    public class var standard: BoundlessKit {
-        if let _ = _standard {
-            return _standard!
-        }
+    public static var standard: BoundlessKit = {
         guard let properties = BoundlessProperties.fromFile else {
             fatalError("Missing <BoundlessProperties.plist> file")
         }
-        _standard = BoundlessKit.init(apiClient: BoundlessAPIClient.init(properties: properties), database: BKUserDefaults.standard)
-        return _standard!
-    }
-    
+        return BoundlessKit.init(apiClient: BoundlessAPIClient(properties: properties), database: BKUserDefaults.standard)
+    }()
     
     internal let apiClient: BoundlessAPIClient
-    internal let database: BKDatabase
     
     internal var trackBatch: BKTrackBatch
     internal var reportBatch: BKReportBatch
@@ -39,7 +25,6 @@ open class BoundlessKit : NSObject {
     
     init(apiClient: BoundlessAPIClient, database: BKDatabase) {
         self.apiClient = apiClient
-        self.database = database
         self.trackBatch = BKTrackBatch.initWith(database: database, forKey: "trackBatch")
         self.reportBatch = BKReportBatch.initWith(database: database, forKey: "reportBatch")
         self.refreshContainer = BKRefreshCartridgeContainer.initWith(database: database, forKey: "refreshContainer")
@@ -77,4 +62,5 @@ open class BoundlessKit : NSObject {
             self.apiClient.syncIfNeeded()
         }
     }
+    
 }

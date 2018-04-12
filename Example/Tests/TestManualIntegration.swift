@@ -23,7 +23,7 @@ class TestManualIntegration: XCTestCase {
     }
     
     func testAddAction() {
-        let kit = MockBoundlessKit.init()
+        let kit = MockBoundlessKit()
         
         let previousTrackCount = kit.trackBatch.count
         

@@ -9,21 +9,15 @@ import Foundation
 
 public class BoundlessKitBooterObjc : NSObject {
     
-    @objc
-    public static let shared = BoundlessKitBooterObjc()
+    @objc public static let standard = BoundlessKitBooterObjc()
     
-    @objc
-    public func appDidLaunch(_ notification: Notification) {
-        _ = BoundlessKitBooterObjc.bootKit
-    }
-    
-    private static let bootKit: Void = {
+    @objc public func appDidLaunch(_ notification: Notification) {
         // Set up boundlessKit if BoundlessProperties.plist found
         if BoundlessProperties.fromFile != nil {
             _ = BoundlessKitBooter.standard
         }
-        return
-    }()
+    }
+    
 }
 
 fileprivate class BoundlessKitBooter : NSObject {
@@ -31,21 +25,19 @@ fileprivate class BoundlessKitBooter : NSObject {
     fileprivate static let standard = BoundlessKitBooter()
     
     let codelessAPIClient = CodelessAPIClient()
-    let database = BKUserDefaults.standard
     
     var codelessReinforcers = [String: CodelessReinforcer]()
     
     private override init() {
         super.init()
-        
         codelessAPIClient.delegate = self
+        
         // set session again to run `didSet` routine
         let session = codelessAPIClient.visualizerSession
         codelessAPIClient.visualizerSession = nil
         codelessAPIClient.visualizerSession = session
         
         refreshKit()
-        
         codelessAPIClient.boot {
             BoundlessKit.standard.apiClient.properties = self.codelessAPIClient.properties
             self.refreshKit()
@@ -74,6 +66,7 @@ fileprivate class BoundlessKitBooter : NSObject {
             }
         }
     }
+    
 }
 
 extension BoundlessKitBooter : CodelessApiClientDelegate {

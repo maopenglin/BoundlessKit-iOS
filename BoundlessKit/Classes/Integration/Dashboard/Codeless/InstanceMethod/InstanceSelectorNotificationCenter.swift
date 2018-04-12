@@ -130,8 +130,11 @@ fileprivate class InstanceSelectorNotifier : NSObject {
     private var observers = [WeakObject]()
     
     init?(_ instanceSelector: InstanceSelector) {
-        if let notificationMethod = BoundlessObject.createTrampoline(for: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorNotifier.postInstanceSelectorNotificationBlock),
-            let notificationSelector = InstanceSelector.init(instanceSelector.classType, notificationMethod) {
+        guard let notificationMethod = BoundlessObject.createTrampoline(for: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorNotifier.postInstanceSelectorNotificationBlock) else {
+            BKLog.print(error: "Could not create trampoline")
+            return nil
+        }
+        if let notificationSelector = InstanceSelector.init(instanceSelector.classType, notificationMethod) {
             self.instanceSelector = instanceSelector
             self.notificationSelector = notificationSelector
             super.init()

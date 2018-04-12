@@ -103,11 +103,11 @@ fileprivate class BluetoothManager : CBCentralManager {
                 //                print("Removed bluetooth teeth(\(devices.count)) for \(startDate as AnyObject)")
                 if self.finishHandlers.isEmpty && self.isScanning {
                     self.stopScan()
-                    //                    DopeLog.debug("Finished all scans, stopping bluetooth scan")
+                    //                    BKLog.debug("Finished all scans, stopping bluetooth scan")
                 }
             }
         } else {
-            //            DopeLog.debug("Couldn't find finish startDate")
+            //            BKLog.debug("Couldn't find finish startDate")
         }
         
     }

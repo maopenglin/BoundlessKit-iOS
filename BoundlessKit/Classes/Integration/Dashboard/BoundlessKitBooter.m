@@ -13,7 +13,7 @@
 + (void) load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [[NSNotificationCenter defaultCenter] addObserver:[BoundlessKitBooterObjc shared] selector:@selector(appDidLaunch:) name:UIApplicationDidFinishLaunchingNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:[BoundlessKitBooterObjc standard] selector:@selector(appDidLaunch:) name:UIApplicationDidFinishLaunchingNotification object:nil];
     });
 }
 

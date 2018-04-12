@@ -14,7 +14,7 @@ class BoundlessContext : NSObject {
     class func getContext(completion:@escaping([String:Any]) -> Void) {
         queue.async {
             var context = [String:Any]()
-            let group = DispatchGroup.init()
+            let group = DispatchGroup()
             
             group.enter()
             BoundlessBluetooth.shared.getBluetooth { bluetoothInfo in
