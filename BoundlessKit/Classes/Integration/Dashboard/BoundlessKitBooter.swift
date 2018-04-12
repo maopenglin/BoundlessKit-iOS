@@ -30,11 +30,16 @@ fileprivate class BoundlessKitBooter : NSObject {
     var codelessReinforcers = [String: CodelessReinforcer]()
     
     private override init() {
-        guard let properties = BoundlessProperties.fromFile else {
-            fatalError("Missing <BoundlessProperties.plist> file")
+        if let kit = BoundlessKit._standard {
+            self.codelessAPIClient = CodelessAPIClient.init(upgradeClient: kit.apiClient)
+            self.kit = kit
+        } else {
+            guard let properties = BoundlessProperties.fromFile else {
+                fatalError("Missing <BoundlessProperties.plist> file")
+            }
+            self.codelessAPIClient = CodelessAPIClient(properties: properties)
+            self.kit = BoundlessKit(apiClient: codelessAPIClient, database: BKUserDefaults.standard)
         }
-        self.codelessAPIClient = CodelessAPIClient(properties: properties)
-        self.kit = BoundlessKit(apiClient: codelessAPIClient, database: BKUserDefaults.standard)
         super.init()
         
         codelessAPIClient.delegate = self

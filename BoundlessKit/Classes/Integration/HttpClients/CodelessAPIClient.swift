@@ -73,6 +73,9 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         }
     }
     
+    convenience init(upgradeClient client: BoundlessAPIClient) {
+        self.init(properties: client.properties)
+    }
     
     override init(properties: BoundlessProperties, session: URLSessionProtocol = URLSession.shared) {
         var currentProperties = properties
