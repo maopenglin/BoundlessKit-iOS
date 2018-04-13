@@ -15,7 +15,7 @@ internal struct BoundlessProperties {
     let clientBuild = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     let appID: String
-    private let primaryIdentity:String
+    var primaryIdentity:String
     let inProduction: Bool
     let developmentSecret: String
     let productionSecret: String

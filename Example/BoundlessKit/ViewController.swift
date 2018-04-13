@@ -71,6 +71,7 @@ class ViewController: UIViewController {
     var locationManager = CLLocationManager()
     
     @objc func action2Performed(){
+        _ = BoundlessKit.standard.setID("Test")
         print("Action 2 performed")
 //        kit.reinforce(actionID: "action1") { reinforcement in }
         ////        // Tracking call is sent asynchronously

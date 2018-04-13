@@ -64,10 +64,13 @@ open class BoundlessKit : NSObject {
         }
     }
     
-//    @objc
-//    public func setID(_ id: String) -> Bool {
-//        if !id.isEmpty && id.count <= 36 && id.range(of: "[^a-zA-Z0-9\\-]", options: .regularExpression) == nil {
-//
-//        }
-//    }
+    @objc
+    public func setID(_ id: String) -> Bool {
+        if !id.isEmpty && id.count <= 36 && id.range(of: "[^a-zA-Z0-9\\-]", options: .regularExpression) == nil {
+            apiClient.properties.primaryIdentity = id
+            return true
+        } else {
+            return false
+        }
+    }
 }
