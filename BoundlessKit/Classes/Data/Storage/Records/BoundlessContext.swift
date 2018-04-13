@@ -18,6 +18,7 @@ class BoundlessContext : NSObject {
             
             group.enter()
             BoundlessBluetooth.shared.getBluetooth { bluetoothInfo in
+//                BKLog.debug("Bluetoothinfo:\(bluetoothInfo as AnyObject)")
                 if let bluetoothInfo = bluetoothInfo {
                     context["bluetoothInfo"] = bluetoothInfo
                 }
@@ -32,7 +33,7 @@ class BoundlessContext : NSObject {
                 group.leave()
             }
             
-            group.notify(queue: queue) {
+            group.notify(queue: DispatchQueue.global()) {
                 completion(context)
             }
         }

@@ -39,27 +39,28 @@ open class BoundlessKit : NSObject {
     }
     
     @objc
-    public func track(actionID: String, metadata: [String: Any] = [:]) {
-        let action = BKAction(actionID, metadata)
-        BKLog.debug("Tracked actionID <\(actionID)>")
-        apiClient.trackBatch.store(action)
-        BKLog.print(confirmed: "Track #\(apiClient.trackBatch.count)")
-        apiClient.syncIfNeeded()
-    }
-    
-    @objc
     public class func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
         standard.reinforce(actionID: actionID, metadata: metadata, completion: completion)
     }
     
     @objc
+    public func track(actionID: String, metadata: [String: Any] = [:]) {
+        let action = BKAction(actionID, metadata)
+        apiClient.trackBatch.store(action)
+//        BKLog.debug("Tracked actionID <\(actionID)>")
+        BKLog.print(confirmed: "Track #<\(apiClient.trackBatch.count)> actionID:<\(actionID)>")
+        apiClient.syncIfNeeded()
+    }
+    
+    
+    @objc
     public func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
         apiClient.refreshContainer.decision(forActionID: actionID) { reinforcementDecision in
             let reinforcement = BKReinforcement.init(reinforcementDecision, metadata)
-            BKLog.print(confirmed: "Reinforcing actionID <\(actionID)> with reinforcement <\(reinforcement.name)>")
             completion(reinforcement.name)
             self.apiClient.reportBatch.store(reinforcement)
-            BKLog.print(confirmed: "Report #\(self.apiClient.reportBatch.count)")
+//            BKLog.print(confirmed: "Reinforcing actionID <\(actionID)> with reinforcement <\(reinforcement.name)>")
+            BKLog.print(confirmed: "Report #<\(self.apiClient.reportBatch.count)> actionID:<\(actionID)> reinforcementID:<\(reinforcement.name)>")
             self.apiClient.syncIfNeeded()
         }
     }
