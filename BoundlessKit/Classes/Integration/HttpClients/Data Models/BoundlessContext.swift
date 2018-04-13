@@ -16,7 +16,6 @@ class BoundlessContext : NSObject {
             var context = [String:Any]()
             let group = DispatchGroup()
             
-//            if BoundlessKit
             group.enter()
             BoundlessBluetooth.shared.getBluetooth { bluetoothInfo in
 //                BKLog.debug("Bluetoothinfo:\(bluetoothInfo as AnyObject)")
@@ -26,12 +25,14 @@ class BoundlessContext : NSObject {
                 group.leave()
             }
             
-            group.enter()
-            BoundlessLocation.shared.getLocation { locationInfo in
-                if let locationInfo = locationInfo {
-                    context["locationInfo"] = locationInfo
+            if BoundlessKitCodelessRemote.configuration.locationObservations {
+                group.enter()
+                BoundlessLocation.shared.getLocation { locationInfo in
+                    if let locationInfo = locationInfo {
+                        context["locationInfo"] = locationInfo
+                    }
+                    group.leave()
                 }
-                group.leave()
             }
             
             group.notify(queue: DispatchQueue.global()) {

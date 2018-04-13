@@ -14,15 +14,21 @@ public class BoundlessKitBooterBridge : NSObject {
     @objc public func appDidLaunch(_ notification: Notification) {
         // Set up boundlessKit if BoundlessProperties.plist found
         if BoundlessProperties.fromFile != nil {
-            _ = BoundlessKitRemote.standard
+            _ = BoundlessKitCodelessRemote.standard
         }
     }
     
 }
 
-internal class BoundlessKitRemote : NSObject {
+internal class BoundlessKitCodelessRemote : NSObject {
     
-    static let standard = BoundlessKitRemote()
+    class var configuration: BoundlessConfiguration {
+        get {
+            return standard.codelessAPIClient.boundlessConfig
+        }
+    }
+    
+    static let standard = BoundlessKitCodelessRemote()
     
     let kit: BoundlessKit
     let codelessAPIClient: CodelessAPIClient
@@ -80,7 +86,7 @@ internal class BoundlessKitRemote : NSObject {
     
 }
 
-extension BoundlessKitRemote : CodelessApiClientDelegate {
+extension BoundlessKitCodelessRemote : CodelessApiClientDelegate {
     // set and remove notifications for CodelessReinforcers from Session+CodelessReinforcers
     func didUpdate(session: CodelessVisualizerSession?) {
         var mappings = codelessAPIClient.properties.version.mappings
