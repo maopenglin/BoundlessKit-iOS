@@ -7,42 +7,39 @@
 
 import Foundation
 
-public class BoundlessKitBooterObjc : NSObject {
+public class BoundlessKitBooterBridge : NSObject {
     
-    @objc public static let standard = BoundlessKitBooterObjc()
+    @objc public static let standard = BoundlessKitBooterBridge()
     
     @objc public func appDidLaunch(_ notification: Notification) {
         // Set up boundlessKit if BoundlessProperties.plist found
         if BoundlessProperties.fromFile != nil {
-            _ = BoundlessKitBooter.standard
+            _ = BoundlessKitRemote.standard
         }
     }
     
 }
 
-fileprivate class BoundlessKitBooter : NSObject {
+internal class BoundlessKitRemote : NSObject {
     
-    fileprivate static let standard = BoundlessKitBooter()
+    static let standard = BoundlessKitRemote()
     
-    private let kit: BoundlessKit
+    let kit: BoundlessKit
     let codelessAPIClient: CodelessAPIClient
     var codelessReinforcers = [String: CodelessReinforcer]()
     
     private override init() {
         if let kit = BoundlessKit._standard {
             self.codelessAPIClient = CodelessAPIClient(properties: kit.apiClient.properties, database: kit.apiClient.database)
-            kit.apiClient = self.codelessAPIClient
-            self.kit = kit
         } else {
             guard let properties = BoundlessProperties.fromFile else {
                 fatalError("Missing <BoundlessProperties.plist> file")
             }
             self.codelessAPIClient = CodelessAPIClient.init(properties: properties, database: BKUserDefaults.standard)
-            let kit = BoundlessKit(apiClient: codelessAPIClient)
-            self.kit = kit
-            BoundlessKit._standard = kit
         }
+        self.kit = BoundlessKit(apiClient: codelessAPIClient)
         super.init()
+        BoundlessKit._standard = kit
         
         codelessAPIClient.delegate = self
         
@@ -83,7 +80,7 @@ fileprivate class BoundlessKitBooter : NSObject {
     
 }
 
-extension BoundlessKitBooter : CodelessApiClientDelegate {
+extension BoundlessKitRemote : CodelessApiClientDelegate {
     // set and remove notifications for CodelessReinforcers from Session+CodelessReinforcers
     func didUpdate(session: CodelessVisualizerSession?) {
         var mappings = codelessAPIClient.properties.version.mappings

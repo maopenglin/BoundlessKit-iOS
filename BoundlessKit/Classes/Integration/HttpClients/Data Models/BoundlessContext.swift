@@ -16,6 +16,7 @@ class BoundlessContext : NSObject {
             var context = [String:Any]()
             let group = DispatchGroup()
             
+//            if BoundlessKit
             group.enter()
             BoundlessBluetooth.shared.getBluetooth { bluetoothInfo in
 //                BKLog.debug("Bluetoothinfo:\(bluetoothInfo as AnyObject)")

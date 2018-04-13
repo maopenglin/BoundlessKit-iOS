@@ -19,7 +19,7 @@ open class BoundlessKit : NSObject {
         return _standard!
     }()
     
-    internal var apiClient: BoundlessAPIClient
+    internal let apiClient: BoundlessAPIClient
     
     private override convenience init() {
         guard let properties = BoundlessProperties.fromFile else {
