@@ -55,11 +55,17 @@ internal class CustomClassMethod : NSObject {
     
     fileprivate static var registeredMethods: [String:String] = [:]
     
-    public static let registerMethods: Void = {
+    public static func unregisterMethods() {
+        for (senderTarget, aSelector) in CustomClassMethod.registeredMethods {
+            CustomClassMethod(actionID: [senderTarget, aSelector].joined(separator: "-"))?.unregisterMethod()
+        }
+    }
+    
+    public static func registerMethods() {
         for actionID in BoundlessVersion.current.actionIDs {
             CustomClassMethod(actionID: actionID)?.registerMethod()
         }
-    }()
+    }
     
     public static func registerVisualizerMethods() {
         for actionID in BoundlessVersion.current.visualizerActionIDs {
@@ -67,30 +73,37 @@ internal class CustomClassMethod : NSObject {
         }
     }
     
-    fileprivate func registerMethod() {
-        guard BoundlessConfiguration.current.integrationMethod == "codeless" else {
-            BoundlessLog.debug("Codeless integration mode disabled")
-            return
-        }
+    fileprivate func unregisterMethod() {
+        guard CustomClassMethod.registeredMethods.removeValue(forKey: "\(sender)-\(target)") != nil else { return }
+        
         guard let originalClass = NSClassFromString(target).self else {
             BoundlessLog.error("Invalid class <\(target)>")
             return
         }
         let originalSelector = NSSelectorFromString(action)
-//        guard originalSelector != Selector() else {
-//            BoundlessLog.error("Invalid action selector <\(action)>")
-//            return
-//        }
-        
-        guard CustomClassMethod.registeredMethods["\(sender)-\(target)"] == nil else { return }
         
         NSObject.swizzleReinforceableMethod(
             swizzleType: sender,
             originalClass: originalClass,
             originalSelector: originalSelector
         )
-        
+    }
+    
+    fileprivate func registerMethod() {
+        guard CustomClassMethod.registeredMethods["\(sender)-\(target)"] == nil else { return }
         CustomClassMethod.registeredMethods["\(sender)-\(target)"] = action
+        
+        guard let originalClass = NSClassFromString(target).self else {
+            BoundlessLog.error("Invalid class <\(target)>")
+            return
+        }
+        let originalSelector = NSSelectorFromString(action)
+        
+        NSObject.swizzleReinforceableMethod(
+            swizzleType: sender,
+            originalClass: originalClass,
+            originalSelector: originalSelector
+        )
     }
     
 }

@@ -121,7 +121,7 @@ internal class BoundlessProperties : UserDefaultsSingleton {
                     }
                 #else
                     if let pid = BoundlessKit.productionIdentity {
-                        BoundlessLog.debug("set productionID for primaryIdentity:(\(pid))")
+//                        BoundlessLog.debug("set productionID for primaryIdentity:(\(pid))")
                         BoundlessProperties._primaryIdentity = pid.isValidIdentity ? pid : nil
                     }
                 #endif
@@ -131,18 +131,18 @@ internal class BoundlessProperties : UserDefaultsSingleton {
                 if BoundlessConfiguration.current.advertiserID,
                     let aid = ASIdHelper.adId()?.uuidString,
                     aid != "00000000-0000-0000-0000-000000000000" {
-                    BoundlessLog.debug("set ASIdentifierManager for primaryIdentity:(\(aid))")
+//                    BoundlessLog.debug("set ASIdentifierManager for primaryIdentity:(\(aid))")
                     BoundlessProperties._primaryIdentity = aid
                 } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
                     BoundlessLog.debug("set identifierForVendor for primaryIdentity:(\(vid))")
-                    BoundlessProperties._primaryIdentity = vid
+//                    BoundlessProperties._primaryIdentity = vid
                 }
             }
             
             if let _primaryIdentity = BoundlessProperties._primaryIdentity {
                 return _primaryIdentity
             } else {
-                // BoundlessLog.debug("set IDUnavailable for primaryIdentity")
+//                 BoundlessLog.debug("set IDUnavailable for primaryIdentity")
                 return "IDUnavailable"
             }
         }

@@ -77,10 +77,9 @@ public class CodelessAPI : NSObject {
             
             completion()
             
-            if BoundlessConfiguration.current.integrationMethod == "codeless" {
-                _ = CustomClassMethod.registerMethods
-            }
+            guard BoundlessConfiguration.current.integrationMethod == "codeless" else { return }
             
+            BoundlessConfiguration.current.reinforcementEnabled ? CustomClassMethod.registerMethods() : CustomClassMethod.unregisterMethods()
             promptPairing()
         }
     }
