@@ -44,6 +44,7 @@
 		73447CEBDC89F20D4ED6367E7B4EF952 /* CGExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52229FFB811AEF11D5A2CDD7DF994D43 /* CGExtensions.swift */; };
 		7667542F44B83F1A6CB9E1CE70361BFE /* BKReportBatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED363B14CF0A9C91C3A2EDE61434F35E /* BKReportBatch.swift */; };
 		78BF92CBE0079165216ECED77A0A302E /* BundleExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F66106DBF2BD8AD4C0BA9CF79BFEEC3 /* BundleExtensions.swift */; };
+		843E8DEC2098ED8100CF3298 /* BoundlessTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843E8DEB2098ED8100CF3298 /* BoundlessTime.swift */; };
 		898E7841049CC49AB76D3A2DF47C7B6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 		8A2553099E172AFEE5055A07A9129663 /* SynchronizedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A467004B024832E22A75A0B803C18E /* SynchronizedDictionary.swift */; };
 		8A834353A0C2E8A6C5113D6D66A5A6FF /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654A983D7C549023EE97033F942EC2CB /* UIImageExtensions.swift */; };
@@ -121,6 +122,7 @@
 		7F415CED8EA5C68960FF7082DC07F7AB /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7F7DD83EFC03B1F2E38DF5303DA85EB4 /* UIWindowExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UIWindowExtensions.swift; sourceTree = "<group>"; };
 		7F8ABF6D37EA1566B80BE40BC1315F83 /* NSObject+Boundless.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "NSObject+Boundless.h"; sourceTree = "<group>"; };
+		843E8DEB2098ED8100CF3298 /* BoundlessTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundlessTime.swift; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		99D98847EBE50A66F1BAEEED474E89EE /* BKLog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BKLog.swift; path = BoundlessKit/Classes/BKLog.swift; sourceTree = "<group>"; };
 		9AAA7BD288F7076562C835C1CE08F0C8 /* BoundlessKit.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; path = BoundlessKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -240,10 +242,8 @@
 		47D3CB02A936AA3BE0CAE801030E0021 /* Data Models */ = {
 			isa = PBXGroup;
 			children = (
-				6C52234ED785BA2E568BD2C98354A629 /* BoundlessBluetooth.swift */,
+				843E8DEA2098ED5300CF3298 /* Metadata */,
 				BE3CC00327839642688889FA2EF6ED28 /* BoundlessConfiguration.swift */,
-				6AE46C4D6196366A9B4D6465012705C8 /* BoundlessContext.swift */,
-				35835902E5229102228CC5F9086D0681 /* BoundlessLocation.swift */,
 				69847D7F15C5D95CA7AA68AB27F08934 /* BoundlessProperties.swift */,
 				E5C44426D34FFFC2495580056C1D7F4C /* BoundlessVersion.swift */,
 			);
@@ -297,6 +297,17 @@
 				DF6F5C7D192FE961A6A612B16A112363 /* Products */,
 				6727043A2755911CD5AD2A34FF1AD5D3 /* Targets Support Files */,
 			);
+			sourceTree = "<group>";
+		};
+		843E8DEA2098ED5300CF3298 /* Metadata */ = {
+			isa = PBXGroup;
+			children = (
+				6C52234ED785BA2E568BD2C98354A629 /* BoundlessBluetooth.swift */,
+				6AE46C4D6196366A9B4D6465012705C8 /* BoundlessContext.swift */,
+				843E8DEB2098ED8100CF3298 /* BoundlessTime.swift */,
+				35835902E5229102228CC5F9086D0681 /* BoundlessLocation.swift */,
+			);
+			path = Metadata;
 			sourceTree = "<group>";
 		};
 		878E3859E000DD64BE96110ACB18731F /* Dashboard */ = {
@@ -682,6 +693,7 @@
 				8A834353A0C2E8A6C5113D6D66A5A6FF /* UIImageExtensions.swift in Sources */,
 				67DD5285469F0B6418CB5BDD57DB050D /* UIView+CodelessAnimation.swift in Sources */,
 				10290CFFB0C8533554E3E288627B0CEA /* UIView+CodelessConfetti.swift in Sources */,
+				843E8DEC2098ED8100CF3298 /* BoundlessTime.swift in Sources */,
 				4F6C3450468ADBF0CAC6CE3B842E7465 /* UIViewControllerExtensions.swift in Sources */,
 				4DB1C63FC82B159ACA8D7379DF4FDC97 /* UIViewExtensions.swift in Sources */,
 				E8C7ADAB5E6F4AACCB8B44B47B8B6D5D /* UIWindowExtensions.swift in Sources */,
