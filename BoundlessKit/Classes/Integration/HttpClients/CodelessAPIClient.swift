@@ -46,7 +46,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                 if oldValue == nil && self.visualizerSession != nil {
                     BKLog.debug("Visualizer session connected")
                     for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
-                        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.getNotif(notification:)), name: visualizerNotification, object: nil)
+                        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.doNothing(notification:)), name: visualizerNotification, object: nil)
                     }
                     // listen for all notifications sent
                     InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: nil, object: nil)
@@ -173,7 +173,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     }()
     
     @objc
-    func getNotif(notification: Notification) {
+    func doNothing(notification: Notification) {
         BKLog.debug("Got notification:\(notification.name.rawValue) ")
     }
     

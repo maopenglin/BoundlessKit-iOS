@@ -9,10 +9,10 @@ import Foundation
 
 internal class CodelessReinforcer : NSObject {
     
-    enum ShowOption {
+    enum ScheduleSetting {
         case reinforcement, random
     }
-    static var showOption: ShowOption = .reinforcement
+    static var scheduleSetting: ScheduleSetting = .reinforcement
     
     let actionID: String
     var reinforcements = [String: CodelessReinforcement]()
@@ -28,7 +28,7 @@ internal class CodelessReinforcer : NSObject {
         guard let target = notification.userInfo?["target"] as? NSObject else { return }
         let sender = notification.userInfo?["sender"] as AnyObject?
         
-        switch CodelessReinforcer.showOption {
+        switch CodelessReinforcer.scheduleSetting {
         case .reinforcement:
             BoundlessKit.standard.reinforce(actionID: actionID) { reinforcementID in
                 BKLog.debug("Showing codeless reinforcementID <\(reinforcementID)> for actionID <\(actionID)>...")
