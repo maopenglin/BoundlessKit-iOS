@@ -104,7 +104,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         
         let reportCopy = self.valuesForKeys
         payload["actions"] = reportCopy.values.flatMap({$0.values}).map({$0.toJSONType()})
-        apiClient.post(url: BoundlessAPIEndpoint.track.url, jsonObject: payload) { response in
+        apiClient.post(url: BoundlessAPIEndpoint.report.url, jsonObject: payload) { response in
             var success = false
             defer { successful(success) }
             if let status = response?["status"] as? Int {
@@ -113,7 +113,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
                         self[actionID]?.removeFirst(actions.count)
                     }
                     self.storage?.0.archive(self, forKey: self.storage!.1)
-                    BKLog.print(confirmed: "Sent report batch!")
+                    BKLog.print(confirmed: "Sent report batch! response\(response as AnyObject)")
                     success = true
                     return
                 }
