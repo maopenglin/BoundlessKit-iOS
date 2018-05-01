@@ -21,13 +21,9 @@ internal enum CodelessAPIEndpoint {
     }
 }
 
-internal protocol CodelessApiClientDelegate {
-    func didUpdate(session: CodelessVisualizerSession?)
-}
-
 internal class CodelessAPIClient : BoundlessAPIClient {
     
-    var delegate: CodelessApiClientDelegate?
+    var codelessReinforcers = [String: CodelessReinforcer]()
     
     override var properties: BoundlessProperties {
         didSet {
@@ -54,7 +50,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                     BKLog.debug("Visualizer session disconnected")
                     InstanceSelectorNotificationCenter.default.removeObserver(self)
                 }
-                self.delegate?.didUpdate(session: self.visualizerSession)
+                self.didUpdate(session: self.visualizerSession)
             }
         }
     }
@@ -86,6 +82,8 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     }
     
     func boot(completion: @escaping () -> () = {}) {
+        restoreVersion()
+        
         var payload = properties.bootCredentials
         payload["inProduction"] = properties.inProduction
         payload["currentVersion"] = properties.version.versionID ?? "nil"
@@ -104,12 +102,35 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                             self.visualizerSession?.mappings = visualizerMappings
                         }
                         self.properties.version = version
+                        self.restoreVersion()
                     }
                 }
             }
-            
+            self.syncIfNeeded()
             completion()
         }.start()
+    }
+    
+    func restoreVersion() {
+        for (actionID, value) in properties.version.mappings {
+            refreshContainer.commit(actionID: actionID, with: self)
+            if let codeless = value["codeless"] as? [String: Any],
+                let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
+                let reinforcer: CodelessReinforcer
+                if let r = codelessReinforcers[actionID] {
+                    reinforcer = r
+                } else {
+                    reinforcer = CodelessReinforcer(forActionID: actionID)
+                    InstanceSelectorNotificationCenter.default.addObserver(reinforcer, selector: #selector(reinforcer.receive(notification:)), name: NSNotification.Name.init(actionID), object: nil)
+                    codelessReinforcers[actionID] = reinforcer
+                }
+                for reinforcementDict in reinforcements {
+                    if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
+                        reinforcer.reinforcements[codelessReinforcement.primitive] = codelessReinforcement
+                    }
+                }
+            }
+        }
     }
     
     
@@ -208,6 +229,48 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                 }
             }.start()
             _ = sema.wait(timeout: .now() + 2)
+        }
+    }
+}
+
+extension CodelessAPIClient {
+    // set and remove notifications for CodelessReinforcers from Session+CodelessReinforcers
+    func didUpdate(session: CodelessVisualizerSession?) {
+        var mappings = properties.version.mappings
+        if let session = session {
+            for (key, value) in session.mappings {
+                mappings[key] = value
+            }
+            CodelessReinforcer.scheduleSetting = .random
+        } else {
+            CodelessReinforcer.scheduleSetting = .reinforcement
+        }
+        
+        for (actionID, value) in codelessReinforcers.filter({mappings[$0.key] == nil}) {
+            InstanceSelectorNotificationCenter.default.removeObserver(value, name: Notification.Name(actionID), object: nil)
+            codelessReinforcers.removeValue(forKey: actionID)
+            BKLog.debug("Removed codeless reinforcer for actionID <\(actionID)>")
+        }
+        
+        for (actionID, value) in mappings {
+            if let codeless = value["codeless"] as? [String: Any],
+                let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
+                let reinforcer: CodelessReinforcer
+                if let r = codelessReinforcers[actionID] {
+                    reinforcer = r
+                    reinforcer.reinforcements.removeAll()
+                } else {
+                    reinforcer = CodelessReinforcer(forActionID: actionID)
+                    InstanceSelectorNotificationCenter.default.addObserver(reinforcer, selector: #selector(reinforcer.receive(notification:)), name: NSNotification.Name(actionID), object: nil)
+                    codelessReinforcers[actionID] = reinforcer
+                    BKLog.print("Created codeless reinforcer for actionID <\(actionID)>")
+                }
+                for reinforcementDict in reinforcements {
+                    if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
+                        reinforcer.reinforcements[codelessReinforcement.primitive] = codelessReinforcement
+                    }
+                }
+            }
         }
     }
 }
