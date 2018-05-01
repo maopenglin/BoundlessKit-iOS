@@ -93,9 +93,9 @@ extension BoundlessKitLauncher : CodelessApiClientDelegate {
             for (key, value) in session.mappings {
                 mappings[key] = value
             }
-            CodelessReinforcer.showOption = .random
+            CodelessReinforcer.scheduleSetting = .random
         } else {
-            CodelessReinforcer.showOption = .reinforcement
+            CodelessReinforcer.scheduleSetting = .reinforcement
         }
         
         for (actionID, value) in codelessReinforcers.filter({mappings[$0.key] == nil}) {
