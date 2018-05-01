@@ -11,13 +11,13 @@ import Foundation
 open class BoundlessKit : NSObject {
     
     internal static var _standard: BoundlessKit?
-    public static var standard: BoundlessKit = {
+    public static var standard: BoundlessKit {
         guard _standard == nil else {
             return _standard!
         }
         _standard = BoundlessKit()
         return _standard!
-    }()
+    }
     
     internal let apiClient: BoundlessAPIClient
     
