@@ -25,7 +25,7 @@ class BoundlessContext : NSObject {
                 group.leave()
             }
             
-            if BoundlessKitLauncher.configuration.locationObservations {
+            if BoundlessKitLauncher.standard.codelessAPIClient.boundlessConfig.locationObservations {
                 group.enter()
                 BoundlessLocation.shared.getLocation { locationInfo in
                     if let locationInfo = locationInfo {
