@@ -22,12 +22,6 @@ public class BoundlessKitApplicationLauncherBridge : NSObject {
 
 internal class BoundlessKitLauncher : NSObject {
     
-    class var configuration: BoundlessConfiguration {
-        get {
-            return standard.codelessAPIClient.boundlessConfig
-        }
-    }
-    
     static let standard = BoundlessKitLauncher()
     
     let kit: BoundlessKit

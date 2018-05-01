@@ -100,8 +100,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                     }
                     if let versionDict = response?["version"] as? [String: Any],
                         let version = BoundlessVersion.convert(from: versionDict) {
-                        if let visualizerMappings = versionDict["visualizerMappings"] as? [String: [String: Any]]
-                            {
+                        if let visualizerMappings = versionDict["visualizerMappings"] as? [String: [String: Any]] {
                             self.visualizerSession?.mappings = visualizerMappings
                         }
                         self.properties.version = version
