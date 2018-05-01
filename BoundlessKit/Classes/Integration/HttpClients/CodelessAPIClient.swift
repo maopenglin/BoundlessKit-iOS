@@ -59,6 +59,10 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         }
     }
     
+    convenience init(boundlessClient: BoundlessAPIClient) {
+        self.init(properties: boundlessClient.properties, database: boundlessClient.database)
+    }
+    
     override init(properties: BoundlessProperties, database: BKUserDefaults, session: URLSessionProtocol = URLSession.shared) {
         var currentProperties = properties
         if let versionData = database.object(forKey: "codelessVersion") as? Data,

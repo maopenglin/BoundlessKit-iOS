@@ -1,5 +1,5 @@
 //
-//  BoundlessKitBooter.swift
+//  BoundlessKitLauncher.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 3/7/18.
@@ -7,20 +7,20 @@
 
 import Foundation
 
-public class BoundlessKitBooterBridge : NSObject {
+public class BoundlessKitApplicationLauncherBridge : NSObject {
     
-    @objc public static let standard = BoundlessKitBooterBridge()
+    @objc public static let standard = BoundlessKitApplicationLauncherBridge()
     
     @objc public func appDidLaunch(_ notification: Notification) {
         // Set up boundlessKit if BoundlessProperties.plist found
         if BoundlessProperties.fromFile != nil {
-            _ = BoundlessKitCodelessRemote.standard
+            _ = BoundlessKitLauncher.standard
         }
     }
     
 }
 
-internal class BoundlessKitCodelessRemote : NSObject {
+internal class BoundlessKitLauncher : NSObject {
     
     class var configuration: BoundlessConfiguration {
         get {
@@ -28,7 +28,7 @@ internal class BoundlessKitCodelessRemote : NSObject {
         }
     }
     
-    static let standard = BoundlessKitCodelessRemote()
+    static let standard = BoundlessKitLauncher()
     
     let kit: BoundlessKit
     let codelessAPIClient: CodelessAPIClient
@@ -36,12 +36,11 @@ internal class BoundlessKitCodelessRemote : NSObject {
     
     private override init() {
         if let kit = BoundlessKit._standard {
-            self.codelessAPIClient = CodelessAPIClient(properties: kit.apiClient.properties, database: kit.apiClient.database)
+            self.codelessAPIClient = CodelessAPIClient(boundlessClient: kit.apiClient)
+        } else if let properties = BoundlessProperties.fromFile {
+            self.codelessAPIClient = CodelessAPIClient(properties: properties, database: BKUserDefaults.standard)
         } else {
-            guard let properties = BoundlessProperties.fromFile else {
-                fatalError("Missing <BoundlessProperties.plist> file")
-            }
-            self.codelessAPIClient = CodelessAPIClient.init(properties: properties, database: BKUserDefaults.standard)
+            fatalError("Missing <BoundlessProperties.plist> file")
         }
         self.kit = BoundlessKit(apiClient: codelessAPIClient)
         super.init()
@@ -86,7 +85,7 @@ internal class BoundlessKitCodelessRemote : NSObject {
     
 }
 
-extension BoundlessKitCodelessRemote : CodelessApiClientDelegate {
+extension BoundlessKitLauncher : CodelessApiClientDelegate {
     // set and remove notifications for CodelessReinforcers from Session+CodelessReinforcers
     func didUpdate(session: CodelessVisualizerSession?) {
         var mappings = codelessAPIClient.properties.version.mappings
