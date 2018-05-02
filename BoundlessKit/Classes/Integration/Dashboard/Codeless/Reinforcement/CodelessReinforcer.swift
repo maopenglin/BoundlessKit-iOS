@@ -41,12 +41,12 @@ internal class CodelessReinforcer : Reinforcer {
                 self.codelessReinforcements[reinforcementID]??.show(targetInstance: target, senderInstance: sender)
             }
         case .random:
-            guard let randomReinforcement = Array(self.codelessReinforcements.values).randomElement as? CodelessReinforcement else {
-                BKLog.print(error: "No codeless reinforcements for actionID <\(actionID)>")
+            guard let randomReinforcement = Array(self.codelessReinforcements.values).randomElement else {
+                BKLog.print(error: "No codeless reinforcement for actionID <\(actionID)>")
                 return
             }
-            BKLog.debug("Showing random codeless reinforcementID <\(randomReinforcement.primitive)> for actionID <\(actionID)>...")
-            randomReinforcement.show(targetInstance: target, senderInstance: sender)
+            BKLog.debug("Showing random codeless reinforcement <\(String(describing: randomReinforcement?.primitive))> for actionID <\(actionID)>...")
+            randomReinforcement?.show(targetInstance: target, senderInstance: sender)
         }
     }
     
