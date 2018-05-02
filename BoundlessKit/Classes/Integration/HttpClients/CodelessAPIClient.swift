@@ -103,17 +103,17 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         mountVersionQueue.async {
             var mappings = self.properties.version.mappings
             let visualizer = self.visualizerSession
-            
             for (key, value) in visualizer?.mappings ?? [:] {
                 mappings[key] = value
             }
+            
             Reinforcer.scheduleSetting = (visualizer == nil) ? .reinforcement : .random
-//            BKLog.debug("ActionIDs:<\(Array(mappings.keys))>")
         
             for (actionID, value) in mappings {
                 if visualizer == nil {
                     self.refreshContainer.commit(actionID: actionID, with: self)
                 }
+                
                 var reinforcer: Reinforcer
                 if let r = self.reinforcers[actionID] {
                     reinforcer = r
@@ -124,12 +124,14 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                     self.reinforcers[actionID] = reinforcer
                     BKLog.debug("Created reinforcer for actionID <\(actionID)>")
                 }
+                
                 if let manual = value["manual"] as? [String: Any],
                     let reinforcements = manual["reinforcements"] as? [String],
                     !reinforcements.isEmpty {
                     BKLog.debug("Manual reinforcement found for actionID <\(actionID)>")
                     reinforcer.reinforcementIDs.append(contentsOf: reinforcements)
                 }
+                
                 if let codeless = value["codeless"] as? [String: Any],
                     let reinforcements = codeless["reinforcements"] as? [[String: Any]],
                     !reinforcements.isEmpty {

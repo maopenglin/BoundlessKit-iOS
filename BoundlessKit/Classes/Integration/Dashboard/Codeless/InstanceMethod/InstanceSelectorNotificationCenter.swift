@@ -97,8 +97,10 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
     override public func removeObserver(_ observer: Any, name aName: NSNotification.Name?, object anObject: Any?) {
         queue.sync {
             if let aName = aName {
-                self.notifiers[aName]?.removeObserver(observer as AnyObject)
-                BKLog.debug("Removed observer for notification:\(aName.rawValue)")
+                if let notifier = self.notifiers[aName] {
+                    notifier.removeObserver(observer as AnyObject)
+                    BKLog.debug("Removed observer for notification:\(aName.rawValue)")
+                }
             } else {
                 for notifier in self.notifiers.values {
                     notifier.removeObserver(observer as AnyObject)

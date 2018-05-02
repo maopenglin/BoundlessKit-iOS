@@ -9,8 +9,8 @@ import Foundation
 
 internal class HTTPClient {
     
-    internal var logRequests = false
-    internal var logResponses = false
+    internal var logRequests = true
+    internal var logResponses = true
     
     private let session: URLSessionProtocol
     
@@ -39,6 +39,7 @@ internal class HTTPClient {
             let response = self.convertResponseToJSON(url, responseData, responseURL, error)
             if self.logResponses {
                 BKLog.print("Received response from <\(request.url?.absoluteString ?? "url:nil")> with payload:\n<\(response as AnyObject)>")
+//                BKLog.print("Received response from <\(request.url?.absoluteString ?? "url:nil")> with payload:\n<\(String.init(data: responseData!, encoding: String.Encoding.utf8)?.replacingOccurrences(of: "\n", with: "\n"))>")
             }
             completion(response)
         }
