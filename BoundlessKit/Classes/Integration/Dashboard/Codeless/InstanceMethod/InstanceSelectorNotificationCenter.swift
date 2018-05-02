@@ -58,58 +58,67 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
     }
     
     fileprivate var notifiers = [Notification.Name: InstanceSelectorNotifier]()
+    fileprivate let queue = DispatchQueue(label: "InstanceSelectorObserverQueue")
     
     override public func addObserver(_ observer: Any, selector aSelector: Selector, name aName: NSNotification.Name?, object anObject: Any?) {
-        guard let aName = aName else {
-            // observe all
-            super.addObserver(observer, selector: aSelector, name: nil, object: anObject)
-            return
+        queue.async {
+            guard let aName = aName else {
+                // observe all
+                super.addObserver(observer, selector: aSelector, name: nil, object: anObject)
+                return
+            }
+            
+            if let notifier = self.notifiers[aName] {
+                notifier.addObserver(observer as AnyObject)
+                super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
+                BKLog.debug("Added observer for notification:\(aName.rawValue)")
+                return
+            }
+            
+            if let instanceSelector = InstanceSelector.init(aName.rawValue),
+                let notifier = InstanceSelectorNotifier.init(instanceSelector) {
+                self.notifiers[aName] = notifier
+                notifier.addObserver(observer as AnyObject)
+                BKLog.debug("Added observer for new notification:\(aName.rawValue)")
+                super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
+                return
+            }
+            
+            BKLog.print(error: "Cannot create instance method for notification<\(aName)>")
         }
-        
-        if let notifier = notifiers[aName] {
-            notifier.addObserver(observer as AnyObject)
-            super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
-            BKLog.debug("Added observer for notification:\(aName.rawValue)")
-            return
-        }
-        
-        if let instanceSelector = InstanceSelector.init(aName.rawValue),
-            let notifier = InstanceSelectorNotifier.init(instanceSelector) {
-            notifiers[aName] = notifier
-            notifier.addObserver(observer as AnyObject)
-            BKLog.debug("Added observer for new notification:\(aName.rawValue)")
-            super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
-            return
-        }
-        
-        BKLog.print(error: "Cannot create instance method for notification<\(aName)>")
     }
     
     override public func removeObserver(_ observer: Any) {
-        self.removeObserver(observer, name: nil, object: nil)
+        queue.async {
+            self.removeObserver(observer, name: nil, object: nil)
+        }
     }
     
     override public func removeObserver(_ observer: Any, name aName: NSNotification.Name?, object anObject: Any?) {
-        if let aName = aName {
-            notifiers[aName]?.removeObserver(observer as AnyObject)
-            BKLog.debug("Removed observer for notification:\(aName.rawValue)")
-        } else {
-            for notifier in notifiers.values {
-                notifier.removeObserver(observer as AnyObject)
+        queue.async {
+            if let aName = aName {
+                self.notifiers[aName]?.removeObserver(observer as AnyObject)
+                BKLog.debug("Removed observer for notification:\(aName.rawValue)")
+            } else {
+                for notifier in self.notifiers.values {
+                    notifier.removeObserver(observer as AnyObject)
+                }
             }
+            super.removeObserver(observer, name: aName, object: anObject)
         }
-        super.removeObserver(observer, name: aName, object: anObject)
     }
     
     public func removeAllObservers(name aName: NSNotification.Name?) {
-        if let aName = aName {
-            for observer in notifiers[aName]?.removeAllObservers() ?? [] {
-                super.removeObserver(observer, name: aName, object: nil)
-            }
-        } else {
-            for (notification, notifier) in notifiers {
-                for observer in notifier.removeAllObservers() {
-                    super.removeObserver(observer, name: notification, object: nil)
+        queue.async {
+            if let aName = aName {
+                for observer in self.notifiers[aName]?.removeAllObservers() ?? [] {
+                    super.removeObserver(observer, name: aName, object: nil)
+                }
+            } else {
+                for (notification, notifier) in self.notifiers {
+                    for observer in notifier.removeAllObservers() {
+                        super.removeObserver(observer, name: notification, object: nil)
+                    }
                 }
             }
         }
@@ -131,7 +140,7 @@ fileprivate class InstanceSelectorNotifier : NSObject {
     
     init?(_ instanceSelector: InstanceSelector) {
         guard let notificationMethod = BoundlessObject.createTrampoline(for: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorNotifier.postInstanceSelectorNotificationBlock) else {
-            BKLog.print(error: "Could not create trampoline")
+            BKLog.print(error: "Could not create trampoline for actionID<\(instanceSelector.notification)")
             return nil
         }
         if let notificationSelector = InstanceSelector.init(instanceSelector.classType, notificationMethod) {
