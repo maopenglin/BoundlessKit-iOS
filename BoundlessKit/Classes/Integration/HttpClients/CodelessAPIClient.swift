@@ -38,20 +38,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     var visualizerSession: CodelessVisualizerSession? {
         didSet {
             database.set(visualizerSession?.encode(), forKey: "codelessSession")
-            submitQueue.addOperation {
-                if oldValue == nil && self.visualizerSession != nil {
-                    BKLog.debug("Visualizer session connected")
-                    for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
-                        InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.doNothing(notification:)), name: visualizerNotification, object: nil)
-                    }
-                    // listen for all notifications sent
-                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: nil, object: nil)
-                } else if oldValue != nil && self.visualizerSession == nil {
-                    BKLog.debug("Visualizer session disconnected")
-                    InstanceSelectorNotificationCenter.default.removeObserver(self)
-                }
-                self.mountVersion()
-            }
+            didSetVisualizerSession(oldValue: oldValue)
         }
     }
     
@@ -79,11 +66,11 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         }
         
         super.init(properties: codelessProperties, database: database, session: session)
+        
+        didSetVisualizerSession(oldValue: nil)
     }
     
     func boot(completion: @escaping () -> () = {}) {
-        mountVersion()
-        
         var payload = properties.bootCredentials
         payload["inProduction"] = properties.inProduction
         payload["currentVersion"] = properties.version.versionID ?? "nil"
@@ -102,18 +89,18 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                             self.visualizerSession?.mappings = visualizerMappings
                         }
                         self.properties.version = version
-                        self.mountVersion()
                     }
                 }
             }
+            self.mountVersion()
             self.syncIfNeeded()
             completion()
         }.start()
     }
     
-//    let mountVersionQueue = DispatchQueue.init(label: "versionQueue")
+    let mountVersionQueue = DispatchQueue.init(label: "versionQueue")
     func mountVersion() {
-//        mountVersionQueue.async {
+        mountVersionQueue.async {
             var mappings = self.properties.version.mappings
             let visualizer = self.visualizerSession
             
@@ -121,8 +108,8 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                 mappings[key] = value
             }
             CodelessReinforcer.scheduleSetting = (visualizer == nil) ? .reinforcement : .random
-            BKLog.debug("ActionIDs:<\(Array(mappings.keys))>")
-            
+//            BKLog.debug("ActionIDs:<\(Array(mappings.keys))>")
+        
             for (actionID, value) in mappings {
                 if visualizer == nil {
                     self.refreshContainer.commit(actionID: actionID, with: self)
@@ -133,10 +120,12 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                     if let r = self.codelessReinforcers[actionID] {
                         reinforcer = r
                         reinforcer.reinforcements.removeAll()
+                        BKLog.debug("Modifying codeless reinforcer for actionID <\(actionID)>")
                     } else {
                         reinforcer = CodelessReinforcer(forActionID: actionID)
                         InstanceSelectorNotificationCenter.default.addObserver(reinforcer, selector: #selector(reinforcer.receive(notification:)), name: NSNotification.Name.init(actionID), object: nil)
                         self.codelessReinforcers[actionID] = reinforcer
+                        BKLog.debug("Created codeless reinforcer for actionID <\(actionID)>")
                     }
                     for reinforcementDict in reinforcements {
                         if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
@@ -144,14 +133,17 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                         }
                     }
                 }
+                else {
+                    BKLog.debug("Manual reinforcement selected for actionID <\(actionID)>")
+                }
             }
             
             for (actionID, value) in self.codelessReinforcers.filter({mappings[$0.key] == nil}) {
                 InstanceSelectorNotificationCenter.default.removeObserver(value, name: Notification.Name(actionID), object: nil)
                 self.codelessReinforcers.removeValue(forKey: actionID)
-                BKLog.debug("Removed codeless reinforcer for actionID <\(actionID)>")
+//                BKLog.debug("Removed codeless reinforcer for actionID <\(actionID)>")
             }
-//        }
+        }
     }
     
     func promptPairing() {
@@ -211,6 +203,23 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
+    
+    func didSetVisualizerSession(oldValue: CodelessVisualizerSession?) {
+        submitQueue.addOperation {
+            if oldValue == nil && self.visualizerSession != nil {
+                BKLog.debug("Visualizer session connected")
+                for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
+                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.doNothing(notification:)), name: visualizerNotification, object: nil)
+                }
+                // listen for all notifications sent
+                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: nil, object: nil)
+            } else if oldValue != nil && self.visualizerSession == nil {
+                BKLog.debug("Visualizer session disconnected")
+                InstanceSelectorNotificationCenter.default.removeObserver(self)
+            }
+            self.mountVersion()
+        }
+    }
     
     @objc
     func doNothing(notification: Notification) {
