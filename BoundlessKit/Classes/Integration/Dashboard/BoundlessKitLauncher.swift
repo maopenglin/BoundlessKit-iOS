@@ -39,11 +39,6 @@ internal class BoundlessKitLauncher : NSObject {
         super.init()
         BoundlessKit._standard = kit
         
-//        // set session again to run `didSet` routine
-//        let session = codelessAPIClient.visualizerSession
-//        codelessAPIClient.visualizerSession = nil
-//        codelessAPIClient.visualizerSession = session
-        
         codelessAPIClient.boot {
             self.codelessAPIClient.promptPairing()
         }
