@@ -23,7 +23,7 @@ internal enum CodelessAPIEndpoint {
 
 internal class CodelessAPIClient : BoundlessAPIClient {
     
-    var codelessReinforcers = [String: CodelessReinforcer]()
+    var reinforcers = [String: Reinforcer]()
     
     override var properties: BoundlessProperties {
         didSet {
@@ -107,40 +107,51 @@ internal class CodelessAPIClient : BoundlessAPIClient {
             for (key, value) in visualizer?.mappings ?? [:] {
                 mappings[key] = value
             }
-            CodelessReinforcer.scheduleSetting = (visualizer == nil) ? .reinforcement : .random
+            Reinforcer.scheduleSetting = (visualizer == nil) ? .reinforcement : .random
 //            BKLog.debug("ActionIDs:<\(Array(mappings.keys))>")
         
             for (actionID, value) in mappings {
                 if visualizer == nil {
                     self.refreshContainer.commit(actionID: actionID, with: self)
                 }
+                var reinforcer: Reinforcer
+                if let r = self.reinforcers[actionID] {
+                    reinforcer = r
+                    reinforcer.reinforcementIDs = []
+                    BKLog.debug("Modifying reinforcer for actionID <\(actionID)>")
+                } else {
+                    reinforcer = Reinforcer(forActionID: actionID)
+                    self.reinforcers[actionID] = reinforcer
+                    BKLog.debug("Created reinforcer for actionID <\(actionID)>")
+                }
+                if let manual = value["manual"] as? [String: Any],
+                    let reinforcements = manual["reinforcements"] as? [String],
+                    !reinforcements.isEmpty {
+                    BKLog.debug("Manual reinforcement found for actionID <\(actionID)>")
+                    reinforcer.reinforcementIDs.append(contentsOf: reinforcements)
+                }
                 if let codeless = value["codeless"] as? [String: Any],
-                    let reinforcements = codeless["reinforcements"] as? [[String: Any]] {
-                    let reinforcer: CodelessReinforcer
-                    if let r = self.codelessReinforcers[actionID] {
-                        reinforcer = r
-                        reinforcer.codelessReinforcements.removeAll()
-                        BKLog.debug("Modifying codeless reinforcer for actionID <\(actionID)>")
-                    } else {
-                        reinforcer = CodelessReinforcer(forActionID: actionID)
-                        InstanceSelectorNotificationCenter.default.addObserver(reinforcer, selector: #selector(reinforcer.receive(notification:)), name: NSNotification.Name.init(actionID), object: nil)
-                        self.codelessReinforcers[actionID] = reinforcer
-                        BKLog.debug("Created codeless reinforcer for actionID <\(actionID)>")
-                    }
+                    let reinforcements = codeless["reinforcements"] as? [[String: Any]],
+                    !reinforcements.isEmpty {
+                    BKLog.debug("Codeless reinforcement found for actionID <\(actionID)>")
+                    let codelessReinforcer: CodelessReinforcer = reinforcer as? CodelessReinforcer ?? {
+                        let codelessReinforcer = CodelessReinforcer(copy: reinforcer)
+                        InstanceSelectorNotificationCenter.default.addObserver(codelessReinforcer, selector: #selector(codelessReinforcer.receive(notification:)), name: NSNotification.Name.init(actionID), object: nil)
+                        reinforcer = codelessReinforcer
+                        self.reinforcers[actionID] = codelessReinforcer
+                        return codelessReinforcer
+                    }()
                     for reinforcementDict in reinforcements {
                         if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
-                            reinforcer.codelessReinforcements[codelessReinforcement.primitive] = codelessReinforcement
+                            codelessReinforcer.codelessReinforcements[codelessReinforcement.primitive] = codelessReinforcement
                         }
                     }
                 }
-                else {
-                    BKLog.debug("Manual reinforcement selected for actionID <\(actionID)>")
-                }
             }
             
-            for (actionID, value) in self.codelessReinforcers.filter({mappings[$0.key] == nil}) {
+            for (actionID, value) in self.reinforcers.filter({mappings[$0.key] == nil}) {
                 InstanceSelectorNotificationCenter.default.removeObserver(value, name: Notification.Name(actionID), object: nil)
-                self.codelessReinforcers.removeValue(forKey: actionID)
+                self.reinforcers.removeValue(forKey: actionID)
 //                BKLog.debug("Removed codeless reinforcer for actionID <\(actionID)>")
             }
         }

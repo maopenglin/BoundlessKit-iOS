@@ -22,4 +22,8 @@ internal class Reinforcer : NSObject {
         self.actionID = forActionID
         self.reinforcementIDs = withReinforcementIDs
     }
+    
+    convenience init(copy: Reinforcer){
+        self.init(forActionID: copy.actionID, withReinforcementIDs: copy.reinforcementIDs)
+    }
 }
