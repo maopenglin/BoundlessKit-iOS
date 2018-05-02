@@ -7,18 +7,24 @@
 
 import Foundation
 
-internal class CodelessReinforcer : NSObject {
+internal class CodelessReinforcer : Reinforcer {
     
-    enum ScheduleSetting {
-        case reinforcement, random
-    }
-    static var scheduleSetting: ScheduleSetting = .reinforcement
-    
-    let actionID: String
-    var reinforcements = [String: CodelessReinforcement]()
-    
-    init(forActionID actionID: String) {
-        self.actionID = actionID
+    var codelessReinforcements = [String: CodelessReinforcement?]()
+    override var reinforcementIDs: [String] {
+        get {
+            return Array(codelessReinforcements.keys)
+        }
+        set {
+            var newReinforcements = [String: CodelessReinforcement?]()
+            for id in newValue {
+                if let cur = codelessReinforcements[id] {
+                    newReinforcements[id] = cur
+                } else {
+                    newReinforcements[id] = nil as CodelessReinforcement?
+                }
+            }
+            codelessReinforcements = newReinforcements
+        }
     }
     
     @objc
@@ -28,15 +34,15 @@ internal class CodelessReinforcer : NSObject {
         guard let target = notification.userInfo?["target"] as? NSObject else { return }
         let sender = notification.userInfo?["sender"] as AnyObject?
         
-        switch CodelessReinforcer.scheduleSetting {
+        switch Reinforcer.scheduleSetting {
         case .reinforcement:
             BoundlessKit.standard.reinforce(actionID: actionID) { reinforcementID in
                 BKLog.debug("Showing codeless reinforcementID <\(reinforcementID)> for actionID <\(actionID)>...")
-                self.reinforcements[reinforcementID]?.show(targetInstance: target, senderInstance: sender)
+                self.codelessReinforcements[reinforcementID]??.show(targetInstance: target, senderInstance: sender)
             }
         case .random:
-            guard let randomReinforcement = Array(self.reinforcements.values).randomElement else {
-                BKLog.print(error: "No reinforcements for actionID <\(actionID)>")
+            guard let randomReinforcement = Array(self.codelessReinforcements.values).randomElement as? CodelessReinforcement else {
+                BKLog.print(error: "No codeless reinforcements for actionID <\(actionID)>")
                 return
             }
             BKLog.debug("Showing random codeless reinforcementID <\(randomReinforcement.primitive)> for actionID <\(actionID)>...")

@@ -119,7 +119,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                     let reinforcer: CodelessReinforcer
                     if let r = self.codelessReinforcers[actionID] {
                         reinforcer = r
-                        reinforcer.reinforcements.removeAll()
+                        reinforcer.codelessReinforcements.removeAll()
                         BKLog.debug("Modifying codeless reinforcer for actionID <\(actionID)>")
                     } else {
                         reinforcer = CodelessReinforcer(forActionID: actionID)
@@ -129,7 +129,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                     }
                     for reinforcementDict in reinforcements {
                         if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
-                            reinforcer.reinforcements[codelessReinforcement.primitive] = codelessReinforcement
+                            reinforcer.codelessReinforcements[codelessReinforcement.primitive] = codelessReinforcement
                         }
                     }
                 }
