@@ -61,7 +61,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
     fileprivate let queue = DispatchQueue(label: "InstanceSelectorObserverQueue")
     
     override public func addObserver(_ observer: Any, selector aSelector: Selector, name aName: NSNotification.Name?, object anObject: Any?) {
-        queue.async {
+        queue.sync {
             guard let aName = aName else {
                 // observe all
                 super.addObserver(observer, selector: aSelector, name: nil, object: anObject)
@@ -89,13 +89,13 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
     }
     
     override public func removeObserver(_ observer: Any) {
-        queue.async {
+        queue.sync {
             self.removeObserver(observer, name: nil, object: nil)
         }
     }
     
     override public func removeObserver(_ observer: Any, name aName: NSNotification.Name?, object anObject: Any?) {
-        queue.async {
+        queue.sync {
             if let aName = aName {
                 self.notifiers[aName]?.removeObserver(observer as AnyObject)
                 BKLog.debug("Removed observer for notification:\(aName.rawValue)")
@@ -109,7 +109,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
     }
     
     public func removeAllObservers(name aName: NSNotification.Name?) {
-        queue.async {
+        queue.sync {
             if let aName = aName {
                 for observer in self.notifiers[aName]?.removeAllObservers() ?? [] {
                     super.removeObserver(observer, name: aName, object: nil)
