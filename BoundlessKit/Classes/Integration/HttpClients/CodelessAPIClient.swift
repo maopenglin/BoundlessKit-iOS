@@ -23,6 +23,7 @@ internal enum CodelessAPIEndpoint {
 
 internal class CodelessAPIClient : BoundlessAPIClient {
     
+    let queue = DispatchQueue.init(label: "CodelessQueue")
     var reinforcers = [String: Reinforcer]()
     
     override var properties: BoundlessProperties {
@@ -33,6 +34,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     var boundlessConfig: BoundlessConfiguration {
         didSet {
             database.set(boundlessConfig.encode(), forKey: "codelessConfig")
+            didSetConfiguration(oldValue: oldValue)
         }
     }
     var visualizerSession: CodelessVisualizerSession? {
@@ -68,6 +70,35 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         super.init(properties: codelessProperties, database: database, session: session)
         
         didSetVisualizerSession(oldValue: nil)
+        didSetConfiguration(oldValue: nil)
+    }
+    
+    func didSetConfiguration(oldValue: BoundlessConfiguration?) {
+        let newValue = boundlessConfig
+        queue.sync {
+            if (oldValue?.applicationViews != boundlessConfig.applicationViews) {
+                if (newValue.applicationViews) {
+                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidAppearNotification, object: nil)
+                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidDisappearNotification, object: nil)
+                } else {
+                    InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.viewControllerDidAppearNotification, object: nil)
+                    InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.viewControllerDidDisappearNotification, object: nil)
+                }
+            }
+        }
+    }
+    
+    let trackQueue = DispatchQueue.init(label: "TrackQueue", attributes: .concurrent)
+    @objc func trackApplicationViews(_ notification: Notification) {
+        if let target = notification.userInfo?["target"] as? NSObject,
+            let selector = notification.userInfo?["selector"] as? Selector {
+            let actionID = "ApplicationView"
+            var metadata: [String: Any] = [ "tag": selector == #selector(UIViewController.viewDidAppear(_:)) ? "didAppear" : "didDisappear"]
+            metadata["target"] = NSStringFromClass(type(of: target))
+            metadata["time"] = selector == #selector(UIViewController.viewDidAppear(_:)) ? BoundlessTime.start(for: target) : BoundlessTime.end(for: target)
+            BKLog.debug("Object id:\(target.boundlessid)")
+            BKLog.debug("Got track with metadata:\(metadata as AnyObject)")
+        }
     }
     
     func boot(completion: @escaping () -> () = {}) {
@@ -98,9 +129,8 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         }.start()
     }
     
-    let mountVersionQueue = DispatchQueue.init(label: "versionQueue")
     func mountVersion() {
-        mountVersionQueue.async {
+        queue.async {
             var mappings = self.properties.version.mappings
             let visualizer = self.visualizerSession
             for (key, value) in visualizer?.mappings ?? [:] {
@@ -211,14 +241,14 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     }
     
     
-    fileprivate lazy var submitQueue: OperationQueue = {
+    fileprivate lazy var visualizerQueue: OperationQueue = {
         let queue = OperationQueue()
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
     
     func didSetVisualizerSession(oldValue: CodelessVisualizerSession?) {
-        submitQueue.addOperation {
+        visualizerQueue.addOperation {
             if oldValue == nil && self.visualizerSession != nil {
                 BKLog.debug("Visualizer session connected")
                 for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
@@ -235,13 +265,8 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     }
     
     @objc
-    func doNothing(notification: Notification) {
-        BKLog.debug("Got notification:\(notification.name.rawValue) ")
-    }
-    
-    @objc
     func submitToDashboard(notification: Notification) {
-        self.submitQueue.addOperation {
+        self.visualizerQueue.addOperation {
             guard let session = self.visualizerSession,
                 let targetClass = notification.userInfo?["classType"] as? AnyClass,
                 let selector = notification.userInfo?["selector"] as? Selector,
@@ -272,6 +297,11 @@ internal class CodelessAPIClient : BoundlessAPIClient {
             }.start()
             _ = sema.wait(timeout: .now() + 2)
         }
+    }
+    
+    @objc
+    func doNothing(notification: Notification) {
+        BKLog.debug("Got notification:\(notification.name.rawValue) ")
     }
 }
 

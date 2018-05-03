@@ -119,8 +119,13 @@ class ViewController: UIViewController {
         
     }
     
+    let one = UIViewController()
+    let two = UIViewController()
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        one.viewDidAppear(animated)
+        two.viewDidAppear(animated)
         print("In viewcontroller viewdidappear")
     }
     

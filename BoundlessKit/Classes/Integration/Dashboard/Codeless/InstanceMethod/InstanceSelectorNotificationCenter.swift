@@ -31,6 +31,10 @@ extension InstanceSelectorNotificationCenter {
         return InstanceSelector(UIViewController.self, #selector(UIViewController.viewDidAppear(_:)))!.notification
     }
     
+    internal static var viewControllerDidDisappearNotification: Notification.Name {
+        return InstanceSelector(UIViewController.self, #selector(UIViewController.viewDidDisappear(_:)))!.notification
+    }
+    
     internal static var collectionViewControllerDidSelectNotifications: [Notification.Name] {
         return forSubclasses(parentClass: UICollectionViewController.self, #selector(UICollectionViewController.collectionView(_:didSelectItemAt:)))
     }
