@@ -8,6 +8,7 @@
 import Foundation
 
 class BoundlessContext : NSObject {
+    static var locationEnabled = false
     
     static let queue = DispatchQueue.init(label: NSStringFromClass(BoundlessContext.self), attributes: .concurrent)
     
@@ -18,14 +19,14 @@ class BoundlessContext : NSObject {
             
             group.enter()
             BoundlessBluetooth.shared.getBluetooth { bluetoothInfo in
-//                BKLog.debug("Bluetoothinfo:\(bluetoothInfo as AnyObject)")
+                //                BKLog.debug("Bluetoothinfo:\(bluetoothInfo as AnyObject)")
                 if let bluetoothInfo = bluetoothInfo {
                     context["bluetoothInfo"] = bluetoothInfo
                 }
                 group.leave()
             }
             
-            if BoundlessKitLauncher.standard.codelessAPIClient.boundlessConfig.locationObservations {
+            if locationEnabled {
                 group.enter()
                 BoundlessLocation.shared.getLocation { locationInfo in
                     if let locationInfo = locationInfo {
@@ -40,5 +41,4 @@ class BoundlessContext : NSObject {
             }
         }
     }
-    
 }

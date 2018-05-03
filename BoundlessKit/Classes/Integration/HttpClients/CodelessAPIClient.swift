@@ -172,8 +172,8 @@ extension CodelessAPIClient {
         serialQueue.sync {
             reportBatch.desiredMaxCountUntilSync = newValue.reportBatchSize
             trackBatch.desiredMaxCountUntilSync = newValue.trackBatchSize
-            
             BKRefreshCartridgeContainer.enabled = newValue.reinforcementEnabled
+            BoundlessContext.locationEnabled = newValue.locationObservations
             
             if (oldValue?.applicationState != newValue.applicationState) {
                 if (newValue.applicationState) {
@@ -184,7 +184,6 @@ extension CodelessAPIClient {
                     NotificationCenter.default.removeObserver(self, name: Notification.Name.UIApplicationWillResignActive, object: nil)
                 }
             }
-            
             
             if (oldValue?.applicationViews != newValue.applicationViews) {
                 if (newValue.applicationViews) {
