@@ -13,6 +13,7 @@ internal class SynchronizedDictionary<Key, Value> : NSObject where Key : Hashabl
     
     init(_ dict: [Key:Value] = [:]) {
         self.dict = dict
+        super.init()
     }
     
     var count: Int {

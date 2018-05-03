@@ -13,6 +13,7 @@ internal class SynchronizedArray<Element> : NSObject {
     
     init(_ array: [Element] = []) {
         self.array = array
+        super.init()
     }
 }
 
