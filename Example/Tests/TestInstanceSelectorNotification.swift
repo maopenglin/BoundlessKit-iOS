@@ -31,21 +31,14 @@ class TestInstanceSelectorNotification: XCTestCase {
         InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver)
     }
     
-//    func testPostNotification() {
-//        let notificationReceiver = NotificationReceiver()
-//        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: nil, object: nil)
-//
-//        InstanceSelectorNotificationCenter.post(instance: self, selector: #selector(testPostNotification), parameter: nil)
-//        XCTAssert(notificationReceiver.didReceiveNotification)
-//    }
-    
-//    func testPostNotificationFail() {
-//        let notificationReceiver = NotificationReceiver()
-//        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: nil, object: nil)
-//
-//        InstanceSelectorNotificationCenter.post(instance: self, selector: #selector(UIViewController.viewDidAppear(_:)), parameter: nil)
-//        XCTAssert(!notificationReceiver.didReceiveNotification)
-//    }
+    func testNonMethodNotificationFail() {
+        let notification = Notification.Name("testNotification")
+        let notificationReceiver = NotificationReceiver()
+        InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: notification, object: nil)
+
+        InstanceSelectorNotificationCenter.default.post(name: notification, object: nil, userInfo: nil)
+        XCTAssert(!notificationReceiver.didReceiveNotification)
+    }
     
     func testNotificationForSelectorWithNoParam() {
         let notificationReceiver = NotificationReceiver()

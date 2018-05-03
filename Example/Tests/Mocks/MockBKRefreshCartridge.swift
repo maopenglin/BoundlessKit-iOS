@@ -7,3 +7,21 @@
 //
 
 import Foundation
+@testable import BoundlessKit
+
+class MockBKRefreshCartridge : BKRefreshCartridge {
+    
+    static var actionID = "action"
+    static var nuetralID = "nuetral"
+    static var rewardID = "reward"
+    
+    static var allRewards: BKRefreshCartridge {
+        return BKRefreshCartridge(actionID: actionID, values: Array(repeating: BKDecision(rewardID, actionID), count: 10))
+    }
+    
+    var _needsSync: Bool = false
+    override var needsSync: Bool {
+        return _needsSync
+    }
+    
+}

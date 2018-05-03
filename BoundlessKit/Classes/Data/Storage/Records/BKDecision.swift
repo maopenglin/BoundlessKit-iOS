@@ -9,8 +9,10 @@ import Foundation
 
 internal class BKDecision : NSObject, BKData {
     
+    static var neutral: String = "neutralResponse"
+    
     class func neutral(for actionID: String) -> BKDecision {
-        return BKDecision.init("neutralResponse", actionID)
+        return BKDecision(neutral, actionID)
     }
     
     let name: String

@@ -28,6 +28,15 @@ class MockBoundlessAPIClient : BoundlessAPIClient {
     }
 }
 
+class MockCodelessAPIClient : CodelessAPIClient {
+    init() {
+        super.init(properties: BoundlessProperties.fromTestFile!, database: MockBKuserDefaults(), session: MockURLSession())
+        self.refreshContainer = MockBKRefreshCartridgeContainer([:])
+        logRequests = true
+        logResponses = true
+    }
+}
+
 
 class MockURLSession: URLSessionProtocol {
     
