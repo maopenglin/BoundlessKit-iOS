@@ -173,6 +173,8 @@ extension CodelessAPIClient {
             reportBatch.desiredMaxCountUntilSync = newValue.reportBatchSize
             trackBatch.desiredMaxCountUntilSync = newValue.trackBatchSize
             
+            BKRefreshCartridgeContainer.enabled = newValue.reinforcementEnabled
+            
             if (oldValue?.applicationState != newValue.applicationState) {
                 if (newValue.applicationState) {
                     NotificationCenter.default.addObserver(self, selector: #selector(trackApplicationState(_:)), name: Notification.Name.UIApplicationDidBecomeActive, object: nil)

@@ -9,6 +9,8 @@ import Foundation
 
 internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRefreshCartridge>, BKData, BoundlessAPISynchronizable {
     
+    static var enabled = true
+    
     static let registerWithNSKeyed: Void = {
         NSKeyedUnarchiver.setClass(BKRefreshCartridgeContainer.self, forClassName: "BKRefreshCartridgeContainer")
         NSKeyedArchiver.setClassName("BKRefreshCartridgeContainer", for: BKRefreshCartridgeContainer.self)
@@ -40,13 +42,16 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
     }
     
     func decision(forActionID actionID: String, completion: @escaping ((BKDecision)->Void)) {
-        let cartridge: BKRefreshCartridge
-        if let c = self[actionID] {
-            cartridge = c
-        } else {
-            cartridge = BKRefreshCartridge(actionID: actionID)
-            self[actionID] = cartridge
+        guard BKRefreshCartridgeContainer.enabled else {
+            completion(BKDecision.neutral(for: actionID))
+            return
         }
+        
+        let cartridge: BKRefreshCartridge = self[actionID] ?? {
+            let cartridge = BKRefreshCartridge(actionID: actionID)
+            self[actionID] = cartridge
+            return cartridge
+        }()
         
         cartridge.removeFirst(completion: { (decision) in
             if let decision = decision {
@@ -149,4 +154,3 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
     }
     
 }
-
