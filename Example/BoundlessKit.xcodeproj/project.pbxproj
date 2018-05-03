@@ -17,6 +17,8 @@
 		842661C3204DE3C5001FEA2F /* BoundlessProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 842661C2204DE3C5001FEA2F /* BoundlessProperties.plist */; };
 		842661E5204E05B3001FEA2F /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		842661E6204E05BA001FEA2F /* BoundlessTestProperties.plist in Resources */ = {isa = PBXBuildFile; fileRef = 842661C4204DFE50001FEA2F /* BoundlessTestProperties.plist */; };
+		84685A4F209AFB5A0086855B /* TestTrackBatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84685A4E209AFB5A0086855B /* TestTrackBatch.swift */; };
+		84685A51209AFB6C0086855B /* MockBKTrackBatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84685A50209AFB6C0086855B /* MockBKTrackBatch.swift */; };
 		847A3CB2205844ED00F16211 /* MockHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF2A42055034000FE49B9 /* MockHTTPClient.swift */; };
 		847A3CB3205844F400F16211 /* MockManualClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CBF29C2054D88400FE49B9 /* MockManualClient.swift */; };
 		84B5C5D5205B6BD700DAFB05 /* Reward.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B5C5D4205B6BD700DAFB05 /* Reward.swift */; };
@@ -63,6 +65,8 @@
 		842661C2204DE3C5001FEA2F /* BoundlessProperties.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BoundlessProperties.plist; sourceTree = "<group>"; };
 		842661C4204DFE50001FEA2F /* BoundlessTestProperties.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BoundlessTestProperties.plist; sourceTree = "<group>"; };
 		842661DB204E03E8001FEA2F /* BoundlessKit_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoundlessKit_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		84685A4E209AFB5A0086855B /* TestTrackBatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTrackBatch.swift; sourceTree = "<group>"; };
+		84685A50209AFB6C0086855B /* MockBKTrackBatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBKTrackBatch.swift; sourceTree = "<group>"; };
 		84B5C5D4205B6BD700DAFB05 /* Reward.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reward.swift; sourceTree = "<group>"; };
 		84B5C5D6205B6BF800DAFB05 /* RewardsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsViewController.swift; sourceTree = "<group>"; };
 		84CBF27A2051D31800FE49B9 /* MockViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockViewController.swift; sourceTree = "<group>"; };
@@ -167,6 +171,7 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				84685A4E209AFB5A0086855B /* TestTrackBatch.swift */,
 				84FB7079209AD89D005DCE40 /* TestBoundlessConfiguration.swift */,
 				84CBF2A72055105600FE49B9 /* TestBoundlessAPIObjects.swift */,
 				84CBF29020523F9D00FE49B9 /* TestManualIntegration.swift */,
@@ -204,6 +209,7 @@
 			isa = PBXGroup;
 			children = (
 				84CEB673205C48BB007AF2AF /* Helper.swift */,
+				84685A50209AFB6C0086855B /* MockBKTrackBatch.swift */,
 				84CBF27A2051D31800FE49B9 /* MockViewController.swift */,
 				84CBF29C2054D88400FE49B9 /* MockManualClient.swift */,
 				84FB707E209AEDCD005DCE40 /* MockBKRefreshCartridge.swift */,
@@ -467,11 +473,13 @@
 				84CBF2802051E5D400FE49B9 /* TestInstanceSelector.swift in Sources */,
 				84CBF2842051EA1500FE49B9 /* TestActionReinforcement.swift in Sources */,
 				84CBF2822051E8AA00FE49B9 /* TestInstanceSelectorNotification.swift in Sources */,
+				84685A4F209AFB5A0086855B /* TestTrackBatch.swift in Sources */,
 				842661E5204E05B3001FEA2F /* Tests.swift in Sources */,
 				84CBF2A82055105600FE49B9 /* TestBoundlessAPIObjects.swift in Sources */,
 				847A3CB2205844ED00F16211 /* MockHTTPClient.swift in Sources */,
 				84FB707D209AEC43005DCE40 /* MockBKRefreshCartridgeContainer.swift in Sources */,
 				84CBF289205213F500FE49B9 /* NotificationReceiver.swift in Sources */,
+				84685A51209AFB6C0086855B /* MockBKTrackBatch.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -47,6 +47,16 @@ class TestBoundlessConfiguration: XCTestCase {
             }
         }
         
+        let gotRewardAgain = expectation(description: "Got a reward after reenabling reinforcement")
+        apiClient.boundlessConfig = enabled
+        apiClient.refreshContainer.decision(forActionID: MockBKRefreshCartridge.actionID) { decision in
+            if decision.name == MockBKRefreshCartridge.rewardID {
+                gotRewardAgain.fulfill()
+            } else {
+                XCTFail()
+            }
+        }
+        
         
         waitForExpectations(timeout: 3)
     }
