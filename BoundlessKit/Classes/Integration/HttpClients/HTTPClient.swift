@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class HTTPClient {
+internal class HTTPClient : NSObject {
     
     internal var logRequests = true
     internal var logResponses = true

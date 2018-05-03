@@ -22,8 +22,6 @@ internal enum CodelessAPIEndpoint {
 }
 
 internal class CodelessAPIClient : BoundlessAPIClient {
-    
-    let queue = DispatchQueue.init(label: "CodelessQueue")
     var reinforcers = [String: Reinforcer]()
     
     override var properties: BoundlessProperties {
@@ -73,34 +71,6 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         didSetConfiguration(oldValue: nil)
     }
     
-    func didSetConfiguration(oldValue: BoundlessConfiguration?) {
-        let newValue = boundlessConfig
-        queue.sync {
-            if (oldValue?.applicationViews != boundlessConfig.applicationViews) {
-                if (newValue.applicationViews) {
-                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidAppearNotification, object: nil)
-                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidDisappearNotification, object: nil)
-                } else {
-                    InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.viewControllerDidAppearNotification, object: nil)
-                    InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.viewControllerDidDisappearNotification, object: nil)
-                }
-            }
-        }
-    }
-    
-    let trackQueue = DispatchQueue.init(label: "TrackQueue", attributes: .concurrent)
-    @objc func trackApplicationViews(_ notification: Notification) {
-        if let target = notification.userInfo?["target"] as? NSObject,
-            let selector = notification.userInfo?["selector"] as? Selector {
-            let action = BKAction("ApplicationView",
-                                  ["tag": selector == #selector(UIViewController.viewDidAppear(_:)) ? "didAppear" : "didDisappear",
-                                   "target": NSStringFromClass(type(of: target)),
-                                   "time": selector == #selector(UIViewController.viewDidAppear(_:)) ? BoundlessTime.start(for: target) : BoundlessTime.end(for: target)
-                ])
-            trackBatch.store(action)
-        }
-    }
-    
     func boot(completion: @escaping () -> () = {}) {
         var payload = properties.bootCredentials
         payload["inProduction"] = properties.inProduction
@@ -130,7 +100,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     }
     
     func mountVersion() {
-        queue.async {
+        serialQueue.async {
             var mappings = self.properties.version.mappings
             let visualizer = self.visualizerSession
             for (key, value) in visualizer?.mappings ?? [:] {
@@ -189,12 +159,128 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         }
     }
     
+    fileprivate let serialQueue = DispatchQueue(label: "CodelessAPIClientSerial")
+    fileprivate let concurrentQueue = DispatchQueue(label: "CodelessAPIClientConcurrent", attributes: .concurrent)
+}
+
+//// Adhering to BoundlessConfiguration
+//
+//
+extension CodelessAPIClient {
+    func didSetConfiguration(oldValue: BoundlessConfiguration?) {
+        let newValue = boundlessConfig
+        serialQueue.sync {
+            reportBatch.desiredMaxCountUntilSync = newValue.reportBatchSize
+            trackBatch.desiredMaxCountUntilSync = newValue.trackBatchSize
+            
+            if (oldValue?.applicationState != newValue.applicationState) {
+                if (newValue.applicationState) {
+                    NotificationCenter.default.addObserver(self, selector: #selector(trackApplicationState(_:)), name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
+                    NotificationCenter.default.addObserver(self, selector: #selector(trackApplicationState(_:)), name: Notification.Name.UIApplicationWillResignActive, object: nil)
+                } else {
+                    NotificationCenter.default.removeObserver(self, name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
+                    NotificationCenter.default.removeObserver(self, name: Notification.Name.UIApplicationWillResignActive, object: nil)
+                }
+            }
+            
+            
+            if (oldValue?.applicationViews != newValue.applicationViews) {
+                if (newValue.applicationViews) {
+                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidAppearNotification, object: nil)
+                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidDisappearNotification, object: nil)
+                } else {
+                    InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.viewControllerDidAppearNotification, object: nil)
+                    InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.viewControllerDidDisappearNotification, object: nil)
+                }
+            }
+        }
+    }
+    
+    @objc func trackApplicationState(_ notification: Notification) {
+        let action: BKAction
+        let actionID: String
+        let tag: String
+        
+        switch notification.name {
+        case Notification.Name.UIApplicationDidBecomeActive:
+            actionID = "UIApplicationDidBecomeActive"
+            tag = "ApplicationState"
+            action = BKAction(actionID,
+                              ["tag": tag,
+                               "time": BoundlessTime.start(for: self, tag: tag)
+                ])
+            
+        case Notification.Name.UIApplicationWillResignActive:
+            actionID = "UIApplicationWillResignActive"
+            tag = "ApplicationState"
+            action = BKAction(actionID,
+                              ["tag": tag,
+                               "time": BoundlessTime.end(for: self, tag: tag)
+                ])
+            
+        default:
+            return
+        }
+        trackBatch.store(action)
+        BKLog.print(confirmed: "\(action.toJSONType() as AnyObject)")
+    }
+    
+    @objc func trackApplicationViews(_ notification: Notification) {
+        if let target = notification.userInfo?["target"] as? NSObject,
+            let selector = notification.userInfo?["selector"] as? Selector {
+            let action = BKAction("ApplicationView",
+                                  ["tag": selector == #selector(UIViewController.viewDidAppear(_:)) ? "didAppear" : "didDisappear",
+                                   "target": NSStringFromClass(type(of: target)),
+                                   "time": selector == #selector(UIViewController.viewDidAppear(_:)) ? BoundlessTime.start(for: target) : BoundlessTime.end(for: target)
+                ])
+            trackBatch.store(action)
+        }
+    }
+}
+
+//// Dashboard Visualizer Connection
+//
+//
+internal struct CodelessVisualizerSession {
+    var adminName: String
+    var connectionUUID: String
+    var mappings: [String: [String: Any]]
+    
+    init(adminName: String, connectionUUID: String, mappings: [String: [String: Any]]) {
+        self.adminName = adminName
+        self.connectionUUID = connectionUUID
+        self.mappings = mappings
+    }
+    
+    init?(data: Data) {
+        let unarchiver = NSKeyedUnarchiver(forReadingWith: data)
+        defer {
+            unarchiver.finishDecoding()
+        }
+        guard let adminName = unarchiver.decodeObject(forKey: "adminName") as? String else { return nil }
+        guard let connectionUUID = unarchiver.decodeObject(forKey: "connectionUUID") as? String else { return nil }
+        guard let mappings = unarchiver.decodeObject(forKey: "mappings") as? [String: [String: Any]] else { return nil }
+        self.init(adminName: adminName, connectionUUID: connectionUUID, mappings: mappings)
+    }
+    
+    func encode() -> Data {
+        let data = NSMutableData()
+        let archiver = NSKeyedArchiver(forWritingWith: data)
+        archiver.encode(adminName, forKey: "adminName")
+        archiver.encode(connectionUUID, forKey: "connectionUUID")
+        archiver.encode(mappings, forKey: "mappings")
+        archiver.finishEncoding()
+        return data as Data
+    }
+}
+
+extension CodelessAPIClient {
     func promptPairing() {
         guard var payload = properties.apiCredentials else {
             return
         }
         payload["deviceName"] = UIDevice.current.name
-
+        
         post(url: CodelessAPIEndpoint.identify.url, jsonObject: payload) { response in
             switch response?["status"] as? Int {
             case 202?:
@@ -219,7 +305,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                         } else {
                             self.visualizerSession = nil
                         }
-                    }.start()
+                        }.start()
                 }))
                 pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
                     self.visualizerSession = nil
@@ -237,18 +323,12 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                 self.visualizerSession = nil
                 break
             }
-        }.start()
+            }.start()
     }
     
     
-    fileprivate lazy var visualizerQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 1
-        return queue
-    }()
-    
     func didSetVisualizerSession(oldValue: CodelessVisualizerSession?) {
-        visualizerQueue.addOperation {
+        serialQueue.async {
             if oldValue == nil && self.visualizerSession != nil {
                 BKLog.debug("Visualizer session connected")
                 for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
@@ -266,7 +346,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     
     @objc
     func submitToDashboard(notification: Notification) {
-        self.visualizerQueue.addOperation {
+        serialQueue.async {
             guard let session = self.visualizerSession,
                 let targetClass = notification.userInfo?["classType"] as? AnyClass,
                 let selector = notification.userInfo?["selector"] as? Selector,
@@ -302,38 +382,5 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     @objc
     func doNothing(notification: Notification) {
         BKLog.debug("Got notification:\(notification.name.rawValue) ")
-    }
-}
-
-internal struct CodelessVisualizerSession {
-    var adminName: String
-    var connectionUUID: String
-    var mappings: [String: [String: Any]]
-    
-    init(adminName: String, connectionUUID: String, mappings: [String: [String: Any]]) {
-        self.adminName = adminName
-        self.connectionUUID = connectionUUID
-        self.mappings = mappings
-    }
-    
-    init?(data: Data) {
-        let unarchiver = NSKeyedUnarchiver(forReadingWith: data)
-        defer {
-            unarchiver.finishDecoding()
-        }
-        guard let adminName = unarchiver.decodeObject(forKey: "adminName") as? String else { return nil }
-        guard let connectionUUID = unarchiver.decodeObject(forKey: "connectionUUID") as? String else { return nil }
-        guard let mappings = unarchiver.decodeObject(forKey: "mappings") as? [String: [String: Any]] else { return nil }
-        self.init(adminName: adminName, connectionUUID: connectionUUID, mappings: mappings)
-    }
-    
-    func encode() -> Data {
-        let data = NSMutableData()
-        let archiver = NSKeyedArchiver(forWritingWith: data)
-        archiver.encode(adminName, forKey: "adminName")
-        archiver.encode(connectionUUID, forKey: "connectionUUID")
-        archiver.encode(mappings, forKey: "mappings")
-        archiver.finishEncoding()
-        return data as Data
     }
 }
