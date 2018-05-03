@@ -29,7 +29,31 @@ class TestTrackBatch: XCTestCase {
     }
     
     func testCodelessReinforcementParse() {
-        let reinforcementString = "{\n              \"primitive\": \"Emojisplosion\",\n              \"SystemSound\": 1109,\n              \"HapticFeedback\": true,\n              \"Delay\": 0,\n              \"ViewCustom\": \"\",\n              \"ViewMarginY\": 0.5,\n              \"ViewMarginX\": 0.5,\n              \"ViewOption\": \"sender\",\n              \"AccelY\": -200,\n              \"AccelX\": 0,\n              \"ScaleSpeed\": 0.5,\n              \"ScaleRange\": 0.2,\n              \"Scale\": 1,\n              \"Bursts\": 1,\n              \"FadeOut\": 1,\n              \"Spin\": 20,\n              \"EmissionRange\": 45,\n              \"EmissionAngle\": 90,\n              \"LifetimeRange\": 0.5,\n              \"Lifetime\": 2,\n              \"Quantity\": 1,\n              \"Velocity\": 20,\n              \"Content\": \"👍\"\n            }"
+        let reinforcementString = "{"
+            + "\"primitive\": \"Emojisplosion\","
+            + "\"SystemSound\": 1109,"
+            + "\"HapticFeedback\": true,"
+            + "\"Delay\": 0,"
+            + "\"ViewCustom\": \"\","
+            + "\"ViewMarginY\": 0.5,"
+            + "\"ViewMarginX\": 0.5,"
+            + "\"ViewOption\": \"sender\","
+            + "\"AccelY\": -200,"
+            + "\"AccelX\": 0,"
+            + "\"ScaleSpeed\": 0.5,"
+            + "\"ScaleRange\": 0.2,"
+            + "\"Scale\": 1,"
+            + "\"Bursts\": 1,"
+            + "\"FadeOut\": 1,"
+            + "\"Spin\": 20,"
+            + "\"EmissionRange\": 45,"
+            + "\"EmissionAngle\": 90,"
+            + "\"LifetimeRange\": 0.5,"
+            + "\"Lifetime\": 2,"
+            + "\"Quantity\": 1,"
+            + "\"Velocity\": 20,"
+            + "\"Content\": \"👍\"" +
+        "}"
         
         let _ = try! CodelessReinforcement(from: JSONSerialization.jsonObject(with: reinforcementString.data(using: .utf8)!) as! [String: Any])
     }
