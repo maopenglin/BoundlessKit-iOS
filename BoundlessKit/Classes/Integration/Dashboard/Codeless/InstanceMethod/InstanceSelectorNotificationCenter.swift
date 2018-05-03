@@ -75,7 +75,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
             if let notifier = self.notifiers[aName] {
                 notifier.addObserver(observer as AnyObject)
                 super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
-                BKLog.debug("Added observer for notification:\(aName.rawValue)")
+                BKLog.debug("Added observer for instance method:\(aName.rawValue)")
                 return
             }
             
@@ -83,19 +83,17 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
                 let notifier = InstanceSelectorNotifier.init(instanceSelector) {
                 self.notifiers[aName] = notifier
                 notifier.addObserver(observer as AnyObject)
-                BKLog.debug("Added observer for new notification:\(aName.rawValue)")
+                BKLog.debug("Added first observer for instance method:\(aName.rawValue)")
                 super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
                 return
             }
             
-            BKLog.print(error: "Cannot create instance method for notification<\(aName)>")
+            BKLog.print(error: "Cannot create  for notification<\(aName)>")
         }
     }
     
     override public func removeObserver(_ observer: Any) {
-        queue.sync {
-            self.removeObserver(observer, name: nil, object: nil)
-        }
+        self.removeObserver(observer, name: nil, object: nil)
     }
     
     override public func removeObserver(_ observer: Any, name aName: NSNotification.Name?, object anObject: Any?) {
