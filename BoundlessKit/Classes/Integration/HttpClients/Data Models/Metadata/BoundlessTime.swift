@@ -28,16 +28,17 @@ extension NSObject : BoundlessID {
 }
 
 internal class BoundlessTime : NSObject {
-    fileprivate static var timeMarkers = [UUID: Date]()
+    fileprivate static var timeMarkers = [UUID: [String:Date]]()
     
-    static func start(for object: NSObject, _ start: Date = Date()) -> [String: NSNumber] {
-        timeMarkers[object.boundlessid] = start
+    static func start(for object: NSObject, tag: String = "", _ start: Date = Date()) -> [String: NSNumber] {
+        if timeMarkers[object.boundlessid] == nil { timeMarkers[object.boundlessid] = [:] }
+        timeMarkers[object.boundlessid]![tag] = start
         return ["start": NSNumber(value: 1000*start.timeIntervalSince1970)]
     }
     
-    static func end(for object: NSObject, _ end: Date = Date()) -> [String: NSNumber] {
+    static func end(for object: NSObject, tag: String = "", _ end: Date = Date()) -> [String: NSNumber] {
         var result = ["end": NSNumber(value: 1000*end.timeIntervalSince1970)]
-        if let start = timeMarkers.removeValue(forKey: object.boundlessid) {
+        if let start = timeMarkers[object.boundlessid]?.removeValue(forKey: tag) {
             result["start"] = NSNumber(value: 1000*start.timeIntervalSince1970)
             result["spent"] = NSNumber(value: 1000*end.timeIntervalSince(start))
         }
