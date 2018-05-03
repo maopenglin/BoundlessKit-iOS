@@ -92,12 +92,12 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     @objc func trackApplicationViews(_ notification: Notification) {
         if let target = notification.userInfo?["target"] as? NSObject,
             let selector = notification.userInfo?["selector"] as? Selector {
-            let actionID = "ApplicationView"
-            var metadata: [String: Any] = [ "tag": selector == #selector(UIViewController.viewDidAppear(_:)) ? "didAppear" : "didDisappear"]
-            metadata["target"] = NSStringFromClass(type(of: target))
-            metadata["time"] = selector == #selector(UIViewController.viewDidAppear(_:)) ? BoundlessTime.start(for: target) : BoundlessTime.end(for: target)
-            BKLog.debug("Object id:\(target.boundlessid)")
-            BKLog.debug("Got track with metadata:\(metadata as AnyObject)")
+            let action = BKAction("ApplicationView",
+                                  ["tag": selector == #selector(UIViewController.viewDidAppear(_:)) ? "didAppear" : "didDisappear",
+                                   "target": NSStringFromClass(type(of: target)),
+                                   "time": selector == #selector(UIViewController.viewDidAppear(_:)) ? BoundlessTime.start(for: target) : BoundlessTime.end(for: target)
+                ])
+            trackBatch.store(action)
         }
     }
     
