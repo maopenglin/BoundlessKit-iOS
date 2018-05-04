@@ -33,13 +33,14 @@ class TestManualIntegration: XCTestCase {
     }
     
     func testSavedData() {
+        let properties = BoundlessProperties.fromTestFile!
         let database = MockBKuserDefaults()
         
-        let client = BoundlessAPIClient(credentials: BoundlessCredentials.fromTestFile!, database: database)
+        let client = BoundlessAPIClient(credentials: properties.credentials, version: properties.version, database: database)
         let kit = MockBoundlessKit.init(apiClient: client)
         kit.track(actionID: "track1")
         
-        let client2 = BoundlessAPIClient(credentials: BoundlessCredentials.fromTestFile!, database: database)
+        let client2 = BoundlessAPIClient(credentials: properties.credentials, version: properties.version, database: database)
         let kit2 = MockBoundlessKit.init(apiClient: client2)
         
         XCTAssert(kit2.apiClient.trackBatch.count == kit.apiClient.trackBatch.count)

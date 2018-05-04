@@ -46,6 +46,7 @@
 		78BF92CBE0079165216ECED77A0A302E /* BundleExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F66106DBF2BD8AD4C0BA9CF79BFEEC3 /* BundleExtensions.swift */; };
 		84152B01209BB16E000CD49B /* ASIdHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 84152AFF209BB16E000CD49B /* ASIdHelper.h */; };
 		84152B02209BB16E000CD49B /* ASIdHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 84152B00209BB16E000CD49B /* ASIdHelper.m */; };
+		84152B04209BF66D000CD49B /* BoundlessProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84152B03209BF66D000CD49B /* BoundlessProperties.swift */; };
 		843E8DEC2098ED8100CF3298 /* BoundlessTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843E8DEB2098ED8100CF3298 /* BoundlessTime.swift */; };
 		843E8DF1209A2FB700CF3298 /* Reinforcer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843E8DF0209A2FB700CF3298 /* Reinforcer.swift */; };
 		898E7841049CC49AB76D3A2DF47C7B6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
@@ -127,6 +128,7 @@
 		7F8ABF6D37EA1566B80BE40BC1315F83 /* NSObject+Boundless.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "NSObject+Boundless.h"; sourceTree = "<group>"; };
 		84152AFF209BB16E000CD49B /* ASIdHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIdHelper.h; sourceTree = "<group>"; };
 		84152B00209BB16E000CD49B /* ASIdHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIdHelper.m; sourceTree = "<group>"; };
+		84152B03209BF66D000CD49B /* BoundlessProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundlessProperties.swift; sourceTree = "<group>"; };
 		843E8DEB2098ED8100CF3298 /* BoundlessTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundlessTime.swift; sourceTree = "<group>"; };
 		843E8DF0209A2FB700CF3298 /* Reinforcer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reinforcer.swift; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -251,6 +253,7 @@
 				843E8DEA2098ED5300CF3298 /* Metadata */,
 				BE3CC00327839642688889FA2EF6ED28 /* BoundlessConfiguration.swift */,
 				69847D7F15C5D95CA7AA68AB27F08934 /* BoundlessCredentials.swift */,
+				84152B03209BF66D000CD49B /* BoundlessProperties.swift */,
 				E5C44426D34FFFC2495580056C1D7F4C /* BoundlessVersion.swift */,
 			);
 			path = "Data Models";
@@ -675,6 +678,7 @@
 				7667542F44B83F1A6CB9E1CE70361BFE /* BKReportBatch.swift in Sources */,
 				84152B02209BB16E000CD49B /* ASIdHelper.m in Sources */,
 				AEB60116D4C3252866B92EAABF728FE5 /* BKTrackBatch.swift in Sources */,
+				84152B04209BF66D000CD49B /* BoundlessProperties.swift in Sources */,
 				D9E0CD99F681426348467B407F20E07D /* BoundlessAPIClient.swift in Sources */,
 				30CCABAF8F52F34A3D790F8FC0CB26A4 /* BoundlessBluetooth.swift in Sources */,
 				48E1B068B85C0EEAB9478BEB4D79E2E1 /* BoundlessConfiguration.swift in Sources */,

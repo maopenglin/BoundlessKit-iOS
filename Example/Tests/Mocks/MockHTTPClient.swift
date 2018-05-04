@@ -9,11 +9,13 @@
 import Foundation
 @testable import BoundlessKit
 
-extension BoundlessCredentials {
-    static var fromTestFile: BoundlessCredentials? {
+extension BoundlessProperties {
+    static var fromTestFile: BoundlessProperties? {
         if let propertiesFile = Bundle(for: MockBoundlessKit.self).path(forResource: "BoundlessTestProperties", ofType: "plist"),
-            let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as? [String: Any] {
-            return BoundlessCredentials.convert(from: propertiesDictionary)
+            let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as? [String: Any],
+            let credentials = BoundlessCredentials.convert(from: propertiesDictionary) {
+            return BoundlessProperties(credentials: credentials,
+                                       version: BoundlessVersion.convert(from: propertiesDictionary) ?? BoundlessVersion())
         } else {
             return nil
         }
@@ -22,7 +24,8 @@ extension BoundlessCredentials {
 
 class MockBoundlessAPIClient : BoundlessAPIClient {
     init() {
-        super.init(credentials: BoundlessCredentials.fromTestFile!, database: MockBKuserDefaults(), session: MockURLSession())
+        let properties = BoundlessProperties.fromTestFile!
+        super.init(credentials: properties.credentials, version: properties.version, database: MockBKuserDefaults(), session: MockURLSession())
         logRequests = true
         logResponses = true
     }
@@ -30,7 +33,8 @@ class MockBoundlessAPIClient : BoundlessAPIClient {
 
 class MockCodelessAPIClient : CodelessAPIClient {
     init() {
-        super.init(credentials: BoundlessCredentials.fromTestFile!, database: MockBKuserDefaults(), session: MockURLSession())
+        let properties = BoundlessProperties.fromTestFile!
+        super.init(credentials: properties.credentials, version: properties.version, database: MockBKuserDefaults(), session: MockURLSession())
         self.refreshContainer = MockBKRefreshCartridgeContainer([:])
         logRequests = true
         logResponses = true

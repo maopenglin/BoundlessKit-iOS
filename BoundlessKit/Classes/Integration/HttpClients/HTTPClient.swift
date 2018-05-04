@@ -39,7 +39,7 @@ internal class HTTPClient : NSObject {
             let response = self.convertResponseToJSON(url, responseData, responseURL, error)
             if self.logResponses {
 //                BKLog.print("Received response from <\(request.url?.absoluteString ?? "url:nil")> with payload:\n<\(response as AnyObject)>")
-                BKLog.print("Received response from <\(request.url?.absoluteString ?? "url:nil")> with payload:\n<\(String.init(data: responseData!, encoding: String.Encoding.utf8)?.replacingOccurrences(of: "\n", with: "\n"))>")
+                BKLog.print("Received response from <\(request.url?.absoluteString ?? "url:nil")> with payload:\n<\(String(describing: String(data: responseData!, encoding: String.Encoding.utf8)))>")
             }
             completion(response)
         }

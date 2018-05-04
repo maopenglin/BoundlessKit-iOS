@@ -19,15 +19,9 @@ internal struct BoundlessCredentials {
     let inProduction: Bool
     let developmentSecret: String
     let productionSecret: String
-    var version: BoundlessVersion {
-        didSet {
-            BKLog.print("BoundlessKit using versionID <\(version.versionID ?? "nil")>")
-        }
-    }
     
-    init(_ primaryIdentity: String? = nil, _ appID: String, _ version: BoundlessVersion, _ inProduction: Bool, _ developmentSecret: String, _ productionSecret: String) {
+    init(_ primaryIdentity: String? = nil, _ appID: String, _ inProduction: Bool, _ developmentSecret: String, _ productionSecret: String) {
         self.appID = appID
-        self.version = version
         self.inProduction = inProduction
         self.developmentSecret = developmentSecret
         self.productionSecret = productionSecret
@@ -42,52 +36,22 @@ internal struct BoundlessCredentials {
         }
     }
     
-    var apiCredentials: [String: Any]? {
-        get {
-            guard let versionID = version.versionID else {
-                return nil
-            }
+    func apiCredentials(for version: BoundlessVersion) -> [String: Any] {
             return [ "clientOS": clientOS,
                      "clientOSVersion": clientOSVersion,
                      "clientSDKVersion": clientSDKVersion,
                      "clientBuild": clientBuild,
                      "primaryIdentity": primaryIdentity,
                      "appID": appID,
-                     "versionID": versionID,
+                     "versionID": version.name ?? "nil",
                      "secret": inProduction ? productionSecret : developmentSecret,
                      "utc": NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000),
                      "timezoneOffset": NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
             ]
-        }
-    }
-    
-    var bootCredentials: [String: Any] {
-        get {
-            return [ "clientOS": clientOS,
-                     "clientOSVersion": clientOSVersion,
-                     "clientSDKVersion": clientSDKVersion,
-                     "clientBuild": clientBuild,
-                     "primaryIdentity": primaryIdentity,
-                     "appID": appID,
-                     "versionID": version.versionID ?? "nil",
-                     "secret": inProduction ? productionSecret : developmentSecret,
-                     "utc": NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000),
-                     "timezoneOffset": NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
-            ]
-        }
     }
 }
 
 extension BoundlessCredentials {
-    static var fromFile: BoundlessCredentials? {
-        if let propertiesFile = Bundle.main.path(forResource: "BoundlessProperties", ofType: "plist"),
-            let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as? [String: Any] {
-            return BoundlessCredentials.convert(from: propertiesDictionary)
-        } else {
-            return nil
-        }
-    }
-    
     static func convert(from propertiesDictionary: [String: Any]) -> BoundlessCredentials? {
         guard let appID = propertiesDictionary["appID"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
         guard let inProduction = propertiesDictionary["inProduction"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
@@ -97,7 +61,6 @@ extension BoundlessCredentials {
         return BoundlessCredentials.init(
             propertiesDictionary["primaryIdentity"] as? String,
             appID,
-            BoundlessVersion.init(propertiesDictionary["versionID"] as? String, [:]),
             inProduction,
             developmentSecret,
             productionSecret

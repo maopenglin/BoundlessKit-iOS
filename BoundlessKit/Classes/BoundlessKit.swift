@@ -22,10 +22,10 @@ open class BoundlessKit : NSObject {
     internal let apiClient: BoundlessAPIClient
     
     private override convenience init() {
-        guard let credentials = BoundlessCredentials.fromFile else {
+        guard let properties = BoundlessProperties.fromFile else {
             fatalError("Missing <BoundlessProperties.plist> file")
         }
-        self.init(apiClient: BoundlessAPIClient(credentials: credentials, database: BKUserDefaults.standard))
+        self.init(apiClient: BoundlessAPIClient(credentials: properties.credentials, version: properties.version, database: BKUserDefaults.standard))
     }
     
     init(apiClient: BoundlessAPIClient) {
