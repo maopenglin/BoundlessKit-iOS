@@ -41,6 +41,7 @@ extension SynchronizedDictionary {
 
 // MARK: - Mutable
 extension SynchronizedDictionary {
+    
     /// Accesses the element at the specified position if it exists.
     ///
     /// - Parameter index: The position of the element to access.
@@ -56,6 +57,19 @@ extension SynchronizedDictionary {
         set {
             queue.async(flags: .barrier) {
                 self.dict[key] = newValue
+            }
+        }
+    }
+    
+    var valuesForKeys: [Key: Value] {
+        get {
+            var copy = [Key: Value]()
+            queue.sync { copy = self.dict }
+            return copy
+        }
+        set {
+            queue.async(flags: .barrier) {
+                self.dict = newValue
             }
         }
     }
@@ -83,11 +97,4 @@ extension SynchronizedDictionary {
         queue.sync { values = Array(dict.values) }
         return values
     }
-    
-    var valuesForKeys: [Key: Value] {
-        var copy = [Key: Value]()
-        queue.sync { copy = self.dict }
-        return copy
-    }
-    
 }
