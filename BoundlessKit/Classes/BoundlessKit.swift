@@ -22,10 +22,10 @@ open class BoundlessKit : NSObject {
     internal let apiClient: BoundlessAPIClient
     
     private override convenience init() {
-        guard let properties = BoundlessProperties.fromFile else {
+        guard let credentials = BoundlessCredentials.fromFile else {
             fatalError("Missing <BoundlessProperties.plist> file")
         }
-        self.init(apiClient: BoundlessAPIClient(properties: properties, database: BKUserDefaults.standard))
+        self.init(apiClient: BoundlessAPIClient(credentials: credentials, database: BKUserDefaults.standard))
     }
     
     init(apiClient: BoundlessAPIClient) {
@@ -68,7 +68,7 @@ open class BoundlessKit : NSObject {
     @objc
     public func setID(_ id: String) -> Bool {
         if !id.isEmpty && id.count <= 36 && id.range(of: "[^a-zA-Z0-9\\-]", options: .regularExpression) == nil {
-            apiClient.properties.primaryIdentity = id
+            apiClient.credentials.primaryIdentity = id
             return true
         } else {
             return false

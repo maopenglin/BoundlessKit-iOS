@@ -14,7 +14,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
         NSKeyedArchiver.setClassName("BKTrackBatch", for: BKTrackBatch.self)
     }()
     
-    
+    var enabled = true
     var desiredMaxTimeUntilSync: Int64
     var desiredMaxCountUntilSync: Int
     
@@ -56,6 +56,9 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
     }
     
     func store(_ action: BKAction) {
+        guard enabled else {
+            return
+        }
         self.append(action)
         self.storage?.0.archive(self, forKey: self.storage!.1)
         BoundlessContext.getContext() {[weak action] contextInfo in
@@ -84,7 +87,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
             successful(true)
             return
         }
-        guard var payload = apiClient.properties.apiCredentials else {
+        guard var payload = apiClient.credentials.apiCredentials else {
             successful(false)
             return
         }

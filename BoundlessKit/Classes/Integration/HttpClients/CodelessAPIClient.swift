@@ -24,9 +24,10 @@ internal enum CodelessAPIEndpoint {
 internal class CodelessAPIClient : BoundlessAPIClient {
     var reinforcers = [String: Reinforcer]()
     
-    override var properties: BoundlessProperties {
+    override var credentials: BoundlessCredentials {
         didSet {
-            database.set(properties.version.encode(), forKey: "codelessVersion")
+            database.set(credentials.version.encode(), forKey: "codelessVersion")
+            didSetProperties(oldValue: oldValue)
         }
     }
     var boundlessConfig: BoundlessConfiguration {
@@ -43,11 +44,11 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     }
     
     convenience init(boundlessClient: BoundlessAPIClient) {
-        self.init(properties: boundlessClient.properties, database: boundlessClient.database)
+        self.init(credentials: boundlessClient.credentials, database: boundlessClient.database)
     }
     
-    override init(properties: BoundlessProperties, database: BKUserDefaults, session: URLSessionProtocol = URLSession.shared) {
-        var codelessProperties = properties
+    override init(credentials: BoundlessCredentials, database: BKUserDefaults, session: URLSessionProtocol = URLSession.shared) {
+        var codelessProperties = credentials
         if let versionData = database.object(forKey: "codelessVersion") as? Data,
             let version = BoundlessVersion(data: versionData) {
             codelessProperties.version = version
@@ -65,16 +66,17 @@ internal class CodelessAPIClient : BoundlessAPIClient {
             self.visualizerSession = nil
         }
         
-        super.init(properties: codelessProperties, database: database, session: session)
+        super.init(credentials: codelessProperties, database: database, session: session)
         
-        didSetVisualizerSession(oldValue: nil)
+        didSetProperties(oldValue: nil)
         didSetConfiguration(oldValue: nil)
+        didSetVisualizerSession(oldValue: nil)
     }
     
     func boot(completion: @escaping () -> () = {}) {
-        var payload = properties.bootCredentials
-        payload["inProduction"] = properties.inProduction
-        payload["currentVersion"] = properties.version.versionID ?? "nil"
+        var payload = credentials.bootCredentials
+        payload["inProduction"] = credentials.inProduction
+        payload["currentVersion"] = credentials.version.versionID ?? "nil"
         payload["currentConfig"] = boundlessConfig.configID ?? "nil"
         payload["initialBoot"] = (database.initialBootDate == nil)
         post(url: CodelessAPIEndpoint.boot.url, jsonObject: payload) { response in
@@ -89,7 +91,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                         if let visualizerMappings = versionDict["visualizerMappings"] as? [String: [String: Any]] {
                             self.visualizerSession?.mappings = visualizerMappings
                         }
-                        self.properties.version = version
+                        self.credentials.version = version
                     }
                 }
             }
@@ -99,16 +101,34 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         }.start()
     }
     
+    fileprivate let serialQueue = DispatchQueue(label: "CodelessAPIClientSerial")
+    fileprivate let concurrentQueue = DispatchQueue(label: "CodelessAPIClientConcurrent", attributes: .concurrent)
+}
+
+//// Adhering to BoundlessConfiguration
+//
+//
+extension CodelessAPIClient {
+    func didSetProperties(oldValue: BoundlessCredentials?) {
+        let newValue = credentials
+        if oldValue?.version.versionID != newValue.version.versionID {
+            mountVersion()
+        }
+        if oldValue?.primaryIdentity != newValue.primaryIdentity {
+            boot()
+        }
+    }
+    
     func mountVersion() {
         serialQueue.async {
-            var mappings = self.properties.version.mappings
+            Reinforcer.scheduleSetting = (self.visualizerSession == nil) ? .reinforcement : .random
+            
+            var mappings = self.credentials.version.mappings
             let visualizer = self.visualizerSession
             for (key, value) in visualizer?.mappings ?? [:] {
                 mappings[key] = value
             }
             
-            Reinforcer.scheduleSetting = (visualizer == nil) ? .reinforcement : .random
-        
             for (actionID, value) in mappings {
                 if visualizer == nil {
                     self.refreshContainer.commit(actionID: actionID, with: self)
@@ -142,7 +162,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                         reinforcer = codelessReinforcer
                         self.reinforcers[actionID] = codelessReinforcer
                         return codelessReinforcer
-                    }()
+                        }()
                     for reinforcementDict in reinforcements {
                         if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
                             codelessReinforcer.codelessReinforcements[codelessReinforcement.primitive] = codelessReinforcement
@@ -154,31 +174,26 @@ internal class CodelessAPIClient : BoundlessAPIClient {
             for (actionID, value) in self.reinforcers.filter({mappings[$0.key] == nil}) {
                 InstanceSelectorNotificationCenter.default.removeObserver(value, name: Notification.Name(actionID), object: nil)
                 self.reinforcers.removeValue(forKey: actionID)
-//                BKLog.debug("Removed codeless reinforcer for actionID <\(actionID)>")
             }
         }
     }
-    
-    fileprivate let serialQueue = DispatchQueue(label: "CodelessAPIClientSerial")
-    fileprivate let concurrentQueue = DispatchQueue(label: "CodelessAPIClientConcurrent", attributes: .concurrent)
 }
 
-//// Adhering to BoundlessConfiguration
-//
-//
-extension CodelessAPIClient {
+extension CodelessAPIClient{
     func didSetConfiguration(oldValue: BoundlessConfiguration?) {
         let newValue = boundlessConfig
-        serialQueue.sync {
-            reportBatch.desiredMaxCountUntilSync = newValue.reportBatchSize
-            trackBatch.desiredMaxCountUntilSync = newValue.trackBatchSize
-            BKRefreshCartridgeContainer.enabled = newValue.reinforcementEnabled
+        serialQueue.async {
+            self.refreshContainer.enabled = newValue.reinforcementEnabled
+            self.trackBatch.enabled = newValue.trackingEnabled
+            self.reportBatch.desiredMaxCountUntilSync = newValue.reportBatchSize
+            self.trackBatch.desiredMaxCountUntilSync = newValue.trackBatchSize
+//            if 
             BoundlessContext.locationEnabled = newValue.locationObservations
             
             if (oldValue?.applicationState != newValue.applicationState) {
                 if (newValue.applicationState) {
-                    NotificationCenter.default.addObserver(self, selector: #selector(trackApplicationState(_:)), name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
-                    NotificationCenter.default.addObserver(self, selector: #selector(trackApplicationState(_:)), name: Notification.Name.UIApplicationWillResignActive, object: nil)
+                    NotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationState(_:)), name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
+                    NotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationState(_:)), name: Notification.Name.UIApplicationWillResignActive, object: nil)
                 } else {
                     NotificationCenter.default.removeObserver(self, name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
                     NotificationCenter.default.removeObserver(self, name: Notification.Name.UIApplicationWillResignActive, object: nil)
@@ -187,8 +202,8 @@ extension CodelessAPIClient {
             
             if (oldValue?.applicationViews != newValue.applicationViews) {
                 if (newValue.applicationViews) {
-                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidAppearNotification, object: nil)
-                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidDisappearNotification, object: nil)
+                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidAppearNotification, object: nil)
+                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidDisappearNotification, object: nil)
                 } else {
                     InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.viewControllerDidAppearNotification, object: nil)
                     InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.viewControllerDidDisappearNotification, object: nil)
@@ -200,12 +215,11 @@ extension CodelessAPIClient {
     @objc func trackApplicationState(_ notification: Notification) {
         let action: BKAction
         let actionID: String
-        let tag: String
+        let tag = "ApplicationState"
         
         switch notification.name {
         case Notification.Name.UIApplicationDidBecomeActive:
             actionID = "UIApplicationDidBecomeActive"
-            tag = "ApplicationState"
             action = BKAction(actionID,
                               ["tag": tag,
                                "time": BoundlessTime.start(for: self, tag: tag)
@@ -213,7 +227,6 @@ extension CodelessAPIClient {
             
         case Notification.Name.UIApplicationWillResignActive:
             actionID = "UIApplicationWillResignActive"
-            tag = "ApplicationState"
             action = BKAction(actionID,
                               ["tag": tag,
                                "time": BoundlessTime.end(for: self, tag: tag)
@@ -242,42 +255,23 @@ extension CodelessAPIClient {
 //// Dashboard Visualizer Connection
 //
 //
-internal struct CodelessVisualizerSession {
-    var adminName: String
-    var connectionUUID: String
-    var mappings: [String: [String: Any]]
-    
-    init(adminName: String, connectionUUID: String, mappings: [String: [String: Any]]) {
-        self.adminName = adminName
-        self.connectionUUID = connectionUUID
-        self.mappings = mappings
-    }
-    
-    init?(data: Data) {
-        let unarchiver = NSKeyedUnarchiver(forReadingWith: data)
-        defer {
-            unarchiver.finishDecoding()
-        }
-        guard let adminName = unarchiver.decodeObject(forKey: "adminName") as? String else { return nil }
-        guard let connectionUUID = unarchiver.decodeObject(forKey: "connectionUUID") as? String else { return nil }
-        guard let mappings = unarchiver.decodeObject(forKey: "mappings") as? [String: [String: Any]] else { return nil }
-        self.init(adminName: adminName, connectionUUID: connectionUUID, mappings: mappings)
-    }
-    
-    func encode() -> Data {
-        let data = NSMutableData()
-        let archiver = NSKeyedArchiver(forWritingWith: data)
-        archiver.encode(adminName, forKey: "adminName")
-        archiver.encode(connectionUUID, forKey: "connectionUUID")
-        archiver.encode(mappings, forKey: "mappings")
-        archiver.finishEncoding()
-        return data as Data
-    }
-}
-
 extension CodelessAPIClient {
+    func didSetVisualizerSession(oldValue: CodelessVisualizerSession?) {
+        serialQueue.async {
+            if oldValue == nil && self.visualizerSession != nil {
+                for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
+                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.doNothing(notification:)), name: visualizerNotification, object: nil)
+                }
+                // listen for all notifications sent
+                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: nil, object: nil)
+            } else if oldValue != nil && self.visualizerSession == nil {
+                InstanceSelectorNotificationCenter.default.removeObserver(self)
+            }
+        }
+    }
+    
     func promptPairing() {
-        guard var payload = properties.apiCredentials else {
+        guard var payload = credentials.apiCredentials else {
             return
         }
         payload["deviceName"] = UIDevice.current.name
@@ -327,31 +321,13 @@ extension CodelessAPIClient {
             }.start()
     }
     
-    
-    func didSetVisualizerSession(oldValue: CodelessVisualizerSession?) {
-        serialQueue.async {
-            if oldValue == nil && self.visualizerSession != nil {
-                BKLog.debug("Visualizer session connected")
-                for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
-                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.doNothing(notification:)), name: visualizerNotification, object: nil)
-                }
-                // listen for all notifications sent
-                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: nil, object: nil)
-            } else if oldValue != nil && self.visualizerSession == nil {
-                BKLog.debug("Visualizer session disconnected")
-                InstanceSelectorNotificationCenter.default.removeObserver(self)
-            }
-            self.mountVersion()
-        }
-    }
-    
     @objc
     func submitToDashboard(notification: Notification) {
         serialQueue.async {
             guard let session = self.visualizerSession,
                 let targetClass = notification.userInfo?["classType"] as? AnyClass,
                 let selector = notification.userInfo?["selector"] as? Selector,
-                var payload = self.properties.apiCredentials else {
+                var payload = self.credentials.apiCredentials else {
                     BKLog.debug("Failed to send notification <\(notification.name.rawValue)> to dashboard")
                     return
             }
@@ -374,6 +350,7 @@ extension CodelessAPIClient {
                 BKLog.print("Sent to dashboard actionID:<\(actionID)>")
                 if let visualizerMappings = response?["mappings"] as? [String: [String: Any]] {
                     self.visualizerSession?.mappings = visualizerMappings
+                    self.mountVersion()
                 }
             }.start()
             _ = sema.wait(timeout: .now() + 2)
@@ -383,5 +360,38 @@ extension CodelessAPIClient {
     @objc
     func doNothing(notification: Notification) {
         BKLog.debug("Got notification:\(notification.name.rawValue) ")
+    }
+}
+
+internal struct CodelessVisualizerSession {
+    var adminName: String
+    var connectionUUID: String
+    var mappings: [String: [String: Any]]
+    
+    init(adminName: String, connectionUUID: String, mappings: [String: [String: Any]]) {
+        self.adminName = adminName
+        self.connectionUUID = connectionUUID
+        self.mappings = mappings
+    }
+    
+    init?(data: Data) {
+        let unarchiver = NSKeyedUnarchiver(forReadingWith: data)
+        defer {
+            unarchiver.finishDecoding()
+        }
+        guard let adminName = unarchiver.decodeObject(forKey: "adminName") as? String else { return nil }
+        guard let connectionUUID = unarchiver.decodeObject(forKey: "connectionUUID") as? String else { return nil }
+        guard let mappings = unarchiver.decodeObject(forKey: "mappings") as? [String: [String: Any]] else { return nil }
+        self.init(adminName: adminName, connectionUUID: connectionUUID, mappings: mappings)
+    }
+    
+    func encode() -> Data {
+        let data = NSMutableData()
+        let archiver = NSKeyedArchiver(forWritingWith: data)
+        archiver.encode(adminName, forKey: "adminName")
+        archiver.encode(connectionUUID, forKey: "connectionUUID")
+        archiver.encode(mappings, forKey: "mappings")
+        archiver.finishEncoding()
+        return data as Data
     }
 }

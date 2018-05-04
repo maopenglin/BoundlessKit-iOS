@@ -27,7 +27,7 @@ internal protocol BoundlessAPISynchronizable: class {
 
 internal class BoundlessAPIClient : HTTPClient {
     
-    internal var properties: BoundlessProperties
+    internal var credentials: BoundlessCredentials
     internal var database: BKUserDefaults
     internal var trackBatch: BKTrackBatch
     internal var reportBatch: BKReportBatch
@@ -39,8 +39,8 @@ internal class BoundlessAPIClient : HTTPClient {
     var timeDelayAfterReport: UInt32 = 5
     var timeDelayAfterRefresh: UInt32 = 3
     
-    init(properties: BoundlessProperties, database: BKUserDefaults, session: URLSessionProtocol = URLSession.shared) {
-        self.properties = properties
+    init(credentials: BoundlessCredentials, database: BKUserDefaults, session: URLSessionProtocol = URLSession.shared) {
+        self.credentials = credentials
         self.database = database
         self.trackBatch = BKTrackBatch.initWith(database: database, forKey: "trackBatch")
         self.reportBatch = BKReportBatch.initWith(database: database, forKey: "reportBatch")

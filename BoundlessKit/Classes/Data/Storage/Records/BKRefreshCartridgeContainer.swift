@@ -9,14 +9,13 @@ import Foundation
 
 internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRefreshCartridge>, BKData, BoundlessAPISynchronizable {
     
-    static var enabled = true
-    
     static let registerWithNSKeyed: Void = {
         NSKeyedUnarchiver.setClass(BKRefreshCartridgeContainer.self, forClassName: "BKRefreshCartridgeContainer")
         NSKeyedArchiver.setClassName("BKRefreshCartridgeContainer", for: BKRefreshCartridgeContainer.self)
     }()
     
     var storage: BKDatabase.Storage?
+    var enabled = true
     
     class func initWith(database: BKDatabase, forKey key: String) -> BKRefreshCartridgeContainer {
         let container: BKRefreshCartridgeContainer
@@ -42,7 +41,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
     }
     
     func decision(forActionID actionID: String, completion: @escaping ((BKDecision)->Void)) {
-        guard BKRefreshCartridgeContainer.enabled else {
+        guard enabled else {
             completion(BKDecision.neutral(for: actionID))
             return
         }
@@ -91,7 +90,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
     let syncQueue = DispatchQueue(label: "boundless.kit.cartridgecontainer")
     func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
         syncQueue.async {
-            for actionID in apiClient.properties.version.mappings.keys {
+            for actionID in apiClient.credentials.version.mappings.keys {
                 if self[actionID] == nil {
                     self[actionID] = BKRefreshCartridge(actionID: actionID)
                 }
@@ -118,7 +117,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
             self[actionID] = BKRefreshCartridge(actionID: actionID)
         }
         guard let cartridge = self[actionID],
-            var payload = apiClient.properties.apiCredentials else {
+            var payload = apiClient.credentials.apiCredentials else {
                 successful(false)
                 return
         }

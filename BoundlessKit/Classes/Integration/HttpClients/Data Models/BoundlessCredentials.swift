@@ -1,5 +1,5 @@
 //
-//  BoundlessProperties.swift
+//  BoundlessCredentials.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 3/10/18.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct BoundlessProperties {
+internal struct BoundlessCredentials {
     
     let clientOS = "iOS"
     let clientOSVersion = UIDevice.current.systemVersion
@@ -78,23 +78,23 @@ internal struct BoundlessProperties {
     }
 }
 
-extension BoundlessProperties {
-    static var fromFile: BoundlessProperties? {
+extension BoundlessCredentials {
+    static var fromFile: BoundlessCredentials? {
         if let propertiesFile = Bundle.main.path(forResource: "BoundlessProperties", ofType: "plist"),
             let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as? [String: Any] {
-            return BoundlessProperties.convert(from: propertiesDictionary)
+            return BoundlessCredentials.convert(from: propertiesDictionary)
         } else {
             return nil
         }
     }
     
-    static func convert(from propertiesDictionary: [String: Any]) -> BoundlessProperties? {
+    static func convert(from propertiesDictionary: [String: Any]) -> BoundlessCredentials? {
         guard let appID = propertiesDictionary["appID"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
         guard let inProduction = propertiesDictionary["inProduction"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
         guard let productionSecret = propertiesDictionary["productionSecret"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
         guard let developmentSecret = propertiesDictionary["developmentSecret"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
         
-        return BoundlessProperties.init(
+        return BoundlessCredentials.init(
             propertiesDictionary["primaryIdentity"] as? String,
             appID,
             BoundlessVersion.init(propertiesDictionary["versionID"] as? String, [:]),

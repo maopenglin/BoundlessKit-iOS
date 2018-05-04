@@ -96,7 +96,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
             successful(true)
             return
         }
-        guard var payload = apiClient.properties.apiCredentials else {
+        guard var payload = apiClient.credentials.apiCredentials else {
                 successful(false)
                 return
         }

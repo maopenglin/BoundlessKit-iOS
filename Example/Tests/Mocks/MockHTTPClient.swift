@@ -9,11 +9,11 @@
 import Foundation
 @testable import BoundlessKit
 
-extension BoundlessProperties {
-    static var fromTestFile: BoundlessProperties? {
+extension BoundlessCredentials {
+    static var fromTestFile: BoundlessCredentials? {
         if let propertiesFile = Bundle(for: MockBoundlessKit.self).path(forResource: "BoundlessTestProperties", ofType: "plist"),
             let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as? [String: Any] {
-            return BoundlessProperties.convert(from: propertiesDictionary)
+            return BoundlessCredentials.convert(from: propertiesDictionary)
         } else {
             return nil
         }
@@ -22,7 +22,7 @@ extension BoundlessProperties {
 
 class MockBoundlessAPIClient : BoundlessAPIClient {
     init() {
-        super.init(properties: BoundlessProperties.fromTestFile!, database: MockBKuserDefaults(), session: MockURLSession())
+        super.init(credentials: BoundlessCredentials.fromTestFile!, database: MockBKuserDefaults(), session: MockURLSession())
         logRequests = true
         logResponses = true
     }
@@ -30,7 +30,7 @@ class MockBoundlessAPIClient : BoundlessAPIClient {
 
 class MockCodelessAPIClient : CodelessAPIClient {
     init() {
-        super.init(properties: BoundlessProperties.fromTestFile!, database: MockBKuserDefaults(), session: MockURLSession())
+        super.init(credentials: BoundlessCredentials.fromTestFile!, database: MockBKuserDefaults(), session: MockURLSession())
         self.refreshContainer = MockBKRefreshCartridgeContainer([:])
         logRequests = true
         logResponses = true
