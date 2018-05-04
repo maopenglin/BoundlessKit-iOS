@@ -21,7 +21,7 @@ internal class HTTPClient : NSObject {
     func post(url: URL, jsonObject: [String: Any], timeout:TimeInterval = 3.0, completion: @escaping ([String: Any]?) -> Void) -> URLSessionDataTaskProtocol {
         
         if logRequests {
-            BKLog.print("Sending request to <\(url.absoluteString)> with paylaod:\n<\(jsonObject)>...")
+            BKLog.print("Sending request to <\(url.absoluteString)> with payload:\n<\(jsonObject as AnyObject)>...")
         }
         
         var request = URLRequest(url:url)
@@ -38,8 +38,8 @@ internal class HTTPClient : NSObject {
         return session.send(request: request) { responseData, responseURL, error in
             let response = self.convertResponseToJSON(url, responseData, responseURL, error)
             if self.logResponses {
-//                BKLog.print("Received response from <\(request.url?.absoluteString ?? "url:nil")> with payload:\n<\(response as AnyObject)>")
-                BKLog.print("Received response from <\(request.url?.absoluteString ?? "url:nil")> with payload:\n<\(String(describing: String(data: responseData!, encoding: String.Encoding.utf8)))>")
+//                BKLog.print("Received response from <\(request.url?.absoluteString ?? "url:nil")> with dictionary:\n<\(response as AnyObject)>")
+                BKLog.print("Received response from <\(request.url?.absoluteString ?? "url:nil")> with json:\n<\((responseData != nil ? String(data: responseData!, encoding: String.Encoding.utf8) : "nil") as AnyObject)>")
             }
             completion(response)
         }

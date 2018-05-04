@@ -96,8 +96,10 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
             successful(true)
             return
         }
-        var payload = apiClient.newRequest
         BKLog.debug("Sending report batch...")
+        
+        var payload = apiClient.credentials.json
+        payload["versionID"] = apiClient.version.name
         
         let reportCopy = self.valuesForKeys
         payload["actions"] = reportCopy.values.flatMap({$0.values}).map({$0.toJSONType()})

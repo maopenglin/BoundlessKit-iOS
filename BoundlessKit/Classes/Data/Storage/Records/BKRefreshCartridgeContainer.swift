@@ -120,9 +120,10 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
                 successful(false)
                 return
         }
-        var payload = apiClient.newRequest
         BKLog.debug("Refreshing cartridge for actionID <\(cartridge.actionID)>...")
         
+        var payload = apiClient.credentials.json
+        payload["versionID"] = apiClient.version.name
         payload["actionID"] = cartridge.actionID
         apiClient.post(url: BoundlessAPIEndpoint.refresh.url, jsonObject: payload) { response in
             var success = false

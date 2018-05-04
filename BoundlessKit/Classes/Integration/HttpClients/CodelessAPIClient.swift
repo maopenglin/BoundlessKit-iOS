@@ -48,10 +48,10 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     }
     
     override init(credentials: BoundlessCredentials, version: BoundlessVersion, database: BKUserDefaults, session: URLSessionProtocol = URLSession.shared) {
-        var currentVersion = version
+        var codelessVersion = version
         if let versionData = database.object(forKey: "codelessVersion") as? Data,
             let version = BoundlessVersion(data: versionData) {
-            currentVersion = version
+            codelessVersion = version
         }
         if let configData = database.object(forKey: "codelessConfig") as? Data,
             let config = BoundlessConfiguration.init(data: configData) {
@@ -66,7 +66,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
             self.visualizerSession = nil
         }
         
-        super.init(credentials: credentials, version: currentVersion, database: database, session: session)
+        super.init(credentials: credentials, version: codelessVersion, database: database, session: session)
         
         didSetVersion(oldValue: nil)
         didSetConfiguration(oldValue: nil)
@@ -74,7 +74,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     }
     
     func boot(completion: @escaping () -> () = {}) {
-        var payload = credentials.apiCredentials(for: version)
+        var payload = credentials.json
         payload["inProduction"] = credentials.inProduction
         payload["currentVersion"] = version.name ?? "nil"
         payload["currentConfig"] = boundlessConfig.configID ?? "nil"
@@ -137,24 +137,24 @@ extension CodelessAPIClient {
                 if let r = self.reinforcers[actionID] {
                     reinforcer = r
                     reinforcer.reinforcementIDs = []
-                    BKLog.debug("Modifying reinforcer for actionID <\(actionID)>")
+//                    BKLog.debug("Modifying reinforcer for actionID <\(actionID)>")
                 } else {
                     reinforcer = Reinforcer(forActionID: actionID)
                     self.reinforcers[actionID] = reinforcer
-                    BKLog.debug("Created reinforcer for actionID <\(actionID)>")
+//                    BKLog.debug("Created reinforcer for actionID <\(actionID)>")
                 }
                 
                 if let manual = value["manual"] as? [String: Any],
                     let reinforcements = manual["reinforcements"] as? [String],
                     !reinforcements.isEmpty {
-                    BKLog.debug("Manual reinforcement found for actionID <\(actionID)>")
+//                    BKLog.debug("Manual reinforcement found for actionID <\(actionID)>")
                     reinforcer.reinforcementIDs.append(contentsOf: reinforcements)
                 }
                 
                 if let codeless = value["codeless"] as? [String: Any],
                     let reinforcements = codeless["reinforcements"] as? [[String: Any]],
                     !reinforcements.isEmpty {
-                    BKLog.debug("Codeless reinforcement found for actionID <\(actionID)>")
+//                    BKLog.debug("Codeless reinforcement found for actionID <\(actionID)>")
                     let codelessReinforcer: CodelessReinforcer = reinforcer as? CodelessReinforcer ?? {
                         let codelessReinforcer = CodelessReinforcer(copy: reinforcer)
                         InstanceSelectorNotificationCenter.default.addObserver(codelessReinforcer, selector: #selector(codelessReinforcer.receive(notification:)), name: NSNotification.Name.init(actionID), object: nil)
@@ -269,7 +269,8 @@ extension CodelessAPIClient {
     }
     
     func promptPairing() {
-        var payload = newRequest
+        var payload = credentials.json
+//        payload["versionID"] = version.name
         payload["deviceName"] = UIDevice.current.name
         
         post(url: CodelessAPIEndpoint.identify.url, jsonObject: payload) { response in
@@ -326,10 +327,11 @@ extension CodelessAPIClient {
                     BKLog.debug("Failed to send notification <\(notification.name.rawValue)> to dashboard")
                     return
             }
-            
-            var payload = self.newRequest
-            let actionID = notification.name.rawValue
             let sender = notification.userInfo?["sender"] as AnyObject
+            let actionID = notification.name.rawValue
+            
+            var payload = self.credentials.json
+            payload["versionID"] = self.version.name
             payload["connectionUUID"] = session.connectionUUID
             payload["sender"] = (type(of: sender) == NSNull.self) ? "nil" : NSStringFromClass(type(of: sender))
             payload["target"] = NSStringFromClass(targetClass)

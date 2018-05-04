@@ -36,19 +36,20 @@ internal struct BoundlessCredentials {
         }
     }
     
-    func apiCredentials(for version: BoundlessVersion) -> [String: Any] {
-            return [ "clientOS": clientOS,
-                     "clientOSVersion": clientOSVersion,
-                     "clientSDKVersion": clientSDKVersion,
-                     "clientBuild": clientBuild,
-                     "primaryIdentity": primaryIdentity,
-                     "appID": appID,
-                     "versionID": version.name ?? "nil",
-                     "secret": inProduction ? productionSecret : developmentSecret,
-                     "utc": NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000),
-                     "timezoneOffset": NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
-            ]
-    }
+    var json: [String: Any] {
+        get {
+                    return [ "clientOS": clientOS,
+                             "clientOSVersion": clientOSVersion,
+                             "clientSDKVersion": clientSDKVersion,
+                             "clientBuild": clientBuild,
+                             "primaryIdentity": primaryIdentity,
+                             "appID": appID,
+                             "secret": inProduction ? productionSecret : developmentSecret,
+                             "utc": NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000),
+                             "timezoneOffset": NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)
+                    ]
+            }
+        }
 }
 
 extension BoundlessCredentials {
