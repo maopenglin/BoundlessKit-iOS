@@ -270,7 +270,6 @@ extension CodelessAPIClient {
     
     func promptPairing() {
         var payload = credentials.json
-//        payload["versionID"] = version.name
         payload["deviceName"] = UIDevice.current.name
         
         post(url: CodelessAPIEndpoint.identify.url, jsonObject: payload) { response in
