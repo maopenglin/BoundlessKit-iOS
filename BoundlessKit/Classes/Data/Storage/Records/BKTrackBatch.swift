@@ -87,7 +87,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
             successful(true)
             return
         }
-        var payload = apiClient.apiCredentials
+        var payload = apiClient.newRequest
         BKLog.debug("Sending track batch...")
         
         let trackCopy = self.values

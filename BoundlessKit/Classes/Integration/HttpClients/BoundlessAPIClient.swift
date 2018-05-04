@@ -27,7 +27,7 @@ internal protocol BoundlessAPISynchronizable: class {
 
 internal class BoundlessAPIClient : HTTPClient {
     
-    internal var apiCredentials: [String: Any] {
+    internal var newRequest: [String: Any] {
         get {
             return credentials.apiCredentials(for: version)
         }

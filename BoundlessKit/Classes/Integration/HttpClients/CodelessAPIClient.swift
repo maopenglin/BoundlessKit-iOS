@@ -269,7 +269,7 @@ extension CodelessAPIClient {
     }
     
     func promptPairing() {
-        var payload = apiCredentials
+        var payload = newRequest
         payload["deviceName"] = UIDevice.current.name
         
         post(url: CodelessAPIEndpoint.identify.url, jsonObject: payload) { response in
@@ -327,7 +327,7 @@ extension CodelessAPIClient {
                     return
             }
             
-            var payload = self.apiCredentials
+            var payload = self.newRequest
             let actionID = notification.name.rawValue
             let sender = notification.userInfo?["sender"] as AnyObject
             payload["connectionUUID"] = session.connectionUUID
@@ -347,8 +347,8 @@ extension CodelessAPIClient {
                 }
                 BKLog.print("Sent to dashboard actionID:<\(actionID)>")
                 if let visualizerMappings = response?["mappings"] as? [String: [String: Any]] {
-                    self.visualizerSession?.mappings = visualizerMappings
                     DispatchQueue.global().async {
+                        self.visualizerSession?.mappings = visualizerMappings
                         self.mountVersion()
                     }
                 }

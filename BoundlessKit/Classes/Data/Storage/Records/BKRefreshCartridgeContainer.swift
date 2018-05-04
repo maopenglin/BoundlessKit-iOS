@@ -120,7 +120,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
                 successful(false)
                 return
         }
-        var payload = apiClient.apiCredentials
+        var payload = apiClient.newRequest
         BKLog.debug("Refreshing cartridge for actionID <\(cartridge.actionID)>...")
         
         payload["actionID"] = cartridge.actionID
