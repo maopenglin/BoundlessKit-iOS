@@ -65,21 +65,6 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
         })
     }
     
-    func commit(actionID: String, with apiClient: BoundlessAPIClient) {
-        if self[actionID] == nil {
-            self[actionID] = BKRefreshCartridge(actionID: actionID)
-            BKLog.debug("Committed actionID <\(actionID)>")
-        }
-        if self[actionID]?.needsSync ?? false {
-            self.synchronize(forActionID: actionID, with:
-            apiClient) { success in
-                self.storage?.0.archive(self, forKey: self.storage!.1)
-            }
-        } else {
-            self.storage?.0.archive(self, forKey: self.storage!.1)
-        }
-    }
-    
     var needsSync : Bool {
         for cartridge in values {
             if cartridge.needsSync { return true }
@@ -88,69 +73,62 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
     }
     
     let syncQueue = DispatchQueue(label: "boundless.kit.cartridgecontainer")
+    let group = DispatchGroup()
     func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
         syncQueue.async {
+            guard self.group.wait(timeout: .now()) == .success else {
+                successful(false)
+                return
+            }
+            self.group.enter()
+            
+            var validCartridges = [String: BKRefreshCartridge]()
             for actionID in apiClient.version.mappings.keys {
-                if self[actionID] == nil {
-                    self[actionID] = BKRefreshCartridge(actionID: actionID)
-                }
+                validCartridges[actionID] = self[actionID] ?? BKRefreshCartridge(actionID: actionID)
             }
-            let group = DispatchGroup()
+            self.valuesForKeys = validCartridges
+            
             var completeSuccess = true
-            for cartridge in self.values where cartridge.needsSync {
-                group.enter()
-                self.synchronize(forActionID: cartridge.actionID, with: apiClient) { success in
-                    completeSuccess = completeSuccess && success
-                    group.leave()
-                }
+            for (actionID, cartridge) in self.valuesForKeys where cartridge.needsSync {
+                self.group.enter()
+                BKLog.debug("Refreshing cartridge for actionID <\(cartridge.actionID)>...")
+                
+                var payload = apiClient.credentials.json
+                payload["versionID"] = apiClient.version.name
+                payload["actionID"] = cartridge.actionID
+                apiClient.post(url: BoundlessAPIEndpoint.refresh.url, jsonObject: payload) { response in
+                    var success = false
+                    defer {
+                        completeSuccess = completeSuccess && success
+                        self.group.leave()
+                    }
+                    if let responseStatusCode = response?["status"] as? Int {
+                        if responseStatusCode == 200,
+                            let reinforcementCartridge = response?["reinforcementCartridge"] as? [String],
+                            let expiresIn = response?["expiresIn"] as? TimeInterval {
+                            let decisions = reinforcementCartridge.map({BKDecision($0, cartridge.actionID)})
+                            cartridge.removeAll()
+                            cartridge.append(decisions)
+                            cartridge.expirationUTC = Int64( 1000*Date().addingTimeInterval(expiresIn).timeIntervalSince1970 )
+                            BKLog.print(confirmed: "Cartridge refresh for actionID <\(cartridge.actionID)> succeeded!")
+                            success = true
+                            return
+                        } else if responseStatusCode == 400 {
+                            self.removeValue(forKey: actionID)
+                            BKLog.print(confirmed: "Cartridge refresh determined actionID<\(actionID)> is no longer a valid actionID. Cartridge deleted.")
+                            success = true
+                            return
+                        }
+                    }
+                    BKLog.print(error: "Cartridge refresh for actionID <\(cartridge.actionID)> failed!")
+                }.start()
             }
-            group.notify(queue: .global()) {
+            self.group.notify(queue: .global()) {
                 self.storage?.0.archive(self, forKey: self.storage!.1)
                 successful(completeSuccess)
             }
+            self.group.leave()
         }
-    }
-    
-    private func synchronize(forActionID actionID: String, with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
-        
-        if self[actionID] == nil {
-            self[actionID] = BKRefreshCartridge(actionID: actionID)
-        }
-        guard let cartridge = self[actionID] else {
-                successful(false)
-                return
-        }
-        BKLog.debug("Refreshing cartridge for actionID <\(cartridge.actionID)>...")
-        
-        var payload = apiClient.credentials.json
-        payload["versionID"] = apiClient.version.name
-        payload["actionID"] = cartridge.actionID
-        apiClient.post(url: BoundlessAPIEndpoint.refresh.url, jsonObject: payload) { response in
-            var success = false
-            defer { successful(success) }
-            if let responseStatusCode = response?["status"] as? Int {
-                if responseStatusCode == 200,
-                    let reinforcementCartridge = response?["reinforcementCartridge"] as? [String],
-                    let expiresIn = response?["expiresIn"] as? TimeInterval {
-                    let values = reinforcementCartridge.map({ (reinforcementDecision) -> BKDecision in
-                        BKDecision.init(reinforcementDecision, cartridge.actionID)
-                    })
-                    cartridge.removeAll()
-                    cartridge.append(values)
-                    cartridge.expirationUTC = Int64( 1000*Date().addingTimeInterval(expiresIn).timeIntervalSince1970 )
-                    BKLog.print(confirmed: "Cartridge refresh for actionID <\(cartridge.actionID)> succeeded!")
-                    success = true
-                    return
-                } else if responseStatusCode == 400 {
-                    self.removeValue(forKey: actionID)
-                    BKLog.print(confirmed: "Cartridge refresh determined actionID<\(cartridge.actionID)> is no longer a valid actionID. Cartridge deleted.")
-                    success = true
-                    return
-                }
-            }
-            BKLog.print(error: "Cartridge refresh for actionID <\(cartridge.actionID)> failed!")
-        }.start()
-        
     }
     
 }

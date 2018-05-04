@@ -88,14 +88,10 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                     }
                     if let versionDict = response?["version"] as? [String: Any],
                         let version = BoundlessVersion.convert(from: versionDict) {
-                        if let visualizerMappings = versionDict["visualizerMappings"] as? [String: [String: Any]] {
-                            self.visualizerSession?.mappings = visualizerMappings
-                        }
                         self.version = version
                     }
                 }
             }
-            self.mountVersion()
             self.syncIfNeeded()
             completion()
         }.start()
@@ -120,28 +116,26 @@ extension CodelessAPIClient {
     
     func mountVersion() {
         serialQueue.async {
-            Reinforcer.scheduleSetting = (self.visualizerSession == nil) ? .reinforcement : .random
             
             var mappings = self.version.mappings
-            let visualizer = self.visualizerSession
-            for (key, value) in visualizer?.mappings ?? [:] {
-                mappings[key] = value
+            if let visualizer = self.visualizerSession {
+                Reinforcer.scheduleSetting = .random
+                for (actionID, value) in visualizer.mappings {
+                    mappings[actionID] = value
+                }
+            } else {
+                Reinforcer.scheduleSetting = .reinforcement
+                self.refreshContainer.synchronize(with: self)
             }
             
             for (actionID, value) in mappings {
-                if visualizer == nil {
-                    self.refreshContainer.commit(actionID: actionID, with: self)
-                }
-                
                 var reinforcer: Reinforcer
                 if let r = self.reinforcers[actionID] {
                     reinforcer = r
                     reinforcer.reinforcementIDs = []
-//                    BKLog.debug("Modifying reinforcer for actionID <\(actionID)>")
                 } else {
                     reinforcer = Reinforcer(forActionID: actionID)
                     self.reinforcers[actionID] = reinforcer
-//                    BKLog.debug("Created reinforcer for actionID <\(actionID)>")
                 }
                 
                 if let manual = value["manual"] as? [String: Any],
@@ -211,41 +205,45 @@ extension CodelessAPIClient{
     }
     
     @objc func trackApplicationState(_ notification: Notification) {
-        let action: BKAction
-        let actionID: String
         let tag = "ApplicationState"
+        let actionID: String
+        var metadata: [String: Any] = ["tag": tag]
         
         switch notification.name {
         case Notification.Name.UIApplicationDidBecomeActive:
             actionID = "UIApplicationDidBecomeActive"
-            action = BKAction(actionID,
-                              ["tag": tag,
-                               "time": BoundlessTime.start(for: self, tag: tag)
-                ])
+            metadata["time"] = BoundlessTime.start(for: self, tag: tag)
             
         case Notification.Name.UIApplicationWillResignActive:
             actionID = "UIApplicationWillResignActive"
-            action = BKAction(actionID,
-                              ["tag": tag,
-                               "time": BoundlessTime.end(for: self, tag: tag)
-                ])
+            metadata["time"] = BoundlessTime.end(for: self, tag: tag)
             
         default:
             return
         }
-        trackBatch.store(action)
-        BKLog.print(confirmed: "\(action.toJSONType() as AnyObject)")
+        
+        trackBatch.store(BKAction(actionID, metadata))
     }
     
     @objc func trackApplicationViews(_ notification: Notification) {
         if let target = notification.userInfo?["target"] as? NSObject,
             let selector = notification.userInfo?["selector"] as? Selector {
-            let action = BKAction("ApplicationView",
-                                  ["tag": selector == #selector(UIViewController.viewDidAppear(_:)) ? "didAppear" : "didDisappear",
-                                   "target": NSStringFromClass(type(of: target)),
-                                   "time": selector == #selector(UIViewController.viewDidAppear(_:)) ? BoundlessTime.start(for: target) : BoundlessTime.end(for: target)
-                ])
-            trackBatch.store(action)
+            let tag = "ApplicationView"
+            let actionID = "\(NSStringFromClass(type(of: target)))-\(NSStringFromSelector(selector))"
+            var metadata: [String: Any] = ["tag": tag]
+            
+            switch selector {
+            case #selector(UIViewController.viewDidAppear(_:)):
+                metadata["time"] = BoundlessTime.start(for: target)
+                
+            case #selector(UIViewController.viewDidDisappear(_:)):
+                metadata["time"] = BoundlessTime.end(for: target)
+                
+            default:
+                return
+            }
+            
+            trackBatch.store(BKAction(actionID, metadata))
         }
     }
 }
@@ -273,7 +271,9 @@ extension CodelessAPIClient {
         payload["deviceName"] = UIDevice.current.name
         
         post(url: CodelessAPIEndpoint.identify.url, jsonObject: payload) { response in
-            switch response?["status"] as? Int {
+            guard let response = response else { return }
+            
+            switch response["status"] as? Int {
             case 202?:
                 DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
                     self.promptPairing()
@@ -281,8 +281,8 @@ extension CodelessAPIClient {
                 break
                 
             case 200?:
-                guard let adminName = response?["adminName"] as? String,
-                    let connectionUUID = response?["connectionUUID"] as? String else {
+                guard let adminName = response["adminName"] as? String,
+                    let connectionUUID = response["connectionUUID"] as? String else {
                         self.visualizerSession = nil
                         return
                 }
@@ -292,11 +292,11 @@ extension CodelessAPIClient {
                     payload["connectionUUID"] = connectionUUID
                     self.post(url: CodelessAPIEndpoint.accept.url, jsonObject: payload) { response in
                         if response?["status"] as? Int == 200 {
-                            self.visualizerSession = CodelessVisualizerSession(adminName: adminName, connectionUUID: connectionUUID, mappings: [:])
+                            self.visualizerSession = CodelessVisualizerSession(connectionUUID: connectionUUID, mappings: [:])
                         } else {
                             self.visualizerSession = nil
                         }
-                        }.start()
+                    }.start()
                 }))
                 pairingAlert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { _ in
                     self.visualizerSession = nil
@@ -304,17 +304,18 @@ extension CodelessAPIClient {
                 UIWindow.presentTopLevelAlert(alertController: pairingAlert)
                 
             case 208?:
-                if let connectionUUID = response?["connectionUUID"] as? String {
-                    self.visualizerSession = CodelessVisualizerSession(adminName: "reconnected", connectionUUID: connectionUUID, mappings: [:])
-                } else {
-                    self.visualizerSession = nil
+                if let _ = response["connectionUUID"] as? String,
+                    let reconnectedSession = CodelessVisualizerSession.convert(from: response) {
+                    self.visualizerSession = reconnectedSession
                 }
+//                else { // /identity endpoint gives back wrongly-formatted visualizer mapping
+//                    self.visualizerSession = nil
+//                }
                 
             default:
                 self.visualizerSession = nil
-                break
             }
-            }.start()
+        }.start()
     }
     
     @objc
@@ -365,12 +366,10 @@ extension CodelessAPIClient {
 }
 
 internal struct CodelessVisualizerSession {
-    var adminName: String
-    var connectionUUID: String
+    let connectionUUID: String
     var mappings: [String: [String: Any]]
     
-    init(adminName: String, connectionUUID: String, mappings: [String: [String: Any]]) {
-        self.adminName = adminName
+    init(connectionUUID: String, mappings: [String: [String: Any]]) {
         self.connectionUUID = connectionUUID
         self.mappings = mappings
     }
@@ -380,19 +379,24 @@ internal struct CodelessVisualizerSession {
         defer {
             unarchiver.finishDecoding()
         }
-        guard let adminName = unarchiver.decodeObject(forKey: "adminName") as? String else { return nil }
         guard let connectionUUID = unarchiver.decodeObject(forKey: "connectionUUID") as? String else { return nil }
         guard let mappings = unarchiver.decodeObject(forKey: "mappings") as? [String: [String: Any]] else { return nil }
-        self.init(adminName: adminName, connectionUUID: connectionUUID, mappings: mappings)
+        self.init(connectionUUID: connectionUUID, mappings: mappings)
     }
     
     func encode() -> Data {
         let data = NSMutableData()
         let archiver = NSKeyedArchiver(forWritingWith: data)
-        archiver.encode(adminName, forKey: "adminName")
         archiver.encode(connectionUUID, forKey: "connectionUUID")
         archiver.encode(mappings, forKey: "mappings")
         archiver.finishEncoding()
         return data as Data
+    }
+    
+    static func convert(from dict: [String: Any]) -> CodelessVisualizerSession? {
+        guard let connectionUUID = dict["connectionUUID"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
+        guard let mappings = dict["mappings"] as? [String: [String: Any]] else { BKLog.print(error: "Bad parameter"); return nil }
+        
+        return CodelessVisualizerSession(connectionUUID: connectionUUID, mappings: mappings)
     }
 }
