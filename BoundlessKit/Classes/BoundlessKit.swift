@@ -66,12 +66,9 @@ open class BoundlessKit : NSObject {
     }
     
     @objc
-    public func setID(_ id: String) -> Bool {
-        if !id.isEmpty && id.count <= 36 && id.range(of: "[^a-zA-Z0-9\\-]", options: .regularExpression) == nil {
-            apiClient.credentials.primaryIdentity = id
-            return true
-        } else {
-            return false
-        }
+    public func setID(_ id: String) {
+        BoundlessUserIdentity.source = .custom
+        BoundlessUserIdentity.setCustom(id)
+//        apiClient.cre
     }
 }

@@ -34,6 +34,7 @@ class TestBoundlessAPIObjects: XCTestCase {
     }
     
     func testTrackStore() {
+        BoundlessKit.standard.setID("test")
         let batch = BKTrackBatch()
         let numConcurrentTrack = 5
         DispatchQueue.concurrentPerform(iterations: numConcurrentTrack) {count in

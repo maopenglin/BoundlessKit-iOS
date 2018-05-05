@@ -15,10 +15,11 @@ internal struct BoundlessCredentials {
     let clientBuild = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     let appID: String
-    var primaryIdentity:String
+    let primaryIdentity:String
     let inProduction: Bool
     let developmentSecret: String
     let productionSecret: String
+    
     
     init(_ primaryIdentity: String? = nil, _ appID: String, _ inProduction: Bool, _ developmentSecret: String, _ productionSecret: String) {
         self.appID = appID
@@ -27,12 +28,8 @@ internal struct BoundlessCredentials {
         self.productionSecret = productionSecret
         if let primaryIdentity = primaryIdentity {
             self.primaryIdentity = primaryIdentity
-        } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
-//            BKLog.print("set identifierForVendor for primaryIdentity:(\(vid))")
-            self.primaryIdentity = vid
         } else {
-//            BKLog.print("set IDUnavailable for primaryIdentity")
-            self.primaryIdentity = "IDUnavailable"
+            self.primaryIdentity = BoundlessUserIdentity.value
         }
     }
     
@@ -68,3 +65,4 @@ extension BoundlessCredentials {
         )
     }
 }
+

@@ -9,10 +9,10 @@ import Foundation
 
 internal class HTTPClient : NSObject {
     
-//    internal var logRequests = true
-    internal var logResponses = true
-    internal var logRequests = false
-//    internal var logResponses = false
+    internal var logRequests = true
+//    internal var logResponses = true
+//    internal var logRequests = false
+    internal var logResponses = false
     
     private let session: URLSessionProtocol
     

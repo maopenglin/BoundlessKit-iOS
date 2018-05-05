@@ -116,7 +116,6 @@ extension CodelessAPIClient {
     
     func mountVersion() {
         serialQueue.async {
-            
             var mappings = self.version.mappings
             if let visualizer = self.visualizerSession {
                 Reinforcer.scheduleSetting = .random
@@ -179,8 +178,16 @@ extension CodelessAPIClient{
         self.trackBatch.enabled = newValue.trackingEnabled
         self.reportBatch.desiredMaxCountUntilSync = newValue.reportBatchSize
         self.trackBatch.desiredMaxCountUntilSync = newValue.trackBatchSize
-        //            if
+        
         BoundlessContext.locationEnabled = newValue.locationObservations
+        
+        if (oldValue?.advertiserID != newValue.advertiserID) {
+            if !newValue.advertiserID {
+                BoundlessUserIdentity.source = .advertiser
+            } else {
+                BoundlessUserIdentity.source = .vendor
+            }
+        }
         
         if (oldValue?.applicationState != newValue.applicationState) {
             if (newValue.applicationState) {

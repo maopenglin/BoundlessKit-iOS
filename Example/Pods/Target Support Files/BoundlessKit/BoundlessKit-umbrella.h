@@ -12,6 +12,7 @@
 
 #import "NSObject+Boundless.h"
 #import "SwizzleHelper.h"
+#import "ASIdHelper.h"
 
 FOUNDATION_EXPORT double BoundlessKitVersionNumber;
 FOUNDATION_EXPORT const unsigned char BoundlessKitVersionString[];

@@ -7,7 +7,6 @@
 
 #import "NSObject+Boundless.h"
 
-#import <BoundlessKit/BoundlessKit-Swift.h>
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
 

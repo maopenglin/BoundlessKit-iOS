@@ -12,90 +12,23 @@ import CoreLocation
 
 class ViewController: UIViewController {
     
-    @objc var someCounter: Float = 0
-//    let kit = BoundlessKit()
-    
     @objc dynamic func action1Performed(button: UIButton){
+        let p = "passss2"
+        print("saved password:\(BoundlessKey.save(key: "here", string: p))")
         print("Action 1 performed")
-//        kit.launch(arguements: Helper.versionMappings)
-        // Reinforce the action to make it sticky!!
-        //        BoundlessKit.reinforce("a1", metaData: ["key":"value"], completion: {
-        //            reinforcement in
-        //                // Update UI to display reinforcement decision on screen for learning purposes
-        //                self.responseLabel.text = reinforcement
-        //                self.flash(self.responseLabel)
-        //
-        //                // Now you should use `response` to call a reward function paired on the Boundless Developer Dashboard
-        //
-        //
-        //                // Try out CandyBar as a form of reinforcement!
-        //                // The functions paired here are medaltStar, stars, and thumbsUp
-        //                var reinforcerType:CandyIcon
-        //                var title:String?
-        //                var subtitle:String?
-        //                var backgroundColor:UIColor = UIColor.blue
-        //                var visibilityDuration:TimeInterval = 1.75
-        //
-        //                // Set up a couple of different responses to keep your users surprised
-        //                switch(reinforcement){
-        //                case "medalStar":
-        //                    reinforcerType = CandyIcon.medalStar
-        //                    title = "You should drop an album soon"
-        //                    subtitle = "Cuz you're on 🔥"
-        //                    break
-        //                case "stars":
-        //                    reinforcerType = CandyIcon.stars
-        //                    title = "Great workout 💯"
-        //                    subtitle = "It's not called sweating, it's called glisenting"
-        //                    backgroundColor = UIColor.orange
-        //                    break
-        //                case "thumbsUp":
-        //                    reinforcerType = CandyIcon.thumbsUp
-        //                    title = "Awesome run!"
-        //                    subtitle = "Either you run the day,\nOr the day runs you."
-        //                    backgroundColor = UIColor.from(rgb:"#ff0000")
-        //                    visibilityDuration = 2.5
-        //                    break
-        //                default:
-        //                    return
-        //                }
-        //
-        //                // Woo hoo! Treat yoself
-        //            let candybar = CandyBar(title: title, subtitle: subtitle, image: reinforcerType.image, backgroundColor: backgroundColor)
-        //                // if `nil` or no duration is provided, the CandyBar will go away when the user taps it or `candybar.dismiss()` is used
-        //            candybar.show(duration: visibilityDuration)
-        //
-        //        })
     }
     
     var locationManager = CLLocationManager()
     
     @objc func action2Performed(){
-        _ = BoundlessKit.standard.setID("Test")
+        if let str: String = BoundlessKey.load(key: "here") {
+            print("Found password:\(str)")
+        } else {
+            print("No password.")
+        }
+        
+//        _ = BoundlessKit.standard.setID("Test")
         print("Action 2 performed")
-//        kit.reinforce(actionID: "action1") { reinforcement in }
-        ////        // Tracking call is sent asynchronously
-        //////        BoundlessKit.track("action2", metaData: ["key":"value", "calories":9000])
-                locationManager.delegate = self
-                locationManager.requestAlwaysAuthorization()
-        
-        
-        BoundlessKit.track(actionID: "action2peformed")
-        //        BoundlessKit.reinforce("a2") { reinforcement in
-        //            // Update UI to display reinforcement decision on screen for learning purposes
-        //            self.responseLabel.text = reinforcement
-        //            self.flash(self.responseLabel)
-        //        }
-        //        view.showConfetti()
-        //        let view = UIView(frame: UIScreen.main.bounds)
-        
-        //        DispatchQueue.main.async {
-        ////            DLUIManager.main.show(false)
-        //            DLWindow.shared.view.showConfetti {
-        //                print("done")
-        ////                DLUIManager.main.hide()
-        //            }
-        //        }
     }
     
     
@@ -112,21 +45,14 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadBasicUI()
-        
-        //        DispatchQueue.concurrentPerform(iterations: 100) { count in
-        //            BoundlessKit.track("testingActionConcurrency", metaData: ["time": NSNumber(value: Date().timeIntervalSince1970*1000)])
-        //        }
-        
     }
-    
-    let one = UIViewController()
-    let two = UIViewController()
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        one.viewDidAppear(animated)
-        two.viewDidAppear(animated)
         print("In viewcontroller viewdidappear")
+        
+        
+        BoundlessKey.clear(key: "here")
     }
     
     @objc func loadBasicUI(){
