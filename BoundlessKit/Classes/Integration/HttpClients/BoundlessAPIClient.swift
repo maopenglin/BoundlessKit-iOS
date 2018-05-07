@@ -51,7 +51,7 @@ internal class BoundlessAPIClient : HTTPClient {
         super.init(session: session)
     }
     
-    func setUserIdentity(_ id: String?) {
+    func setCustomUserIdentity(_ id: String?) {
         credentials.identity.setSource(customValue: id)
     }
     

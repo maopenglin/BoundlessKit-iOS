@@ -73,9 +73,9 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         didSetVisualizerSession(oldValue: nil)
     }
     
-    override func setUserIdentity(_ id: String?) {
+    override func setCustomUserIdentity(_ id: String?) {
         let oldId = credentials.identity.value
-        super.setUserIdentity(id)
+        super.setCustomUserIdentity(id)
         boundlessConfig.identityType = credentials.identity.source.rawValue
         if oldId != credentials.identity.value {
             boot()
