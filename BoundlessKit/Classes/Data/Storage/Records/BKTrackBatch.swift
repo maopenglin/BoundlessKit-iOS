@@ -56,6 +56,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
     }
     
     func store(_ action: BKAction) {
+//        BKLog.debug("Tracked action:\(action.name) metadata:\(action.metadata as AnyObject)")
         guard enabled else {
             return
         }

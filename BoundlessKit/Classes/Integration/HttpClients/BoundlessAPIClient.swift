@@ -51,6 +51,10 @@ internal class BoundlessAPIClient : HTTPClient {
         super.init(session: session)
     }
     
+    func setUserIdentity(_ id: String?) {
+        credentials.identity.setSource(customValue: id)
+    }
+    
     func syncIfNeeded() {
         if coordinationWork == nil &&
             (refreshContainer.needsSync || reportBatch.needsSync || trackBatch.needsSync) {

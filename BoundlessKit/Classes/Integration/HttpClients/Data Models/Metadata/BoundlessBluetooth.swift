@@ -59,7 +59,7 @@ fileprivate class BluetoothManager : CBCentralManager {
     }
     
     fileprivate var queue = OperationQueue()
-    private var queuedScanners = [Date: ([String: BluetoothSignalInfo], [ScanFinishBlock]) ]()
+    private var queuedScanners = SynchronizedDictionary<Date, ([String: BluetoothSignalInfo], [ScanFinishBlock])>()
     
     fileprivate let scanDuration = TimeInterval(5)
     private var cachedSignals = [String: BluetoothSignalInfo]()
@@ -82,7 +82,7 @@ fileprivate class BluetoothManager : CBCentralManager {
         //        print("Found bluetooth device:\(peripheral.name ?? "unknown")")
         let signalInfo = BluetoothSignalInfo(utc: Date(), uuid: peripheral.identifier.uuidString, name: peripheral.name ?? "unknown", rssi: rssi)
         cachedSignals[peripheral.identifier.uuidString] = signalInfo
-        for (key, queuedScan) in queuedScanners {
+        for (key, queuedScan) in queuedScanners.valuesForKeys {
             if queuedScan.0[signalInfo.uuid] == nil {
                 self.queuedScanners[key]?.0[signalInfo.uuid] = signalInfo
             }

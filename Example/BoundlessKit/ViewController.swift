@@ -13,22 +13,20 @@ import CoreLocation
 class ViewController: UIViewController {
     
     @objc dynamic func action1Performed(button: UIButton){
-        let p = "passss2"
-        print("saved password:\(BoundlessKey.save(key: "here", string: p))")
         print("Action 1 performed")
     }
     
     var locationManager = CLLocationManager()
     
     @objc func action2Performed(){
-        if let str: String = BoundlessKey.load(key: "here") {
-            print("Found password:\(str)")
-        } else {
-            print("No password.")
-        }
-        
-//        _ = BoundlessKit.standard.setID("Test")
         print("Action 2 performed")
+        
+        
+        
+        BoundlessKit.standard.setID("auser")
+//        BoundlessKit.standard.setID(nil)
+//        BoundlessKit.standard.setID("buser")
+        
     }
     
     
@@ -50,9 +48,6 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         print("In viewcontroller viewdidappear")
-        
-        
-        BoundlessKey.clear(key: "here")
     }
     
     @objc func loadBasicUI(){

@@ -83,18 +83,24 @@ extension SynchronizedDictionary {
 
 // MARK: - Immutable
 extension SynchronizedDictionary {
-//
-//    var keys: [Key] {
-//        var keys: [Key] = []
-//        queue.sync {
-//            keys = Array(dict.keys)
-//        }
-//        return keys
-//    }
-//    
+
+    var keys: [Key] {
+        var keys: [Key] = []
+        queue.sync {
+            keys = Array(dict.keys)
+        }
+        return keys
+    }
+    
     var values: [Value] {
         var values: [Value] = []
         queue.sync { values = Array(dict.values) }
         return values
+    }
+    
+    var isEmpty: Bool {
+        var result = true
+        queue.sync { result = dict.isEmpty }
+        return result
     }
 }

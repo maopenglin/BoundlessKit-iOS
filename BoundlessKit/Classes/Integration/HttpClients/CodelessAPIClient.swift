@@ -73,12 +73,26 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         didSetVisualizerSession(oldValue: nil)
     }
     
+    override func setUserIdentity(_ id: String?) {
+        let oldId = credentials.identity.value
+        super.setUserIdentity(id)
+        boundlessConfig.identityType = "custom"
+        if oldId != credentials.identity.value {
+            boot()
+        }
+    }
+    
     func boot(completion: @escaping () -> () = {}) {
+        let initialBoot = database.initialBootDate
+        if initialBoot == nil {
+            BKLog.print(error: "Erasing previous keys.")
+            BoundlessKey.buid = nil
+        }
         var payload = credentials.json
         payload["inProduction"] = credentials.inProduction
         payload["currentVersion"] = version.name ?? "nil"
         payload["currentConfig"] = boundlessConfig.configID ?? "nil"
-        payload["initialBoot"] = (database.initialBootDate == nil)
+        payload["initialBoot"] = (initialBoot == nil)
         post(url: CodelessAPIEndpoint.boot.url, jsonObject: payload) { response in
             if let status = response?["status"] as? Int {
                 if status == 205 {
@@ -109,9 +123,6 @@ extension CodelessAPIClient {
         if oldValue?.name != version.name {
             mountVersion()
         }
-//        if oldValue?.primaryIdentity != newValue.primaryIdentity {
-//            boot()
-//        }
     }
     
     func mountVersion() {
@@ -171,7 +182,7 @@ extension CodelessAPIClient {
     }
 }
 
-extension CodelessAPIClient{
+extension CodelessAPIClient {
     func didSetConfiguration(oldValue: BoundlessConfiguration?) {
         let newValue = boundlessConfig
         self.refreshContainer.enabled = newValue.reinforcementEnabled
@@ -181,11 +192,16 @@ extension CodelessAPIClient{
         
         BoundlessContext.locationEnabled = newValue.locationObservations
         
-        if (oldValue?.advertiserID != newValue.advertiserID) {
-            if !newValue.advertiserID {
-                BoundlessUserIdentity.source = .advertiser
-            } else {
-                BoundlessUserIdentity.source = .vendor
+        if (oldValue?.identityType != newValue.identityType) {
+            switch  newValue.identityType {
+            case "IDFV":
+                credentials.identity.source = .IDFV
+            case "IDFA":
+                credentials.identity.source = .IDFA
+            case "custom":
+                credentials.identity.source = .custom
+            default:
+                credentials.identity.source = .IDFV
             }
         }
         

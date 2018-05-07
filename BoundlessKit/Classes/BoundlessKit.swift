@@ -66,9 +66,9 @@ open class BoundlessKit : NSObject {
     }
     
     @objc
-    public func setID(_ id: String) {
-        BoundlessUserIdentity.source = .custom
-        BoundlessUserIdentity.setCustom(id)
-//        apiClient.cre
+    public func setID(_ id: String?) {
+//        BoundlessKey.clear(key: NSStringFromClass(BoundlessUserIdentity.self))
+        apiClient.setUserIdentity(id)
+//        apiClient.credentials.identity.source = .IDFV
     }
 }

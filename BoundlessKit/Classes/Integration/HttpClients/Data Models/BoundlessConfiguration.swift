@@ -18,7 +18,7 @@ internal struct BoundlessConfiguration {
     let trackingEnabled: Bool
     let trackBatchSize: Int
     
-    let advertiserID: Bool
+    var identityType: String
     let notificationObservations: Bool
     let storekitObservations: Bool
     let locationObservations: Bool
@@ -36,7 +36,7 @@ internal struct BoundlessConfiguration {
          triggerEnabled: Bool = false,
          trackingEnabled: Bool = true,
          trackBatchSize: Int = 10,
-         advertiserID: Bool = false,
+         identityType: String = "IDFV",
          notificationObservations: Bool = false,
          storekitObservations: Bool = false,
          locationObservations: Bool = false,
@@ -53,7 +53,7 @@ internal struct BoundlessConfiguration {
         self.triggerEnabled = triggerEnabled
         self.trackingEnabled = trackingEnabled
         self.trackBatchSize = trackBatchSize
-        self.advertiserID = advertiserID
+        self.identityType = identityType
         self.notificationObservations = notificationObservations
         self.storekitObservations = storekitObservations
         self.locationObservations = locationObservations
@@ -76,7 +76,7 @@ extension BoundlessConfiguration {
         archiver.encode(triggerEnabled, forKey: "triggerEnabled")
         archiver.encode(trackingEnabled, forKey: "trackingEnabled")
         archiver.encode(trackBatchSize, forKey: "trackBatchSize")
-        archiver.encode(advertiserID, forKey: "advertiserID")
+        archiver.encode(identityType, forKey: "identityType")
         archiver.encode(notificationObservations, forKey: "notificationObservations")
         archiver.encode(storekitObservations, forKey: "storekitObservations")
         archiver.encode(locationObservations, forKey: "locationObservations")
@@ -96,6 +96,7 @@ extension BoundlessConfiguration {
         }
         guard let configID = unarchiver.decodeObject(forKey: "configID") as? String else { return nil }
         guard let integrationMethod = unarchiver.decodeObject(forKey: "integrationMethod") as? String else { return nil }
+        guard let identityType = unarchiver.decodeObject(forKey: "identityType") as? String else { return nil }
         guard let customViews = unarchiver.decodeObject(forKey: "customViews") as? [String: Any] else { return nil }
         guard let customEvents = unarchiver.decodeObject(forKey: "customEvents") as? [String: Any] else { return nil }
         self.init(configID: configID,
@@ -105,7 +106,7 @@ extension BoundlessConfiguration {
                   triggerEnabled: unarchiver.decodeBool(forKey: "triggerEnabled"),
                   trackingEnabled: unarchiver.decodeBool(forKey: "trackingEnabled"),
                   trackBatchSize: unarchiver.decodeInteger(forKey: "trackBatchSize"),
-                  advertiserID: unarchiver.decodeBool(forKey: "advertiserID"),
+                  identityType: identityType,
                   notificationObservations: unarchiver.decodeBool(forKey: "notificationObservations"),
                   storekitObservations: unarchiver.decodeBool(forKey: "storekitObservations"),
                   locationObservations: unarchiver.decodeBool(forKey: "locationObservations"),
@@ -146,7 +147,7 @@ extension BoundlessConfiguration {
                                            triggerEnabled: triggerEnabled,
                                            trackingEnabled: trackingEnabled,
                                            trackBatchSize: trackBatchSize,
-                                           advertiserID: advertiserID,
+                                           identityType: advertiserID ? BoundlessUserIdentity.Source.IDFA.rawValue : BoundlessUserIdentity.Source.IDFV.rawValue,
                                            notificationObservations: notificationObservations,
                                            storekitObservations: storekitObservations,
                                            locationObservations: locationObservations,

@@ -7,66 +7,63 @@
 
 import Foundation
 
-protocol BoundlessUserIdentityCustomSource : class {
-    func idForBoundless() -> String?
-}
-
 open class BoundlessUserIdentity : NSObject {
-    enum Source {
-        case advertiser, vendor, custom
+    enum Source : String {
+        case IDFA, IDFV, custom
     }
     
-    weak static var sourceDelegate: BoundlessUserIdentityCustomSource?
-    static var source: Source = .vendor {
+    var source: Source = .IDFV {
         didSet {
+            BKLog.print(error: "SOurce changed to:\(source)")
             _value = nil
-            _ = value
+            _ = self.value
         }
     }
     
-    class func setCustom(_ newId:String?) {
-//        if let validId = newId?.asValidId ?? _value ?? BoundlessKey.load(key: NSStringFromClass(BoundlessUserIdentity.self)) {
-//            value = validId
-//        }
-        value = newId?.asValidId ?? _value ?? BoundlessKey.load(key: NSStringFromClass(BoundlessUserIdentity.self)) ?? UUID().uuidString
+    func setSource() {
+        source = { source }()
     }
     
-    fileprivate static var _value: String?
-    static var value: String {
+    fileprivate var _customSource: String?
+    func setSource(customValue newId:String?) {
+        if let newId = newId?.asValidId {
+            _customSource = newId
+            BoundlessKey.buid = newId
+        }
+        source = .custom
+    }
+    
+    fileprivate var _value: String?
+    var value: String {
         get {
             switch source {
-            case .advertiser:
-                _value = ASIdHelper.adId()?.uuidString
-                if _value != nil {
-                    return _value!
+            case .IDFA:
+                if _value == nil {
+                    _value = ASIdHelper.adId()?.uuidString
                 }
                 fallthrough
-            case .vendor:
-                _value = UIDevice.current.identifierForVendor?.uuidString
-                if _value != nil {
-                    return _value!
+            case .IDFV:
+                if _value == nil {
+                    _value = UIDevice.current.identifierForVendor?.uuidString
                 }
                 fallthrough
             case .custom:
-                setCustom(sourceDelegate?.idForBoundless())
-                if _value != nil {
-                    return _value!
+                if _value == nil {
+                    _value = _customSource ?? BoundlessKey.buid ?? {
+                        let uuid = UUID().uuidString
+                        BoundlessKey.buid = uuid
+                        return uuid
+                    }()
                 }
                 fallthrough
             default:
-                return "IDUnavailable"
-            }
-        }
-        set {
-            if source == .custom {
-                _value = newValue
-                BoundlessKey.save(key: NSStringFromClass(BoundlessUserIdentity.self), string: newValue)
+                return _value ?? "IDUnavailable"
             }
         }
     }
 }
 
-extension String {
+fileprivate extension String {
     var asValidId: String? {
         if !self.isEmpty,
             self.count <= 36,
