@@ -55,19 +55,22 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
         aCoder.encode(desiredMaxCountUntilSync, forKey: "desiredMaxCountUntilSync")
     }
     
+    let storeGroup = DispatchGroup()
+    
     func store(_ action: BKAction) {
-//        BKLog.debug("Tracked action:\(action.name) metadata:\(action.metadata as AnyObject)")
+        //        BKLog.debug("Tracked action:\(action.name) metadata:\(action.metadata as AnyObject)")
         guard enabled else {
             return
         }
         self.append(action)
+        storeGroup.enter()
         self.storage?.0.archive(self, forKey: self.storage!.1)
-        BoundlessContext.getContext() {[weak action] contextInfo in
-            guard let action = action else { return }
+        BoundlessContext.getContext() { contextInfo in
             for (key, value) in contextInfo {
                 action.metadata[key] = value
             }
             self.storage?.0.archive(self, forKey: self.storage!.1)
+            self.storeGroup.leave()
         }
     }
     
@@ -84,16 +87,16 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
     }
     
     func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
-        guard count > 0 else {
+        storeGroup.wait()
+        let trackCopy = self.values
+        guard trackCopy.count > 0 else {
             successful(true)
             return
         }
-        BKLog.debug("Sending track batch...")
+        BKLog.debug("Sending track batch with \(trackCopy.count) actions...")
         
         var payload = apiClient.credentials.json
         payload["versionID"] = apiClient.version.name
-        
-        let trackCopy = self.values
         payload["actions"] = trackCopy.map({$0.toJSONType()})
         apiClient.post(url: BoundlessAPIEndpoint.track.url, jsonObject: payload) { response in
             var success = false

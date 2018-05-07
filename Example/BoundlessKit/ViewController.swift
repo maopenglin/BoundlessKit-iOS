@@ -21,12 +21,8 @@ class ViewController: UIViewController {
     @objc func action2Performed(){
         print("Action 2 performed")
         
-        
-        
-        BoundlessKit.standard.setID("auser")
-//        BoundlessKit.standard.setID(nil)
-//        BoundlessKit.standard.setID("buser")
-        
+        BoundlessKit.track(actionID: "pressed track")
+//        locationManager.requestAlwaysAuthorization()
     }
     
     

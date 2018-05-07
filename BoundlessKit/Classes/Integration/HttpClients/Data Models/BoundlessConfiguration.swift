@@ -36,7 +36,7 @@ internal struct BoundlessConfiguration {
          triggerEnabled: Bool = false,
          trackingEnabled: Bool = true,
          trackBatchSize: Int = 10,
-         identityType: String = "IDFV",
+         identityType: String = BoundlessUserIdentity.Source.IDFV.rawValue,
          notificationObservations: Bool = false,
          storekitObservations: Bool = false,
          locationObservations: Bool = false,

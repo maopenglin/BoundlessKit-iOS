@@ -14,7 +14,6 @@ open class BoundlessUserIdentity : NSObject {
     
     var source: Source = .IDFV {
         didSet {
-            BKLog.print(error: "SOurce changed to:\(source)")
             _value = nil
             _ = self.value
         }

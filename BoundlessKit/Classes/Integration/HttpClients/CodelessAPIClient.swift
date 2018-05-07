@@ -85,7 +85,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     func boot(completion: @escaping () -> () = {}) {
         let initialBoot = database.initialBootDate
         if initialBoot == nil {
-            BKLog.print(error: "Erasing previous keys.")
+            // onInitialBoot erase previous keys
             BoundlessKey.buid = nil
         }
         var payload = credentials.json
@@ -192,7 +192,8 @@ extension CodelessAPIClient {
         
         BoundlessContext.locationEnabled = newValue.locationObservations
         
-        if (oldValue?.identityType != newValue.identityType) {
+//        if (oldValue?.identityType != newValue.identityType) {
+        if credentials.identity.source.rawValue != newValue.identityType {
             switch  newValue.identityType {
             case "IDFV":
                 credentials.identity.source = .IDFV

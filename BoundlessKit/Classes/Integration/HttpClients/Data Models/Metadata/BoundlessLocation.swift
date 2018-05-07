@@ -35,6 +35,7 @@ class BoundlessLocation : NSObject, CLLocationManagerDelegate {
     
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         enabled = status == .authorizedAlways || status == .authorizedWhenInUse
+        queue.isSuspended = false
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -52,11 +53,6 @@ class BoundlessLocation : NSObject, CLLocationManagerDelegate {
     }
     
     public func getLocation(callback: @escaping ([String: Any]?)->()) {
-//        guard DopamineConfiguration.current.locationObservations else {
-//            callback(nil)
-//            return
-//        }
-        
         if !enabled {
             callback(nil)
         } else if Date() < expiresAt {

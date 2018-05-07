@@ -72,6 +72,7 @@ internal class BoundlessAPIClient : HTTPClient {
             var goodProgress = true
             defer {
                 BKLog.debug("Finished api synchronization.")
+                self.coordinationWork = nil
                 successful(goodProgress)
             }
             
@@ -108,8 +109,6 @@ internal class BoundlessAPIClient : HTTPClient {
             } else {
                 return
             }
-            
-            self.coordinationWork = nil
         }
         coordinationWork = work
         coordinationQueue.async(execute: work)

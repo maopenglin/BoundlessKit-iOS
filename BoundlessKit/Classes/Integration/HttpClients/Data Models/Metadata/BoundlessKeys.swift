@@ -35,7 +35,7 @@ extension BoundlessKey {
     class func save(key: String, string: String) {
         if let data = string.data(using: String.Encoding.utf8, allowLossyConversion: false) {
             _ = save(key: key, data: data)
-            BKLog.debug("Saved key:\(key) value:\(string)")
+//            BKLog.debug("Saved key:\(key) value:\(string)")
         }
     }
     
@@ -52,10 +52,10 @@ extension BoundlessKey {
     class func load(key: String) -> String? {
         if let data: Data = BoundlessKey.load(key: key),
             let str = String(data: data, encoding: String.Encoding.utf8) {
-            BKLog.debug("Loaded key:\(key) with value:\(str)")
+//            BKLog.debug("Loaded key:\(key) with value:\(str)")
             return str
         } else {
-            BKLog.debug("Load failed for key:\(key)")
+//            BKLog.debug("Load failed for key:\(key)")
             return nil
         }
     }

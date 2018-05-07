@@ -10,7 +10,7 @@ import Foundation
 class BoundlessContext : NSObject {
     static var locationEnabled = false
     
-    static let queue = DispatchQueue.init(label: NSStringFromClass(BoundlessContext.self), attributes: .concurrent)
+    static let queue = DispatchQueue(label: NSStringFromClass(BoundlessContext.self), attributes: .concurrent)
     
     class func getContext(completion:@escaping([String:Any]) -> Void) {
         queue.async {

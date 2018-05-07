@@ -60,18 +60,21 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         aCoder.encode(desiredMaxCountUntilSync, forKey: "desiredMaxCountUntilSync")
     }
     
+    let storeGroup = DispatchGroup()
+    
     func store(_ reinforcement: BKReinforcement) {
         if self[reinforcement.actionID] == nil {
             self[reinforcement.actionID] = SynchronizedArray()
         }
         self[reinforcement.actionID]?.append(reinforcement)
+        storeGroup.enter()
         self.storage?.0.archive(self, forKey: self.storage!.1)
-        BoundlessContext.getContext() { [weak reinforcement] contextInfo in
-            guard let reinforcement = reinforcement else { return }
+        BoundlessContext.getContext() { contextInfo in
             for (key, value) in contextInfo {
                 reinforcement.metadata[key] = value
             }
             self.storage?.0.archive(self, forKey: self.storage!.1)
+            self.storeGroup.leave()
         }
     }
     
@@ -92,16 +95,17 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
     }
     
     func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
-        guard count > 0 else {
+        storeGroup.wait()
+        let reportCopy = self.valuesForKeys
+        let reportCount = reportCopy.values.reduce(0, {$0 + $1.count})
+        guard reportCount > 0 else {
             successful(true)
             return
         }
-        BKLog.debug("Sending report batch...")
+        BKLog.debug("Sending report batch with \(reportCount) actions...")
         
         var payload = apiClient.credentials.json
         payload["versionID"] = apiClient.version.name
-        
-        let reportCopy = self.valuesForKeys
         payload["actions"] = reportCopy.values.flatMap({$0.values}).map({$0.toJSONType()})
         apiClient.post(url: BoundlessAPIEndpoint.report.url, jsonObject: payload) { response in
             var success = false
@@ -124,7 +128,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
     override var count: Int {
         var count = 0
         queue.sync {
-            count = values.reduce(0, { $0 + $1.count})
+            count = values.reduce(0, {$0 + $1.count})
         }
         return count
     }
