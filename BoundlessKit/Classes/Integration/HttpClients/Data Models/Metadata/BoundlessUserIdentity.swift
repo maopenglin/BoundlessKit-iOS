@@ -51,6 +51,7 @@ open class BoundlessUserIdentity : NSObject {
                 if _value == nil {
                     _value = _customSource ?? BoundlessKey.buid ?? {
                         let uuid = UUID().uuidString
+                        _customSource = uuid
                         BoundlessKey.buid = uuid
                         return uuid
                     }()
