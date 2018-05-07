@@ -76,23 +76,23 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     override func setUserIdentity(_ id: String?) {
         let oldId = credentials.identity.value
         super.setUserIdentity(id)
-        boundlessConfig.identityType = "custom"
+        boundlessConfig.identityType = credentials.identity.source.rawValue
         if oldId != credentials.identity.value {
             boot()
         }
     }
     
     func boot(completion: @escaping () -> () = {}) {
-        let initialBoot = database.initialBootDate
-        if initialBoot == nil {
+        let initialBoot = (database.initialBootDate == nil)
+        if initialBoot {
             // onInitialBoot erase previous keys
-            BoundlessKey.buid = nil
+            BoundlessKeychain.buid = nil
         }
         var payload = credentials.json
         payload["inProduction"] = credentials.inProduction
         payload["currentVersion"] = version.name ?? "nil"
         payload["currentConfig"] = boundlessConfig.configID ?? "nil"
-        payload["initialBoot"] = (initialBoot == nil)
+        payload["initialBoot"] = initialBoot
         post(url: CodelessAPIEndpoint.boot.url, jsonObject: payload) { response in
             if let status = response?["status"] as? Int {
                 if status == 205 {
@@ -192,17 +192,16 @@ extension CodelessAPIClient {
         
         BoundlessContext.locationEnabled = newValue.locationObservations
         
-//        if (oldValue?.identityType != newValue.identityType) {
         if credentials.identity.source.rawValue != newValue.identityType {
-            switch  newValue.identityType {
-            case "IDFV":
-                credentials.identity.source = .IDFV
-            case "IDFA":
-                credentials.identity.source = .IDFA
-            case "custom":
+            switch  BoundlessUserIdentity.Source(rawValue: newValue.identityType) {
+            case .idfv?:
+                credentials.identity.source = .idfv
+            case .idfa?:
+                credentials.identity.source = .idfa
+            case .custom?:
                 credentials.identity.source = .custom
             default:
-                credentials.identity.source = .IDFV
+                credentials.identity.source = .idfv
             }
         }
         

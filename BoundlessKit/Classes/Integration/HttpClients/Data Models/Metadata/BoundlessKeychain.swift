@@ -1,5 +1,5 @@
 //
-//  BoundlessKeys.swift
+//  BoundlessKeychain.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 5/4/18.
@@ -7,22 +7,22 @@
 
 import Foundation
 
-internal class BoundlessKey {
+internal class BoundlessKeychain {
     static var buid: String? {
         get {
-            return BoundlessKey.load(key: NSStringFromClass(BoundlessUserIdentity.self))
+            return BoundlessKeychain.load(key: NSStringFromClass(BoundlessUserIdentity.self))
         }
         set {
             if let newValue = newValue {
-                BoundlessKey.save(key: NSStringFromClass(BoundlessUserIdentity.self), string: newValue)
+                BoundlessKeychain.save(key: NSStringFromClass(BoundlessUserIdentity.self), string: newValue)
             } else {
-                BoundlessKey.clear(key: NSStringFromClass(BoundlessUserIdentity.self))
+                BoundlessKeychain.clear(key: NSStringFromClass(BoundlessUserIdentity.self))
             }
         }
     }
 }
 
-extension BoundlessKey {
+extension BoundlessKeychain {
     class func save(key: String, data: Data) -> Bool {
         let query: [String : Any] = [ kSecClass as String       : kSecClassGenericPassword as String,
                                       kSecAttrAccount as String : key,
@@ -50,7 +50,7 @@ extension BoundlessKey {
     }
     
     class func load(key: String) -> String? {
-        if let data: Data = BoundlessKey.load(key: key),
+        if let data: Data = BoundlessKeychain.load(key: key),
             let str = String(data: data, encoding: String.Encoding.utf8) {
 //            BKLog.debug("Loaded key:\(key) with value:\(str)")
             return str

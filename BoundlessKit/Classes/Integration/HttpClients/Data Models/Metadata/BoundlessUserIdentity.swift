@@ -9,10 +9,10 @@ import Foundation
 
 open class BoundlessUserIdentity : NSObject {
     enum Source : String {
-        case IDFA, IDFV, custom
+        case idfa, idfv, custom
     }
     
-    var source: Source = .IDFV {
+    var source: Source = .idfv {
         didSet {
             _value = nil
             _ = self.value
@@ -27,7 +27,7 @@ open class BoundlessUserIdentity : NSObject {
     func setSource(customValue newId:String?) {
         if let newId = newId?.asValidId {
             _customSource = newId
-            BoundlessKey.buid = newId
+            BoundlessKeychain.buid = newId
         }
         source = .custom
     }
@@ -36,22 +36,22 @@ open class BoundlessUserIdentity : NSObject {
     var value: String {
         get {
             switch source {
-            case .IDFA:
+            case .idfa:
                 if _value == nil {
                     _value = ASIdHelper.adId()?.uuidString
                 }
                 fallthrough
-            case .IDFV:
+            case .idfv:
                 if _value == nil {
                     _value = UIDevice.current.identifierForVendor?.uuidString
                 }
                 fallthrough
             case .custom:
                 if _value == nil {
-                    _value = _customSource ?? BoundlessKey.buid ?? {
+                    _value = _customSource ?? BoundlessKeychain.buid ?? {
                         let uuid = UUID().uuidString
                         _customSource = uuid
-                        BoundlessKey.buid = uuid
+                        BoundlessKeychain.buid = uuid
                         return uuid
                     }()
                 }
