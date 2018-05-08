@@ -193,6 +193,7 @@ fileprivate extension CodelessAPIClient {
         self.trackBatch.desiredMaxCountUntilSync = newValue.trackBatchSize
         
         BoundlessContext.locationEnabled = newValue.locationObservations
+        BKLogPreferences.printEnabled = newValue.consoleLoggingEnabled
         
         if credentials.identity.source.rawValue != newValue.identityType {
             switch  BoundlessUserIdentity.Source(rawValue: newValue.identityType) {

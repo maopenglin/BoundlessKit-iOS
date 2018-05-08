@@ -47,8 +47,6 @@ open class BoundlessKit : NSObject {
     public func track(actionID: String, metadata: [String: Any] = [:]) {
         let action = BKAction(actionID, metadata)
         apiClient.trackBatch.store(action)
-//        BKLog.debug("Tracked actionID <\(actionID)>")
-//        BKLog.print(confirmed: "Track #<\(apiClient.trackBatch.count)> actionID:<\(actionID)>")
         apiClient.syncIfNeeded()
     }
     
@@ -56,11 +54,9 @@ open class BoundlessKit : NSObject {
     @objc
     public func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
         apiClient.refreshContainer.decision(forActionID: actionID) { reinforcementDecision in
-            let reinforcement = BKReinforcement.init(reinforcementDecision, metadata)
+            let reinforcement = BKReinforcement(reinforcementDecision, metadata)
             completion(reinforcement.name)
             self.apiClient.reportBatch.store(reinforcement)
-//            BKLog.print(confirmed: "Reinforcing actionID <\(actionID)> with reinforcement <\(reinforcement.name)>")
-//            BKLog.print(confirmed: "Report #<\(self.apiClient.reportBatch.count)> actionID:<\(actionID)> reinforcementID:<\(reinforcement.name)>")
             self.apiClient.syncIfNeeded()
         }
     }

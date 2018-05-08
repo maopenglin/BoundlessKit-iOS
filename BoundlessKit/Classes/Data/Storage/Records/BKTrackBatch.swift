@@ -58,11 +58,11 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
     let storeGroup = DispatchGroup()
     
     func store(_ action: BKAction) {
-//        BKLog.print(confirmed: "Tracked action #\(self.count):\(action.name) metadata:\(action.metadata as AnyObject)")
         guard enabled else {
             return
         }
         self.append(action)
+//        BKLog.print(confirmed: "Tracked action #<\(self.count)>:<\(action.name)>")
         storeGroup.enter()
         self.storage?.0.archive(self, forKey: self.storage!.1)
         BoundlessContext.getContext() { contextInfo in
