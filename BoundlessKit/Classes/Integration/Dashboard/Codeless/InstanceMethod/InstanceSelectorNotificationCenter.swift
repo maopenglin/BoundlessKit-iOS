@@ -23,11 +23,11 @@ internal extension Array where Element == Notification.Name {
     }
     
     static func forSubclasses(parentClass: AnyClass, _ selector: Selector) -> [Notification.Name] {
-        return (SwizzleHelper.classesInheriting(parentClass) as? [AnyClass])?.flatMap({InstanceSelector($0, selector)?.notificationName}) ?? []
+        return (InstanceSelectorHelper.classesInheriting(parentClass) as? [AnyClass])?.flatMap({InstanceSelector($0, selector)?.notificationName}) ?? []
     }
     
     static func forClassesConforming(to searchProtocol: Protocol, with selector: Selector) -> [Notification.Name] {
-        return (SwizzleHelper.classesConforming(searchProtocol) as? [AnyClass])?.flatMap({InstanceSelector.init($0, selector)?.notificationName}) ?? []
+        return (InstanceSelectorHelper.classesConforming(searchProtocol) as? [AnyClass])?.flatMap({InstanceSelector.init($0, selector)?.notificationName}) ?? []
     }
 }
 
@@ -87,8 +87,8 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
                 return
             }
             
-            if let instanceSelector = InstanceSelector.init(aName.rawValue),
-                let notifier = InstanceSelectorNotifier.init(instanceSelector) {
+            if let instanceSelector = InstanceSelector(aName.rawValue),
+                let notifier = InstanceSelectorNotifier(instanceSelector) {
                 self.notifiers[aName] = notifier
                 notifier.addObserver(observer as AnyObject)
                 super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
@@ -146,27 +146,24 @@ fileprivate class InstanceSelectorNotifier : NSObject {
         }
     }
     
-    let instanceSelector: InstanceSelector
+    let originalSelector: InstanceSelector
     let notificationSelector: InstanceSelector
     private var observers = [WeakObject]()
     
     init?(_ instanceSelector: InstanceSelector) {
-        guard let notificationMethod = BoundlessObject.createTrampoline(for: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorNotifier.postInstanceSelectorNotificationBlock) else {
-            BKLog.print(error: "Could not create trampoline for actionID<\(instanceSelector.notificationName)")
+        guard let notificationMethod = InstanceSelectorHelper.createMethod(beforeInstance: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorNotifier.postInstanceSelection),
+            let notificationSelector = InstanceSelector(instanceSelector.classType, notificationMethod) else {
+            BKLog.print(error: "Could not create notification method for actionID<\(instanceSelector.notificationName)")
             return nil
         }
-        if let notificationSelector = InstanceSelector.init(instanceSelector.classType, notificationMethod) {
-            self.instanceSelector = instanceSelector
+            self.originalSelector = instanceSelector
             self.notificationSelector = notificationSelector
             super.init()
-        } else {
-            return nil
-        }
     }
     
     func addObserver(_ observer: AnyObject) {
         if observers.count == 0 {
-            instanceSelector.swizzle(with: notificationSelector)
+            originalSelector.exchange(with: notificationSelector)
         }
         observers.append(WeakObject(value: observer))
     }
@@ -175,20 +172,20 @@ fileprivate class InstanceSelectorNotifier : NSObject {
         let oldCount = observers.count
         observers = observers.filter({$0.value != nil && $0.value !== observer})
         if observers.count == 0 && oldCount != 0 {
-            instanceSelector.swizzle(with: notificationSelector)
+            originalSelector.exchange(with: notificationSelector)
         }
     }
     
     func removeAllObservers() -> [AnyObject] {
         if observers.count != 0 {
-            instanceSelector.swizzle(with: notificationSelector)
+            originalSelector.exchange(with: notificationSelector)
         }
         let oldObservers = observers.flatMap({$0.value})
         observers = []
         return oldObservers
     }
     
-    static var postInstanceSelectorNotificationBlock: SelectorTrampolineBlock {
+    static var postInstanceSelection: InstanceSelectionBlock {
         return { aClassType, aSelector, aTarget, aSender in
             guard let classType = aClassType,
                 let selector = aSelector,
@@ -244,7 +241,7 @@ fileprivate struct InstanceSelector {
         return Notification.Name(self.name)
     }
     
-    func swizzle(with other: InstanceSelector) {
-        SwizzleHelper.injectSelector(other.classType, other.selector, self.classType, self.selector)
+    func exchange(with other: InstanceSelector) {
+        InstanceSelectorHelper.injectSelector(other.classType, other.selector, self.classType, self.selector)
     }
 }

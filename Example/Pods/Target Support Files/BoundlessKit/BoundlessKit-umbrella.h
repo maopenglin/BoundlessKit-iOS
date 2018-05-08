@@ -10,9 +10,8 @@
 #endif
 #endif
 
-#import "NSObject+Boundless.h"
-#import "SwizzleHelper.h"
 #import "ASIdHelper.h"
+#import "InstanceSelectorHelper.h"
 
 FOUNDATION_EXPORT double BoundlessKitVersionNumber;
 FOUNDATION_EXPORT const unsigned char BoundlessKitVersionString[];
