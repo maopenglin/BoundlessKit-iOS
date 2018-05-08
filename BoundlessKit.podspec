@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
                           DESC
 
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'Akash Desai' => 'team@boundlessai.com' }
+  s.author           = { 'BoundlessAI' => 'team@boundless.ai' }
   s.source           = { :git => 'https://github.com/BoundlessAI/BoundlessKit-iOS.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '9.0'

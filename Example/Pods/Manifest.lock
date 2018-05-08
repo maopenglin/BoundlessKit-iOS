@@ -6,11 +6,11 @@ DEPENDENCIES:
 
 EXTERNAL SOURCES:
   BoundlessKit:
-    :path: ../
+    :path: "../"
 
 SPEC CHECKSUMS:
-  BoundlessKit: 617d09d86fc5c3f786a01b6f5932047de2ee36ca
+  BoundlessKit: 941fb5b200f9f99f6a02fa9e9e2b3c8104aac5ab
 
 PODFILE CHECKSUM: ec9418edc4a4b0f1661ce7ce640082caba32e229
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.0
