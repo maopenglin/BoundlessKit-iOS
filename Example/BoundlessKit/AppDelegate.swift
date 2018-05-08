@@ -19,9 +19,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         print("in app didfinishlaunching")
         
-//        BoundlessKit.standard.setID("auser")
-//        BoundlessKit.standard.setID(nil)
-//        BoundlessKit.standard.setID("buser")
+//        BoundlessKit.standard.setCustomUserID("auser")
+//        BoundlessKit.standard.setCustomUserID(nil)
+//        BoundlessKit.standard.setCustomUserID("buser")
 
         return true
     }

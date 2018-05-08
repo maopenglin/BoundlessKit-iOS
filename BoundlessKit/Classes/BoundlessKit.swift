@@ -62,7 +62,7 @@ open class BoundlessKit : NSObject {
     }
     
     @objc
-    public func setID(_ id: String?) {
+    public func setCustomUserID(_ id: String?) {
         apiClient.setCustomUserIdentity(id)
     }
 }

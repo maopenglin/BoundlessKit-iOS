@@ -466,6 +466,7 @@
 		D22CD614E528319F8B2FC15AFAAA4065 /* Records */ = {
 			isa = PBXGroup;
 			children = (
+				18A225667CCE4830E3D1F5DBE50070C7 /* Metadata */,
 				497A2F49515A7BE418650878632A655B /* BKAction.swift */,
 				FF1B16F8798258A044C41A3F77B18F32 /* BKDecision.swift */,
 				1364985CBFD55AD78AFEBF1187AC7FDE /* BKRefreshCartridge.swift */,
@@ -484,7 +485,6 @@
 				1917861BAFD76A9EC608A8836D0D093E /* BoundlessCredentials.swift */,
 				BB61636F5134EC6AC2B30132D2E9F139 /* BoundlessProperties.swift */,
 				EA749E386413A9F5BB0E57CF04939C4A /* BoundlessVersion.swift */,
-				18A225667CCE4830E3D1F5DBE50070C7 /* Metadata */,
 			);
 			path = "Data Models";
 			sourceTree = "<group>";
