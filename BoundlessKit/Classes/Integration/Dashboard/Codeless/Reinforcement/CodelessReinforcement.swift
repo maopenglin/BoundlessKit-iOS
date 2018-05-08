@@ -73,7 +73,7 @@ struct CodelessReinforcement {
                     guard let systemSound = self.parameters["SystemSound"] as? UInt32  else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     let color = UIColor.from(rgb: colorString)
                     for (view, _) in viewAndLocation {
-                        view.showGlow(duration: duration, color: color, alpha: alpha, radius: radius, count: count, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
+                        view.showGlow(count: count, duration: duration, color: color, alpha: alpha, radius: radius, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
                     }
                     return
                     

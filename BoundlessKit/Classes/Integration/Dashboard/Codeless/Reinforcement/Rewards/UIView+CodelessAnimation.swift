@@ -224,34 +224,27 @@ public extension UIView {
             ).start(view: self, animation: rotateAnimation)
     }
     
-    public func showGlow(duration: Double = 1.7, color: UIColor = UIColor(red: 255/256.0, green: 28/256.0, blue: 251/256.0, alpha: 0.8), alpha: CGFloat = 0.8, radius: CGFloat = 250, count: Float = 2, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
+    public func showGlow(count: Float = 2, duration: Double = 3.0, color: UIColor = UIColor(red: 255/255.0, green: 26/255.0, blue: 251/255.0, alpha: 0.7), alpha: CGFloat = 0.7, radius: CGFloat = 250, timingFunction: CAMediaTimingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut), hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
         
         UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
-        
         self.layer.render(in: UIGraphicsGetCurrentContext()!)
         color.setFill()
         UIBezierPath(rect: CGRect(origin: .zero, size: self.bounds.size)).fill(with: .sourceAtop, alpha:1.0)
         let image = UIGraphicsGetImageFromCurrentImageContext()!
-        
         UIGraphicsEndImageContext()
         
         let glowView = UIImageView(image: image)
         glowView.center = CGPoint(x: self.bounds.midX, y: self.bounds.midY)
         glowView.alpha = 0
-        glowView.layer.shadowColor = color.cgColor
-        glowView.layer.shadowOffset = .zero
-        glowView.layer.shadowRadius = radius
-        glowView.layer.shadowOpacity = 1.0
         
         let animation = CABasicAnimation(keyPath: "opacity")
         animation.fromValue = 0
         animation.toValue = alpha
         animation.repeatCount = count
-        animation.duration = duration/TimeInterval(count)
-        //        animation.speed = 0.35
+        animation.duration = duration/TimeInterval(count*2)
         animation.autoreverses = true
-        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-        
+        animation.timingFunction = timingFunction
+
         CoreAnimationDelegate(
             willStart: { start in
                 self.insertSubview(glowView, aboveSubview: self)

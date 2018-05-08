@@ -69,8 +69,7 @@ extension UIImage {
         
         // using scale correctly preserves retina images
         UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        let context: CGContext! = UIGraphicsGetCurrentContext()
-        assert(context != nil)
+        let context: CGContext = UIGraphicsGetCurrentContext()!
         
         // correctly rotate image
         context.translateBy(x: 0, y: size.height)
