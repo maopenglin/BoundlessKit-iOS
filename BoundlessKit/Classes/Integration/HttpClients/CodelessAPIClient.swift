@@ -163,15 +163,20 @@ fileprivate extension CodelessAPIClient {
 //                    BKLog.debug("Codeless reinforcement found for actionID <\(actionID)>")
                     let codelessReinforcer: CodelessReinforcer = reinforcer as? CodelessReinforcer ?? {
                         let codelessReinforcer = CodelessReinforcer(copy: reinforcer)
-                        if actionID == CodelessReinforcer.UIApplicationDidLaunch {
+                        switch actionID {
+                        case CodelessReinforcer.UIApplicationDidLaunch:
                             NotificationCenter.default.addObserver(codelessReinforcer, selector: #selector(codelessReinforcer.receive(notification:)), name: Notification.Name.UIApplicationDidFinishLaunching, object: nil)
-                        } else {
+                            
+                        case CodelessReinforcer.UIApplicationDidBecomeActive:
+                            NotificationCenter.default.addObserver(codelessReinforcer, selector: #selector(codelessReinforcer.receive(notification:)), name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
+                            
+                        default:
                             InstanceSelectorNotificationCenter.default.addObserver(codelessReinforcer, selector: #selector(codelessReinforcer.receive(notification:)), name: NSNotification.Name(actionID), object: nil)
                         }
                         reinforcer = codelessReinforcer
                         self.reinforcers[actionID] = codelessReinforcer
                         return codelessReinforcer
-                        }()
+                    }()
                     for reinforcementDict in reinforcements {
                         if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
                             codelessReinforcer.codelessReinforcements[codelessReinforcement.primitive] = codelessReinforcement
@@ -317,17 +322,6 @@ fileprivate extension CodelessAPIClient {
                     self.post(url: CodelessAPIEndpoint.accept.url, jsonObject: payload) { response in
                         if response?["status"] as? Int == 200 {
                             self.visualizerSession = CodelessVisualizerSession(connectionUUID: connectionUUID, mappings: [:])
-                            
-                            
-                            var payload = self.credentials.json
-//                            payload["versionID"] = self.version.name
-                            payload["connectionUUID"] = self.visualizerSession?.connectionUUID
-//                            payload["sender"] = (type(of: sender) == NSNull.self) ? "nil" : NSStringFromClass(type(of: sender))
-//                            payload["target"] = NSStringFromClass(targetClass)
-//                            payload["selector"] = NSStringFromSelector(selector)
-                            payload["actionID"] = Notification.Name.UIApplicationDidFinishLaunching
-//                            payload["senderImage"] = ""
-                            self.post(url: CodelessAPIEndpoint.submit.url, jsonObject: payload) {_ in}.start()
                         } else {
                             self.visualizerSession = nil
                         }
@@ -339,16 +333,8 @@ fileprivate extension CodelessAPIClient {
                 UIWindow.presentTopLevelAlert(alertController: pairingAlert)
                 
             case 208?:
-                
-                
-                var payload = self.credentials.json
-                payload["versionID"] = self.version.name
-                payload["connectionUUID"] = self.visualizerSession?.connectionUUID
-                payload["target"] = Notification.Name.UIApplicationDidFinishLaunching.rawValue
-                payload["selector"] = "codeless"
-                payload["actionID"] = CodelessReinforcer.UIApplicationDidLaunch
-                payload["senderImage"] = ""
-                self.post(url: CodelessAPIEndpoint.submit.url, jsonObject: payload) {_ in}.start()
+                self.submitToDashboard(actionID: CodelessReinforcer.UIApplicationDidBecomeActive)
+                self.submitToDashboard(actionID: CodelessReinforcer.UIApplicationDidLaunch)
                 if let _ = response["connectionUUID"] as? String,
                     let reconnectedSession = CodelessVisualizerSession.convert(from: response) {
                     self.visualizerSession = reconnectedSession
@@ -407,6 +393,24 @@ fileprivate extension CodelessAPIClient {
     @objc
     func doNothing(notification: Notification) {
         BKLog.debug("Got notification:\(notification.name.rawValue) ")
+    }
+}
+
+extension CodelessAPIClient {
+    func submitToDashboard(actionID: String) {
+        var components = actionID.components(separatedBy: "-")
+        if components.count == 2 {
+            let target = components.removeFirst()
+            let selector = components.removeFirst()
+            var payload = self.credentials.json
+            payload["versionID"] = self.version.name
+            payload["connectionUUID"] = self.visualizerSession?.connectionUUID
+            payload["target"] = target
+            payload["selector"] = selector
+            payload["actionID"] = actionID
+            payload["senderImage"] = ""
+            self.post(url: CodelessAPIEndpoint.submit.url, jsonObject: payload) {_ in}.start()
+        }
     }
 }
 

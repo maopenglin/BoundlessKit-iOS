@@ -8,7 +8,9 @@
 import Foundation
 
 extension CodelessReinforcer {
-    static let UIApplicationDidLaunch: String = [Notification.Name.UIApplicationDidFinishLaunching.rawValue, "codeless"].joined(separator: "-")
+    static let defaultSelectorTerm = "codeless"
+    static let UIApplicationDidLaunch: String = [Notification.Name.UIApplicationDidFinishLaunching.rawValue, defaultSelectorTerm].joined(separator: "-")
+    static let UIApplicationDidBecomeActive: String = [Notification.Name.UIApplicationDidBecomeActive.rawValue, defaultSelectorTerm].joined(separator: "-")
 }
 
 internal class CodelessReinforcer : Reinforcer {
