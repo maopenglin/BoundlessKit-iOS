@@ -82,7 +82,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
                 return
             }
             
-            BKLog.print(error: "Cannot create  for notification for <\(aName)>")
+            BKLog.debug(error: "Cannot create  for notification for <\(aName)>")
         }
     }
     
@@ -139,7 +139,7 @@ fileprivate class InstanceSelectorNotifier : NSObject {
     init?(_ instanceSelector: InstanceSelector) {
         guard let notificationMethod = InstanceSelectorHelper.createMethod(beforeInstance: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorNotifier.postInstanceSelection),
             let notificationSelector = InstanceSelector(instanceSelector.classType, notificationMethod) else {
-            BKLog.print(error: "Could not create notification method for actionID<\(instanceSelector.notificationName)")
+            BKLog.debug(error: "Could not create notification method for actionID<\(instanceSelector.notificationName)")
             return nil
         }
             self.originalSelector = instanceSelector

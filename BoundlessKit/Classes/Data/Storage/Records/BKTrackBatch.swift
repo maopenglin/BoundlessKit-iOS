@@ -105,12 +105,12 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
                 if status == 200 {
                     self.removeFirst(trackCopy.count)
                     self.storage?.0.archive(self, forKey: self.storage!.1)
-                    BKLog.print(confirmed: "Sent track batch!")
+                    BKLog.debug(confirmed: "Sent track batch!")
                     success = true
                     return
                 }
             }
-            BKLog.print(error: "Sending track batch failed")
+            BKLog.debug(error: "Sending track batch failed")
         }.start()
     }
 }

@@ -50,10 +50,10 @@ internal struct BoundlessCredentials {
 
 extension BoundlessCredentials {
     static func convert(from propertiesDictionary: [String: Any]) -> BoundlessCredentials? {
-        guard let appID = propertiesDictionary["appID"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let inProduction = propertiesDictionary["inProduction"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let productionSecret = propertiesDictionary["productionSecret"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let developmentSecret = propertiesDictionary["developmentSecret"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
+        guard let appID = propertiesDictionary["appID"] as? String else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let inProduction = propertiesDictionary["inProduction"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let productionSecret = propertiesDictionary["productionSecret"] as? String else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let developmentSecret = propertiesDictionary["developmentSecret"] as? String else { BKLog.debug(error: "Bad parameter"); return nil }
         
         return BoundlessCredentials.init(
             propertiesDictionary["primaryIdentity"] as? String,

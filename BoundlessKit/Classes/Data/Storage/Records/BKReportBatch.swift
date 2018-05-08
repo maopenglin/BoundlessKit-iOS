@@ -67,7 +67,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
             self[reinforcement.actionID] = SynchronizedArray()
         }
         self[reinforcement.actionID]?.append(reinforcement)
-//        BKLog.print(confirmed: "Report #<\(count)> actionID:<\(reinforcement.actionID)> with reinforcementID:<\(reinforcement.name)>")
+        BKLog.debug(confirmed: "Report #<\(count)> actionID:<\(reinforcement.actionID)> with reinforcementID:<\(reinforcement.name)>")
         storeGroup.enter()
         self.storage?.0.archive(self, forKey: self.storage!.1)
         BoundlessContext.getContext() { contextInfo in
@@ -117,12 +117,12 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
                         self[actionID]?.removeFirst(actions.count)
                     }
                     self.storage?.0.archive(self, forKey: self.storage!.1)
-                    BKLog.print(confirmed: "Sent report batch!")
+                    BKLog.debug(confirmed: "Sent report batch!")
                     success = true
                     return
                 }
             }
-            BKLog.print(error: "Sending report batch failed")
+            BKLog.debug(error: "Sending report batch failed")
         }.start()
     }
     

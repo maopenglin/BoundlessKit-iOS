@@ -121,24 +121,24 @@ extension BoundlessConfiguration {
 
 extension BoundlessConfiguration {
     static func convert(from dict: [String: Any]) -> BoundlessConfiguration? {
-        guard let configID = dict["configID"] as? String? else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let reinforcementEnabled = dict["reinforcementEnabled"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let triggerEnabled = dict["triggerEnabled"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let trackingEnabled = dict["trackingEnabled"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let trackingCapabilities = dict["trackingCapabilities"] as? [String: Any] else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let applicationState = trackingCapabilities["applicationState"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let applicationViews = trackingCapabilities["applicationViews"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let customViews = trackingCapabilities["customViews"] as? [String: Any] else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let customEvents = trackingCapabilities["customEvents"] as? [String: Any] else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let notificationObservations = trackingCapabilities["notificationObservations"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let storekitObservations = trackingCapabilities["storekitObservations"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let locationObservations = trackingCapabilities["locationObservations"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let batchSize = dict["batchSize"] as? [String: Any] else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let trackBatchSize = batchSize["track"] as? Int else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let reportBatchSize = batchSize["report"] as? Int else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let integrationMethod = dict["integrationMethod"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let advertiserID = dict["advertiserID"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let consoleLoggingEnabled = dict["consoleLoggingEnabled"] as? Bool else { BKLog.print(error: "Bad parameter"); return nil }
+        guard let configID = dict["configID"] as? String? else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let reinforcementEnabled = dict["reinforcementEnabled"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let triggerEnabled = dict["triggerEnabled"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let trackingEnabled = dict["trackingEnabled"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let trackingCapabilities = dict["trackingCapabilities"] as? [String: Any] else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let applicationState = trackingCapabilities["applicationState"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let applicationViews = trackingCapabilities["applicationViews"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let customViews = trackingCapabilities["customViews"] as? [String: Any] else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let customEvents = trackingCapabilities["customEvents"] as? [String: Any] else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let notificationObservations = trackingCapabilities["notificationObservations"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let storekitObservations = trackingCapabilities["storekitObservations"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let locationObservations = trackingCapabilities["locationObservations"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let batchSize = dict["batchSize"] as? [String: Any] else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let trackBatchSize = batchSize["track"] as? Int else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let reportBatchSize = batchSize["report"] as? Int else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let integrationMethod = dict["integrationMethod"] as? String else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let advertiserID = dict["advertiserID"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let consoleLoggingEnabled = dict["consoleLoggingEnabled"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
         
         return BoundlessConfiguration.init(configID: configID,
                                            integrationMethod: integrationMethod,

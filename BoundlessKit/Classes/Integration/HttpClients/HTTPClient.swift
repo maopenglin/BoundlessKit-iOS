@@ -34,7 +34,7 @@ internal class HTTPClient : NSObject {
             request.httpBody = try JSONSerialization.data(withJSONObject: jsonObject)
         } catch {
             let message = "\(url.absoluteString) call got error while converting request to JSON"
-            BKLog.print(error: message)
+            BKLog.debug(error: message)
         }
         
         return session.send(request: request) { responseData, responseURL, error in
@@ -50,7 +50,7 @@ internal class HTTPClient : NSObject {
     fileprivate func convertResponseToJSON(_ url: URL, _ responseData: Data?, _ responseURL: URLResponse?, _ error: Error?)  -> [String: Any]? {
         guard responseURL != nil else {
             let message = "\(url.absoluteString) call got invalid response with error:<\(error?.localizedDescription as AnyObject)>"
-            BKLog.print(error: message)
+            BKLog.debug(error: message)
             return nil
         }
         
@@ -69,7 +69,7 @@ internal class HTTPClient : NSObject {
         } else {
             let message = "\(url.absoluteString) call got invalid response"
             let dataString: String = (responseData.flatMap({ NSString(data: $0, encoding: String.Encoding.utf8.rawValue) }) ?? "") as String
-            BKLog.print(error: "\(message)\n\t<\(dataString)>")
+            BKLog.debug(error: "\(message)\n\t<\(dataString)>")
             return nil
         }
     }

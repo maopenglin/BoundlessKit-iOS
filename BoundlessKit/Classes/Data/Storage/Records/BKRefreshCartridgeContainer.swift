@@ -54,11 +54,11 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
         
         cartridge.removeFirst(completion: { (decision) in
             if let decision = decision {
-//                BKLog.debug("Cartridge for actionID <\(actionID)> unloaded decision <\(decision.name)>")
+                BKLog.print("Cartridge for actionID <\(actionID)> unloaded decision <\(decision.name)>")
                 completion(decision)
             } else {
                 let defaultDecision = BKDecision.neutral(for: actionID)
-//                BKLog.debug("Cartridge for actionID <\(actionID)> is empty! Using default decision <\(defaultDecision.name)>")
+                BKLog.print("Cartridge for actionID <\(actionID)> is empty! Using default decision <\(defaultDecision.name)>")
                 completion(defaultDecision)
             }
             self.storage?.0.archive(self, forKey: self.storage!.1)
@@ -110,17 +110,17 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
                             cartridge.removeAll()
                             cartridge.append(decisions)
                             cartridge.expirationUTC = Int64( 1000*Date().addingTimeInterval(expiresIn).timeIntervalSince1970 )
-                            BKLog.print(confirmed: "Cartridge refresh for actionID <\(cartridge.actionID)> succeeded!")
+                            BKLog.debug(confirmed: "Cartridge refresh for actionID <\(cartridge.actionID)> succeeded!")
                             success = true
                             return
                         } else if responseStatusCode == 400 {
                             self.removeValue(forKey: actionID)
-                            BKLog.print(confirmed: "Cartridge refresh determined actionID<\(actionID)> is no longer a valid actionID. Cartridge deleted.")
+                            BKLog.debug(confirmed: "Cartridge refresh determined actionID<\(actionID)> is no longer a valid actionID. Cartridge deleted.")
                             success = true
                             return
                         }
                     }
-                    BKLog.print(error: "Cartridge refresh for actionID <\(cartridge.actionID)> failed!")
+                    BKLog.debug(error: "Cartridge refresh for actionID <\(cartridge.actionID)> failed!")
                 }.start()
             }
             self.group.notify(queue: .global()) {

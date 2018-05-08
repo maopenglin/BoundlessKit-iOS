@@ -443,8 +443,8 @@ fileprivate  struct CodelessVisualizerSession {
     }
     
     static func convert(from dict: [String: Any]) -> CodelessVisualizerSession? {
-        guard let connectionUUID = dict["connectionUUID"] as? String else { BKLog.print(error: "Bad parameter"); return nil }
-        guard let mappings = dict["mappings"] as? [String: [String: Any]] else { BKLog.print(error: "Bad parameter"); return nil }
+        guard let connectionUUID = dict["connectionUUID"] as? String else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let mappings = dict["mappings"] as? [String: [String: Any]] else { BKLog.debug(error: "Bad parameter"); return nil }
         
         return CodelessVisualizerSession(connectionUUID: connectionUUID, mappings: mappings)
     }

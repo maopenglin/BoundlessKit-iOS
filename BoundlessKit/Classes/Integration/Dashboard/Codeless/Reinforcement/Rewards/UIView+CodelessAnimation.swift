@@ -75,7 +75,7 @@ public extension UIView {
                                   completion: @escaping ()->Void = {}
         ) {
         guard let content = content else {
-            BKLog.print(error: "Received nil image content!")
+            BKLog.debug(error: "Received nil image content!")
             return
         }
         DispatchQueue.main.async {

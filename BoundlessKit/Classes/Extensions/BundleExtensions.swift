@@ -12,7 +12,7 @@ internal extension Bundle {
         if let bundleURL = Bundle(for: BoundlessKit.classForCoder()).url(forResource: "BoundlessKit", withExtension: "bundle") {
             return Bundle(url: bundleURL)
         } else {
-            BKLog.print(error: "The BoundlessKit framework bundle cannot be found")
+            BKLog.debug(error: "The BoundlessKit framework bundle cannot be found")
             return nil
         }
     }
