@@ -58,7 +58,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
     let storeGroup = DispatchGroup()
     
     func store(_ action: BKAction) {
-        //        BKLog.debug("Tracked action:\(action.name) metadata:\(action.metadata as AnyObject)")
+//        BKLog.print(confirmed: "Tracked action #\(self.count):\(action.name) metadata:\(action.metadata as AnyObject)")
         guard enabled else {
             return
         }
@@ -93,7 +93,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
             successful(true)
             return
         }
-        BKLog.debug("Sending track batch with \(trackCopy.count) actions...")
+//        BKLog.debug("Sending track batch with \(trackCopy.count) actions...")
         
         var payload = apiClient.credentials.json
         payload["versionID"] = apiClient.version.name

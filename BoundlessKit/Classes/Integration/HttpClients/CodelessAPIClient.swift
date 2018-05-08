@@ -36,7 +36,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
             didSetConfiguration(oldValue: oldValue)
         }
     }
-    var visualizerSession: CodelessVisualizerSession? {
+    fileprivate var visualizerSession: CodelessVisualizerSession? {
         didSet {
             database.set(visualizerSession?.encode(), forKey: "codelessSession")
             didSetVisualizerSession(oldValue: oldValue)
@@ -111,6 +111,8 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         }.start()
     }
     
+    func promptPairing() { _promptPairing() }
+    
     fileprivate let serialQueue = DispatchQueue(label: "CodelessAPIClientSerial")
     fileprivate let concurrentQueue = DispatchQueue(label: "CodelessAPIClientConcurrent", attributes: .concurrent)
 }
@@ -118,7 +120,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
 //// Adhering to BoundlessConfiguration
 //
 //
-extension CodelessAPIClient {
+fileprivate extension CodelessAPIClient {
     func didSetVersion(oldValue: BoundlessVersion?) {
         if oldValue?.name != version.name {
             mountVersion()
@@ -161,7 +163,7 @@ extension CodelessAPIClient {
 //                    BKLog.debug("Codeless reinforcement found for actionID <\(actionID)>")
                     let codelessReinforcer: CodelessReinforcer = reinforcer as? CodelessReinforcer ?? {
                         let codelessReinforcer = CodelessReinforcer(copy: reinforcer)
-                        InstanceSelectorNotificationCenter.default.addObserver(codelessReinforcer, selector: #selector(codelessReinforcer.receive(notification:)), name: NSNotification.Name.init(actionID), object: nil)
+                        InstanceSelectorNotificationCenter.default.addObserver(codelessReinforcer, selector: #selector(codelessReinforcer.receive(notification:)), name: NSNotification.Name(actionID), object: nil)
                         reinforcer = codelessReinforcer
                         self.reinforcers[actionID] = codelessReinforcer
                         return codelessReinforcer
@@ -182,7 +184,7 @@ extension CodelessAPIClient {
     }
 }
 
-extension CodelessAPIClient {
+fileprivate extension CodelessAPIClient {
     func didSetConfiguration(oldValue: BoundlessConfiguration?) {
         let newValue = boundlessConfig
         self.refreshContainer.enabled = newValue.reinforcementEnabled
@@ -207,21 +209,17 @@ extension CodelessAPIClient {
         
         if (oldValue?.applicationState != newValue.applicationState) {
             if (newValue.applicationState) {
-                NotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationState(_:)), name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
-                NotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationState(_:)), name: Notification.Name.UIApplicationWillResignActive, object: nil)
+                NotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationState(_:)), names: [.UIApplicationDidBecomeActive, .UIApplicationWillResignActive], object: nil)
             } else {
-                NotificationCenter.default.removeObserver(self, name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
-                NotificationCenter.default.removeObserver(self, name: Notification.Name.UIApplicationWillResignActive, object: nil)
+                NotificationCenter.default.removeObserver(self, names: [.UIApplicationDidBecomeActive, .UIApplicationWillResignActive], object: nil)
             }
         }
         
         if (oldValue?.applicationViews != newValue.applicationViews) {
             if (newValue.applicationViews) {
-                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidAppearNotification, object: nil)
-                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationViews(_:)), name: InstanceSelectorNotificationCenter.viewControllerDidDisappearNotification, object: nil)
+                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationViews(_:)), names: [.UIViewControllerDidAppear, .UIViewControllerDidDisappear], object: nil)
             } else {
-                InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.viewControllerDidAppearNotification, object: nil)
-                InstanceSelectorNotificationCenter.default.removeObserver(self, name: InstanceSelectorNotificationCenter.viewControllerDidDisappearNotification, object: nil)
+                InstanceSelectorNotificationCenter.default.removeObserver(self, names: [.UIViewControllerDidAppear, .UIViewControllerDidDisappear], object: nil)
             }
         }
         
@@ -274,13 +272,11 @@ extension CodelessAPIClient {
 //// Dashboard Visualizer Connection
 //
 //
-extension CodelessAPIClient {
+fileprivate extension CodelessAPIClient {
     func didSetVisualizerSession(oldValue: CodelessVisualizerSession?) {
         serialQueue.async {
             if oldValue == nil && self.visualizerSession != nil {
-                for visualizerNotification in InstanceSelectorNotificationCenter.visualizerNotifications {
-                    InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.doNothing(notification:)), name: visualizerNotification, object: nil)
-                }
+                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.doNothing(notification:)), names: .visualizerNotifications, object: nil)
                 // listen for all notifications sent
                 InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: nil, object: nil)
             } else if oldValue != nil && self.visualizerSession == nil {
@@ -289,7 +285,7 @@ extension CodelessAPIClient {
         }
     }
     
-    func promptPairing() {
+    func _promptPairing() {
         var payload = credentials.json
         payload["deviceName"] = UIDevice.current.name
         
@@ -299,7 +295,7 @@ extension CodelessAPIClient {
             switch response["status"] as? Int {
             case 202?:
                 DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
-                    self.promptPairing()
+                    self._promptPairing()
                 }
                 break
                 
@@ -388,7 +384,7 @@ extension CodelessAPIClient {
     }
 }
 
-internal struct CodelessVisualizerSession {
+fileprivate  struct CodelessVisualizerSession {
     let connectionUUID: String
     var mappings: [String: [String: Any]]
     

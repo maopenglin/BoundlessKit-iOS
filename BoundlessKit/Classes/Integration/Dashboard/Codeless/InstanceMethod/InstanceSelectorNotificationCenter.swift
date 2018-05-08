@@ -7,52 +7,60 @@
 
 import Foundation
 
-@objc
-class Nothing : NSObject {
-    
-}
-
-extension InstanceSelectorNotificationCenter {
-    internal static var visualizerNotifications: [Notification.Name] {
-        return [actionMessagesNotification]
-            + viewControllerDidAppearNotifications
-            + collectionViewControllerDidSelectNotifications
+internal extension Array where Element == Notification.Name {
+    static var visualizerNotifications: [Notification.Name] {
+        return [.UIApplicationSendAction]
+            + UIViewControllerChildrenDidAppear
+            + UICollectionViewControllerChildrenDidSelect
     }
     
-    internal static var actionMessagesNotification: Notification.Name {
-        return InstanceSelector(UIApplication.self, #selector(UIApplication.sendAction(_:to:from:for:)))!.notification
-    }
-    
-    internal static var viewControllerDidAppearNotifications: [Notification.Name] {
+    static var UIViewControllerChildrenDidAppear: [Notification.Name] {
         return forSubclasses(parentClass: UIViewController.self, #selector(UIViewController.viewDidAppear(_:)))
     }
     
-    internal static var viewControllerDidAppearNotification: Notification.Name {
-        return InstanceSelector(UIViewController.self, #selector(UIViewController.viewDidAppear(_:)))!.notification
-    }
-    
-    internal static var viewControllerDidDisappearNotification: Notification.Name {
-        return InstanceSelector(UIViewController.self, #selector(UIViewController.viewDidDisappear(_:)))!.notification
-    }
-    
-    internal static var collectionViewControllerDidSelectNotifications: [Notification.Name] {
+    static var UICollectionViewControllerChildrenDidSelect: [Notification.Name] {
         return forSubclasses(parentClass: UICollectionViewController.self, #selector(UICollectionViewController.collectionView(_:didSelectItemAt:)))
     }
     
-    internal static func forSubclasses(parentClass: AnyClass, _ selector: Selector) -> [Notification.Name] {
-        if let classes = SwizzleHelper.classesInheriting(parentClass) as? [AnyClass] {
-            return classes.flatMap({InstanceSelector($0, selector)?.notification})
-        }
-        return []
+    static func forSubclasses(parentClass: AnyClass, _ selector: Selector) -> [Notification.Name] {
+        return (SwizzleHelper.classesInheriting(parentClass) as? [AnyClass])?.flatMap({InstanceSelector($0, selector)?.notificationName}) ?? []
     }
     
-    internal static func forClassesConforming(to searchProtocol: Protocol, with selector: Selector) -> [Notification.Name] {
-        if let classes = SwizzleHelper.classesConforming(searchProtocol) as? [AnyClass] {
-            return classes.flatMap({InstanceSelector.init($0, selector)?.notification})
-        }
-        return []
+    static func forClassesConforming(to searchProtocol: Protocol, with selector: Selector) -> [Notification.Name] {
+        return (SwizzleHelper.classesConforming(searchProtocol) as? [AnyClass])?.flatMap({InstanceSelector.init($0, selector)?.notificationName}) ?? []
     }
 }
+
+internal extension Notification.Name {
+    static let UIApplicationSendAction: Notification.Name = {
+        return InstanceSelector(UIApplication.self, #selector(UIApplication.sendAction(_:to:from:for:)))!.notificationName
+    }()
+    
+    static let UIViewControllerDidAppear: Notification.Name = {
+        return InstanceSelector(UIViewController.self, #selector(UIViewController.viewDidAppear(_:)))!.notificationName
+    }()
+    
+    static let UIViewControllerDidDisappear: Notification.Name = {
+        return InstanceSelector(UIViewController.self, #selector(UIViewController.viewDidDisappear(_:)))!.notificationName
+    }()
+}
+
+internal extension NotificationCenter {
+    func addObserver(_ observer: Any, selector aSelector: Selector, names someNames: [NSNotification.Name], object anObject: Any?) {
+        for aName in someNames {
+            self.addObserver(observer, selector: aSelector, name: aName, object: anObject)
+        }
+    }
+    
+    func removeObserver(_ observer: Any, names someNames: [NSNotification.Name], object anObject: Any?) {
+        for aName in someNames {
+            self.removeObserver(observer, name: aName, object: anObject)
+        }
+    }
+}
+
+
+
 
 internal class InstanceSelectorNotificationCenter : NotificationCenter {
     
@@ -75,7 +83,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
             if let notifier = self.notifiers[aName] {
                 notifier.addObserver(observer as AnyObject)
                 super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
-                BKLog.debug("Added observer for instance method:\(aName.rawValue)")
+//                BKLog.debug("Added observer for instance method:\(aName.rawValue)")
                 return
             }
             
@@ -83,12 +91,12 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
                 let notifier = InstanceSelectorNotifier.init(instanceSelector) {
                 self.notifiers[aName] = notifier
                 notifier.addObserver(observer as AnyObject)
-                BKLog.debug("Added first observer for instance method:\(aName.rawValue)")
                 super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
+//                BKLog.debug("Added first observer for instance method:\(aName.rawValue)")
                 return
             }
             
-            BKLog.print(error: "Cannot create  for notification<\(aName)>")
+            BKLog.print(error: "Cannot create  for notification for <\(aName)>")
         }
     }
     
@@ -101,7 +109,7 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
             if let aName = aName {
                 if let notifier = self.notifiers[aName] {
                     notifier.removeObserver(observer as AnyObject)
-                    BKLog.debug("Removed observer for notification:\(aName.rawValue)")
+//                    BKLog.debug("Removed observer for notification:\(aName.rawValue)")
                 }
             } else {
                 for notifier in self.notifiers.values {
@@ -144,7 +152,7 @@ fileprivate class InstanceSelectorNotifier : NSObject {
     
     init?(_ instanceSelector: InstanceSelector) {
         guard let notificationMethod = BoundlessObject.createTrampoline(for: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorNotifier.postInstanceSelectorNotificationBlock) else {
-            BKLog.print(error: "Could not create trampoline for actionID<\(instanceSelector.notification)")
+            BKLog.print(error: "Could not create trampoline for actionID<\(instanceSelector.notificationName)")
             return nil
         }
         if let notificationSelector = InstanceSelector.init(instanceSelector.classType, notificationMethod) {
@@ -188,16 +196,16 @@ fileprivate class InstanceSelectorNotifier : NSObject {
                     BKLog.debug("Not posting because <\(String(describing: aClassType))-\(String(describing: aSelector))> is not a valid instance selector")
                     return
             }
-            let notification = Notification.Name.init(instanceSelector.name)
-            InstanceSelectorNotificationCenter.default.post(name: notification,
+            
+            InstanceSelectorNotificationCenter.default.post(name: instanceSelector.notificationName,
                                                             object: nil,
                                                             userInfo: ["classType": classType,
                                                                        "selector": selector,
                                                                        "sender": aSender as Any,
                                                                        "target": aTarget as Any,
-                                                                       ]
-            )
-//            BKLog.print("Posted instance method notification with name:\(notification.rawValue)")
+                                                                       ])
+            
+//            BKLog.print("Posted instance method notification with name:\(instanceSelector.notificationName.rawValue)")
         }
     }
 }
@@ -232,8 +240,8 @@ fileprivate struct InstanceSelector {
         self.init(notification.rawValue)
     }
     
-    var notification: Notification.Name {
-        return Notification.Name.init(self.name)
+    var notificationName: Notification.Name {
+        return Notification.Name(self.name)
     }
     
     func swizzle(with other: InstanceSelector) {

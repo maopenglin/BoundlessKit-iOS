@@ -102,7 +102,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
             successful(true)
             return
         }
-        BKLog.debug("Sending report batch with \(reportCount) actions...")
+//        BKLog.debug("Sending report batch with \(reportCount) actions...")
         
         var payload = apiClient.credentials.json
         payload["versionID"] = apiClient.version.name
@@ -116,7 +116,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
                         self[actionID]?.removeFirst(actions.count)
                     }
                     self.storage?.0.archive(self, forKey: self.storage!.1)
-                    BKLog.print(confirmed: "Sent report batch! response\(response as AnyObject)")
+                    BKLog.print(confirmed: "Sent report batch!")
                     success = true
                     return
                 }

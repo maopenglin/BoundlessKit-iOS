@@ -54,11 +54,11 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
         
         cartridge.removeFirst(completion: { (decision) in
             if let decision = decision {
-                BKLog.debug("Cartridge for actionID <\(actionID)> unloaded decision <\(decision.name)>")
+//                BKLog.debug("Cartridge for actionID <\(actionID)> unloaded decision <\(decision.name)>")
                 completion(decision)
             } else {
                 let defaultDecision = BKDecision.neutral(for: actionID)
-                BKLog.debug("Cartridge for actionID <\(actionID)> is empty! Using default decision <\(defaultDecision.name)>")
+//                BKLog.debug("Cartridge for actionID <\(actionID)> is empty! Using default decision <\(defaultDecision.name)>")
                 completion(defaultDecision)
             }
             self.storage?.0.archive(self, forKey: self.storage!.1)
