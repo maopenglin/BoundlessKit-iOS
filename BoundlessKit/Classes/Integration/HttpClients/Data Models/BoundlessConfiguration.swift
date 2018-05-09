@@ -22,6 +22,7 @@ internal struct BoundlessConfiguration {
     let notificationObservations: Bool
     let storekitObservations: Bool
     let locationObservations: Bool
+    let bluetoothObservations: Bool
     let applicationState: Bool
     let applicationViews: Bool
     let customViews: [String: Any]
@@ -31,7 +32,7 @@ internal struct BoundlessConfiguration {
     
     init(configID: String? = nil,
          integrationMethod: String = "manual",
-         reinforcementEnabled: Bool = true,
+         reinforcementEnabled: Bool = false,
          reportBatchSize: Int = 10,
          triggerEnabled: Bool = false,
          trackingEnabled: Bool = true,
@@ -40,6 +41,7 @@ internal struct BoundlessConfiguration {
          notificationObservations: Bool = false,
          storekitObservations: Bool = false,
          locationObservations: Bool = false,
+         bluetoothObservations: Bool = true,
          applicationState: Bool = true,
          applicationViews: Bool = true,
          customViews: [String: Any] = [:],
@@ -57,6 +59,7 @@ internal struct BoundlessConfiguration {
         self.notificationObservations = notificationObservations
         self.storekitObservations = storekitObservations
         self.locationObservations = locationObservations
+        self.bluetoothObservations = bluetoothObservations
         self.applicationState = applicationState
         self.applicationViews = applicationViews
         self.customViews = customViews
@@ -80,6 +83,7 @@ extension BoundlessConfiguration {
         archiver.encode(notificationObservations, forKey: "notificationObservations")
         archiver.encode(storekitObservations, forKey: "storekitObservations")
         archiver.encode(locationObservations, forKey: "locationObservations")
+        archiver.encode(bluetoothObservations, forKey: "bluetoothObservations")
         archiver.encode(applicationState, forKey: "applicationState")
         archiver.encode(applicationViews, forKey: "applicationViews")
         archiver.encode(customViews, forKey: "customViews")
@@ -110,6 +114,7 @@ extension BoundlessConfiguration {
                   notificationObservations: unarchiver.decodeBool(forKey: "notificationObservations"),
                   storekitObservations: unarchiver.decodeBool(forKey: "storekitObservations"),
                   locationObservations: unarchiver.decodeBool(forKey: "locationObservations"),
+                  bluetoothObservations: unarchiver.decodeBool(forKey: "bluetoothObservations"),
                   applicationState: unarchiver.decodeBool(forKey: "applicationState"),
                   applicationViews: unarchiver.decodeBool(forKey: "applicationViews"),
                   customViews: customViews,
@@ -133,6 +138,7 @@ extension BoundlessConfiguration {
         guard let notificationObservations = trackingCapabilities["notificationObservations"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
         guard let storekitObservations = trackingCapabilities["storekitObservations"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
         guard let locationObservations = trackingCapabilities["locationObservations"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
+        guard let bluetoothObservations = trackingCapabilities["bluetoothObservations"] as? Bool else { BKLog.debug(error: "Bad parameter"); return nil }
         guard let batchSize = dict["batchSize"] as? [String: Any] else { BKLog.debug(error: "Bad parameter"); return nil }
         guard let trackBatchSize = batchSize["track"] as? Int else { BKLog.debug(error: "Bad parameter"); return nil }
         guard let reportBatchSize = batchSize["report"] as? Int else { BKLog.debug(error: "Bad parameter"); return nil }
@@ -151,6 +157,7 @@ extension BoundlessConfiguration {
                                            notificationObservations: notificationObservations,
                                            storekitObservations: storekitObservations,
                                            locationObservations: locationObservations,
+                                           bluetoothObservations: bluetoothObservations,
                                            applicationState: applicationState,
                                            applicationViews: applicationViews,
                                            customViews: customViews,

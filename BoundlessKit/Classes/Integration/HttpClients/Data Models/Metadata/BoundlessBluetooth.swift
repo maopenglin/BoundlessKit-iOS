@@ -14,7 +14,6 @@ internal class BoundlessBluetooth : NSObject {
     
     fileprivate var bluetoothManager: BluetoothManager!
     
-    
     fileprivate override init() {
         super.init()
         bluetoothManager = BluetoothManager(delegate: self, queue: .main, options: [CBCentralManagerOptionShowPowerAlertKey: 0])
@@ -181,7 +180,6 @@ fileprivate class BluetoothManager : CBCentralManager {
             }
         }
     }
-    
 }
 
 
