@@ -18,11 +18,13 @@ class ViewController: UIViewController {
     
     var locationManager = CLLocationManager()
     
-    @objc func action2Performed(){
+    @objc func action2Performed(sender: UIButton){
         print("Action 2 performed")
         
-        BoundlessKit.track(actionID: "pressed track")
+//        BoundlessKit.track(actionID: "pressed track")
 //        locationManager.requestAlwaysAuthorization()
+        
+        sender.showEmojiSplosion(at: CGPoint(x: sender.bounds.midX, y: sender.bounds.midY))
     }
     
     

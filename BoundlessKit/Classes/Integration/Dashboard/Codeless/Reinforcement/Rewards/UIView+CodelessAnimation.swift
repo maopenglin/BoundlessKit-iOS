@@ -81,6 +81,7 @@ public extension UIView {
         DispatchQueue.main.async {
             let emitter = CAEmitterLayer()
             emitter.emitterPosition = location
+            emitter.beginTime = CACurrentMediaTime() - 0.9
             
             let cell = CAEmitterCell()
             cell.contents = content
@@ -101,24 +102,20 @@ public extension UIView {
             if fadeout > 0 {
                 cell.alphaSpeed = -1.0 / fadeout
                 cell.color = cell.color?.copy(alpha: CGFloat(lifetime / fadeout))
-            }
-            else if fadeout < 0 {
+            } else if fadeout < 0 { // fadein
                 cell.alphaSpeed = 1.0 / -fadeout
                 cell.color = cell.color?.copy(alpha: 0)
             }
-            
             emitter.emitterCells = [cell]
             
-            emitter.beginTime = CACurrentMediaTime()
             self.layer.addSublayer(emitter)
-            self.layer.setNeedsLayout()
-            //            BKLog.debug("💥 Emojisplosion on <\(NSStringFromClass(type(of: self)))> at <\(location)>!")
+//            BKLog.debug("💥 Emojisplosion on <\(NSStringFromClass(type(of: self)))> at <\(location)>!")
             BKAudio.play(systemSound, vibrate: hapticFeedback)
             DispatchQueue.main.asyncAfter(deadline: .now() + birthCycles) {
                 emitter.birthRate = 0
                 DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(lifetime + lifetimeRange)) {
                     emitter.removeFromSuperlayer()
-                    //                    BKLog.debug("💥 Emojisplosion done")
+//                    BKLog.debug("💥 Emojisplosion done")
                     completion()
                 }
             }
@@ -144,9 +141,7 @@ public extension UIView {
         
         CoreAnimationDelegate(didStart:{
             BKAudio.play(systemSound, vibrate: hapticFeedback)
-        }, didStop: {
-            completion()
-        }).start(view: self, animation: animation)
+        }, didStop: completion).start(view: self, animation: animation)
     }
     
     public func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
@@ -159,9 +154,7 @@ public extension UIView {
         pulse.initialVelocity = velocity
         pulse.damping = damping
         
-        CoreAnimationDelegate(didStop: {
-            completion()
-        }).start(view: self, animation: pulse)
+        CoreAnimationDelegate(didStop: completion).start(view: self, animation: pulse)
     }
     
     public func showVibrate(vibrateCount:Int = 6, vibrateDuration:TimeInterval = 1.0, vibrateTranslation:Int = 10, vibrateSpeed:Float = 3, scale:CGFloat = 0.8, scaleCount:Float = 1, scaleDuration:TimeInterval = 0.3, scaleVelocity:CGFloat = 20, scaleDamping:CGFloat = 10, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
@@ -204,8 +197,7 @@ public extension UIView {
         }, didStop: {
             self.clipsToBounds = oldClipsToBounds
             completion()
-        }
-            ).start(view: self, animation: group)
+        }).start(view: self, animation: group)
     }
     
     public func rotate360Degrees(count: Float = 2, duration: CFTimeInterval = 1.0, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
@@ -218,10 +210,7 @@ public extension UIView {
         CoreAnimationDelegate(
             didStart: {
                 BKAudio.play(systemSound, vibrate: hapticFeedback)
-        }, didStop: {
-            completion()
-        }
-            ).start(view: self, animation: rotateAnimation)
+        }, didStop: completion).start(view: self, animation: rotateAnimation)
     }
     
     public func showGlow(count: Float = 2, duration: Double = 3.0, color: UIColor = UIColor(red: 255/255.0, green: 26/255.0, blue: 251/255.0, alpha: 0.7), alpha: CGFloat = 0.7, radius: CGFloat = 250, timingFunction: CAMediaTimingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut), hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
@@ -256,8 +245,7 @@ public extension UIView {
             didStop: {
                 glowView.removeFromSuperview()
                 completion()
-        }
-            ).start(view: glowView, animation: animation)
+        }).start(view: glowView, animation: animation)
     }
     
     public func showSheen(duration: Double = 2.0, color: UIColor? = nil, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
@@ -273,13 +261,12 @@ public extension UIView {
         
         let imageView = UIImageView(image: image)
         
-        let height = self.frame.height * 1.1
+        let height = self.frame.height
         let width: CGFloat =  height * 1.667
         imageView.frame = CGRect(x: -width, y: 0, width: width, height: height)
         
         let animation = CABasicAnimation(keyPath: "transform.translation.x")
         animation.duration = duration
-        //        animation.speed = 2.0
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         animation.byValue = self.frame.width + width
         
@@ -294,8 +281,7 @@ public extension UIView {
             didStop: {
                 imageView.removeFromSuperview()
                 completion()
-        }
-            ).start(view: imageView, animation: animation)
+        }).start(view: imageView, animation: animation)
     }
 }
 
