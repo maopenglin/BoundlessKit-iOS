@@ -24,12 +24,6 @@ internal enum CodelessAPIEndpoint {
 internal class CodelessAPIClient : BoundlessAPIClient {
     var reinforcers = [String: Reinforcer]()
     
-    override var version: BoundlessVersion {
-        didSet {
-            database.set(version.encode(), forKey: "codelessVersion")
-            didSetVersion(oldValue: oldValue)
-        }
-    }
     var boundlessConfig: BoundlessConfiguration {
         didSet {
             database.set(boundlessConfig.encode(), forKey: "codelessConfig")
@@ -42,17 +36,18 @@ internal class CodelessAPIClient : BoundlessAPIClient {
             didSetVisualizerSession(oldValue: oldValue)
         }
     }
+    override var version: BoundlessVersion {
+        didSet {
+            database.set(version.encode(), forKey: "codelessVersion")
+            didSetVersion(oldValue: oldValue)
+        }
+    }
     
     convenience init(boundlessClient: BoundlessAPIClient) {
         self.init(credentials: boundlessClient.credentials, version: boundlessClient.version, database: boundlessClient.database)
     }
     
     override init(credentials: BoundlessCredentials, version: BoundlessVersion, database: BKUserDefaults, session: URLSessionProtocol = URLSession.shared) {
-        var codelessVersion = version
-        if let versionData = database.object(forKey: "codelessVersion") as? Data,
-            let version = BoundlessVersion(data: versionData) {
-            codelessVersion = version
-        }
         if let configData = database.object(forKey: "codelessConfig") as? Data,
             let config = BoundlessConfiguration.init(data: configData) {
             self.boundlessConfig = config
@@ -65,12 +60,17 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         } else {
             self.visualizerSession = nil
         }
+        var codelessVersion = version
+        if let versionData = database.object(forKey: "codelessVersion") as? Data,
+            let version = BoundlessVersion(data: versionData) {
+            codelessVersion = version
+        }
         
         super.init(credentials: credentials, version: codelessVersion, database: database, session: session)
         
-        didSetVersion(oldValue: nil)
         didSetConfiguration(oldValue: nil)
         didSetVisualizerSession(oldValue: nil)
+        didSetVersion(oldValue: nil)
     }
     
     override func setCustomUserIdentity(_ id: String?) {
@@ -129,16 +129,19 @@ fileprivate extension CodelessAPIClient {
     
     func mountVersion() {
         serialQueue.async {
-            var mappings = self.version.mappings
-            if let visualizer = self.visualizerSession {
-                Reinforcer.scheduleSetting = .random
-                for (actionID, value) in visualizer.mappings {
-                    mappings[actionID] = value
+            var mappings: [String : [String : Any]] = !self.boundlessConfig.reinforcementEnabled ? [:] : {
+                var mappings = self.version.mappings
+                if let visualizer = self.visualizerSession {
+                    Reinforcer.scheduleSetting = .random
+                    for (actionID, value) in visualizer.mappings {
+                        mappings[actionID] = value
+                    }
+                } else {
+                    Reinforcer.scheduleSetting = .reinforcement
+                    self.refreshContainer.synchronize(with: self)
                 }
-            } else {
-                Reinforcer.scheduleSetting = .reinforcement
-                self.refreshContainer.synchronize(with: self)
-            }
+                return mappings
+                }()
             
             for (actionID, value) in mappings {
                 var reinforcer: Reinforcer = {
@@ -160,7 +163,6 @@ fileprivate extension CodelessAPIClient {
                 if let codeless = value["codeless"] as? [String: Any],
                     let reinforcements = codeless["reinforcements"] as? [[String: Any]],
                     !reinforcements.isEmpty {
-//                    BKLog.debug("Codeless reinforcement found for actionID <\(actionID)>")
                     let codelessReinforcer: CodelessReinforcer = reinforcer as? CodelessReinforcer ?? {
                         let codelessReinforcer = CodelessReinforcer(copy: reinforcer)
                         switch actionID {
@@ -177,6 +179,7 @@ fileprivate extension CodelessAPIClient {
                         self.reinforcers[actionID] = codelessReinforcer
                         return codelessReinforcer
                     }()
+//                    BKLog.debug("Codeless reinforcement found for actionID <\(actionID)>")
                     for reinforcementDict in reinforcements {
                         if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
                             codelessReinforcer.codelessReinforcements[codelessReinforcement.primitive] = codelessReinforcement
@@ -218,16 +221,16 @@ fileprivate extension CodelessAPIClient {
             }
         }
         
-        if (oldValue?.applicationState != newValue.applicationState) {
-            if (newValue.applicationState) {
+        if (oldValue?.applicationState != newValue.applicationState || oldValue?.trackingEnabled != newValue.trackingEnabled) {
+            if (newValue.trackingEnabled && newValue.applicationState) {
                 NotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationState(_:)), names: [.UIApplicationDidBecomeActive, .UIApplicationWillResignActive], object: nil)
             } else {
                 NotificationCenter.default.removeObserver(self, names: [.UIApplicationDidBecomeActive, .UIApplicationWillResignActive], object: nil)
             }
         }
         
-        if (oldValue?.applicationViews != newValue.applicationViews) {
-            if (newValue.applicationViews) {
+        if (oldValue?.applicationViews != newValue.applicationViews || oldValue?.trackingEnabled != newValue.trackingEnabled) {
+            if (newValue.trackingEnabled && newValue.applicationViews) {
                 InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationViews(_:)), names: [.UIViewControllerDidAppear, .UIViewControllerDidDisappear], object: nil)
             } else {
                 InstanceSelectorNotificationCenter.default.removeObserver(self, names: [.UIViewControllerDidAppear, .UIViewControllerDidDisappear], object: nil)
@@ -288,7 +291,7 @@ fileprivate extension CodelessAPIClient {
         serialQueue.async {
             if oldValue == nil && self.visualizerSession != nil {
                 InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.doNothing(notification:)), names: .visualizerNotifications, object: nil)
-                // listen for all notifications sent
+                // listen for all notifications since notification names not known prior
                 InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: nil, object: nil)
             } else if oldValue != nil && self.visualizerSession == nil {
                 InstanceSelectorNotificationCenter.default.removeObserver(self)
@@ -297,6 +300,9 @@ fileprivate extension CodelessAPIClient {
     }
     
     func _promptPairing() {
+        guard !credentials.inProduction && boundlessConfig.integrationMethod == "codeless" else {
+            return
+        }
         var payload = credentials.json
         payload["deviceName"] = UIDevice.current.name
         
