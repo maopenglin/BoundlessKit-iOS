@@ -38,7 +38,7 @@ internal class BoundlessUserIdentity : NSObject {
             switch source {
             case .idfa:
                 if _value == nil {
-                    _value = ASIdHelper.adId()?.uuidString
+                    _value = ASIdHelper.adId()?.uuidString.asValidId
                 }
                 fallthrough
             case .idfv:

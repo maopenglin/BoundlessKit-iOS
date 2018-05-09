@@ -20,11 +20,10 @@ class ViewController: UIViewController {
     
     @objc func action2Performed(sender: UIButton){
         print("Action 2 performed")
+        BoundlessKit.track(actionID: "pressed track")
         
-//        BoundlessKit.track(actionID: "pressed track")
+//        BoundlessKit.standard.setCustomUserID("bob")
 //        locationManager.requestAlwaysAuthorization()
-        
-        sender.showEmojiSplosion(at: CGPoint(x: sender.bounds.midX, y: sender.bounds.midY))
     }
     
     
