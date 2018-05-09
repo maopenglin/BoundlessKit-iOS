@@ -201,6 +201,7 @@ fileprivate extension CodelessAPIClient {
         let newValue = boundlessConfig
         
         self.refreshContainer.enabled = newValue.reinforcementEnabled
+        self.reportBatch.enabled = newValue.reinforcementEnabled
         self.trackBatch.enabled = newValue.trackingEnabled
         self.reportBatch.desiredMaxCountUntilSync = newValue.reportBatchSize
         self.trackBatch.desiredMaxCountUntilSync = newValue.trackBatchSize

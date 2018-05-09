@@ -14,6 +14,7 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         NSKeyedArchiver.setClassName("BKReportBatch", for: BKReportBatch.self)
     }()
     
+    var enabled = true
     var desiredMaxTimeUntilSync: Int64
     var desiredMaxCountUntilSync: Int
     
@@ -63,6 +64,9 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
     let storeGroup = DispatchGroup()
     
     func store(_ reinforcement: BKReinforcement) {
+        guard enabled else {
+            return
+        }
         if self[reinforcement.actionID] == nil {
             self[reinforcement.actionID] = SynchronizedArray()
         }
@@ -80,6 +84,8 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
     }
     
     var needsSync: Bool {
+        guard enabled else { return false }
+        
         if count >= desiredMaxCountUntilSync {
             return true
         }
@@ -96,6 +102,10 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
     }
     
     func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
+        guard enabled else {
+            successful(true)
+            return
+        }
         storeGroup.wait()
         let reportCopy = self.valuesForKeys
         let reportCount = reportCopy.values.reduce(0, {$0 + $1.count})

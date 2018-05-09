@@ -77,7 +77,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
     let group = DispatchGroup()
     func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
         guard enabled else {
-            successful(false)
+            successful(true)
             return
         }
         syncQueue.async {

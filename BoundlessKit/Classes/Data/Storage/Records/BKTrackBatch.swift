@@ -62,7 +62,7 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
             return
         }
         self.append(action)
-//        BKLog.print(confirmed: "Tracked action #<\(self.count)>:<\(action.name)>")
+//        BKLog.debug(confirmed: "Tracked action #<\(self.count)>:<\(action.name)>")
         storeGroup.enter()
         self.storage?.0.archive(self, forKey: self.storage!.1)
         BoundlessContext.getContext() { contextInfo in
@@ -75,6 +75,8 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
     }
     
     var needsSync: Bool {
+        guard enabled else { return false }
+        
         if count >= desiredMaxCountUntilSync {
             return true
         }
@@ -87,6 +89,10 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
     }
     
     func synchronize(with apiClient: BoundlessAPIClient, successful: @escaping (Bool)->Void = {_ in}) {
+        guard enabled else {
+            successful(true)
+            return
+        }
         storeGroup.wait()
         let trackCopy = self.values
         guard trackCopy.count > 0 else {
