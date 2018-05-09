@@ -12,16 +12,23 @@ internal class BoundlessBluetooth : NSObject {
     
     static let shared = BoundlessBluetooth()
     
-    fileprivate var bluetoothManager: BluetoothManager!
+    fileprivate let bluetoothManager: BluetoothManager?
     
     fileprivate override init() {
+        #if (arch(i386) || arch(x86_64)) && os(iOS)
+            bluetoothManager = nil
+        #else
+            bluetoothManager = BluetoothManager(delegate: nil, queue: .main, options: [CBCentralManagerOptionShowPowerAlertKey: 0])
+        #endif
         super.init()
-        bluetoothManager = BluetoothManager(delegate: self, queue: .main, options: [CBCentralManagerOptionShowPowerAlertKey: 0])
-        bluetoothManager.scan(completion: {_ in})
+        bluetoothManager?.delegate = self
+        bluetoothManager?.scan(completion: {_ in})
     }
     
     func getBluetooth(callback: @escaping([[String: Any]]?) -> Void) {
-        bluetoothManager.scan(completion: callback)
+        bluetoothManager?.scan(completion: callback) ?? {
+            callback(nil)
+        }()
     }
     
 }
@@ -29,11 +36,11 @@ internal class BoundlessBluetooth : NSObject {
 extension BoundlessBluetooth : CBPeripheralDelegate, CBCentralManagerDelegate {
     
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        bluetoothManager.canScan = (central.state == .poweredOn)
+        bluetoothManager?.canScan = (central.state == .poweredOn)
     }
     
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        bluetoothManager.didDiscover(peripheral: peripheral, rssi: RSSI)
+        bluetoothManager?.didDiscover(peripheral: peripheral, rssi: RSSI)
     }
     
 }
