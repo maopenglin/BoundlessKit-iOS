@@ -11,7 +11,7 @@ import Foundation
 open class BoundlessKit : NSObject {
     
     internal static var _standard: BoundlessKit?
-    public static var standard: BoundlessKit {
+    open class var standard: BoundlessKit {
         guard _standard == nil else {
             return _standard!
         }
@@ -21,7 +21,7 @@ open class BoundlessKit : NSObject {
     
     internal let apiClient: BoundlessAPIClient
     
-    private override convenience init() {
+    public convenience override init() {
         guard let properties = BoundlessProperties.fromFile else {
             fatalError("Missing <BoundlessProperties.plist> file")
         }
@@ -34,25 +34,24 @@ open class BoundlessKit : NSObject {
     }
     
     @objc
-    public class func track(actionID: String, metadata: [String: Any] = [:]) {
+    open class func track(actionID: String, metadata: [String: Any] = [:]) {
         standard.track(actionID: actionID, metadata: metadata)
     }
     
     @objc
-    public class func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
+    open class func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
         standard.reinforce(actionID: actionID, metadata: metadata, completion: completion)
     }
     
     @objc
-    public func track(actionID: String, metadata: [String: Any] = [:]) {
+    open func track(actionID: String, metadata: [String: Any] = [:]) {
         let action = BKAction(actionID, metadata)
         apiClient.trackBatch.store(action)
         apiClient.syncIfNeeded()
     }
     
-    
     @objc
-    public func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
+    open func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
         apiClient.refreshContainer.decision(forActionID: actionID) { reinforcementDecision in
             let reinforcement = BKReinforcement(reinforcementDecision, metadata)
             completion(reinforcement.name)
@@ -62,7 +61,7 @@ open class BoundlessKit : NSObject {
     }
     
     @objc
-    public func setCustomUserID(_ id: String?) {
+    open func setCustomUserID(_ id: String?) {
         apiClient.setCustomUserIdentity(id)
     }
 }

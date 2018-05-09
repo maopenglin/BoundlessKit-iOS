@@ -38,7 +38,7 @@ public extension UIView {
         }
     }
     
-    internal func confettiBurst(duration:Double, size:CGSize, shapes:[ConfettiShape], colors:[UIColor], startedHandler: @escaping ()->Void) {
+    public func confettiBurst(duration:Double, size:CGSize, shapes:[ConfettiShape], colors:[UIColor], startedHandler: @escaping ()->Void) {
         DispatchQueue.main.async {
             
             /* Create bursting confetti */
@@ -94,7 +94,7 @@ public extension UIView {
         }
     }
     
-    internal func confettiShower(duration:Double, size:CGSize, shapes:[ConfettiShape], colors:[UIColor], completion: @escaping ()->Void) {
+    public func confettiShower(duration:Double, size:CGSize, shapes:[ConfettiShape], colors:[UIColor], completion: @escaping ()->Void) {
         DispatchQueue.main.async {
             
             /* Create showering confetti */
