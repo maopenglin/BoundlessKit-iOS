@@ -32,7 +32,7 @@ internal struct BoundlessConfiguration {
     
     init(configID: String? = nil,
          integrationMethod: String = "manual",
-         reinforcementEnabled: Bool = false,
+         reinforcementEnabled: Bool = true,
          reportBatchSize: Int = 10,
          triggerEnabled: Bool = false,
          trackingEnabled: Bool = true,
