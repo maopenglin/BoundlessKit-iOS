@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class BoundlessKitApplicationLauncherBridge : NSObject {
+open class BoundlessKitApplicationLauncherBridge : NSObject {
     
     @objc public static let standard = BoundlessKitApplicationLauncherBridge()
     

@@ -8,7 +8,7 @@
 import Foundation
 import CoreLocation
 
-class BoundlessLocation : NSObject, CLLocationManagerDelegate {
+internal class BoundlessLocation : NSObject, CLLocationManagerDelegate {
     
     static let shared = BoundlessLocation()
     

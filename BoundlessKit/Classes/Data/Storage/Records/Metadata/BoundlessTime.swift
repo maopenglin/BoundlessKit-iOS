@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol BoundlessObjectID {
+internal protocol BoundlessObjectID {
     var boid: UUID {get set}
 }
 

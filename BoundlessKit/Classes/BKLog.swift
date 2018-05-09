@@ -8,8 +8,8 @@
 import Foundation
 
 open class BKLogPreferences {
-    static var debugEnabled = false
     static var printEnabled = true
+    static var debugEnabled = false
 }
 
 internal class BKLog {
@@ -41,15 +41,13 @@ internal class BKLog {
     ///     - line: Used to get the line of bug. Do not use this parameter. Defaults to #line.
     ///
     @objc public class func debug(_ message: String, filePath: String = #file, function: String =  #function, line: Int = #line) {
-        #if DEBUG
-            guard BKLogPreferences.printEnabled && BKLogPreferences.debugEnabled else { return }
-            var functionSignature:String = function
-            if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
-                functionSignature.replaceSubrange(parameterNames, with: "()")
-            }
-            let fileName = NSString(string: filePath).lastPathComponent
-            Swift.print("[\(fileName):\(line):\(functionSignature)] - \(message)")
-        #endif
+        guard BKLogPreferences.printEnabled && BKLogPreferences.debugEnabled else { return }
+        var functionSignature:String = function
+        if let parameterNames = functionSignature.range(of: "\\((.*?)\\)", options: .regularExpression) {
+            functionSignature.replaceSubrange(parameterNames, with: "()")
+        }
+        let fileName = NSString(string: filePath).lastPathComponent
+        Swift.print("[\(fileName):\(line):\(functionSignature)] - \(message)")
     }
     
     /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'

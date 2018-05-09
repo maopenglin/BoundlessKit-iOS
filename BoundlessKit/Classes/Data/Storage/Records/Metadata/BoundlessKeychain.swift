@@ -8,7 +8,7 @@
 import Foundation
 
 internal class BoundlessKeychain {
-    static var buid: String? {
+    class var buid: String? {
         get {
             return BoundlessKeychain.load(key: NSStringFromClass(BoundlessUserIdentity.self))
         }

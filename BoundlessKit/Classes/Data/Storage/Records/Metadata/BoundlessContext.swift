@@ -7,7 +7,7 @@
 
 import Foundation
 
-class BoundlessContext : NSObject {
+internal class BoundlessContext : NSObject {
     static var locationEnabled = false
     
     static let queue = DispatchQueue(label: NSStringFromClass(BoundlessContext.self), attributes: .concurrent)

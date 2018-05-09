@@ -7,14 +7,14 @@
 
 import Foundation
 
-protocol BKData : NSCoding {}
-protocol BKDatabase {
+internal protocol BKData : NSCoding {}
+internal protocol BKDatabase {
     typealias Storage = (BKDatabase, String)
     func archive<T: BKData>(_ value: T?, forKey key: String)
     func unarchive<T: BKData>(_ key: String) -> T?
 }
 
-class BKUserDefaults : UserDefaults, BKDatabase {
+internal class BKUserDefaults : UserDefaults, BKDatabase {
     
     override class var standard: BKUserDefaults {
         get {
@@ -51,7 +51,7 @@ class BKUserDefaults : UserDefaults, BKDatabase {
         }
     }
     
-    open var initialBootDate: Date? {
+    var initialBootDate: Date? {
         get {
             let date = object(forKey: "initialBootDate") as? Date
             if date == nil {

@@ -141,14 +141,14 @@ fileprivate extension CodelessAPIClient {
             }
             
             for (actionID, value) in mappings {
-                var reinforcer: Reinforcer
-                if let r = self.reinforcers[actionID] {
-                    reinforcer = r
-                    reinforcer.reinforcementIDs = []
-                } else {
-                    reinforcer = Reinforcer(forActionID: actionID)
-                    self.reinforcers[actionID] = reinforcer
-                }
+                var reinforcer: Reinforcer = {
+                    self.reinforcers[actionID]?.reinforcementIDs = []
+                    return self.reinforcers[actionID]
+                    }() ?? {
+                        let reinforcer = Reinforcer(forActionID: actionID)
+                        self.reinforcers[actionID] = reinforcer
+                        return reinforcer
+                    }()
                 
                 if let manual = value["manual"] as? [String: Any],
                     let reinforcements = manual["reinforcements"] as? [String],
@@ -196,6 +196,7 @@ fileprivate extension CodelessAPIClient {
 fileprivate extension CodelessAPIClient {
     func didSetConfiguration(oldValue: BoundlessConfiguration?) {
         let newValue = boundlessConfig
+        
         self.refreshContainer.enabled = newValue.reinforcementEnabled
         self.trackBatch.enabled = newValue.trackingEnabled
         self.reportBatch.desiredMaxCountUntilSync = newValue.reportBatchSize
@@ -212,7 +213,7 @@ fileprivate extension CodelessAPIClient {
                 credentials.identity.source = .idfa
             case .custom?:
                 credentials.identity.source = .custom
-            default:
+            case nil:
                 credentials.identity.source = .idfv
             }
         }

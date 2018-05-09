@@ -7,7 +7,7 @@
 
 import Foundation
 
-open class BoundlessUserIdentity : NSObject {
+internal class BoundlessUserIdentity : NSObject {
     enum Source : String {
         case idfa, idfv, custom
     }
