@@ -51,6 +51,10 @@ internal class BoundlessAPIClient : HTTPClient {
         super.init(session: session)
     }
     
+    func reinforcement(forActionID actionID: String, completion: @escaping ((BKDecision)->Void)) {
+        refreshContainer.decision(forActionID: actionID, completion: completion)
+    }
+    
     func setCustomUserIdentity(_ id: String?) {
         credentials.identity.setSource(customValue: id)
     }

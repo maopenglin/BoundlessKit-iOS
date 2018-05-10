@@ -52,7 +52,7 @@ open class BoundlessKit : NSObject {
     
     @objc
     open func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
-        apiClient.refreshContainer.decision(forActionID: actionID) { reinforcementDecision in
+        apiClient.reinforcement(forActionID: actionID) { reinforcementDecision in
             let reinforcement = BKReinforcement(reinforcementDecision, metadata)
             completion(reinforcement.name)
             self.apiClient.reportBatch.store(reinforcement)
