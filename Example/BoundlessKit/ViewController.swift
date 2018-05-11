@@ -14,7 +14,7 @@ class ViewController: UIViewController {
     
     @objc var someCounter: Float = 0
     
-    @objc func action1Performed(){
+    @objc func action1Performed(_ sender: UIButton){
         // Reinforce the action to make it sticky!!
         //        BoundlessKit.reinforce("a1", metaData: ["key":"value"], completion: {
         //            reinforcement in

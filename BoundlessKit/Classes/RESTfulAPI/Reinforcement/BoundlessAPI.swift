@@ -11,7 +11,7 @@ import Foundation
 @objc
 public class BoundlessAPI : NSObject{
     
-    public static var logCalls = false
+    public static var logCalls = true
     
     /// Valid API actions appeneded to the BoundlessAI URL
     ///

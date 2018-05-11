@@ -1,16 +1,16 @@
 PODS:
-  - BoundlessKit (5.2.15)
+  - BoundlessKit (5.2.16)
 
 DEPENDENCIES:
   - BoundlessKit (from `../`)
 
 EXTERNAL SOURCES:
   BoundlessKit:
-    :path: ../
+    :path: "../"
 
 SPEC CHECKSUMS:
-  BoundlessKit: 501b786b4a1dd58f4e85909b27a807bf991ff366
+  BoundlessKit: 5cffb7f6eb7149c54dff61b920f8146ec7c17c0d
 
 PODFILE CHECKSUM: ec9418edc4a4b0f1661ce7ce640082caba32e229
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.0

@@ -37,6 +37,7 @@ public class BoundlessConfiguration : UserDefaultsSingleton  {
     @objc public var notificationObservations: Bool
     @objc public var storekitObservations: Bool
     @objc public var locationObservations: Bool
+    @objc public var bluetoothObservations: Bool
     @objc public var applicationState: Bool
     @objc public var applicationViews: Bool
     @objc public var customViews: [String: Any]
@@ -53,6 +54,7 @@ public class BoundlessConfiguration : UserDefaultsSingleton  {
          notificationObservations: Bool,
          storekitObservations: Bool,
          locationObservations: Bool,
+         bluetoothObservations: Bool,
          trackBatchSize: Int,
          reportBatchSize: Int,
          integrationMethod: String,
@@ -70,6 +72,7 @@ public class BoundlessConfiguration : UserDefaultsSingleton  {
         self.notificationObservations = notificationObservations
         self.storekitObservations = storekitObservations
         self.locationObservations = locationObservations
+        self.bluetoothObservations = bluetoothObservations
         self.trackBatchSize = trackBatchSize
         self.reportBatchSize = reportBatchSize
         self.integrationMethod = integrationMethod
@@ -134,6 +137,7 @@ public class BoundlessConfiguration : UserDefaultsSingleton  {
                 notificationObservations: aDecoder.decodeBool(forKey: #keyPath(BoundlessConfiguration.notificationObservations)),
                 storekitObservations: aDecoder.decodeBool(forKey: #keyPath(BoundlessConfiguration.storekitObservations)),
                 locationObservations: aDecoder.decodeBool(forKey: #keyPath(BoundlessConfiguration.locationObservations)),
+                bluetoothObservations: aDecoder.decodeBool(forKey: #keyPath(BoundlessConfiguration.bluetoothObservations)),
                 trackBatchSize: aDecoder.decodeInteger(forKey: #keyPath(BoundlessConfiguration.trackBatchSize)),
                 reportBatchSize: aDecoder.decodeInteger(forKey: #keyPath(BoundlessConfiguration.reportBatchSize)),
                 integrationMethod: integrationMethod,
@@ -159,7 +163,8 @@ public class BoundlessConfiguration : UserDefaultsSingleton  {
                                                   "customEvents": [String: Any](),
                                                   "notificationObservations": false,
                                                   "storekitObservations": false,
-                                                  "locationObservations": true
+                                                  "locationObservations": true,
+                                                  "bluetoothObservations": true
         ]
         standardConfig["batchSize"] = ["track": 15, "report": 15]
         standardConfig["integrationMethod"] = "codeless"
@@ -186,6 +191,7 @@ extension BoundlessConfiguration {
         guard let notificationObservations = trackingCapabilities["notificationObservations"] as? Bool else { BoundlessLog.debug("Bad parameter"); return nil }
         guard let storekitObservations = trackingCapabilities["storekitObservations"] as? Bool else { BoundlessLog.debug("Bad parameter"); return nil }
         guard let locationObservations = trackingCapabilities["locationObservations"] as? Bool else { BoundlessLog.debug("Bad parameter"); return nil }
+        guard let bluetoothObservations = trackingCapabilities["bluetoothObservations"] as? Bool else { BoundlessLog.debug("Bad parameter"); return nil }
         guard let batchSize = configDictionary["batchSize"] as? [String: Any] else { BoundlessLog.debug("Bad parameter"); return nil }
         guard let trackBatchSize = batchSize["track"] as? Int else { BoundlessLog.debug("Bad parameter"); return nil }
         guard let reportBatchSize = batchSize["report"] as? Int else { BoundlessLog.debug("Bad parameter"); return nil }
@@ -205,6 +211,7 @@ extension BoundlessConfiguration {
             notificationObservations: notificationObservations,
             storekitObservations: storekitObservations,
             locationObservations: locationObservations,
+            bluetoothObservations: bluetoothObservations,
             trackBatchSize: trackBatchSize,
             reportBatchSize: reportBatchSize,
             integrationMethod: integrationMethod,
