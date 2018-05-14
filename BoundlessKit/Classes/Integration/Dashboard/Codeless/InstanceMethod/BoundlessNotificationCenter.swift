@@ -35,7 +35,8 @@ internal extension Notification.Name {
     
     static let actionIndicatorTerm = "codeless"
     
-    static let CodelessUIApplicationDidLaunch: String = [Notification.Name.UIApplicationDidFinishLaunching.rawValue, actionIndicatorTerm].joined(separator: "-")
+    static let CodelessUIApplicationDidFinishLaunching: String = [Notification.Name.UIApplicationDidFinishLaunching.rawValue, actionIndicatorTerm].joined(separator: "-")
+    
     static let CodelessUIApplicationDidBecomeActive: String = [Notification.Name.UIApplicationDidBecomeActive.rawValue, actionIndicatorTerm].joined(separator: "-")
     
     static let UIApplicationSendAction: Notification.Name = {
@@ -80,8 +81,10 @@ internal class BoundlessNotificationCenter : NotificationCenter {
             if let instanceSelector = InstanceSelector(aName.rawValue),
                 let poster = InstanceSelectorPoster(instanceSelector) {
                 aPoster = poster
-            } else if aName.rawValue == Notification.Name.CodelessUIApplicationDidLaunch || aName.rawValue == Notification.Name.CodelessUIApplicationDidBecomeActive {
-                aPoster = ForwardPoster(notification: aName, center: NotificationCenter.default)
+            } else if aName.rawValue == Notification.Name.CodelessUIApplicationDidFinishLaunching {
+                aPoster = ForwardPoster(notification: Notification.Name.UIApplicationDidFinishLaunching, center: NotificationCenter.default)
+            } else if aName.rawValue == Notification.Name.CodelessUIApplicationDidBecomeActive {
+                aPoster = ForwardPoster(notification: Notification.Name.UIApplicationDidBecomeActive, center: NotificationCenter.default)
             } else {
                 aPoster = ForwardPoster(notification: aName, center: BoundlessNotificationCenter.external)
             }

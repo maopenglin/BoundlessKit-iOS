@@ -339,7 +339,7 @@ extension CodelessAPIClient {
                 
             case 208?:
                 self.submitToDashboard(actionID: Notification.Name.CodelessUIApplicationDidBecomeActive)
-                self.submitToDashboard(actionID: Notification.Name.CodelessUIApplicationDidLaunch)
+                self.submitToDashboard(actionID: Notification.Name.CodelessUIApplicationDidFinishLaunching)
                 if let _ = response["connectionUUID"] as? String,
                     let reconnectedSession = CodelessVisualizerSession.convert(from: response) {
                     self.visualizerSession = reconnectedSession
