@@ -34,16 +34,6 @@ open class BoundlessKit : NSObject {
     }
     
     @objc
-    open class func track(actionID: String, metadata: [String: Any] = [:]) {
-        standard.track(actionID: actionID, metadata: metadata)
-    }
-    
-    @objc
-    open class func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
-        standard.reinforce(actionID: actionID, metadata: metadata, completion: completion)
-    }
-    
-    @objc
     open func track(actionID: String, metadata: [String: Any] = [:]) {
         let action = BKAction(actionID, metadata)
         apiClient.version.trackBatch.store(action)
@@ -62,6 +52,16 @@ open class BoundlessKit : NSObject {
 }
 
 extension BoundlessKit {
+    
+    @objc
+    open class func track(actionID: String, metadata: [String: Any] = [:]) {
+        standard.track(actionID: actionID, metadata: metadata)
+    }
+    
+    @objc
+    open class func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
+        standard.reinforce(actionID: actionID, metadata: metadata, completion: completion)
+    }
     
     @objc
     open func setCustomUserID(_ id: String?) {
