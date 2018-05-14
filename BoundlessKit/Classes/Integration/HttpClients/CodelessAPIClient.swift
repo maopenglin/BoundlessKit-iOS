@@ -22,6 +22,8 @@ internal enum CodelessAPIEndpoint {
 }
 
 internal class CodelessAPIClient : BoundlessAPIClient {
+    internal var database: BKUserDefaults = BKUserDefaults.standard
+    
     var reinforcers = [String: Reinforcer]()
     
     var boundlessConfig: BoundlessConfiguration {
@@ -44,10 +46,10 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     }
     
     convenience init(boundlessClient: BoundlessAPIClient) {
-        self.init(credentials: boundlessClient.credentials, version: boundlessClient.version, database: boundlessClient.database)
+        self.init(credentials: boundlessClient.credentials, version: boundlessClient.version)
     }
     
-    override init(credentials: BoundlessCredentials, version: BoundlessVersion, database: BKUserDefaults, session: URLSessionProtocol = URLSession.shared) {
+    override init(credentials: BoundlessCredentials, version: BoundlessVersion, session: URLSessionProtocol = URLSession.shared) {
         if let configData = database.object(forKey: "codelessConfig") as? Data,
             let config = BoundlessConfiguration.init(data: configData) {
             self.boundlessConfig = config
@@ -66,7 +68,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
             codelessVersion = version
         }
         
-        super.init(credentials: credentials, version: codelessVersion, database: database, session: session)
+        super.init(credentials: credentials, version: codelessVersion, session: session)
         
         didSetConfiguration(oldValue: nil)
         didSetVisualizerSession(oldValue: nil)
@@ -83,7 +85,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     }
     
     func boot(completion: @escaping () -> () = {}) {
-        let initialBoot = (database.initialBootDate == nil)
+        let initialBoot = (version.database.initialBootDate == nil)
         if initialBoot {
             // onInitialBoot erase previous keys
             BoundlessKeychain.buid = nil
@@ -101,7 +103,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                         self.boundlessConfig = config
                     }
                     if let versionDict = response?["version"] as? [String: Any],
-                        let version = BoundlessVersion.convert(from: versionDict) {
+                        let version = BoundlessVersion.convert(from: versionDict, database: self.database) {
                         self.version = version
                     }
                 }
@@ -123,11 +125,11 @@ fileprivate extension CodelessAPIClient {
     func didSetConfiguration(oldValue: BoundlessConfiguration?) {
         let newValue = boundlessConfig
         
-        self.refreshContainer.enabled = newValue.reinforcementEnabled
-        self.reportBatch.enabled = newValue.reinforcementEnabled
-        self.trackBatch.enabled = newValue.trackingEnabled
-        self.reportBatch.desiredMaxCountUntilSync = newValue.reportBatchSize
-        self.trackBatch.desiredMaxCountUntilSync = newValue.trackBatchSize
+        self.version.refreshContainer.enabled = newValue.reinforcementEnabled
+        self.version.reportBatch.enabled = newValue.reinforcementEnabled
+        self.version.trackBatch.enabled = newValue.trackingEnabled
+        self.version.reportBatch.desiredMaxCountUntilSync = newValue.reportBatchSize
+        self.version.trackBatch.desiredMaxCountUntilSync = newValue.trackBatchSize
         
         BoundlessContext.locationEnabled = newValue.locationObservations
         BoundlessContext.bluetoothEnabled = newValue.bluetoothObservations
@@ -182,7 +184,7 @@ fileprivate extension CodelessAPIClient {
             return
         }
         
-        trackBatch.store(BKAction(actionID, metadata))
+        version.trackBatch.store(BKAction(actionID, metadata))
     }
     
     @objc func trackApplicationViews(_ notification: Notification) {
@@ -203,7 +205,7 @@ fileprivate extension CodelessAPIClient {
                 return
             }
             
-            trackBatch.store(BKAction(actionID, metadata))
+            version.trackBatch.store(BKAction(actionID, metadata))
         }
     }
 }

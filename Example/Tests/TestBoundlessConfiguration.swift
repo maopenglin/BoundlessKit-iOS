@@ -29,7 +29,7 @@ class TestBoundlessConfiguration: XCTestCase {
 
         let gotReward = expectation(description: "Got a reward")
         apiClient.boundlessConfig = enabled
-        apiClient.refreshContainer.decision(forActionID: MockBKRefreshCartridge.actionID) { decision in
+        apiClient.version.refreshContainer.decision(forActionID: MockBKRefreshCartridge.actionID) { decision in
             if decision.name == MockBKRefreshCartridge.rewardID {
                 gotReward.fulfill()
             } else {
@@ -39,7 +39,7 @@ class TestBoundlessConfiguration: XCTestCase {
 
         let gotNeutral = expectation(description: "Got neutral")
         apiClient.boundlessConfig = disabled
-        apiClient.refreshContainer.decision(forActionID: MockBKRefreshCartridge.actionID) { decision in
+        apiClient.version.refreshContainer.decision(forActionID: MockBKRefreshCartridge.actionID) { decision in
             if decision.name == BKDecision.neutral {
                 gotNeutral.fulfill()
             } else {
@@ -49,7 +49,7 @@ class TestBoundlessConfiguration: XCTestCase {
 
         let gotRewardAgain = expectation(description: "Got a reward after reenabling reinforcement")
         apiClient.boundlessConfig = enabled
-        apiClient.refreshContainer.decision(forActionID: MockBKRefreshCartridge.actionID) { decision in
+        apiClient.version.refreshContainer.decision(forActionID: MockBKRefreshCartridge.actionID) { decision in
             if decision.name == MockBKRefreshCartridge.rewardID {
                 gotRewardAgain.fulfill()
             } else {

@@ -12,10 +12,20 @@ internal struct BoundlessVersion {
     let name: String?
     let mappings: [String: [String: Any]]
     
+    internal let database: BKUserDefaults
+    internal var trackBatch: BKTrackBatch
+    internal var reportBatch: BKReportBatch
+    internal var refreshContainer: BKRefreshCartridgeContainer
+    
     init(_ name: String? = nil,
-         _ mappings: [String: [String: Any]] = [:]) {
+         _ mappings: [String: [String: Any]] = [:],
+         database: BKUserDefaults = BKUserDefaults.standard) {
         self.name = name
         self.mappings = mappings
+        self.database = database
+        self.trackBatch = BKTrackBatch.initWith(database: database, forKey: "trackBatch")
+        self.reportBatch = BKReportBatch.initWith(database: database, forKey: "reportBatch")
+        self.refreshContainer = BKRefreshCartridgeContainer.initWith(database: database, forKey: "refreshContainer")
     }
 }
 
@@ -41,13 +51,14 @@ extension BoundlessVersion {
 }
 
 extension BoundlessVersion {
-    static func convert(from dict: [String: Any]) -> BoundlessVersion? {
+    static func convert(from dict: [String: Any], database: BKUserDefaults) -> BoundlessVersion? {
         guard let versionID = dict["versionID"] as? String else { BKLog.debug(error: "Bad parameter"); return nil }
         let mappings = dict["mappings"] as? [String: [String: Any]] ?? [:]
         
         return BoundlessVersion.init(
             versionID,
-            mappings
+            mappings,
+            database: database
         )
     }
 }

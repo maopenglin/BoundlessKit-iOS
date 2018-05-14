@@ -13,8 +13,8 @@ open class BoundlessKitApplicationLauncherBridge : NSObject {
     
     @objc public func appDidLaunch(_ notification: Notification) {
         // Set up boundlessKit if BoundlessProperties.plist found
-        if let properties = BoundlessProperties.fromFile {
-            let codelessAPIClient = CodelessAPIClient(credentials: properties.credentials, version: properties.version, database: BKUserDefaults.standard)
+        if let properties = BoundlessProperties.fromFile(using: BKUserDefaults.standard) {
+            let codelessAPIClient = CodelessAPIClient(credentials: properties.credentials, version: properties.version)
             BoundlessKit._standard = BoundlessKit(apiClient: codelessAPIClient)
             codelessAPIClient.boot()
         }

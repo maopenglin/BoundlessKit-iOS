@@ -22,10 +22,10 @@ open class BoundlessKit : NSObject {
     internal let apiClient: BoundlessAPIClient
     
     public convenience override init() {
-        guard let properties = BoundlessProperties.fromFile else {
+        guard let properties = BoundlessProperties.fromFile(using: BKUserDefaults.standard) else {
             fatalError("Missing <BoundlessProperties.plist> file")
         }
-        self.init(apiClient: BoundlessAPIClient(credentials: properties.credentials, version: properties.version, database: BKUserDefaults.standard))
+        self.init(apiClient: BoundlessAPIClient(credentials: properties.credentials, version: properties.version))
     }
     
     init(apiClient: BoundlessAPIClient) {
@@ -46,16 +46,16 @@ open class BoundlessKit : NSObject {
     @objc
     open func track(actionID: String, metadata: [String: Any] = [:]) {
         let action = BKAction(actionID, metadata)
-        apiClient.trackBatch.store(action)
+        apiClient.version.trackBatch.store(action)
         apiClient.syncIfNeeded()
     }
     
     @objc
     open func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
-        apiClient.refreshContainer.decision(forActionID: actionID) { reinforcementDecision in
+        apiClient.version.refreshContainer.decision(forActionID: actionID) { reinforcementDecision in
             let reinforcement = BKReinforcement(reinforcementDecision, metadata)
             completion(reinforcement.name)
-            self.apiClient.reportBatch.store(reinforcement)
+            self.apiClient.version.reportBatch.store(reinforcement)
             self.apiClient.syncIfNeeded()
         }
     }

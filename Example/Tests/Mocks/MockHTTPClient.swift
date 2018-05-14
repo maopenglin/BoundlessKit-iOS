@@ -10,12 +10,12 @@ import Foundation
 @testable import BoundlessKit
 
 extension BoundlessProperties {
-    static var fromTestFile: BoundlessProperties? {
+    static func fromTestFile(using database: BKUserDefaults = MockBKuserDefaults()) -> BoundlessProperties? {
         if let propertiesFile = Bundle(for: MockBoundlessKit.self).path(forResource: "BoundlessTestProperties", ofType: "plist"),
             let propertiesDictionary = NSDictionary(contentsOfFile: propertiesFile) as? [String: Any],
             let credentials = BoundlessCredentials.convert(from: propertiesDictionary) {
             return BoundlessProperties(credentials: credentials,
-                                       version: BoundlessVersion.convert(from: propertiesDictionary) ?? BoundlessVersion())
+                                       version: BoundlessVersion.convert(from: propertiesDictionary, database: database) ?? BoundlessVersion(database: database))
         } else {
             return nil
         }
@@ -24,8 +24,8 @@ extension BoundlessProperties {
 
 class MockBoundlessAPIClient : BoundlessAPIClient {
     init() {
-        let properties = BoundlessProperties.fromTestFile!
-        super.init(credentials: properties.credentials, version: properties.version, database: MockBKuserDefaults(), session: MockURLSession())
+        let properties = BoundlessProperties.fromTestFile()!
+        super.init(credentials: properties.credentials, version: properties.version, session: MockURLSession())
         logRequests = true
         logResponses = true
     }
@@ -33,9 +33,9 @@ class MockBoundlessAPIClient : BoundlessAPIClient {
 
 class MockCodelessAPIClient : CodelessAPIClient {
     init() {
-        let properties = BoundlessProperties.fromTestFile!
-        super.init(credentials: properties.credentials, version: properties.version, database: MockBKuserDefaults(), session: MockURLSession())
-        self.refreshContainer = MockBKRefreshCartridgeContainer([:])
+        let properties = BoundlessProperties.fromTestFile()!
+        super.init(credentials: properties.credentials, version: properties.version, session: MockURLSession())
+        self.version.refreshContainer = MockBKRefreshCartridgeContainer([:])
         logRequests = true
         logResponses = true
     }

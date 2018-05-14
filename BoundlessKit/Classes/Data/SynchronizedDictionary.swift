@@ -37,6 +37,12 @@ extension SynchronizedDictionary {
 //        queue.sync { result = self.dict.flatMap(transform) }
 //        return result
 //    }
+    
+    func mapValues<ElementOfResult>(_ transform: (Value) -> ElementOfResult) -> Dictionary<Key, ElementOfResult> {
+        var result = Dictionary<Key, ElementOfResult>()
+        queue.sync { result = self.dict.mapValues(transform) }
+        return result
+    }
 }
 
 // MARK: - Mutable

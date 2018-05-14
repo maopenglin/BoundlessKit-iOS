@@ -30,24 +30,15 @@ internal class BoundlessAPIClient : HTTPClient {
     internal var credentials: BoundlessCredentials
     internal var version: BoundlessVersion
     
-    internal var database: BKUserDefaults
-    internal var trackBatch: BKTrackBatch
-    internal var reportBatch: BKReportBatch
-    internal var refreshContainer: BKRefreshCartridgeContainer
-    
     let coordinationQueue = DispatchQueue(label: "boundless.kit.api")
     var coordinationWork: DispatchWorkItem?
     var timeDelayAfterTrack: UInt32 = 1
     var timeDelayAfterReport: UInt32 = 5
     var timeDelayAfterRefresh: UInt32 = 3
     
-    init(credentials: BoundlessCredentials, version: BoundlessVersion, database: BKUserDefaults, session: URLSessionProtocol = URLSession.shared) {
+    init(credentials: BoundlessCredentials, version: BoundlessVersion, session: URLSessionProtocol = URLSession.shared) {
         self.credentials = credentials
         self.version = version
-        self.database = database
-        self.trackBatch = BKTrackBatch.initWith(database: database, forKey: "trackBatch")
-        self.reportBatch = BKReportBatch.initWith(database: database, forKey: "reportBatch")
-        self.refreshContainer = BKRefreshCartridgeContainer.initWith(database: database, forKey: "refreshContainer")
         super.init(session: session)
     }
     
@@ -57,7 +48,7 @@ internal class BoundlessAPIClient : HTTPClient {
     
     func syncIfNeeded() {
         if coordinationWork == nil &&
-            (refreshContainer.needsSync || reportBatch.needsSync || trackBatch.needsSync) {
+            (version.refreshContainer.needsSync || version.reportBatch.needsSync || version.trackBatch.needsSync) {
             synchronize()
         }
     }
@@ -77,7 +68,7 @@ internal class BoundlessAPIClient : HTTPClient {
             }
             
             let sema = DispatchSemaphore(value: 0)
-            self.trackBatch.synchronize(with: self) { success in
+            self.version.trackBatch.synchronize(with: self) { success in
                 goodProgress = goodProgress && success
                 sema.signal()
             }
@@ -88,7 +79,7 @@ internal class BoundlessAPIClient : HTTPClient {
                 return
             }
             
-            self.reportBatch.synchronize(with: self) { success in
+            self.version.reportBatch.synchronize(with: self) { success in
                 goodProgress = goodProgress && success
                 sema.signal()
             }
@@ -99,7 +90,7 @@ internal class BoundlessAPIClient : HTTPClient {
                 return
             }
             
-            self.refreshContainer.synchronize(with: self) { success in
+            self.version.refreshContainer.synchronize(with: self) { success in
                 goodProgress = goodProgress && success
                 sema.signal()
             }
