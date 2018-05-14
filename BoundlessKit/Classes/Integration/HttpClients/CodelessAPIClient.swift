@@ -357,11 +357,10 @@ extension CodelessAPIClient {
                 UIWindow.presentTopLevelAlert(alertController: pairingAlert)
                 
             case 208?:
-                self.submitToDashboard(actionID: Notification.Name.CodelessUIApplicationDidBecomeActive)
-                self.submitToDashboard(actionID: Notification.Name.CodelessUIApplicationDidFinishLaunching)
-                if let _ = response["connectionUUID"] as? String,
-                    let reconnectedSession = CodelessVisualizerSession.convert(from: response) {
+                if let reconnectedSession = CodelessVisualizerSession.convert(from: response) {
                     self.visualizerSession = reconnectedSession
+                    self.submitToDashboard(actionID: Notification.Name.CodelessUIApplicationDidBecomeActive)
+                    self.submitToDashboard(actionID: Notification.Name.CodelessUIApplicationDidFinishLaunching)
                 }
 //                else { // /identity endpoint gives back wrongly-formatted visualizer mapping
 //                    self.visualizerSession = nil
@@ -468,8 +467,7 @@ fileprivate  struct CodelessVisualizerSession {
     
     static func convert(from dict: [String: Any]) -> CodelessVisualizerSession? {
         guard let connectionUUID = dict["connectionUUID"] as? String else { BKLog.debug(error: "Bad parameter"); return nil }
-        guard let mappings = dict["mappings"] as? [String: [String: Any]] else { BKLog.debug(error: "Bad parameter"); return nil }
         
-        return CodelessVisualizerSession(connectionUUID: connectionUUID, mappings: mappings)
+        return CodelessVisualizerSession(connectionUUID: connectionUUID, mappings: dict["mappings"] as? [String: [String: Any]] ?? [:])
     }
 }

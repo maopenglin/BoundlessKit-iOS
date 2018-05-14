@@ -30,7 +30,6 @@ internal class CodelessReinforcer : Reinforcer {
     
     @objc
     func receive(notification: Notification) {
-        let actionID = notification.name.rawValue
 //        BKLog.print("Action peformed with actionID <\(actionID)>")
         let target = notification.userInfo?["target"] as? NSObject ?? UIWindow.topWindow ?? NSObject()
         let sender = notification.userInfo?["sender"] as AnyObject?
@@ -38,7 +37,7 @@ internal class CodelessReinforcer : Reinforcer {
         switch Reinforcer.scheduleSetting {
         case .reinforcement:
             BoundlessKit.standard.reinforce(actionID: actionID) { reinforcementID in
-                BKLog.debug("Showing codeless reinforcementID <\(reinforcementID)> for actionID <\(actionID)>...")
+                BKLog.debug("Showing codeless reinforcementID <\(reinforcementID)> for actionID <\(self.actionID)>...")
                 self.codelessReinforcements[reinforcementID]??.show(targetInstance: target, senderInstance: sender)
             }
         case .random:

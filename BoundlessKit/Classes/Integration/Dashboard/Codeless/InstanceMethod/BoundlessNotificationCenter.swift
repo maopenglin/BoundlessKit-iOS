@@ -35,9 +35,9 @@ internal extension Notification.Name {
     
     static let actionIndicatorTerm = "codeless"
     
-    static let CodelessUIApplicationDidFinishLaunching: String = [Notification.Name.UIApplicationDidFinishLaunching.rawValue, actionIndicatorTerm].joined(separator: "-")
+    static let CodelessUIApplicationDidFinishLaunching: String = [actionIndicatorTerm, Notification.Name.UIApplicationDidFinishLaunching.rawValue].joined(separator: "-")
     
-    static let CodelessUIApplicationDidBecomeActive: String = [Notification.Name.UIApplicationDidBecomeActive.rawValue, actionIndicatorTerm].joined(separator: "-")
+    static let CodelessUIApplicationDidBecomeActive: String = [actionIndicatorTerm, Notification.Name.UIApplicationDidBecomeActive.rawValue].joined(separator: "-")
     
     static let UIApplicationSendAction: Notification.Name = {
         return InstanceSelector(UIApplication.self, #selector(UIApplication.sendAction(_:to:from:for:)))!.notificationName
@@ -57,7 +57,6 @@ internal extension Notification.Name {
 
 internal class BoundlessNotificationCenter : NotificationCenter {
     
-    static let external = NotificationCenter()
     static let _default = BoundlessNotificationCenter()
     override public class var `default`: BoundlessNotificationCenter {
         return _default
@@ -82,15 +81,17 @@ internal class BoundlessNotificationCenter : NotificationCenter {
                 let poster = InstanceSelectorPoster(instanceSelector) {
                 aPoster = poster
             } else if aName.rawValue == Notification.Name.CodelessUIApplicationDidFinishLaunching {
-                aPoster = ForwardPoster(notification: Notification.Name.UIApplicationDidFinishLaunching, center: NotificationCenter.default)
+                NotificationCenter.default.addObserver(observer, selector: aSelector, name: Notification.Name.UIApplicationDidFinishLaunching, object: anObject)
+                return
             } else if aName.rawValue == Notification.Name.CodelessUIApplicationDidBecomeActive {
-                aPoster = ForwardPoster(notification: Notification.Name.UIApplicationDidBecomeActive, center: NotificationCenter.default)
+                NotificationCenter.default.addObserver(observer, selector: aSelector, name: Notification.Name.UIApplicationDidBecomeActive, object: anObject)
+                return
             } else {
-                aPoster = ForwardPoster(notification: aName, center: BoundlessNotificationCenter.external)
+                return
             }
             self.posters[aName] = aPoster
             aPoster.addObserver(observer as AnyObject)
-            // BKLog.debug("Added first observer for instance method:\(aName.rawValue)")
+//            BKLog.debug("Added first observer for instance method:\(aName.rawValue)")
             
         }
     }
@@ -156,22 +157,6 @@ fileprivate class Poster : NSObject {
         let oldObservers = observers.flatMap({$0.value})
         observers = []
         return oldObservers
-    }
-}
-
-fileprivate class ForwardPoster : Poster {
-    
-    let _notificationName: Notification.Name?
-    override var notificationName: Notification.Name? { get { return _notificationName } }
-    
-    init(notification: Notification.Name?, center: NotificationCenter) {
-        self._notificationName = notification
-        super.init()
-        center.addObserver(self, selector: #selector(post(notification:)), name: notification, object: nil)
-    }
-    
-    @objc func post(notification: Notification) {
-        BoundlessNotificationCenter.default.post(notification)
     }
 }
 
