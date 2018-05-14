@@ -134,8 +134,8 @@ internal class BoundlessProperties : UserDefaultsSingleton {
 //                    BoundlessLog.debug("set ASIdentifierManager for primaryIdentity:(\(aid))")
                     BoundlessProperties._primaryIdentity = aid
                 } else if let vid = UIDevice.current.identifierForVendor?.uuidString {
-                    BoundlessLog.debug("set identifierForVendor for primaryIdentity:(\(vid))")
-//                    BoundlessProperties._primaryIdentity = vid
+//                    BoundlessLog.debug("set identifierForVendor for primaryIdentity:(\(vid))")
+                    BoundlessProperties._primaryIdentity = vid
                 }
             }
             

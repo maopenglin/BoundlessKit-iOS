@@ -19,7 +19,7 @@ public class CodelessAPI : NSObject {
         case identify, accept, submit, boot
         var path:String{ switch self{
         case .identify: return "https://dashboard-api.usedopamine.com/codeless/pair/customer/identity/"
-        case .boot: return "https://api.usedopamine.com/v5/app/boot"
+        case .boot: return "https://reinforce.boundless.ai/v5/app/boot"
         case .accept: return "https://dashboard-api.usedopamine.com/codeless/pair/customer/accept/"
         case .submit: return "https://dashboard-api.usedopamine.com/codeless/visualizer/customer/submit/"
             }

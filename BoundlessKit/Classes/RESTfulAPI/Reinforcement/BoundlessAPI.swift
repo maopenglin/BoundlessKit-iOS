@@ -18,10 +18,10 @@ public class BoundlessAPI : NSObject{
     internal enum CallType{
         case track, report, refresh, telemetry
         var path:String{ switch self{
-        case .track: return "https://api.usedopamine.com/v4/app/track/"
-        case .report: return "https://api.usedopamine.com/v4/app/report/"
-        case .refresh: return "https://api.usedopamine.com/v4/app/refresh/"
-        case .telemetry: return "https://api.usedopamine.com/v4/telemetry/sync/"
+        case .track: return "https://reinforce.boundless.ai/v4/app/track/"
+        case .report: return "https://reinforce.boundless.ai/v4/app/report/"
+        case .refresh: return "https://reinforce.boundless.ai/v4/app/refresh/"
+        case .telemetry: return "https://reinforce.boundless.ai/v4/telemetry/sync/"
             }
         }
     }

@@ -149,7 +149,7 @@ public extension UIView {
             ).start(view: glowView, animation: animation)
     }
     
-    public func showSheen(duration: Double = 2.0, color: UIColor? = nil, hapticFeedback: Bool = true, systemSound: UInt32 = 1009) {
+    public func showSheen(duration: Double = 2.0, color: UIColor? = nil, heightMultiplier: CGFloat = 1.0, widthMultiplier: CGFloat = 1.667, hapticFeedback: Bool = true, systemSound: UInt32 = 1009) {
         guard let bundle = BoundlessKit.frameworkBundle else {
             return
         }
@@ -162,8 +162,8 @@ public extension UIView {
         
         let imageView = UIImageView(image: image)
         
-        let height = self.frame.height * 1.1
-        let width: CGFloat =  height * 1.667
+        let height = self.frame.height * heightMultiplier
+        let width: CGFloat =  height * widthMultiplier
         imageView.frame = CGRect(x: -width, y: 0, width: width, height: height)
         
         let animation = CABasicAnimation(keyPath: "transform.translation.x")
@@ -171,6 +171,9 @@ public extension UIView {
         //        animation.speed = 2.0
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         animation.byValue = self.frame.width + width
+        
+        animation.fillMode = kCAFillModeForwards
+        animation.isRemovedOnCompletion = false
         
         CoreAnimationDelegate(
             willStart: { start in
