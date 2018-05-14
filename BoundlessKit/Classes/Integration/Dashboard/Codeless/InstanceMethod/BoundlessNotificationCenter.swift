@@ -1,5 +1,5 @@
 //
-//  InstanceSelectorNotificationCenter.swift
+//  BoundlessNotificationCenter.swift
 //  BoundlessKit
 //
 //  Created by Akash Desai on 3/7/18.
@@ -48,10 +48,10 @@ internal extension Notification.Name {
 
 
 
-internal class InstanceSelectorNotificationCenter : NotificationCenter {
+internal class BoundlessNotificationCenter : NotificationCenter {
     
-    static let _default = InstanceSelectorNotificationCenter()
-    override public class var `default`: InstanceSelectorNotificationCenter {
+    static let _default = BoundlessNotificationCenter()
+    override public class var `default`: BoundlessNotificationCenter {
         return _default
     }
     
@@ -193,7 +193,7 @@ fileprivate class InstanceSelectorPoster : Poster {
                     return
             }
             
-            InstanceSelectorNotificationCenter.default.post(name: instanceSelector.notificationName,
+            BoundlessNotificationCenter.default.post(name: instanceSelector.notificationName,
                                                             object: nil,
                                                             userInfo: ["classType": classType,
                                                                        "selector": selector,
