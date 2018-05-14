@@ -116,11 +116,10 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                 }
             }
             self.syncIfNeeded()
+            self.promptPairing()
             completion()
         }.start()
     }
-    
-    func promptPairing() { _promptPairing() }
     
     fileprivate let serialQueue = DispatchQueue(label: "CodelessAPIClientSerial")
     fileprivate let concurrentQueue = DispatchQueue(label: "CodelessAPIClientConcurrent", attributes: .concurrent)
@@ -166,9 +165,9 @@ fileprivate extension CodelessAPIClient {
         
         if (oldValue?.applicationViews != newValue.applicationViews || oldValue?.trackingEnabled != newValue.trackingEnabled) {
             if (newValue.trackingEnabled && newValue.applicationViews) {
-                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationViews(_:)), names: [.UIViewControllerDidAppear, .UIViewControllerDidDisappear], object: nil)
+                BoundlessNotificationCenter.default.addObserver(self, selector: #selector(self.trackApplicationViews(_:)), names: [.UIViewControllerDidAppear, .UIViewControllerDidDisappear], object: nil)
             } else {
-                InstanceSelectorNotificationCenter.default.removeObserver(self, names: [.UIViewControllerDidAppear, .UIViewControllerDidDisappear], object: nil)
+                BoundlessNotificationCenter.default.removeObserver(self, names: [.UIViewControllerDidAppear, .UIViewControllerDidDisappear], object: nil)
             }
         }
         
@@ -225,30 +224,21 @@ fileprivate extension CodelessAPIClient {
     func didSetVersion(oldValue: BoundlessVersion?) {
         if oldValue?.name != version.name {
             mountVersion()
+            //self.synchronize()
         }
     }
     
-//    func versionDidUpdate(oldValue: BoundlessVersion) {
-//        var tempClient = BoundlessAPIClient.init(credentials: credentials, version: oldValue, database: database)
-//        tempClient.trackBatch = self.trackBatch
-//        self.trackBatch =
-//        trackBatch.storage = nil
-//    }
-    
-//    func mountActionReinforcement(for mappings: [String:[String: Any]]) {
     func mountVersion() {
         serialQueue.async {
-            var mappings: [String : [String : Any]] = !self.boundlessConfig.reinforcementEnabled ? [:] : {
+            var mappings: [String : [String : Any]] = self.boundlessConfig.reinforcementEnabled ? {
                 var mappings = self.version.mappings
                 if let visualizer = self.visualizerSession {
                     for (actionID, value) in visualizer.mappings {
                         mappings[actionID] = value
                     }
-                } else {
-                    self.refreshContainer.synchronize(with: self)
                 }
                 return mappings
-                }()
+                }() : [:]
             
             for (actionID, value) in mappings {
                 var reinforcer: Reinforcer = {
@@ -260,36 +250,29 @@ fileprivate extension CodelessAPIClient {
                         return reinforcer
                     }()
                 
-                if let manual = value["manual"] as? [String: Any],
-                    let reinforcements = manual["reinforcements"] as? [String],
-                    !reinforcements.isEmpty {
-//                    BKLog.debug("Manual reinforcement found for actionID <\(actionID)>")
-                    reinforcer.reinforcementIDs.append(contentsOf: reinforcements)
-                }
-                
-                if let codeless = value["codeless"] as? [String: Any],
-                    let reinforcements = codeless["reinforcements"] as? [[String: Any]],
-                    !reinforcements.isEmpty {
-                    let codelessReinforcer: CodelessReinforcer = reinforcer as? CodelessReinforcer ?? {
-                        let codelessReinforcer = CodelessReinforcer(copy: reinforcer)
-                        switch actionID {
-                        case CodelessReinforcer.UIApplicationDidLaunch:
-                            NotificationCenter.default.addObserver(codelessReinforcer, selector: #selector(codelessReinforcer.receive(notification:)), name: Notification.Name.UIApplicationDidFinishLaunching, object: nil)
-                            
-                        case CodelessReinforcer.UIApplicationDidBecomeActive:
-                            NotificationCenter.default.addObserver(codelessReinforcer, selector: #selector(codelessReinforcer.receive(notification:)), name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
-                            
-                        default:
-                            InstanceSelectorNotificationCenter.default.addObserver(codelessReinforcer, selector: #selector(codelessReinforcer.receive(notification:)), name: NSNotification.Name(actionID), object: nil)
-                        }
-                        reinforcer = codelessReinforcer
-                        self.reinforcers[actionID] = codelessReinforcer
-                        return codelessReinforcer
-                    }()
-//                    BKLog.debug("Codeless reinforcement found for actionID <\(actionID)>")
-                    for reinforcementDict in reinforcements {
-                        if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
-                            codelessReinforcer.codelessReinforcements[codelessReinforcement.primitive] = codelessReinforcement
+                if self.boundlessConfig.integrationMethod == "manual" {
+                    if let manual = value["manual"] as? [String: Any],
+                        let reinforcements = manual["reinforcements"] as? [String],
+                        !reinforcements.isEmpty {
+                        // BKLog.debug("Manual reinforcement found for actionID <\(actionID)>")
+                        reinforcer.reinforcementIDs.append(contentsOf: reinforcements)
+                    }
+                } else if self.boundlessConfig.integrationMethod == "codeless" {
+                    if let codeless = value["codeless"] as? [String: Any],
+                        let reinforcements = codeless["reinforcements"] as? [[String: Any]],
+                        !reinforcements.isEmpty {
+                        let codelessReinforcer: CodelessReinforcer = reinforcer as? CodelessReinforcer ?? {
+                            let codelessReinforcer = CodelessReinforcer(copy: reinforcer)
+                            BoundlessNotificationCenter.default.addObserver(codelessReinforcer, selector: #selector(codelessReinforcer.receive(notification:)), name: NSNotification.Name(actionID), object: nil)
+                            reinforcer = codelessReinforcer
+                            self.reinforcers[actionID] = codelessReinforcer
+                            return codelessReinforcer
+                            }()
+                        // BKLog.debug("Codeless reinforcement found for actionID <\(actionID)>")
+                        for reinforcementDict in reinforcements {
+                            if let codelessReinforcement = CodelessReinforcement(from: reinforcementDict) {
+                                codelessReinforcer.codelessReinforcements[codelessReinforcement.primitive] = codelessReinforcement
+                            }
                         }
                     }
                 }
@@ -297,7 +280,7 @@ fileprivate extension CodelessAPIClient {
             
             for (actionID, value) in self.reinforcers.filter({mappings[$0.key] == nil}) {
                 if value is CodelessReinforcer {
-                    InstanceSelectorNotificationCenter.default.removeObserver(value, name: Notification.Name(actionID), object: nil)
+                    BoundlessNotificationCenter.default.removeObserver(value, name: Notification.Name(actionID), object: nil)
                 }
                 self.reinforcers.removeValue(forKey: actionID)
             }
@@ -308,22 +291,22 @@ fileprivate extension CodelessAPIClient {
 //// Dashboard Visualizer Connection
 //
 //
-fileprivate extension CodelessAPIClient {
-    func didSetVisualizerSession(oldValue: CodelessVisualizerSession?) {
+extension CodelessAPIClient {
+    fileprivate func didSetVisualizerSession(oldValue: CodelessVisualizerSession?) {
         serialQueue.async {
             if oldValue == nil && self.visualizerSession != nil {
                 Reinforcer.scheduleSetting = .random
-                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.doNothing(notification:)), names: .visualizerNotifications, object: nil)
+                BoundlessNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.doNothing(notification:)), names: .visualizerNotifications, object: nil)
                 // listen for all notifications since notification names not known prior
-                InstanceSelectorNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: nil, object: nil)
+                BoundlessNotificationCenter.default.addObserver(self, selector: #selector(CodelessAPIClient.submitToDashboard(notification:)), name: nil, object: nil)
             } else if oldValue != nil && self.visualizerSession == nil {
                 Reinforcer.scheduleSetting = .reinforcement
-                InstanceSelectorNotificationCenter.default.removeObserver(self)
+                BoundlessNotificationCenter.default.removeObserver(self)
             }
         }
     }
     
-    func _promptPairing() {
+    func promptPairing() {
         guard !credentials.inProduction && boundlessConfig.integrationMethod == "codeless" else {
             return
         }
@@ -336,7 +319,7 @@ fileprivate extension CodelessAPIClient {
             switch response["status"] as? Int {
             case 202?:
                 DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
-                    self._promptPairing()
+                    self.promptPairing()
                 }
                 break
                 
@@ -364,8 +347,8 @@ fileprivate extension CodelessAPIClient {
                 UIWindow.presentTopLevelAlert(alertController: pairingAlert)
                 
             case 208?:
-                self.submitToDashboard(actionID: CodelessReinforcer.UIApplicationDidBecomeActive)
-                self.submitToDashboard(actionID: CodelessReinforcer.UIApplicationDidLaunch)
+                self.submitToDashboard(actionID: Notification.Name.CodelessUIApplicationDidBecomeActive)
+                self.submitToDashboard(actionID: Notification.Name.CodelessUIApplicationDidLaunch)
                 if let _ = response["connectionUUID"] as? String,
                     let reconnectedSession = CodelessVisualizerSession.convert(from: response) {
                     self.visualizerSession = reconnectedSession
