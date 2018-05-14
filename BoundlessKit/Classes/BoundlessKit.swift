@@ -52,16 +52,20 @@ open class BoundlessKit : NSObject {
     
     @objc
     open func reinforce(actionID: String, metadata: [String: Any] = [:], completion: @escaping (String)->Void) {
-        apiClient.reinforcement(forActionID: actionID) { reinforcementDecision in
+        apiClient.refreshContainer.decision(forActionID: actionID) { reinforcementDecision in
             let reinforcement = BKReinforcement(reinforcementDecision, metadata)
             completion(reinforcement.name)
             self.apiClient.reportBatch.store(reinforcement)
             self.apiClient.syncIfNeeded()
         }
     }
+}
+
+extension BoundlessKit {
     
     @objc
     open func setCustomUserID(_ id: String?) {
         apiClient.setCustomUserIdentity(id)
     }
+    
 }

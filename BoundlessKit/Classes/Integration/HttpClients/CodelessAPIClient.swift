@@ -73,15 +73,6 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         didSetVersion(oldValue: nil)
     }
     
-    override func reinforcement(forActionID actionID: String, completion: @escaping ((BKDecision)->Void)) {
-        refreshContainer.decision(forActionID: actionID) { decision in
-            if let reinforcer = self.reinforcers[actionID] as? CodelessReinforcer {
-                reinforcer.codelessReinforcements[decision.name]??.show(targetInstance: NSObject(), senderInstance: nil)
-            }
-            completion(decision)
-        }
-    }
-    
     override func setCustomUserIdentity(_ id: String?) {
         let oldId = credentials.identity.value
         super.setCustomUserIdentity(id)
