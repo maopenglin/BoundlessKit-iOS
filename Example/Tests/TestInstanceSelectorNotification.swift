@@ -31,13 +31,13 @@ class TestInstanceSelectorNotification: XCTestCase {
         InstanceSelectorNotificationCenter.default.removeObserver(notificationReceiver)
     }
     
-    func testNonMethodNotificationFail() {
+    func testGenericNotificationPass() {
         let notification = Notification.Name("testNotification")
         let notificationReceiver = NotificationReceiver()
         InstanceSelectorNotificationCenter.default.addObserver(notificationReceiver, selector: #selector(notificationReceiver.receiveNotification(notification:)), name: notification, object: nil)
 
         InstanceSelectorNotificationCenter.default.post(name: notification, object: nil, userInfo: nil)
-        XCTAssert(!notificationReceiver.didReceiveNotification)
+        XCTAssert(notificationReceiver.didReceiveNotification)
     }
     
     func testNotificationForSelectorWithNoParam() {
