@@ -55,34 +55,31 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
         return _default
     }
     
-    fileprivate var notifiers = [Notification.Name: InstanceSelectorNotifier]()
+    fileprivate var posters = [Notification.Name: Poster]()
     fileprivate let queue = DispatchQueue(label: "InstanceSelectorObserverQueue")
+    
+    func isValidInstanceSelectorPost(_ name: String) -> Bool {
+        return InstanceSelector(name) != nil
+    }
     
     override public func addObserver(_ observer: Any, selector aSelector: Selector, name aName: NSNotification.Name?, object anObject: Any?) {
         queue.sync {
-            guard let aName = aName else {
-                // observe all
-                super.addObserver(observer, selector: aSelector, name: nil, object: anObject)
-                return
-            }
+            super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
+            guard let aName = aName else { return }
             
-            if let notifier = self.notifiers[aName] {
-                notifier.addObserver(observer as AnyObject)
-                super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
+            if let poster = self.posters[aName] {
+                poster.addObserver(observer as AnyObject)
 //                BKLog.debug("Added observer for instance method:\(aName.rawValue)")
                 return
             }
             
             if let instanceSelector = InstanceSelector(aName.rawValue),
-                let notifier = InstanceSelectorNotifier(instanceSelector) {
-                self.notifiers[aName] = notifier
-                notifier.addObserver(observer as AnyObject)
-                super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
+                let poster = InstanceSelectorPoster(instanceSelector) {
+                self.posters[aName] = poster
+                poster.addObserver(observer as AnyObject)
 //                BKLog.debug("Added first observer for instance method:\(aName.rawValue)")
                 return
             }
-            
-            BKLog.debug(error: "Cannot create  for notification for <\(aName)>")
         }
     }
     
@@ -93,13 +90,13 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
     override public func removeObserver(_ observer: Any, name aName: NSNotification.Name?, object anObject: Any?) {
         queue.sync {
             if let aName = aName {
-                if let notifier = self.notifiers[aName] {
-                    notifier.removeObserver(observer as AnyObject)
+                if let poster = self.posters[aName] {
+                    poster.removeObserver(observer as AnyObject)
 //                    BKLog.debug("Removed observer for notification:\(aName.rawValue)")
                 }
             } else {
-                for notifier in self.notifiers.values {
-                    notifier.removeObserver(observer as AnyObject)
+                for poster in self.posters.values {
+                    poster.removeObserver(observer as AnyObject)
                 }
             }
             super.removeObserver(observer, name: aName, object: anObject)
@@ -109,12 +106,12 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
     public func removeAllObservers(name aName: NSNotification.Name?) {
         queue.sync {
             if let aName = aName {
-                for observer in self.notifiers[aName]?.removeAllObservers() ?? [] {
+                for observer in self.posters[aName]?.removeAllObservers() ?? [] {
                     super.removeObserver(observer, name: aName, object: nil)
                 }
             } else {
-                for (notification, notifier) in self.notifiers {
-                    for observer in notifier.removeAllObservers() {
+                for (notification, poster) in self.posters {
+                    for observer in poster.removeAllObservers() {
                         super.removeObserver(observer, name: notification, object: nil)
                     }
                 }
@@ -123,21 +120,39 @@ internal class InstanceSelectorNotificationCenter : NotificationCenter {
     }
 }
 
-fileprivate class InstanceSelectorNotifier : NSObject {
+fileprivate class Poster : NSObject {
     
-    private struct WeakObject {
+    struct WeakObject {
         weak var value: AnyObject?
         init (value: AnyObject) {
             self.value = value
         }
     }
     
+    var observers = [WeakObject]()
+    
+    func addObserver(_ observer: AnyObject) {
+        observers.append(WeakObject(value: observer))
+    }
+    
+    func removeObserver(_ observer: AnyObject) {
+        observers = observers.filter({$0.value != nil && $0.value !== observer})
+    }
+    
+    func removeAllObservers() -> [AnyObject] {
+        let oldObservers = observers.flatMap({$0.value})
+        observers = []
+        return oldObservers
+    }
+}
+
+fileprivate class InstanceSelectorPoster : Poster {
+    
     let originalSelector: InstanceSelector
     let notificationSelector: InstanceSelector
-    private var observers = [WeakObject]()
     
     init?(_ instanceSelector: InstanceSelector) {
-        guard let notificationMethod = InstanceSelectorHelper.createMethod(beforeInstance: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorNotifier.postInstanceSelection),
+        guard let notificationMethod = InstanceSelectorHelper.createMethod(beforeInstance: instanceSelector.classType, selector: instanceSelector.selector, with: InstanceSelectorPoster.postInstanceSelection),
             let notificationSelector = InstanceSelector(instanceSelector.classType, notificationMethod) else {
             BKLog.debug(error: "Could not create notification method for actionID<\(instanceSelector.notificationName)")
             return nil
@@ -147,28 +162,26 @@ fileprivate class InstanceSelectorNotifier : NSObject {
             super.init()
     }
     
-    func addObserver(_ observer: AnyObject) {
+    override func addObserver(_ observer: AnyObject) {
         if observers.count == 0 {
             originalSelector.exchange(with: notificationSelector)
         }
-        observers.append(WeakObject(value: observer))
+        super.addObserver(observer)
     }
     
-    func removeObserver(_ observer: AnyObject) {
+    override func removeObserver(_ observer: AnyObject) {
         let oldCount = observers.count
-        observers = observers.filter({$0.value != nil && $0.value !== observer})
+        super.removeObserver(observer)
         if observers.count == 0 && oldCount != 0 {
             originalSelector.exchange(with: notificationSelector)
         }
     }
     
-    func removeAllObservers() -> [AnyObject] {
+    override func removeAllObservers() -> [AnyObject] {
         if observers.count != 0 {
             originalSelector.exchange(with: notificationSelector)
         }
-        let oldObservers = observers.flatMap({$0.value})
-        observers = []
-        return oldObservers
+        return super.removeAllObservers()
     }
     
     static var postInstanceSelection: InstanceSelectionBlock {
