@@ -270,6 +270,9 @@ public extension UIView {
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         animation.byValue = self.frame.width + width
         
+        animation.fillMode = kCAFillModeForwards
+        animation.isRemovedOnCompletion = false
+        
         CoreAnimationDelegate(
             willStart: { start in
                 self.addSubview(imageView)
