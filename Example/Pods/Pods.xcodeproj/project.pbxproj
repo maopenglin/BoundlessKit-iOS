@@ -303,13 +303,13 @@
 			path = Dashboard;
 			sourceTree = "<group>";
 		};
-		64F88131A70BC38A43D9D1FBAB1085B2 /* InstanceMethod */ = {
+		64F88131A70BC38A43D9D1FBAB1085B2 /* NotificationCenter */ = {
 			isa = PBXGroup;
 			children = (
 				E55A1D0327667D52228A3346CFDEEEEB /* BoundlessNotificationCenter.swift */,
 				6C7BA067B1CF70F8AD0843292AF89220 /* Objc */,
 			);
-			path = InstanceMethod;
+			path = NotificationCenter;
 			sourceTree = "<group>";
 		};
 		6727043A2755911CD5AD2A34FF1AD5D3 /* Targets Support Files */ = {
@@ -357,7 +357,7 @@
 		8CACC04E67A4EABD1C8138F3E0D44DC7 /* Codeless */ = {
 			isa = PBXGroup;
 			children = (
-				64F88131A70BC38A43D9D1FBAB1085B2 /* InstanceMethod */,
+				64F88131A70BC38A43D9D1FBAB1085B2 /* NotificationCenter */,
 				760747FB03EEFC29F631F8589F584A99 /* Reinforcement */,
 			);
 			path = Codeless;

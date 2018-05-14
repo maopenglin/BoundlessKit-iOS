@@ -96,7 +96,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         payload["currentConfig"] = boundlessConfig.configID ?? "nil"
         payload["initialBoot"] = initialBoot
         post(url: CodelessAPIEndpoint.boot.url, jsonObject: payload) { response in
-            self.checkPairing()
+            self.confirmBoot()
             if let status = response?["status"] as? Int {
                 if status == 205 {
                     if let configDict = response?["config"] as? [String: Any],
@@ -234,7 +234,6 @@ fileprivate extension CodelessAPIClient {
     func didSetVersion(oldValue: BoundlessVersion?) {
         if oldValue?.name != version.name {
             mountVersion()
-            //self.synchronize()
         }
     }
     
@@ -316,7 +315,7 @@ extension CodelessAPIClient {
         }
     }
     
-    func checkPairing() {
+    func confirmBoot() {
         guard !credentials.inProduction && boundlessConfig.integrationMethod == "codeless" else {
             return
         }
@@ -329,7 +328,7 @@ extension CodelessAPIClient {
             switch response["status"] as? Int {
             case 202?:
                 DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
-                    self.checkPairing()
+                    self.confirmBoot()
                 }
                 break
                 
