@@ -51,7 +51,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
     
     override init(credentials: BoundlessCredentials, version: BoundlessVersion, session: URLSessionProtocol = URLSession.shared) {
         if let configData = database.object(forKey: "codelessConfig") as? Data,
-            let config = BoundlessConfiguration.init(data: configData) {
+            let config = BoundlessConfiguration(data: configData) {
             self.boundlessConfig = config
         } else {
             self.boundlessConfig = BoundlessConfiguration()
@@ -64,7 +64,7 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         }
         var codelessVersion = version
         if let versionData = database.object(forKey: "codelessVersion") as? Data,
-            let version = BoundlessVersion(data: versionData) {
+            let version = BoundlessVersion(data: versionData, database: database) {
             codelessVersion = version
         }
         
@@ -118,6 +118,8 @@ internal class CodelessAPIClient : BoundlessAPIClient {
                                 newVersion.trackBatch = self.version.trackBatch
                                 newVersion.reportBatch = self.version.reportBatch
                                 newVersion.refreshContainer = self.version.refreshContainer
+                                newVersion.reportBatch.erase()
+                                newVersion.refreshContainer.erase()
                                 self.version = newVersion
                                 newVersion.refreshContainer.synchronize(with: self)
                             }

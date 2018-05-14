@@ -30,14 +30,14 @@ internal struct BoundlessVersion {
 }
 
 extension BoundlessVersion {
-    init?(data: Data) {
+    init?(data: Data, database: BKUserDefaults) {
         let unarchiver = NSKeyedUnarchiver(forReadingWith: data)
         defer {
             unarchiver.finishDecoding()
         }
         guard let versionID = unarchiver.decodeObject(forKey: "versionID") as? String? else { return nil }
         guard let mappings = unarchiver.decodeObject(forKey: "mappings") as? [String: [String: Any]] else { return nil }
-        self.init(versionID, mappings)
+        self.init(versionID, mappings, database: database)
     }
     
     func encode() -> Data {

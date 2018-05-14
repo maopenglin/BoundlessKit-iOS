@@ -65,6 +65,11 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
         })
     }
     
+    func erase() {
+        self.valuesForKeys = [:]
+        self.storage?.0.archive(self, forKey: self.storage!.1)
+    }
+    
     var needsSync : Bool {
         guard enabled else { return false }
         for cartridge in values {

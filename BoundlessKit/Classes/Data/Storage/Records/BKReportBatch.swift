@@ -83,6 +83,11 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         }
     }
     
+    func erase() {
+        self.valuesForKeys = [:]
+        self.storage?.0.archive(self, forKey: self.storage!.1)
+    }
+    
     var needsSync: Bool {
         guard enabled else { return false }
         
