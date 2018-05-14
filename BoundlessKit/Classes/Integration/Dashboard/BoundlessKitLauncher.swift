@@ -16,9 +16,7 @@ open class BoundlessKitApplicationLauncherBridge : NSObject {
         if let properties = BoundlessProperties.fromFile {
             let codelessAPIClient = CodelessAPIClient(credentials: properties.credentials, version: properties.version, database: BKUserDefaults.standard)
             BoundlessKit._standard = BoundlessKit(apiClient: codelessAPIClient)
-            codelessAPIClient.boot {
-                codelessAPIClient.promptPairing()
-            }
+            codelessAPIClient.boot()
         }
     }
     

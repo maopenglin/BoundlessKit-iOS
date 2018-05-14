@@ -7,11 +7,6 @@
 
 import Foundation
 
-extension CodelessReinforcer {
-    static let defaultSelectorTerm = "codeless"
-    static let UIApplicationDidLaunch: String = [Notification.Name.UIApplicationDidFinishLaunching.rawValue, defaultSelectorTerm].joined(separator: "-")
-    static let UIApplicationDidBecomeActive: String = [Notification.Name.UIApplicationDidBecomeActive.rawValue, defaultSelectorTerm].joined(separator: "-")
-}
 
 internal class CodelessReinforcer : Reinforcer {
     
@@ -37,7 +32,7 @@ internal class CodelessReinforcer : Reinforcer {
     func receive(notification: Notification) {
         let actionID = notification.name.rawValue
 //        BKLog.print("Action peformed with actionID <\(actionID)>")
-        let target = notification.userInfo?["target"] as? NSObject ?? NSObject()
+        let target = notification.userInfo?["target"] as? NSObject ?? UIWindow.topWindow ?? NSObject()
         let sender = notification.userInfo?["sender"] as AnyObject?
         
         switch Reinforcer.scheduleSetting {

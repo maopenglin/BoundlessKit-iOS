@@ -32,6 +32,12 @@ internal extension Array where Element == Notification.Name {
 }
 
 internal extension Notification.Name {
+    
+    static let actionIndicatorTerm = "codeless"
+    
+    static let CodelessUIApplicationDidLaunch: String = [Notification.Name.UIApplicationDidFinishLaunching.rawValue, actionIndicatorTerm].joined(separator: "-")
+    static let CodelessUIApplicationDidBecomeActive: String = [Notification.Name.UIApplicationDidBecomeActive.rawValue, actionIndicatorTerm].joined(separator: "-")
+    
     static let UIApplicationSendAction: Notification.Name = {
         return InstanceSelector(UIApplication.self, #selector(UIApplication.sendAction(_:to:from:for:)))!.notificationName
     }()
@@ -50,36 +56,39 @@ internal extension Notification.Name {
 
 internal class BoundlessNotificationCenter : NotificationCenter {
     
+    static let external = NotificationCenter()
     static let _default = BoundlessNotificationCenter()
     override public class var `default`: BoundlessNotificationCenter {
         return _default
     }
     
     fileprivate var posters = [Notification.Name: Poster]()
-    fileprivate let queue = DispatchQueue(label: "InstanceSelectorObserverQueue")
-    
-    func isValidInstanceSelectorPost(_ name: String) -> Bool {
-        return InstanceSelector(name) != nil
-    }
+    fileprivate let queue = DispatchQueue(label: "BoundlessNotificationObserverQueue")
     
     override public func addObserver(_ observer: Any, selector aSelector: Selector, name aName: NSNotification.Name?, object anObject: Any?) {
         queue.sync {
             super.addObserver(observer, selector: aSelector, name: aName, object: anObject)
             guard let aName = aName else { return }
             
-            if let poster = self.posters[aName] {
-                poster.addObserver(observer as AnyObject)
+            if let aPoster = self.posters[aName] {
+                aPoster.addObserver(observer as AnyObject)
 //                BKLog.debug("Added observer for instance method:\(aName.rawValue)")
                 return
             }
             
+            let aPoster: Poster
             if let instanceSelector = InstanceSelector(aName.rawValue),
                 let poster = InstanceSelectorPoster(instanceSelector) {
-                self.posters[aName] = poster
-                poster.addObserver(observer as AnyObject)
-//                BKLog.debug("Added first observer for instance method:\(aName.rawValue)")
-                return
+                aPoster = poster
+            } else if aName.rawValue == Notification.Name.CodelessUIApplicationDidLaunch || aName.rawValue == Notification.Name.CodelessUIApplicationDidBecomeActive {
+                aPoster = ForwardPoster(notification: aName, center: NotificationCenter.default)
+            } else {
+                aPoster = ForwardPoster(notification: aName, center: BoundlessNotificationCenter.external)
             }
+            self.posters[aName] = aPoster
+            aPoster.addObserver(observer as AnyObject)
+            // BKLog.debug("Added first observer for instance method:\(aName.rawValue)")
+            
         }
     }
     
@@ -129,6 +138,7 @@ fileprivate class Poster : NSObject {
         }
     }
     
+    var notificationName: Notification.Name? { get { return nil } }
     var observers = [WeakObject]()
     
     func addObserver(_ observer: AnyObject) {
@@ -146,7 +156,25 @@ fileprivate class Poster : NSObject {
     }
 }
 
+fileprivate class ForwardPoster : Poster {
+    
+    let _notificationName: Notification.Name?
+    override var notificationName: Notification.Name? { get { return _notificationName } }
+    
+    init(notification: Notification.Name?, center: NotificationCenter) {
+        self._notificationName = notification
+        super.init()
+        center.addObserver(self, selector: #selector(post(notification:)), name: notification, object: nil)
+    }
+    
+    @objc func post(notification: Notification) {
+        BoundlessNotificationCenter.default.post(notification)
+    }
+}
+
 fileprivate class InstanceSelectorPoster : Poster {
+    
+    override var notificationName: Notification.Name? { get { return originalSelector.notificationName } }
     
     let originalSelector: InstanceSelector
     let notificationSelector: InstanceSelector
