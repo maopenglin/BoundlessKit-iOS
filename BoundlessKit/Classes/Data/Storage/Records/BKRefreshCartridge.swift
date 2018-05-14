@@ -14,14 +14,17 @@ internal class BKRefreshCartridge : SynchronizedArray<BKDecision>, BKData {
         NSKeyedArchiver.setClassName("BKRefreshCartridge", for: BKRefreshCartridge.self)
     }()
     
+    let cartridgeID: String?
     let actionID: String
     var expirationUTC: Int64
     var desiredMinCountUntilSync: Int
     
-    init(actionID: String,
+    init(cartridgeID: String?,
+         actionID: String,
          expirationUTC: Int64 = Int64(Date().timeIntervalSince1970),
          sizeUntilSync: Int = 2,
          values: [BKDecision] = []) {
+        self.cartridgeID = cartridgeID
         self.actionID = actionID
         self.expirationUTC = expirationUTC
         self.desiredMinCountUntilSync = sizeUntilSync
@@ -29,20 +32,25 @@ internal class BKRefreshCartridge : SynchronizedArray<BKDecision>, BKData {
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
-        guard let actionID = aDecoder.decodeObject(forKey: "actionID") as? String,
+        guard
+            let cartridgeID = aDecoder.decodeObject(forKey: "cartridgeID") as? String?,
+            let actionID = aDecoder.decodeObject(forKey: "actionID") as? String,
             let arrayData = aDecoder.decodeObject(forKey: "arrayValues") as? Data,
             let arrayValues = NSKeyedUnarchiver.unarchiveObject(with: arrayData) as? [BKDecision] else {
                 return nil
         }
         let expirationUTC = aDecoder.decodeInt64(forKey: "expirationUTC")
         let desiredMinCountUntilSync = aDecoder.decodeInteger(forKey: "desiredMinCountUntilSync")
-        self.init(actionID: actionID,
-                  expirationUTC: expirationUTC,
-                  sizeUntilSync: desiredMinCountUntilSync,
-                  values: arrayValues)
+        self.init(
+            cartridgeID: cartridgeID,
+            actionID: actionID,
+            expirationUTC: expirationUTC,
+            sizeUntilSync: desiredMinCountUntilSync,
+            values: arrayValues)
     }
     
     func encode(with aCoder: NSCoder) {
+        aCoder.encode(cartridgeID, forKey: "cartridgeID")
         aCoder.encode(actionID, forKey: "actionID")
         aCoder.encode(NSKeyedArchiver.archivedData(withRootObject: values), forKey: "arrayValues")
         aCoder.encode(expirationUTC, forKey: "expirationUTC")

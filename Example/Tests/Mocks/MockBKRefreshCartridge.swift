@@ -16,7 +16,7 @@ class MockBKRefreshCartridge : BKRefreshCartridge {
     static var rewardID = "reward"
     
     static var allRewards: BKRefreshCartridge {
-        return BKRefreshCartridge(actionID: actionID, values: Array(repeating: BKDecision(rewardID, actionID), count: 10))
+        return BKRefreshCartridge(cartridgeID: nil, actionID: actionID, values: Array(repeating: BKDecision(rewardID, actionID), count: 10))
     }
     
     var _needsSync: Bool = false

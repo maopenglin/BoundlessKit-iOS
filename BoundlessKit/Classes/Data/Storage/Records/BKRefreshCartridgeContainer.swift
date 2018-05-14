@@ -47,7 +47,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
         }
         
         let cartridge: BKRefreshCartridge = self[actionID] ?? {
-            let cartridge = BKRefreshCartridge(actionID: actionID)
+            let cartridge = BKRefreshCartridge(cartridgeID: nil, actionID: actionID)
             self[actionID] = cartridge
             return cartridge
         }()
@@ -89,7 +89,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
             
             var validCartridges = [String: BKRefreshCartridge]()
             for actionID in apiClient.version.mappings.keys {
-                validCartridges[actionID] = self[actionID] ?? BKRefreshCartridge(actionID: actionID)
+                validCartridges[actionID] = self[actionID] ?? BKRefreshCartridge(cartridgeID: nil, actionID: actionID)
             }
             self.valuesForKeys = validCartridges
             
@@ -109,12 +109,14 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
                     }
                     if let responseStatusCode = response?["status"] as? Int {
                         if responseStatusCode == 200,
-                            let reinforcementCartridge = response?["reinforcementCartridge"] as? [String],
+                            let decisionNames = response?["reinforcementCartridge"] as? [String],
                             let expiresIn = response?["expiresIn"] as? TimeInterval {
-                            let decisions = reinforcementCartridge.map({BKDecision($0, cartridge.actionID)})
-                            cartridge.removeAll()
-                            cartridge.append(decisions)
-                            cartridge.expirationUTC = Int64( 1000*Date().addingTimeInterval(expiresIn).timeIntervalSince1970 )
+                            self[cartridge.actionID] = BKRefreshCartridge(
+                                cartridgeID: nil,
+                                actionID: cartridge.actionID,
+                                expirationUTC: Int64( 1000*Date().addingTimeInterval(expiresIn).timeIntervalSince1970 ),
+                                values: decisionNames.map({BKDecision($0, cartridge.actionID)})
+                            )
                             BKLog.debug(confirmed: "Cartridge refresh for actionID <\(cartridge.actionID)> succeeded!")
                             success = true
                             return
