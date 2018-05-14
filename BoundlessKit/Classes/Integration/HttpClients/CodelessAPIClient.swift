@@ -96,20 +96,37 @@ internal class CodelessAPIClient : BoundlessAPIClient {
         payload["currentConfig"] = boundlessConfig.configID ?? "nil"
         payload["initialBoot"] = initialBoot
         post(url: CodelessAPIEndpoint.boot.url, jsonObject: payload) { response in
+            self.checkPairing()
             if let status = response?["status"] as? Int {
                 if status == 205 {
                     if let configDict = response?["config"] as? [String: Any],
                         let config = BoundlessConfiguration.convert(from: configDict) {
                         self.boundlessConfig = config
                     }
-                    if let versionDict = response?["version"] as? [String: Any],
-                        let version = BoundlessVersion.convert(from: versionDict, database: self.database) {
-                        self.version = version
+                    if let versionDict = response?["version"] as? [String: Any] {
+                        let updateVersionGroup = DispatchGroup()
+                        updateVersionGroup.enter()
+                        self.version.reportBatch.synchronize(with: self) { _ in
+                            updateVersionGroup.leave()
+                        }
+                        updateVersionGroup.enter()
+                        self.version.trackBatch.synchronize(with: self) { _ in
+                            updateVersionGroup.leave()
+                        }
+                        updateVersionGroup.notify(queue: .global()) {
+                            if var newVersion = BoundlessVersion.convert(from: versionDict, database: self.version.database) {
+                                newVersion.trackBatch = self.version.trackBatch
+                                newVersion.reportBatch = self.version.reportBatch
+                                newVersion.refreshContainer = self.version.refreshContainer
+                                self.version = newVersion
+                                newVersion.refreshContainer.synchronize(with: self)
+                            }
+                        }
                     }
+                } else if status == 200 {
+                    self.syncIfNeeded()
                 }
             }
-            self.syncIfNeeded()
-            self.promptPairing()
             completion()
         }.start()
     }
@@ -299,7 +316,7 @@ extension CodelessAPIClient {
         }
     }
     
-    func promptPairing() {
+    func checkPairing() {
         guard !credentials.inProduction && boundlessConfig.integrationMethod == "codeless" else {
             return
         }
@@ -312,7 +329,7 @@ extension CodelessAPIClient {
             switch response["status"] as? Int {
             case 202?:
                 DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
-                    self.promptPairing()
+                    self.checkPairing()
                 }
                 break
                 
