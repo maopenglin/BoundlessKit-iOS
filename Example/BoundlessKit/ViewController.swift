@@ -8,7 +8,6 @@
 
 import UIKit
 import BoundlessKit
-import CoreLocation
 
 class ViewController: UIViewController {
     
@@ -17,15 +16,12 @@ class ViewController: UIViewController {
         
     }
     
-    var locationManager = CLLocationManager()
-    
     @objc func action2Performed(sender: UIButton){
         print("Action 2 performed")
         BoundlessKit.track(actionID: "pressed track")
 //        BoundlessKit.reinforce(actionID: <#T##String#>, completion: <#T##(String) -> Void#>)
         
 //        BoundlessKit.standard.setCustomUserID("bob")
-//        locationManager.requestAlwaysAuthorization()
     }
     
     
@@ -103,9 +99,5 @@ class ViewController: UIViewController {
     override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.portrait
     }
-    
-}
-
-extension ViewController : CLLocationManagerDelegate {
     
 }
