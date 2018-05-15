@@ -78,7 +78,7 @@ class TestBoundlessAPIObjects: XCTestCase {
     func testReportEncodeAndDecode() {
         let database = MockBKuserDefaults()
         
-        let encodedBatch = BKReportBatch.init(dict: ["action1" : [BKReinforcement.init("reinforcement1", "action1")]])
+        let encodedBatch = BKReportBatch.init(dict: ["action1" : [BKReinforcement.init("reinforcement1", "TEST", "action1")]])
         database.archive(encodedBatch, forKey: "testReportEncodeAndDecode")
         let decodedBatch: BKReportBatch = database.unarchive("testReportEncodeAndDecode")!
         
@@ -94,7 +94,7 @@ class TestBoundlessAPIObjects: XCTestCase {
         let numConcurrentReinforcementsPerAction = 3
         DispatchQueue.concurrentPerform(iterations: numConcurrentReports) { actionCount in
             DispatchQueue.concurrentPerform(iterations: numConcurrentReinforcementsPerAction) { reinforcementCount in
-                batch.store(BKReinforcement.init("reinforcement\(reinforcementCount)", "action\(actionCount)"))
+                batch.store(BKReinforcement.init("reinforcement\(reinforcementCount)", "TEST", "action\(actionCount)"))
             }
         }
         XCTAssert(batch.count == numConcurrentReports * numConcurrentReinforcementsPerAction)
@@ -104,8 +104,8 @@ class TestBoundlessAPIObjects: XCTestCase {
         var batch = BKReportBatch()
         XCTAssert(!batch.needsSync)
         
-        batch = BKReportBatch.init(dict: ["action1": [ BKReinforcement.init("reinforcement1", "action1"),
-                                                        BKReinforcement.init("reinforcement1", "action1") ]
+        batch = BKReportBatch.init(dict: ["action1": [ BKReinforcement.init("reinforcement1", "TEST", "action1"),
+                                                        BKReinforcement.init("reinforcement1", "TEST", "action1") ]
             ])
         
         XCTAssert(!batch.needsSync)
@@ -113,15 +113,15 @@ class TestBoundlessAPIObjects: XCTestCase {
         batch.desiredMaxCountUntilSync = 2
         XCTAssert(batch.needsSync)
         
-        batch = BKReportBatch.init(dict: ["action1": [ BKReinforcement.init("reinforcement1", "action1") ],
-                                          "action2": [ BKReinforcement.init("reinforcement1", "action2", [:], Int64(Date().timeIntervalSince1970*1000) - batch.desiredMaxTimeUntilSync, 0) ]
+        batch = BKReportBatch.init(dict: ["action1": [ BKReinforcement.init("reinforcement1", "TEST", "action1") ],
+                                          "action2": [ BKReinforcement.init("reinforcement1", "TEST", "action2", [:], Int64(Date().timeIntervalSince1970*1000) - batch.desiredMaxTimeUntilSync, 0) ]
             ])
         XCTAssert(batch.needsSync)
     }
 
     func testReportSync() {
-        let batch = BKReportBatch.init(dict: ["action1": [ BKReinforcement.init("reinforcement1", "action1"),
-                                                           BKReinforcement.init("reinforcement1", "action1") ]
+        let batch = BKReportBatch.init(dict: ["action1": [ BKReinforcement.init("reinforcement1", "TEST", "action1"),
+                                                           BKReinforcement.init("reinforcement1", "TEST", "action1") ]
             ])
         let apiClient = MockBoundlessAPIClient()
         
