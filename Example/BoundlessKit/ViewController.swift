@@ -12,8 +12,9 @@ import CoreLocation
 
 class ViewController: UIViewController {
     
-    @objc dynamic func action1Performed(button: UIButton){
+    @objc func action1Performed(button: UIButton){
         print("Action 1 performed")
+        
     }
     
     var locationManager = CLLocationManager()
@@ -21,6 +22,7 @@ class ViewController: UIViewController {
     @objc func action2Performed(sender: UIButton){
         print("Action 2 performed")
         BoundlessKit.track(actionID: "pressed track")
+//        BoundlessKit.reinforce(actionID: <#T##String#>, completion: <#T##(String) -> Void#>)
         
 //        BoundlessKit.standard.setCustomUserID("bob")
 //        locationManager.requestAlwaysAuthorization()
