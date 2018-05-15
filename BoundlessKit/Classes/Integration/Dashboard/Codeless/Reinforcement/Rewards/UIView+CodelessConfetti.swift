@@ -23,7 +23,7 @@ public extension UIView {
         - shapes: This directly affects the quantity of confetti. For example, [.circle] will show half as much confetti as [.circle, .circle]
         - colors: This directly affects the quantity of confetti. For example, [.blue] will show half as much confetti as [.blue, .blue]
      */
-    @objc
+    
     public func showConfetti(duration:Double = 2,
                       size:CGSize = CGSize(width: 9, height: 6),
                       shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle, .spiral],
@@ -39,7 +39,6 @@ public extension UIView {
         }
     }
     
-    @objc
     public func confettiBurst(duration:Double, size:CGSize, shapes:[ConfettiShape], colors:[UIColor], startedHandler: @escaping ()->Void) {
         DispatchQueue.main.async {
             
@@ -96,7 +95,6 @@ public extension UIView {
         }
     }
     
-    @objc
     public func confettiShower(duration:Double, size:CGSize, shapes:[ConfettiShape], colors:[UIColor], completion: @escaping ()->Void) {
         DispatchQueue.main.async {
             
