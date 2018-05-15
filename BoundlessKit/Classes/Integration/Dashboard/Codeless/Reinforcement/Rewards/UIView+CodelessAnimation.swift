@@ -14,6 +14,7 @@ import AVFoundation
 // call all these in main queue DispatchQueue.main
 public extension UIView {
     
+    @objc
     public func showPopover(content: UIImage? = "❤️".image(),
                           duration:TimeInterval = 1.0,
                           style: UIBlurEffectStyle = UIBlurEffectStyle.light,
@@ -54,6 +55,7 @@ public extension UIView {
         })
     }
     
+    @objc
     public func showEmojiSplosion(at location:CGPoint,
                                   content: CGImage? = "❤️".image().cgImage,
                                   scale: CGFloat = 0.6,
@@ -122,6 +124,7 @@ public extension UIView {
         }
     }
     
+    @objc
     public func showShimmy(count:Int = 2, duration:TimeInterval = 5.0, translation:Int = 10, speed:Float = 3, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
         
         let path = UIBezierPath()
@@ -144,6 +147,7 @@ public extension UIView {
         }, didStop: completion).start(view: self, animation: animation)
     }
     
+    @objc
     public func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
         
         let pulse = CASpringAnimation(keyPath: "transform.scale")
@@ -157,6 +161,7 @@ public extension UIView {
         CoreAnimationDelegate(didStop: completion).start(view: self, animation: pulse)
     }
     
+    @objc
     public func showVibrate(vibrateCount:Int = 6, vibrateDuration:TimeInterval = 1.0, vibrateTranslation:Int = 10, vibrateSpeed:Float = 3, scale:CGFloat = 0.8, scaleCount:Float = 1, scaleDuration:TimeInterval = 0.3, scaleVelocity:CGFloat = 20, scaleDamping:CGFloat = 10, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
         
         let path = UIBezierPath()
@@ -213,6 +218,7 @@ public extension UIView {
         }, didStop: completion).start(view: self, animation: rotateAnimation)
     }
     
+    @objc
     public func showGlow(count: Float = 2, duration: Double = 3.0, color: UIColor = UIColor(red: 255/255.0, green: 26/255.0, blue: 251/255.0, alpha: 0.7), alpha: CGFloat = 0.7, radius: CGFloat = 250, timingFunction: CAMediaTimingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut), hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
         
         UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
@@ -248,6 +254,7 @@ public extension UIView {
         }).start(view: glowView, animation: animation)
     }
     
+    @objc
     public func showSheen(duration: Double = 2.0, color: UIColor? = nil, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
         guard let bundle = Bundle.boundlessKit else {
             return
