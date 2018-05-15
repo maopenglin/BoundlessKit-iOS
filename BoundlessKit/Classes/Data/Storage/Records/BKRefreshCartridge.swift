@@ -9,19 +9,21 @@ import Foundation
 
 internal class BKRefreshCartridge : SynchronizedArray<BKDecision>, BKData {
     
+    static let neutralCartridgeId = "CLIENT_NEUTRAL"
+    
     static let registerWithNSKeyed: Void = {
         NSKeyedUnarchiver.setClass(BKRefreshCartridge.self, forClassName: "BKRefreshCartridge")
         NSKeyedArchiver.setClassName("BKRefreshCartridge", for: BKRefreshCartridge.self)
     }()
     
-    let cartridgeID: String?
+    let cartridgeID: String
     let actionID: String
     var expirationUTC: Int64
     var desiredMinCountUntilSync: Int
     
-    init(cartridgeID: String?,
+    init(cartridgeID: String,
          actionID: String,
-         expirationUTC: Int64 = Int64(Date().timeIntervalSince1970),
+         expirationUTC: Int64 = Int64(1000*Date().timeIntervalSince1970),
          sizeUntilSync: Int = 2,
          values: [BKDecision] = []) {
         self.cartridgeID = cartridgeID
@@ -31,9 +33,16 @@ internal class BKRefreshCartridge : SynchronizedArray<BKDecision>, BKData {
         super.init(values)
     }
     
+    class func initNeutral(actionID: String,
+                           expirationUTC: Int64 = Int64(1000*Date().timeIntervalSince1970),
+                           sizeUntilSync: Int = 2,
+                           values: [BKDecision] = []) -> BKRefreshCartridge {
+        return BKRefreshCartridge(cartridgeID: neutralCartridgeId, actionID: actionID, expirationUTC: expirationUTC, sizeUntilSync: sizeUntilSync)
+    }
+    
     required convenience init?(coder aDecoder: NSCoder) {
         guard
-            let cartridgeID = aDecoder.decodeObject(forKey: "cartridgeID") as? String?,
+            let cartridgeID = aDecoder.decodeObject(forKey: "cartridgeID") as? String,
             let actionID = aDecoder.decodeObject(forKey: "actionID") as? String,
             let arrayData = aDecoder.decodeObject(forKey: "arrayValues") as? Data,
             let arrayValues = NSKeyedUnarchiver.unarchiveObject(with: arrayData) as? [BKDecision] else {

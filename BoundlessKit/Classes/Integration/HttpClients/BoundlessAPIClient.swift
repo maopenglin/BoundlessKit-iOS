@@ -13,9 +13,9 @@ internal enum BoundlessAPIEndpoint {
     var url: URL! { return URL(string: path)! }
     
     var path:String{ switch self{
-    case .track: return "https://api.usedopamine.com/v4/app/track/"
-    case .report: return "https://api.usedopamine.com/v4/app/report/"
-    case .refresh: return "https://api.usedopamine.com/v4/app/refresh/"
+    case .track: return "https://reinforce.boundless.ai/v6/app/track/"
+    case .report: return "https://reinforce.boundless.ai/v6/app/report/"
+    case .refresh: return "https://reinforce.boundless.ai/v6/app/refresh/"
         }
     }
 }

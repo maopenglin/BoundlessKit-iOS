@@ -39,7 +39,7 @@ internal struct BoundlessCredentials {
                      "clientSDKVersion": clientSDKVersion,
                      "clientBuild": clientBuild,
                      "primaryIdentity": identity.value,
-                     "appID": appID,
+                     "appId": appID,
                      "secret": inProduction ? productionSecret : developmentSecret,
                      "utc": NSNumber(value: Int64(Date().timeIntervalSince1970) * 1000),
                      "timezoneOffset": NSNumber(value: Int64(NSTimeZone.default.secondsFromGMT()) * 1000)

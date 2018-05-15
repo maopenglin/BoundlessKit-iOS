@@ -47,7 +47,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
         }
         
         let cartridge: BKRefreshCartridge = self[actionID] ?? {
-            let cartridge = BKRefreshCartridge(cartridgeID: nil, actionID: actionID)
+            let cartridge = BKRefreshCartridge.initNeutral(actionID: actionID)
             self[actionID] = cartridge
             return cartridge
         }()
@@ -94,7 +94,7 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
             
             var validCartridges = [String: BKRefreshCartridge]()
             for actionID in apiClient.version.mappings.keys {
-                validCartridges[actionID] = self[actionID] ?? BKRefreshCartridge(cartridgeID: nil, actionID: actionID)
+                validCartridges[actionID] = self[actionID] ?? BKRefreshCartridge.initNeutral(actionID: actionID)
             }
             self.valuesForKeys = validCartridges
             
@@ -104,35 +104,31 @@ internal class BKRefreshCartridgeContainer : SynchronizedDictionary<String, BKRe
                 BKLog.debug("Refreshing cartridge for actionID <\(cartridge.actionID)>...")
                 
                 var payload = apiClient.credentials.json
-                payload["versionID"] = apiClient.version.name
-                payload["actionID"] = cartridge.actionID
+                payload["versionId"] = apiClient.version.name
+                payload["actionName"] = cartridge.actionID
                 apiClient.post(url: BoundlessAPIEndpoint.refresh.url, jsonObject: payload) { response in
                     var success = false
                     defer {
                         completeSuccess = completeSuccess && success
                         self.group.leave()
                     }
-                    if let responseStatusCode = response?["status"] as? Int {
-                        if responseStatusCode == 200,
-                            let decisionNames = response?["reinforcementCartridge"] as? [String],
-                            let expiresIn = response?["expiresIn"] as? TimeInterval {
-                            self[cartridge.actionID] = BKRefreshCartridge(
-                                cartridgeID: nil,
-                                actionID: cartridge.actionID,
-                                expirationUTC: Int64( 1000*Date().addingTimeInterval(expiresIn).timeIntervalSince1970 ),
-                                values: decisionNames.map({BKDecision($0, cartridge.actionID)})
-                            )
-                            BKLog.debug(confirmed: "Cartridge refresh for actionID <\(cartridge.actionID)> succeeded!")
-                            success = true
-                            return
-                        } else if responseStatusCode == 400 {
-                            self.removeValue(forKey: actionID)
-                            BKLog.debug(confirmed: "Cartridge refresh determined actionID<\(actionID)> is no longer a valid actionID. Cartridge deleted.")
-                            success = true
-                            return
-                        }
+                    if let errors = response?["errors"] as? [String: Any] {
+                        BKLog.debug(error: "Cartridge refresh for actionID <\(cartridge.actionID)> failed with error type <\(errors["type"] ?? "nil")> message <\(errors["msg"] ?? "nil")>")
+                        return
                     }
-                    BKLog.debug(error: "Cartridge refresh for actionID <\(cartridge.actionID)> failed!")
+                    if let cartridgeId = response?["cartridgeId"] as? String,
+                        let ttl = response?["ttl"] as? Double,
+                        let reinforcements = response?["reinforcements"] as? [[String: Any]] {
+                        self[cartridge.actionID] = BKRefreshCartridge(
+                            cartridgeID: cartridgeId,
+                            actionID: cartridge.actionID,
+                            expirationUTC: Int64( 1000*Date().timeIntervalSince1970 + ttl),
+                            values: reinforcements.flatMap({$0["reinforcementName"] as? String}).flatMap({BKDecision.init($0, cartridgeId, cartridge.actionID)})
+                        )
+                        BKLog.debug(confirmed: "Cartridge refresh for actionID <\(cartridge.actionID)> succeeded!")
+                        success = true
+                        return
+                    }
                 }.start()
             }
             self.group.notify(queue: .global()) {

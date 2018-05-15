@@ -47,12 +47,10 @@ extension BKAction {
     func toJSONType() -> [String : Any] {
         var jsonObject: [String:Any] = [:]
         
-        jsonObject["actionID"] = name
+//        jsonObject["actionID"] = name
         jsonObject["metadata"] = metadata
-        jsonObject["time"] = [
-            ["timeType":"utc", "value": NSNumber(value: utc)],
-            ["timeType":"deviceTimezoneOffset", "value": NSNumber(value: timezoneOffset)]
-        ]
+        jsonObject["utc"] = NSNumber(value: utc)
+        jsonObject["timezoneOffset"] = NSNumber(value: timezoneOffset)
         
         return jsonObject
     }

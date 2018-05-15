@@ -100,23 +100,31 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
             return
         }
 //        BKLog.debug("Sending track batch with \(trackCopy.count) actions...")
+        var trackEvents = [String: [Any]]()
+        for event in trackCopy {
+            if trackEvents[event.name] == nil { trackEvents[event.name] = [] }
+            trackEvents[event.name]?.append(event.toJSONType())
+        }
+        
         
         var payload = apiClient.credentials.json
-        payload["versionID"] = apiClient.version.name
-        payload["actions"] = trackCopy.map({$0.toJSONType()})
+        payload["versionId"] = apiClient.version.name
+        payload["tracks"] = trackEvents.reduce(into: [[String: Any]](), { (result, args) in
+            result.append(["actionName": args.key, "events": args.value])
+        })
         apiClient.post(url: BoundlessAPIEndpoint.track.url, jsonObject: payload) { response in
             var success = false
             defer { successful(success) }
-            if let status = response?["status"] as? Int {
-                if status == 200 {
-                    self.removeFirst(trackCopy.count)
-                    self.storage?.0.archive(self, forKey: self.storage!.1)
-                    BKLog.debug(confirmed: "Sent track batch!")
-                    success = true
-                    return
-                }
+            if let errors = response?["errors"] as? [String: Any] {
+                BKLog.debug(error: "Sending track batch failed with error type <\(errors["type"] ?? "nil")> message <\(errors["msg"] ?? "nil")>")
+                return
             }
-            BKLog.debug(error: "Sending track batch failed")
+            
+            self.removeFirst(trackCopy.count)
+            self.storage?.0.archive(self, forKey: self.storage!.1)
+            BKLog.debug(confirmed: "Sent track batch!")
+            success = true
+            return
         }.start()
     }
 }

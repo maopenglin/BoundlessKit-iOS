@@ -13,7 +13,7 @@ internal enum CodelessAPIEndpoint {
     var url: URL! { return URL(string: path)! }
     
     var path:String{ switch self{
-    case .boot: return "https://api.usedopamine.com/v5/app/boot"
+    case .boot: return "https://reinforce.boundless.ai/v6/app/boot"
     case .identify: return "https://dashboard-api.usedopamine.com/codeless/pair/customer/identity/"
     case .accept: return "https://dashboard-api.usedopamine.com/codeless/pair/customer/accept/"
     case .submit: return "https://dashboard-api.usedopamine.com/codeless/visualizer/customer/submit/"
@@ -323,6 +323,7 @@ extension CodelessAPIClient {
         }
         var payload = credentials.json
         payload["deviceName"] = UIDevice.current.name
+        payload["appID"] = payload["appId"]
         
         post(url: CodelessAPIEndpoint.identify.url, jsonObject: payload) { response in
             guard let response = response else { return }
@@ -386,7 +387,7 @@ extension CodelessAPIClient {
             let actionID = notification.name.rawValue
             
             var payload = self.credentials.json
-            payload["versionID"] = self.version.name
+            payload["versionId"] = self.version.name
             payload["connectionUUID"] = session.connectionUUID
             payload["sender"] = (type(of: sender) == NSNull.self) ? "nil" : NSStringFromClass(type(of: sender))
             payload["target"] = NSStringFromClass(targetClass)
@@ -427,7 +428,7 @@ extension CodelessAPIClient {
             let target = components.removeFirst()
             let selector = components.removeFirst()
             var payload = self.credentials.json
-            payload["versionID"] = self.version.name
+            payload["versionId"] = self.version.name
             payload["connectionUUID"] = self.visualizerSession?.connectionUUID
             payload["target"] = target
             payload["selector"] = selector

@@ -120,24 +120,37 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         }
 //        BKLog.debug("Sending report batch with \(reportCount) actions...")
         
+        var reportEvents = [String: [String: [[String:Any]]]]()
+        for (actionID, events) in reportCopy {
+            if reportEvents[actionID] == nil { reportEvents[actionID] = [:] }
+            for reinforcement in events.values {
+                if reportEvents[actionID]?[reinforcement.cartridgeID] == nil { reportEvents[actionID]?[reinforcement.cartridgeID] = [] }
+                reportEvents[actionID]?[reinforcement.cartridgeID]?.append(reinforcement.toJSONType())
+            }
+        }
+        
         var payload = apiClient.credentials.json
-        payload["versionID"] = apiClient.version.name
-        payload["actions"] = reportCopy.values.flatMap({$0.values}).map({$0.toJSONType()})
+        payload["versionId"] = apiClient.version.name
+        payload["reports"] = reportEvents.reduce(into: [[[String: Any]]]()) { (result, args) in
+            let (key, value) = args
+            result.append(value.map{["actionName": key, "cartridgeId": $0.key, "events": $0.value]})
+            }.flatMap({$0})
+        
         apiClient.post(url: BoundlessAPIEndpoint.report.url, jsonObject: payload) { response in
             var success = false
             defer { successful(success) }
-            if let status = response?["status"] as? Int {
-                if status == 200 || status == 400 {
-                    for (actionID, actions) in reportCopy {
-                        self[actionID]?.removeFirst(actions.count)
-                    }
-                    self.storage?.0.archive(self, forKey: self.storage!.1)
-                    BKLog.debug(confirmed: "Sent report batch!")
-                    success = true
-                    return
-                }
+            if let errors = response?["errors"] as? [String: Any] {
+                BKLog.debug(error: "Sending report batch failed with error type <\(errors["type"] ?? "nil")> message <\(errors["msg"] ?? "nil")>")
+                return
             }
-            BKLog.debug(error: "Sending report batch failed")
+            
+            for (actionID, actions) in reportCopy {
+                self[actionID]?.removeFirst(actions.count)
+            }
+            self.storage?.0.archive(self, forKey: self.storage!.1)
+            BKLog.debug(confirmed: "Sent report batch!")
+            success = true
+            return
         }.start()
     }
     
