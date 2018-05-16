@@ -32,8 +32,8 @@ struct CodelessReinforcement {
                     
                 case "Confetti":
                     guard let duration = self.parameters["Duration"] as? Double else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let systemSound = self.parameters["SystemSound"] as? UInt32  else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let systemSound = self.parameters["SystemSound"] as? UInt32 else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     for (view, _) in viewAndLocation {
                         view.showConfetti(duration: duration, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
                     }
@@ -42,21 +42,21 @@ struct CodelessReinforcement {
                 case "Emojisplosion":
                     guard let content = self.parameters["Content"] as? String else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     guard let xAcceleration = self.parameters["AccelX"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let yAcceleration = self.parameters["AccelY"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let bursts = self.parameters["Bursts"] as? Double  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let angle = self.parameters["EmissionAngle"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let range = self.parameters["EmissionRange"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let fadeout = self.parameters["FadeOut"] as? Float  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let lifetime = self.parameters["Lifetime"] as? Float  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let lifetimeRange = self.parameters["LifetimeRange"] as? Float  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let quantity = self.parameters["Quantity"] as? Float  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let scale = self.parameters["Scale"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let scaleRange = self.parameters["ScaleRange"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let scaleSpeed = self.parameters["ScaleSpeed"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let spin = self.parameters["Spin"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let velocity = self.parameters["Velocity"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let systemSound = self.parameters["SystemSound"] as? UInt32  else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let yAcceleration = self.parameters["AccelY"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let bursts = self.parameters["Bursts"] as? Double else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let angle = self.parameters["EmissionAngle"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let range = self.parameters["EmissionRange"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let fadeout = self.parameters["FadeOut"] as? Float else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let lifetime = self.parameters["Lifetime"] as? Float else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let lifetimeRange = self.parameters["LifetimeRange"] as? Float else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let quantity = self.parameters["Quantity"] as? Float else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let scale = self.parameters["Scale"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let scaleRange = self.parameters["ScaleRange"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let scaleSpeed = self.parameters["ScaleSpeed"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let spin = self.parameters["Spin"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let velocity = self.parameters["Velocity"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let systemSound = self.parameters["SystemSound"] as? UInt32 else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     let image = content.decode().image().cgImage
                     for (view, location) in viewAndLocation {
                         view.showEmojiSplosion(at: location, content: image, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
@@ -64,64 +64,63 @@ struct CodelessReinforcement {
                     return
                     
                 case "Glow":
-                    guard let duration = self.parameters["Duration"] as? Double  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let colorString = self.parameters["Color"] as? String  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let alpha = self.parameters["Alpha"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let count = self.parameters["Count"] as? Float  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let radius = self.parameters["Radius"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let systemSound = self.parameters["SystemSound"] as? UInt32  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    let color = UIColor.from(rgb: colorString)
+                    guard let duration = self.parameters["Duration"] as? Double else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let colorString = self.parameters["Color"] as? String, let color = UIColor.from(rgb: colorString) else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let alpha = self.parameters["Alpha"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let count = self.parameters["Count"] as? Float else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let radius = self.parameters["Radius"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let systemSound = self.parameters["SystemSound"] as? UInt32 else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     for (view, _) in viewAndLocation {
                         view.showGlow(count: count, duration: duration, color: color, alpha: alpha, radius: radius, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
                     }
                     return
                     
                 case "Sheen":
-                    guard let duration = self.parameters["Duration"] as? Double  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let systemSound = self.parameters["SystemSound"] as? UInt32  else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let duration = self.parameters["Duration"] as? Double else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let systemSound = self.parameters["SystemSound"] as? UInt32 else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     for (view, _) in viewAndLocation {
                         view.showSheen(duration: duration, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
                     }
                     return
                     
                 case "Pulse":
-                    guard let count = self.parameters["Count"] as? Float  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let duration = self.parameters["Duration"] as? Double  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let scale = self.parameters["Scale"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let velocity = self.parameters["Velocity"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let damping = self.parameters["Damping"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let systemSound = self.parameters["SystemSound"] as? UInt32  else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let count = self.parameters["Count"] as? Float else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let duration = self.parameters["Duration"] as? Double else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let scale = self.parameters["Scale"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let velocity = self.parameters["Velocity"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let damping = self.parameters["Damping"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let systemSound = self.parameters["SystemSound"] as? UInt32 else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     for (view, _) in viewAndLocation {
                         view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
                     }
                     return
                     
                 case "Shimmy":
-                    guard let count = self.parameters["Count"] as? Int  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let duration = self.parameters["Duration"] as? Double  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let translation = self.parameters["Translation"] as? Int  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let systemSound = self.parameters["SystemSound"] as? UInt32  else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let count = self.parameters["Count"] as? Int else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let duration = self.parameters["Duration"] as? Double else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let translation = self.parameters["Translation"] as? Int else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let systemSound = self.parameters["SystemSound"] as? UInt32 else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     for (view, _) in viewAndLocation {
                         view.showShimmy(count: count, duration: duration, translation: translation, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
                     }
                     return
                     
                 case "Vibrate":
-                    guard let vibrateDuration = self.parameters["VibrateDuration"] as? Double  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let vibrateCount = self.parameters["VibrateCount"] as? Int  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let vibrateTranslation = self.parameters["VibrateTranslation"] as? Int  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let vibrateSpeed = self.parameters["VibrateSpeed"] as? Float  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let scale = self.parameters["Scale"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let scaleDuration = self.parameters["ScaleDuration"] as? Double  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let scaleCount = self.parameters["ScaleCount"] as? Float  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let scaleVelocity = self.parameters["ScaleVelocity"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let scaleDamping = self.parameters["ScaleDamping"] as? CGFloat  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool  else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let systemSound = self.parameters["SystemSound"] as? UInt32  else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let vibrateDuration = self.parameters["VibrateDuration"] as? Double else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let vibrateCount = self.parameters["VibrateCount"] as? Int else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let vibrateTranslation = self.parameters["VibrateTranslation"] as? Int else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let vibrateSpeed = self.parameters["VibrateSpeed"] as? Float else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let scale = self.parameters["Scale"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let scaleDuration = self.parameters["ScaleDuration"] as? Double else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let scaleCount = self.parameters["ScaleCount"] as? Float else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let scaleVelocity = self.parameters["ScaleVelocity"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let scaleDamping = self.parameters["ScaleDamping"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool else { BKLog.debug(error: "Missing parameter", visual: true); break }
+                    guard let systemSound = self.parameters["SystemSound"] as? UInt32 else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     for (view, _) in viewAndLocation {
                         view.showVibrate(vibrateCount: vibrateCount, vibrateDuration: vibrateDuration, vibrateTranslation: vibrateTranslation, vibrateSpeed: vibrateSpeed, scale: scale, scaleCount: scaleCount, scaleDuration: scaleDuration, scaleVelocity: scaleVelocity, scaleDamping: scaleDamping, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
                     }
