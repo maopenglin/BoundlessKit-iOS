@@ -8,6 +8,23 @@
 import Foundation
 
 public extension UIColor {
+    
+    var rgba: String {
+        var r:CGFloat = 0
+        var g:CGFloat = 0
+        var b:CGFloat = 0
+        var a:CGFloat = 0
+        getRed(&r, green: &g, blue: &b, alpha: &a)
+        
+        let rgba:Int = (Int)(r*255)<<24 | (Int)(g*255)<<16 | (Int)(b*255)<<8 | (Int)(a*255)<<0
+        
+        return String(format:"#%08x", rgba).uppercased()
+    }
+    
+    var rgb: String {
+        return String(rgba.dropLast(2))
+    }
+    
     /// This function takes a hex string and alpha value and returns its UIColor
     ///
     /// - parameters:
@@ -17,26 +34,31 @@ public extension UIColor {
     /// - returns:
     ///     The corresponding UIColor for valid hex strings, `UIColor.grayColor()` otherwise.
     ///
-    class func from(rgb: String, alpha: CGFloat = 1.0) -> UIColor {
-        var colorString:String = rgb.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines).uppercased()
+    class func from(rgba: String) -> UIColor? {
+        var colorString:String = rgba.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines).uppercased()
         
         if (colorString.hasPrefix("#")) {
             colorString.removeFirst()
         }
         
-        if colorString.count != 6 {
-            return UIColor.gray
+        if colorString.count == 6 {
+            colorString += "FF"
+        } else if colorString.count != 8 {
+            return nil
         }
         
-        var rgbValue:UInt32 = 0
-        Scanner(string: colorString).scanHexInt32(&rgbValue)
+        var rgbaValue:UInt32 = 0
+        Scanner(string: colorString).scanHexInt32(&rgbaValue)
         
         return UIColor(
-            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-            alpha: alpha
+            red: CGFloat((rgbaValue & 0xFF000000) >> 24) / 255.0,
+            green: CGFloat((rgbaValue & 0x00FF0000) >> 16) / 255.0,
+            blue: CGFloat((rgbaValue & 0x0000FF00) >> 8) / 255.0,
+            alpha: CGFloat(rgbaValue & 0x000000FF) / 255.0
         )
     }
+    
+    class func from(rgb: String, alpha: CGFloat = 1.0) -> UIColor? {
+        return UIColor.from(rgba: rgb)?.withAlphaComponent(alpha)
+    }
 }
-

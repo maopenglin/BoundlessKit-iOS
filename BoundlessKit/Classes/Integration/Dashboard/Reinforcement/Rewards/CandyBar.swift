@@ -53,7 +53,7 @@ open class CandyBar: UIView {
     ///     - backgroundColor?: The color of the candybar's background view. Defaults to `UIColor.blackColor()`.
     ///     - didTapBlock?: An action to be called when the user taps on the candybar. Defaults to `nil`.
     ///
-    public required init(title: String? = nil, subtitle: String? = nil, image: UIImage? = nil, position: CandyBarPosition = .top, backgroundColor: UIColor = UIColor.from(rgb: "#1689ce"), didDismissBlock: (() -> ())? = nil) {
+    public required init(title: String? = nil, subtitle: String? = nil, image: UIImage? = nil, position: CandyBarPosition = .top, backgroundColor: UIColor = UIColor.from(rgb: "#1689ce") ?? UIColor.blue, didDismissBlock: (() -> ())? = nil) {
         self.didDismissBlock = didDismissBlock
         self.image = image
         super.init(frame: CGRect.zero)

@@ -25,12 +25,16 @@ public extension UIView {
      */
     
     public func showConfetti(duration:Double = 2,
-                      size:CGSize = CGSize(width: 9, height: 6),
-                      shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle, .spiral],
-                      colors:[UIColor] = [UIColor.from(rgb: "4d81fb", alpha: 0.8), UIColor.from(rgb: "4ac4fb", alpha: 0.8), UIColor.from(rgb: "9243f9", alpha: 0.8), UIColor.from(rgb: "fdc33b", alpha: 0.8), UIColor.from(rgb: "f7332f", alpha: 0.8)],
-                      hapticFeedback: Bool = false,
-                      systemSound: UInt32 = 0,
-                      completion: @escaping ()->Void = {}) {
+                             size:CGSize = CGSize(width: 9, height: 6),
+                             shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle, .spiral],
+                             colors:[UIColor] = [UIColor.from(rgb: "4d81fb", alpha: 0.8) ?? UIColor.purple,
+                                                 UIColor.from(rgb: "4ac4fb", alpha: 0.8) ?? UIColor.blue,
+                                                 UIColor.from(rgb: "9243f9", alpha: 0.8) ?? UIColor.purple,
+                                                 UIColor.from(rgb: "fdc33b", alpha: 0.8) ?? UIColor.orange,
+                                                 UIColor.from(rgb: "f7332f", alpha: 0.8) ?? UIColor.red,],
+                             hapticFeedback: Bool = false,
+                             systemSound: UInt32 = 0,
+                             completion: @escaping ()->Void = {}) {
         let burstDuration = 0.8
         let showerDuration = max(0, duration - burstDuration)
         self.confettiBurst(duration: burstDuration, size: size, shapes: shapes, colors: colors) {
@@ -39,7 +43,11 @@ public extension UIView {
         }
     }
     
-    public func confettiBurst(duration:Double, size:CGSize, shapes:[ConfettiShape], colors:[UIColor], startedHandler: @escaping ()->Void) {
+    public func confettiBurst(duration:Double,
+                              size:CGSize,
+                              shapes:[ConfettiShape],
+                              colors:[UIColor],
+                              startedHandler: @escaping ()->Void) {
         DispatchQueue.main.async {
             
             /* Create bursting confetti */
@@ -95,7 +103,11 @@ public extension UIView {
         }
     }
     
-    public func confettiShower(duration:Double, size:CGSize, shapes:[ConfettiShape], colors:[UIColor], completion: @escaping ()->Void) {
+    public func confettiShower(duration:Double,
+                               size:CGSize,
+                               shapes:[ConfettiShape],
+                               colors:[UIColor],
+                               completion: @escaping ()->Void) {
         DispatchQueue.main.async {
             
             /* Create showering confetti */
