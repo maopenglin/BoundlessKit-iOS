@@ -13,7 +13,6 @@ open class BKLogPreferences {
 }
 
 internal class BKLog {
-    
     /// This function sends debug messages if "-D DEBUG" flag is added in 'Build Settings' > 'Swift Compiler - Custom Flags'
     ///
     /// - parameters:
