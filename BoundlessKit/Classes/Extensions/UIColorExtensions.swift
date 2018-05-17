@@ -25,15 +25,7 @@ public extension UIColor {
         return String(rgba.dropLast(2))
     }
     
-    /// This function takes a hex string and alpha value and returns its UIColor
-    ///
-    /// - parameters:
-    ///     - rgb: A hex string with either format `"#ffffff"` or `"ffffff"` or `"#FFFFFF"`.
-    ///     - alpha: The alpha value to apply to the color, default is 1.0 for opaque
-    ///
-    /// - returns:
-    ///     The corresponding UIColor for valid hex strings, `UIColor.grayColor()` otherwise.
-    ///
+    @objc
     class func from(rgba: String) -> UIColor? {
         var colorString:String = rgba.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines).uppercased()
         
@@ -58,6 +50,17 @@ public extension UIColor {
         )
     }
     
+    
+    /// This function takes a hex string and alpha value and returns its UIColor
+    ///
+    /// - parameters:
+    ///     - rgb: A hex string with either format `"#ffffff"` or `"ffffff"` or `"#FFFFFF"`.
+    ///     - alpha: The alpha value to apply to the color. Default is `1.0`.
+    ///
+    /// - returns:
+    ///     The corresponding UIColor for valid hex strings, `nil` otherwise.
+    ///
+    @objc
     class func from(rgb: String, alpha: CGFloat = 1.0) -> UIColor? {
         return UIColor.from(rgba: rgb)?.withAlphaComponent(alpha)
     }

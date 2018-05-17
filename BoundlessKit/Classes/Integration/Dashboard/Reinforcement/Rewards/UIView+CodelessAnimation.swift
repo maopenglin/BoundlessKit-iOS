@@ -20,15 +20,15 @@ public extension UIView {
                             style: UIBlurEffectStyle = UIBlurEffectStyle.light,
                             hapticFeedback: Bool = false,
                             systemSound: UInt32 = 0,
-                            completion: @escaping ()->Void = {}
+                            completion: (()->Void)? = nil
         ) {
         let blurEffectView = UIVisualEffectView(effect: nil)
         blurEffectView.frame = self.bounds
+        blurEffectView.contentView.alpha = 0
         self.addSubview(blurEffectView)
         
         let popupView = UIImageView(image: content)
         popupView.center = blurEffectView.center
-        popupView.alpha = 0
         popupView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
         blurEffectView.contentView.addSubview(popupView)
         
@@ -37,8 +37,7 @@ public extension UIView {
             animations: {
                 BKAudio.play(systemSound, vibrate: hapticFeedback)
                 blurEffectView.effect = UIBlurEffect(style: style)
-                
-                popupView.alpha = 1
+                blurEffectView.contentView.alpha = 1
                 popupView.transform = .identity
         },
             completion: { _ in
@@ -47,13 +46,12 @@ public extension UIView {
                     delay: duration,
                     animations: {
                         popupView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-                        popupView.alpha = 0
-                        
+                        blurEffectView.contentView.alpha = 0
                         blurEffectView.effect = nil
                 },
                     completion: { _ in
                         blurEffectView.removeFromSuperview()
-                        completion()
+                        completion?()
                 })
         })
     }
@@ -77,7 +75,7 @@ public extension UIView {
                                   spin: CGFloat = 0,
                                   hapticFeedback: Bool = false,
                                   systemSound: UInt32 = 0,
-                                  completion: @escaping ()->Void = {}
+                                  completion: (()->Void)? = nil
         ) {
         guard let content = content else {
             BKLog.debug(error: "Received nil image content!")
@@ -121,14 +119,14 @@ public extension UIView {
                 DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(lifetime + lifetimeRange)) {
                     emitter.removeFromSuperlayer()
 //                    BKLog.debug("💥 Emojisplosion done")
-                    completion()
+                    completion?()
                 }
             }
         }
     }
     
     @objc
-    public func showShimmy(count:Int = 2, duration:TimeInterval = 5.0, translation:Int = 10, speed:Float = 3, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
+    public func showShimmy(count:Int = 2, duration:TimeInterval = 5.0, translation:Int = 10, speed:Float = 3, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: (()->Void)? = nil) {
         
         let path = UIBezierPath()
         path.move(to: .zero)
@@ -151,7 +149,7 @@ public extension UIView {
     }
     
     @objc
-    public func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
+    public func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: (()->Void)? = nil) {
         
         let pulse = CASpringAnimation(keyPath: "transform.scale")
         pulse.repeatCount = count
@@ -165,7 +163,7 @@ public extension UIView {
     }
     
     @objc
-    public func showVibrate(vibrateCount:Int = 6, vibrateDuration:TimeInterval = 1.0, vibrateTranslation:Int = 10, vibrateSpeed:Float = 3, scale:CGFloat = 0.8, scaleCount:Float = 1, scaleDuration:TimeInterval = 0.3, scaleVelocity:CGFloat = 20, scaleDamping:CGFloat = 10, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
+    public func showVibrate(vibrateCount:Int = 6, vibrateDuration:TimeInterval = 1.0, vibrateTranslation:Int = 10, vibrateSpeed:Float = 3, scale:CGFloat = 0.8, scaleCount:Float = 1, scaleDuration:TimeInterval = 0.3, scaleVelocity:CGFloat = 20, scaleDamping:CGFloat = 10, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: (()->Void)? = nil) {
         
         let path = UIBezierPath()
         path.move(to: .zero)
@@ -204,11 +202,11 @@ public extension UIView {
             BKAudio.play(systemSound, vibrate: hapticFeedback)
         }, didStop: {
             self.clipsToBounds = oldClipsToBounds
-            completion()
+            completion?()
         }).start(view: self, animation: group)
     }
     
-    public func rotate360Degrees(count: Float = 2, duration: CFTimeInterval = 1.0, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
+    public func rotate360Degrees(count: Float = 2, duration: CFTimeInterval = 1.0, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: (()->Void)? = nil) {
         let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")
         rotateAnimation.duration = duration
         rotateAnimation.fromValue = 0.0
@@ -222,7 +220,7 @@ public extension UIView {
     }
     
     @objc
-    public func showGlow(count: Float = 2, duration: Double = 3.0, color: UIColor = UIColor(red: 255/255.0, green: 26/255.0, blue: 251/255.0, alpha: 0.7), alpha: CGFloat = 0.7, radius: CGFloat = 250, timingFunction: CAMediaTimingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut), hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
+    public func showGlow(count: Float = 2, duration: Double = 3.0, color: UIColor = UIColor(red: 255/255.0, green: 26/255.0, blue: 251/255.0, alpha: 0.7), alpha: CGFloat = 0.7, timingFunction: CAMediaTimingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut), hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: (()->Void)? = nil) {
         
         UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
         self.layer.render(in: UIGraphicsGetCurrentContext()!)
@@ -253,12 +251,12 @@ public extension UIView {
         },
             didStop: {
                 glowView.removeFromSuperview()
-                completion()
+                completion?()
         }).start(view: glowView, animation: animation)
     }
     
     @objc
-    public func showSheen(duration: Double = 2.0, color: UIColor? = nil, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: @escaping ()->Void = {}) {
+    public func showSheen(duration: Double = 2.0, color: UIColor? = nil, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: (()->Void)? = nil) {
         guard let bundle = Bundle.boundlessKit else {
             return
         }
@@ -293,7 +291,7 @@ public extension UIView {
         },
             didStop: {
                 imageView.removeFromSuperview()
-                completion()
+                completion?()
         }).start(view: imageView, animation: animation)
     }
 }
@@ -301,10 +299,10 @@ public extension UIView {
 fileprivate class CoreAnimationDelegate : NSObject, CAAnimationDelegate {
     
     let willStart: (@escaping()->Void)->Void
-    let didStart: ()->Void
-    let didStop: ()->Void
+    let didStart: (()->Void)?
+    let didStop: (()->Void)?
     
-    init(willStart: @escaping (@escaping()->Void)->Void = {startAnimation in startAnimation()}, didStart: @escaping ()->Void = {}, didStop: @escaping ()->Void = {}) {
+    init(willStart: @escaping (@escaping()->Void)->Void = {startAnimation in startAnimation()}, didStart: (()->Void)? = nil, didStop: (()->Void)? = nil) {
         self.willStart = willStart
         self.didStart = didStart
         self.didStop = didStop
@@ -318,12 +316,12 @@ fileprivate class CoreAnimationDelegate : NSObject, CAAnimationDelegate {
     }
     
     func animationDidStart(_ anim: CAAnimation) {
-        didStart()
+        didStart?()
     }
     
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if flag {
-            didStop()
+            didStop?()
         }
     }
     

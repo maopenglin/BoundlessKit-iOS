@@ -7,8 +7,24 @@
 
 import Foundation
 
-public extension String {
-    func image(font:UIFont = .systemFont(ofSize: 24)) -> UIImage {
+public extension NSString {
+    @objc
+    func utf8Decoded() -> NSString {
+        if let data = self.data(using: String.Encoding.utf8.rawValue),
+            let str = NSString(data: data, encoding: String.Encoding.nonLossyASCII.rawValue) {
+            return str as NSString
+        } else {
+            return self
+        }
+    }
+    
+    @objc
+    func image() -> UIImage {
+        return image(font: .systemFont(ofSize: 24))
+    }
+    
+    @objc
+    func image(font:UIFont) -> UIImage {
         let size = self.size(withAttributes: [NSAttributedStringKey.font: font])
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         self.draw(at: .zero, withAttributes: [NSAttributedStringKey.font: font])
@@ -18,13 +34,3 @@ public extension String {
     }
 }
 
-public extension String {
-    public func decode() -> String {
-        if let data = self.data(using: .utf8),
-            let str = String(data: data, encoding: .nonLossyASCII) {
-            return str
-        } else {
-            return self
-        }
-    }
-}

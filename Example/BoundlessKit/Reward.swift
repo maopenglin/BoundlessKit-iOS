@@ -34,8 +34,7 @@ enum Reward : String {
         case .emojisplosion:
             view.superview!.showEmojiSplosion(at: view.center, completion: completion)
         case .confetti:
-//            viewController.view.showConfetti(completion: completion)
-            viewController.view.showConfetti(duration: 3, colors: [UIColor.blue], completion: completion)
+            viewController.view.showConfetti(completion: completion)
         case .popover:
             viewController.view.showPopover(completion: completion)
         }

@@ -57,7 +57,7 @@ struct CodelessReinforcement {
                     guard let velocity = self.parameters["Velocity"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     guard let systemSound = self.parameters["SystemSound"] as? UInt32 else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    let image = content.decode().image().cgImage
+                    let image = content.utf8Decoded().image().cgImage
                     for (view, location) in viewAndLocation {
                         view.showEmojiSplosion(at: location, content: image, scale: scale, scaleSpeed: scaleSpeed, scaleRange: scaleRange, lifetime: lifetime, lifetimeRange: lifetimeRange, fadeout: fadeout, quantity: quantity, bursts: bursts, velocity: velocity, xAcceleration: xAcceleration, yAcceleration: yAcceleration, angle: angle, range: range, spin: spin, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
                     }
@@ -68,11 +68,10 @@ struct CodelessReinforcement {
                     guard let colorString = self.parameters["Color"] as? String, let color = UIColor.from(rgb: colorString) else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     guard let alpha = self.parameters["Alpha"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     guard let count = self.parameters["Count"] as? Float else { BKLog.debug(error: "Missing parameter", visual: true); break }
-                    guard let radius = self.parameters["Radius"] as? CGFloat else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     guard let systemSound = self.parameters["SystemSound"] as? UInt32 else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     for (view, _) in viewAndLocation {
-                        view.showGlow(count: count, duration: duration, color: color, alpha: alpha, radius: radius, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
+                        view.showGlow(count: count, duration: duration, color: color, alpha: alpha, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
                     }
                     return
                     

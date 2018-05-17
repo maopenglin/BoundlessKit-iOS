@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 
+@objc
 public enum ConfettiShape : Int {
     case rectangle, circle, spiral
 }
@@ -18,12 +19,14 @@ public extension UIView {
      Creates a CAEmitterLayer that drops celebration confetti from the top of the view
      
      - parameters:
-        - duration: How long celebration confetti should last
-        - size: Size of individual confetti pieces
-        - shapes: This directly affects the quantity of confetti. For example, [.circle] will show half as much confetti as [.circle, .circle]
-        - colors: This directly affects the quantity of confetti. For example, [.blue] will show half as much confetti as [.blue, .blue]
+        - duration: How long celebration confetti should last in seconds. Default is set to `2`.
+        - size: Size of individual confetti pieces. Default is set to `CGSize(width: 9, height: 6)`.
+        - shapes: This directly affects the quantity of confetti. For example, [.circle] will show half as much confetti as [.circle, .circle].
+        - colors: This directly affects the quantity of confetti. For example, [.blue] will show half as much confetti as [.blue, .blue].
+        - hapticFeedback: If set to true, the device will vibrate at the start of animation. Default is set to `false`.
+        - systemSound: The SystemSoundId to play at the start of animation. If `0` no sound is played. Default is set to `0`.
+        - completion: Completion handler performated at the end of animation.
      */
-    
     public func showConfetti(duration:Double = 2,
                              size:CGSize = CGSize(width: 9, height: 6),
                              shapes:[ConfettiShape] = [.rectangle, .rectangle, .circle, .spiral],
@@ -296,4 +299,94 @@ fileprivate extension ConfettiShape {
 }
 
 
+
+
+
+@objc
+public extension UIView {
+    /**
+     Creates a CAEmitterLayer that drops celebration confetti from the top of the view
+     */
+    @objc(showConfetti)
+    public func objc_showConfetti() {
+        self.showConfetti()
+    }
+    
+    
+    
+    /**
+     Creates a CAEmitterLayer that drops celebration confetti from the top of the view
+     
+    - parameters:
+        - duration: How long celebration confetti should last in seconds.
+        - completion: Completion handler performated at the end of animation. Nullable.
+     */
+    @objc(showConfettiWithDuration:completion:)
+    public func objc_showConfetti(duration:Double, completion: (()->Void)?) {
+        self.showConfetti(duration: duration, completion: completion ?? {})
+    }
+    
+    
+    
+    /**
+     Creates a CAEmitterLayer that drops celebration confetti from the top of the view
+     
+    - parameters:
+        - duration: How long celebration confetti should last in seconds.
+        - hapticFeedback: If set to true, the device will vibrate at the start of animation.
+        - systemSound: The SystemSoundId to play at the start of animation. If `0` no sound is played.
+        - completion: Completion handler performated at the end of animation. Nullable.
+     */
+    @objc(showConfettiWithDuration: hapticFeedback: systemSound: completion:)
+    public func objc_showConfetti(duration:Double,
+                                  hapticFeedback: Bool,
+                                  systemSound: UInt32,
+                                  completion: (()->Void)?) {
+        self.showConfetti(duration: duration, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion ?? {})
+    }
+    
+    
+    
+    /**
+     Creates a CAEmitterLayer that drops celebration confetti from the top of the view
+     
+    - parameters:
+        - duration: How long celebration confetti should last in seconds.
+        - colors: This directly affects the quantity of confetti. For example, `@[UIColor.blueColor]` will show half as much confetti as `@[UIColor.blueColor, UIColor.blueColor]`.
+        - hapticFeedback: If set to true, the device will vibrate at the start of animation.
+        - systemSound: The SystemSoundId to play at the start of animation. If `0` no sound is played.
+        - completion: Completion handler performated at the end of animation. Nullable.
+     */
+    @objc(showConfettiWithDuration: colors: hapticFeedback: systemSound: completion:)
+    public func objc_showConfetti(duration:Double,
+                                  colors:[UIColor],
+                                  hapticFeedback: Bool,
+                                  systemSound: UInt32,
+                                 completion: (()->Void)? = nil) {
+        self.showConfetti(duration: duration, colors: colors, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion ?? {})
+    }
+    
+    /**
+     Creates a CAEmitterLayer that drops celebration confetti from the top of the view
+     
+    - parameters:
+        - duration: How long celebration confetti should last in seconds.
+        - size: Size of individual confetti pieces.
+        - shapes: This directly affects the quantity of confetti. For example, [ConfettiShape.circle.rawValue] will show half as much confetti as [ConfettiShape.circle.rawValue, ConfettiShape.circle.rawValue].
+        - colors: This directly affects the quantity of confetti. For example, `@[UIColor.blueColor]` will show half as much confetti as `@[UIColor.blueColor, UIColor.blueColor]`.
+        - hapticFeedback: If set to true, the device will vibrate at the start of animation.
+        - systemSound: The SystemSoundId to play at the start of animation. If `0` no sound is played.
+        - completion: Completion handler performated at the end of animation. Nullable.
+     */
+    @objc(showConfettiWithDuration: size: shapes: colors: hapticFeedback: systemSound: completion:)
+    public func objc_showConfetti(duration:Double,
+                                  size:CGSize,
+                                  shapes:[Int],
+                                  colors:[UIColor],
+                                  hapticFeedback: Bool,
+                                  systemSound: UInt32,
+                                  completion: (()->Void)?) {
+        self.showConfetti(duration: duration, size: size, shapes: shapes.map({ConfettiShape.init(rawValue: $0)!}), colors: colors, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion ?? {})
+    }
+}
 
