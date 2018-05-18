@@ -251,41 +251,41 @@ public extension UIView {
     }
     
     @objc
-    public func showSheen(duration: Double = 2.0, color: UIColor? = nil, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: (()->Void)? = nil) {
+    public func showSheen(duration: Double = 2.0, color: UIColor? = nil, heightMultiplier: CGFloat = 1, widthMultiplier: CGFloat = 1.667, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: (()->Void)? = nil) {
         guard let bundle = Bundle.boundlessKit else {
             return
         }
+        
+        let containerView = UIView(frame: self.bounds)
+        containerView.mask = self.generateMask()
         
         var image = UIImage(named: "sheen", in: bundle, compatibleWith: nil)
         if let color = color {
             image = image?.tint(tintColor: color)
         }
-        
-        
         let imageView = UIImageView(image: image)
-        
-        let height = self.frame.height
-        let width: CGFloat =  height * 1.667
+        let height = self.frame.height * heightMultiplier
+        let width: CGFloat =  self.frame.height * widthMultiplier
         imageView.frame = CGRect(x: -width, y: 0, width: width, height: height)
+        containerView.addSubview(imageView)
         
         let animation = CABasicAnimation(keyPath: "transform.translation.x")
         animation.duration = duration
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         animation.byValue = self.frame.width + width
-        
         animation.fillMode = kCAFillModeForwards
         animation.isRemovedOnCompletion = false
         
         CoreAnimationDelegate(
             willStart: { start in
-                self.addSubview(imageView)
+                self.addSubview(containerView)
                 start()
         },
             didStart:{
                 BKAudio.play(systemSound, vibrate: hapticFeedback)
         },
             didStop: {
-                imageView.removeFromSuperview()
+                containerView.removeFromSuperview()
                 completion?()
         }).start(view: imageView, animation: animation)
     }
