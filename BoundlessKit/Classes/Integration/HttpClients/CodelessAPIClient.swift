@@ -150,8 +150,6 @@ fileprivate extension CodelessAPIClient {
         self.version.reportBatch.desiredMaxCountUntilSync = newValue.reportBatchSize
         self.version.trackBatch.desiredMaxCountUntilSync = newValue.trackBatchSize
         
-        BoundlessContext.locationEnabled = newValue.locationObservations
-        BoundlessContext.bluetoothEnabled = newValue.bluetoothObservations
         BKLogPreferences.printEnabled = newValue.consoleLoggingEnabled
         
         if credentials.identity.source.rawValue != newValue.identityType {

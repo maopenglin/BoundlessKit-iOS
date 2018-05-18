@@ -65,13 +65,6 @@ internal class BKTrackBatch : SynchronizedArray<BKAction>, BKData, BoundlessAPIS
 //        BKLog.debug(confirmed: "Tracked action #<\(self.count)>:<\(action.name)>")
         storeGroup.enter()
         self.storage?.0.archive(self, forKey: self.storage!.1)
-        BoundlessContext.getContext() { contextInfo in
-            for (key, value) in contextInfo {
-                action.metadata[key] = value
-            }
-            self.storage?.0.archive(self, forKey: self.storage!.1)
-            self.storeGroup.leave()
-        }
     }
     
     var needsSync: Bool {

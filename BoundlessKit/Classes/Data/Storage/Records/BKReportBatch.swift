@@ -74,13 +74,6 @@ internal class BKReportBatch : SynchronizedDictionary<String, SynchronizedArray<
         BKLog.debug(confirmed: "Report #<\(count)> actionID:<\(reinforcement.actionID)> with reinforcementID:<\(reinforcement.name)>")
         storeGroup.enter()
         self.storage?.0.archive(self, forKey: self.storage!.1)
-        BoundlessContext.getContext() { contextInfo in
-            for (key, value) in contextInfo {
-                reinforcement.metadata[key] = value
-            }
-            self.storage?.0.archive(self, forKey: self.storage!.1)
-            self.storeGroup.leave()
-        }
     }
     
     func erase() {
