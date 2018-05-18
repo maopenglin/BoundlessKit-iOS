@@ -24,7 +24,9 @@ public extension UIView {
         ) {
         let blurEffectView = UIVisualEffectView(effect: nil)
         blurEffectView.frame = self.bounds
+        blurEffectView.mask = self.generateMask()
         blurEffectView.contentView.alpha = 0
+        
         self.addSubview(blurEffectView)
         
         let popupView = UIImageView(image: content)
@@ -222,14 +224,7 @@ public extension UIView {
     @objc
     public func showGlow(count: Float = 2, duration: Double = 3.0, color: UIColor = UIColor(red: 255/255.0, green: 26/255.0, blue: 251/255.0, alpha: 0.7), alpha: CGFloat = 0.7, timingFunction: CAMediaTimingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut), hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: (()->Void)? = nil) {
         
-        UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
-        self.layer.render(in: UIGraphicsGetCurrentContext()!)
-        color.setFill()
-        UIBezierPath(rect: CGRect(origin: .zero, size: self.bounds.size)).fill(with: .sourceAtop, alpha:1.0)
-        let image = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        
-        let glowView = UIImageView(image: image)
+        let glowView = self.generateMask()
         glowView.center = CGPoint(x: self.bounds.midX, y: self.bounds.midY)
         glowView.alpha = 0
         
@@ -326,3 +321,17 @@ fileprivate class CoreAnimationDelegate : NSObject, CAAnimationDelegate {
     }
     
 }
+
+fileprivate extension UIView {
+    func generateMask(color: UIColor = .white) -> UIView {
+        UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
+        self.layer.render(in: UIGraphicsGetCurrentContext()!)
+        color.setFill()
+        UIBezierPath(rect: CGRect(origin: .zero, size: self.bounds.size)).fill(with: .sourceAtop, alpha:1.0)
+        let image = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        
+        return UIImageView(image: image)
+    }
+}
+
