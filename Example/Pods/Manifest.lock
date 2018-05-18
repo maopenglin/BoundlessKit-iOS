@@ -1,5 +1,5 @@
 PODS:
-  - BoundlessKit (5.4.2-core)
+  - BoundlessKit (5.4.2-core2)
 
 DEPENDENCIES:
   - BoundlessKit (from `../`)
@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  BoundlessKit: cd5dc4a1d5a23840451462e24fb79c81d51705c5
+  BoundlessKit: 1aa40547fe359afd12209064e4bc101bec99661a
 
 PODFILE CHECKSUM: ec9418edc4a4b0f1661ce7ce640082caba32e229
 
