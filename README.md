@@ -1,6 +1,5 @@
 # BoundlessKit
 
-[![CI Status](http://img.shields.io/travis/cuddergambino/BoundlessKit.svg?style=flat)](https://travis-ci.org/cuddergambino/BoundlessKit)
 [![Version](https://img.shields.io/cocoapods/v/BoundlessKit.svg?style=flat)](http://cocoapods.org/pods/BoundlessKit)
 [![License](https://img.shields.io/cocoapods/l/BoundlessKit.svg?style=flat)](http://cocoapods.org/pods/BoundlessKit)
 [![Platform](https://img.shields.io/cocoapods/p/BoundlessKit.svg?style=flat)](http://cocoapods.org/pods/BoundlessKit)
