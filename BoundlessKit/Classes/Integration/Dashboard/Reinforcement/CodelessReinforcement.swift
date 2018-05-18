@@ -93,7 +93,9 @@ struct CodelessReinforcement {
                     guard let hapticFeedback = self.parameters["HapticFeedback"] as? Bool else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     guard let systemSound = self.parameters["SystemSound"] as? UInt32 else { BKLog.debug(error: "Missing parameter", visual: true); break }
                     for (view, _) in viewAndLocation {
-                        view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
+                        if #available(iOS 9.0, *) {
+                            view.showPulse(count: count, duration: duration, scale: scale, velocity: velocity, damping: damping, hapticFeedback: hapticFeedback, systemSound: systemSound, completion: completion)
+                        }
                     }
                     return
                     

@@ -150,6 +150,7 @@ public extension UIView {
         }, didStop: completion).start(view: self, animation: animation)
     }
     
+    @available(iOS 9.0, *)
     @objc
     public func showPulse(count: Float = 1, duration: TimeInterval = 0.86, scale: CGFloat = 1.4, velocity: CGFloat = 5.0, damping: CGFloat = 2.0, hapticFeedback: Bool = false, systemSound: UInt32 = 0, completion: (()->Void)? = nil) {
         
@@ -177,23 +178,29 @@ public extension UIView {
         }
         path.close()
         
+        var animationsArray = [CAAnimation]()
+
         let vibrateAnimation = CAKeyframeAnimation(keyPath: "transform.translation.x")
         vibrateAnimation.repeatCount = 1
         vibrateAnimation.duration = vibrateDuration / TimeInterval(vibrateAnimation.repeatCount)
         vibrateAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         vibrateAnimation.path = path.cgPath
         vibrateAnimation.speed = vibrateSpeed
-        
-        let scaleAnimation = CASpringAnimation(keyPath: "transform.scale")
-        scaleAnimation.repeatCount = scaleCount > 0 ? scaleCount : 1
-        scaleAnimation.duration = scaleDuration / TimeInterval(scaleAnimation.repeatCount)
-        scaleAnimation.toValue = scaleCount > 0 ? scale : 1
-        scaleAnimation.autoreverses = true
-        scaleAnimation.initialVelocity = scaleVelocity
-        scaleAnimation.damping = scaleDamping
+        animationsArray.append(vibrateAnimation)
+
+        if #available(iOS 9.0, *) {
+            let scaleAnimation = CASpringAnimation(keyPath: "transform.scale")
+            scaleAnimation.repeatCount = scaleCount > 0 ? scaleCount : 1
+            scaleAnimation.duration = scaleDuration / TimeInterval(scaleAnimation.repeatCount)
+            scaleAnimation.toValue = scaleCount > 0 ? scale : 1
+            scaleAnimation.autoreverses = true
+            scaleAnimation.initialVelocity = scaleVelocity
+            scaleAnimation.damping = scaleDamping
+            animationsArray.append(scaleAnimation)
+        }
         
         let group = CAAnimationGroup()
-        group.animations = [vibrateAnimation, scaleAnimation]
+        group.animations = animationsArray
         group.duration = max(vibrateDuration, scaleDuration)
         let oldClipsToBounds = clipsToBounds
         
@@ -263,6 +270,7 @@ public extension UIView {
         
         
         let imageView = UIImageView(image: image)
+        imageView.mask = self.generateMask()
         
         let height = self.frame.height
         let width: CGFloat =  height * 1.667
